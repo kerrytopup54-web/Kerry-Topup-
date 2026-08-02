@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kerry Topup</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Segoe UI',Arial,sans-serif;
+    background:#F6F8F5;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    text-align:center;
+  }
+  .box{max-width:360px;}
+  .icon{font-size:56px;margin-bottom:18px;}
+  h1{font-size:20px;color:#11151A;margin-bottom:10px;}
+  p{font-size:14px;color:#6B7A6E;line-height:1.6;margin-bottom:22px;}
+  button{
+    background:#0FA654;color:#fff;border:none;border-radius:12px;
+    padding:13px 26px;font-size:14px;font-weight:700;cursor:pointer;
+  }
+  .logo{font-weight:800;font-size:16px;margin-bottom:30px;color:#0FA654;}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="logo">Kerry Topup Official</div>
+    <div class="icon">📡</div>
+    <h1 id="offTitle">Pa gen koneksyon entènèt</h1>
+    <p id="offText">Sanble ou pa konekte ak entènèt kounye a. Tanpri tcheke koneksyon ou (WiFi oswa done mobil), epi eseye ankò.</p>
+    <button id="offBtn" onclick="window.location.reload()">Eseye ankò</button>
+  </div>
+<script>
+const TXT = {
+  ht: { title:'Pa gen koneksyon entènèt', text:'Sanble ou pa konekte ak entènèt kounye a. Tanpri tcheke koneksyon ou (WiFi oswa done mobil), epi eseye ankò.', btn:'Eseye ankò' },
+  fr: { title:'Pas de connexion internet', text:"Il semble que vous n'êtes pas connecté à internet. Veuillez vérifier votre connexion (WiFi ou données mobiles), puis réessayer.", btn:'Réessayer' },
+  en: { title:'No internet connection', text:'It looks like you are not connected to the internet. Please check your connection (WiFi or mobile data), then try again.', btn:'Try again' }
+};
+const saved = localStorage.getItem('kt_lang');
+const nav = (navigator.language || 'ht').toLowerCase();
+let lang = saved || (nav.startsWith('fr') ? 'fr' : (nav.startsWith('en') ? 'en' : 'ht'));
+const dict = TXT[lang] || TXT.ht;
+document.getElementById('offTitle').textContent = dict.title;
+document.getElementById('offText').textContent = dict.text;
+document.getElementById('offBtn').textContent = dict.btn;
+</script>
+</body>
+</html>
