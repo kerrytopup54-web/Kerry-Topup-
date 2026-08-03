@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Katalòg Woodflix — Kerry Topup</title>
+<style>
+  *{box-sizing:border-box;}
+  body{font-family:Arial,sans-serif;background:#F6F8F5;margin:0;padding:20px;}
+  h1{font-size:18px;color:#11151A;}
+  table{width:100%;border-collapse:collapse;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+  th, td{padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid #E3E8E0;}
+  th{background:#0FA654;color:#fff;font-size:12px;}
+  tr:hover{background:#F0F3EE;}
+  .id{font-weight:800;color:#0FA654;font-family:monospace;font-size:14px;}
+  #status{color:#6B7A6E;margin-bottom:12px;}
+  input{width:100%;padding:10px;margin-bottom:14px;border-radius:8px;border:1px solid #E3E8E0;font-size:14px;}
+</style>
+</head>
+<body>
+  <h1>📋 Katalòg Woodflix — Kerry Topup Official</h1>
+  <div id="status">Chajman katalòg la...</div>
+  <input type="text" id="searchBox" placeholder="Chèche pa non (ex: Free Fire, 110)..." oninput="filterTable()" style="display:none;">
+  <table id="catalogTable" style="display:none;">
+    <thead><tr><th>product_id</th><th>Non</th><th>Pri (USD)</th><th>Player ID?</th><th>Server ID?</th><th>Stòk</th></tr></thead>
+    <tbody id="catalogBody"></tbody>
+  </table>
+
+<script>
+const SUPABASE_URL = 'https://nzbnlecbtvbnulkknqbi.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_FuR-1uEkz6pLdwnHamIJqQ_9dkC8K_U';
+
+let fullCatalog = [];
+
+async function loadCatalog(){
+  try{
+    const res = await fetch(SUPABASE_URL + '/functions/v1/get-catalog', {
+      headers: { 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'apikey': SUPABASE_ANON_KEY }
+    });
+    const data = await res.json();
+    if(data.error){
+      document.getElementById('status').textContent = '⚠️ Erè: ' + data.error;
+      return;
+    }
+    fullCatalog = data.catalog || [];
+    document.getElementById('status').textContent = fullCatalog.length + ' pwodwi jwenn.';
+    document.getElementById('searchBox').style.display = 'block';
+    document.getElementById('catalogTable').style.display = 'table';
+    renderTable(fullCatalog);
+  }catch(e){
+    document.getElementById('status').textContent = '⚠️ Erè rezo: ' + e.message;
+  }
+}
+
+function renderTable(items){
+  document.getElementById('catalogBody').innerHTML = items.map(p => `
+    <tr>
+      <td class="id">${p.product_id}</td>
+      <td>${p.name}</td>
+      <td>${p.price}</td>
+      <td>${p.requires_player_id ? '✅' : '—'}</td>
+      <td>${p.requires_server_id ? '✅' : '—'}</td>
+      <td>${p.in_stock ? '✅' : '❌'}</td>
+    </tr>
+  `).join('');
+}
+
+function filterTable(){
+  const q = document.getElementById('searchBox').value.toLowerCase();
+  renderTable(fullCatalog.filter(p => p.name.toLowerCase().includes(q)));
+}
+
+loadCatalog();
+</script>
+</body>
+</html>
