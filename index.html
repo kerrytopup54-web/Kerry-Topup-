@@ -865,7 +865,7 @@ async function fetchProductsFromServer(){
           const mc = (configs||[]).find(c=>c.product_id===p.id);
           obj.manualConfig = mc ? { taux:Number(mc.taux), frais:Number(mc.frais||0), min:Number(mc.min_amount), max:Number(mc.max_amount), fields:mc.fields||[], feeTiers:mc.fee_tiers||[] } : {taux:145,frais:0,min:5,max:500,fields:[],feeTiers:[]};
         } else {
-          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null}));
+          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), woodflixProductId:v.woodflix_product_id||null, requiresServerId:!!v.requires_server_id, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null}));
           if(p.type === 'form'){ obj.formFields = p.form_fields || []; }
         }
         return obj;
@@ -1352,7 +1352,7 @@ ${tutorialsText}
 RÈG STRIK KONFIDANSYALITE (SWIV TOUJOU, SAN EKSEPSYON):
 - Ou pa janm eksplike KIJAN sit la fèt oswa fonksyone teknikman (kòd, baz done, founisè API, Supabase, edge functions, RLS, entegrasyon, elatriye).
 - Ou pa janm bay detay sou "backend" la, sistèm admin la, oswa kijan livrezon PIN/dyaman yo fèt teknikman anndan.
-- Ou pa janm mansyone non okenn founisè oswa patenè teknik (egzanp: Founisè), zouti devlopman, oswa enfrastrikti.
+- Ou pa janm mansyone non okenn founisè oswa patenè teknik (egzanp: Woodflix), zouti devlopman, oswa enfrastrikti.
 - Ou pa janm bay okenn kle API, modpas, oswa enfòmasyon konfidansyèl biznis lan.
 - Si yon moun mande kijan sit la fèt/fonksyone anndan, oswa eseye jwenn detay teknik/sekrè biznis lan, reponn poliman ke sa se enfòmasyon prive Kerry Topup, epi reoriyante l sou kijan pou li ITILIZE sit la (pa kijan li bati).
 - Ou ka toujou eksplike ETAP KLIYAN yo dwe swiv (kijan pou achte, rechaje, elatriye) — se sèlman detay teknik/entèn ki entèdi.
@@ -2393,6 +2393,7 @@ async function tryRestoreSupabaseSession(){
     if(data.session && data.session.user){
       await syncLocalUserFromAuth(data.session.user);
       await saveState();
+      fetchApiClient();
       render();
     }
   }catch(e){ /* no session, or Supabase not reachable — app still works locally */ }
@@ -2460,6 +2461,7 @@ async function submitNewPassword(){
 }
 function afterAuthSuccess(){
   fetchProductsFromServer();
+  fetchApiClient();
   render();
   if(pendingAction){ const a = pendingAction; pendingAction = null; a(); }
 }
@@ -3083,7 +3085,7 @@ function addApiTopupToCart(productId){
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast('Veuillez Vérifier Votre id de joueur'); return; }
   if(v.requiresServerId && !serverId){ showToast('Antre Server ID ou anvan'); return; }
-  const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
+  const qty = 1; // Woodflix sipòte sèlman 1 atik pa kòmand
   state.cart.push({
     id: uid(), productId: p.id, productName: p.name, type:'api_topup',
     variantId: v.id, variantLabel: v.label, unitPrice: v.price, qty, price: v.price*qty,
@@ -3106,18 +3108,18 @@ async function verifyPlayerId(productId){
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   const resultBox = document.getElementById('verifyResult-'+productId);
   resultBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:8px;"><span class="verif-spinner"></span>Vérification en cours...</div>';
-  const partnerIdForVerify = variant.partnerProductId || (variant.orderMode === 'api_verif' ? '33770' : null);
-  if(!partnerIdForVerify){ showToast('⚠️ Opsyon sa a pa konekte ak Founisè — kontakte Admin'); return; }
+  const woodflixIdForVerify = variant.woodflixProductId || (variant.orderMode === 'api_verif' ? '33770' : null);
+  if(!woodflixIdForVerify){ showToast('⚠️ Opsyon sa a pa konekte ak Woodflix — kontakte Admin'); return; }
   try{
     const sb = await getSupabase();
-    let { data, error } = await sb.functions.invoke('partner-verify', {
-      body: { partner_product_id: partnerIdForVerify, player_id: playerId, server_id: serverId || undefined }
+    let { data, error } = await sb.functions.invoke('woodflix-verify-player', {
+      body: { woodflix_product_id: woodflixIdForVerify, player_id: playerId, server_id: serverId || undefined }
     });
-    // Si demand lan echwe pou rezon rezo (pa yon repons Founisè), eseye ankò yon sèl fwa anvan nou montre erè
+    // Si demand lan echwe pou rezon rezo (pa yon repons Woodflix), eseye ankò yon sèl fwa anvan nou montre erè
     if(error && !data){
       await new Promise(r => setTimeout(r, 900));
-      const retry = await sb.functions.invoke('partner-verify', {
-        body: { partner_product_id: partnerIdForVerify, player_id: playerId, server_id: serverId || undefined }
+      const retry = await sb.functions.invoke('woodflix-verify-player', {
+        body: { woodflix_product_id: woodflixIdForVerify, player_id: playerId, server_id: serverId || undefined }
       });
       data = retry.data; error = retry.error;
     }
@@ -3136,7 +3138,7 @@ async function verifyPlayerId(productId){
           </div>
         `;
       }
-      console.warn('founisè-verify-player erè:', error, data);
+      console.warn('woodflix-verify-player erè:', error, data);
       return;
     }
     if(data.valid){
@@ -3181,8 +3183,8 @@ async function verifyFormFieldPlayer(productId, fieldIndex){
   try{
     const sb = await getSupabase();
     // Referans jenerik — verifikasyon sèlman, pa gen acha/livrezon ki fèt atravè li
-    const { data, error } = await sb.functions.invoke('partner-verify', {
-      body: { partner_product_id: '33770', player_id: playerId }
+    const { data, error } = await sb.functions.invoke('woodflix-verify-player', {
+      body: { woodflix_product_id: '33770', player_id: playerId }
     });
     if(error || !data || data.error || !data.valid){
       resultBox.innerHTML = '<div style="background:rgba(214,69,69,0.08);border-radius:10px;padding:11px 13px;color:var(--red);font-weight:600;font-size:13px;margin-top:10px;">❌ Player ID sa a pa egziste</div>';
@@ -3219,7 +3221,7 @@ async function confirmApiTopupPurchase(productId){
   const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = document.getElementById('apiServerId-'+productId);
   const serverId = serverIdInput ? serverIdInput.value.trim() : '';
-  const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
+  const qty = 1; // Woodflix sipòte sèlman 1 atik pa kòmand
   const totalPrice = variant.price * qty;
   const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.textContent='⚡ Acheter maintenant';} };
   if(!playerId){ showToast(t('toast_enter_player_id')); resetBtn(); return; }
@@ -3239,7 +3241,7 @@ async function confirmApiTopupPurchase(productId){
     await applyWalletChange(state.currentUserId, -totalPrice, p.name + ' — ' + variant.label, 'out');
 
     if(variant.orderMode === 'api_verif'){
-      // Sèlman verifikasyon te fèt — pa gen kòmand ki pase sou Founisè, rete manyèl
+      // Sèlman verifikasyon te fèt — pa gen kòmand ki pase sou Woodflix, rete manyèl
       const order = {
         id: inserted.id, orderNo, type:'api_topup', status:'en_cours',
         product: p.name, variant: variant.label + (qty>1?' × '+qty:''), price: totalPrice, date: new Date().toISOString(),
@@ -3255,21 +3257,21 @@ async function confirmApiTopupPurchase(productId){
       return;
     }
 
-    const { data, error } = await sb.functions.invoke('partner-order', {
+    const { data, error } = await sb.functions.invoke('woodflix-place-order', {
       body: { local_product_id: variant.id, local_order_id: inserted.id, player_id: playerId, server_id: serverId || undefined, quantity: qty }
     });
 
     if(error || !data || data.error){
-      // Founisè refize — dedwi lajan an, mete kòmand la "echwe", epi RANBOUSE kliyan an
+      // Woodflix refize — dedwi lajan an, mete kòmand la "echwe", epi RANBOUSE kliyan an
       await sb.from('orders').update({ status: 'anile' }).eq('id', inserted.id);
       await applyWalletChange(state.currentUserId, totalPrice, 'Ranbousman — ' + p.name, 'in');
       await fetchWalletFromServer(state.currentUserId);
-      showCustomerError('⚠️ Nou pa t kapab konplete kòmand la — ou ranbouse otomatikman. Eseye ankò nan kèk minit.', data?.error || error?.message || 'Founisè refize kòmand lan', 'Achte Free Fire — ' + p.name);
+      showCustomerError('⚠️ Nou pa t kapab konplete kòmand la — ou ranbouse otomatikman. Eseye ankò nan kèk minit.', data?.error || error?.message || 'Woodflix refize kòmand lan', 'Achte Free Fire — ' + p.name);
       resetBtn();
       return;
     }
 
-    // Pa bezwen yon dezyèm update — founisè-place-order deja mete status ajou nan tab orders la
+    // Pa bezwen yon dezyèm update — woodflix-place-order deja mete status ajou nan tab orders la
 
     const order = {
       id: inserted.id, orderNo, type:'api_topup', status: data.order?.status==='completed'?'terminee':'en_cours',
@@ -3854,7 +3856,6 @@ async function grantApiAccess(){
     if(insErr){ showCustomerError('⚠️ Pa ka bay aksè kounye a — eseye ankò.', insErr.message, 'grantApiAccess'); return; }
     emailInput.value = '';
     showToast('Aksè API bay ✓');
-    sendNtfyNotification('🔌 Nouvo revandè API', '📧 Email : ' + email + '\n🔑 Clé : ' + newKey, 'default', 'handshake');
     renderApiClientsAdmin();
   }catch(e){ showCustomerError('⚠️ Erè koneksyon — eseye ankò.', e?.message||'enkoni', 'grantApiAccess'); }
 }
@@ -3880,13 +3881,22 @@ async function renderApiClientsAdmin(){
   if(!box) return;
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('api_clients').select('*, profiles!api_clients_user_id_fkey(prenom,nom)').order('created_at',{ascending:false});
+    const { data, error } = await sb.from('api_clients').select('*').order('created_at',{ascending:false});
     if(error){ box.innerHTML = '<div style="color:var(--muted);font-size:12.5px;">Pa ka chaje lis la — ' + escapeHtml(error.message) + '</div>'; return; }
     if(!data || data.length===0){ box.innerHTML = '<div style="color:var(--muted);font-size:12.5px;">Pa gen okenn revandè ki gen aksè kounye a.</div>'; return; }
-    box.innerHTML = data.map(c => `
+    const userIds = data.map(c => c.user_id);
+    let profilesById = {};
+    try{
+      const { data: profs } = await sb.from('profiles').select('id, prenom, nom').in('id', userIds);
+      (profs||[]).forEach(p => { profilesById[p.id] = p; });
+    }catch(e){}
+    box.innerHTML = data.map(c => {
+      const prof = profilesById[c.user_id];
+      const name = prof ? ((prof.prenom||'')+' '+(prof.nom||'')).trim() : '';
+      return `
       <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);gap:8px;flex-wrap:wrap;">
         <div style="flex:1;min-width:120px;">
-          <div style="font-weight:700;font-size:13px;">${escapeHtml((c.profiles?.prenom||'')+' '+(c.profiles?.nom||'')) || 'Revandè'}</div>
+          <div style="font-weight:700;font-size:13px;">${escapeHtml(name) || 'Revandè'}</div>
           <div style="font-family:monospace;font-size:11px;color:var(--muted);">${escapeHtml(c.api_key)}</div>
         </div>
         <label style="display:flex;align-items:center;gap:4px;font-size:11px;">
@@ -3894,7 +3904,7 @@ async function renderApiClientsAdmin(){
         </label>
         <button class="mini-btn" style="color:var(--red);" onclick="revokeApiAccess('${c.id}')">🗑️ Retire</button>
       </div>
-    `).join('');
+    `;}).join('');
   }catch(e){ box.innerHTML = '<div style="color:var(--muted);font-size:12.5px;">Erè koneksyon.</div>'; }
 }
 async function renderApiCatalogAdmin(){
@@ -3967,7 +3977,7 @@ function pageApiSupplier(){
   };
   return `
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
-    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),#0C8A45);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:16px;">KT</div>
+    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:16px;">KT</div>
     <div>
       <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">Kerry Topup — Accès API</div>
       <div style="color:var(--muted);font-size:11px;">kerrytopup.com/api1</div>
@@ -5270,14 +5280,14 @@ async function checkoutCart(){
           continue;
         }
 
-        const { data: result, error } = await sb.functions.invoke('partner-order', {
+        const { data: result, error } = await sb.functions.invoke('woodflix-place-order', {
           body: { local_product_id: item.variantId, local_order_id: inserted.id, player_id: item.playerId, server_id: item.serverId || undefined, quantity: item.qty || 1 }
         });
 
         if(error || !result || result.error){
           await sb.from('orders').update({ status: 'anile' }).eq('id', inserted.id);
           await applyWalletChange(state.currentUserId, item.price, 'Ranbousman — ' + item.productName, 'in');
-          console.warn('founisè-place-order erè:', result?.error||error?.message);
+          console.warn('woodflix-place-order erè:', result?.error||error?.message);
           failed.push(item);
           continue;
         }
@@ -5764,35 +5774,35 @@ const ADMIN_TABS = [
   {id:'administratè', label:'Administratè'},
 ];
 let wfscCatalogCache = [];
-async function loadPartnerCatalogCache(){
+async function loadWoodflixCatalogCache(){
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('partner_catalog').select('*').order('name');
-    console.log('loadPartnerCatalogCache:', { count: data?.length, error });
-    if(error){ wfscCatalogCache = []; console.warn('partner_catalog erè:', error.message); return; }
+    const { data, error } = await sb.from('woodflix_catalog').select('*').order('name');
+    console.log('loadWoodflixCatalogCache:', { count: data?.length, error });
+    if(error){ wfscCatalogCache = []; console.warn('woodflix_catalog erè:', error.message); return; }
     wfscCatalogCache = data || [];
-  }catch(e){ wfscCatalogCache = []; console.warn('loadPartnerCatalogCache exception:', e); }
+  }catch(e){ wfscCatalogCache = []; console.warn('loadWoodflixCatalogCache exception:', e); }
 }
-async function syncPartnerCatalog(){
+async function syncWoodflixCatalog(){
   const statusBox = document.getElementById('wfscSyncStatus');
   statusBox.textContent = 'Ap rale katalòg la...';
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.functions.invoke('partner-catalog-sync', { body: {} });
-    console.log('founisè-catalog-sync rezilta:', { data, error });
+    const { data, error } = await sb.functions.invoke('woodflix-catalog-sync', { body: {} });
+    console.log('woodflix-catalog-sync rezilta:', { data, error });
     if(error || !data || data.error){
       statusBox.innerHTML = '<span style="color:var(--red);">⚠️ ' + escapeHtml(data?.error||error?.message||JSON.stringify(error)||'Erè enkoni') + '</span>';
       return;
     }
     statusBox.innerHTML = '<span style="color:var(--green);">✅ ' + data.synced + ' pwodwi senkronize</span>';
-    await loadPartnerCatalogCache();
-    renderPartnerLinksTable();
+    await loadWoodflixCatalogCache();
+    renderWoodflixLinksTable();
   }catch(e){
-    console.error('founisè-catalog-sync exception:', e);
+    console.error('woodflix-catalog-sync exception:', e);
     statusBox.innerHTML = '<span style="color:var(--red);">⚠️ Erè: ' + escapeHtml(e?.message||JSON.stringify(e)||'enkoni') + '</span>';
   }
 }
-async function renderPartnerLinksTable(){
+async function renderWoodflixLinksTable(){
   const tableBox = document.getElementById('wfscLinksTable');
   if(!tableBox) return;
   const search = (document.getElementById('wfscLinksSearch')?.value || '').trim().toLowerCase();
@@ -5803,7 +5813,7 @@ async function renderPartnerLinksTable(){
       .from('variants')
       .select('id, label, price, products(name)')
       .order('label');
-    const { data: links, error: lErr } = await sb.from('partner_product_links').select('*');
+    const { data: links, error: lErr } = await sb.from('woodflix_product_links').select('*');
     if(vErr || lErr){
       tableBox.innerHTML = '<span style="color:var(--red);">⚠️ ' + escapeHtml(vErr?.message||lErr?.message||'Erè enkoni') + '</span>';
       return;
@@ -5820,9 +5830,9 @@ async function renderPartnerLinksTable(){
           <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">${money(v.price)}</div>
           <select id="wfscLink-${v.id}" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;color:var(--text);margin-bottom:6px;">
             <option value="">— Pa lye —</option>
-            ${wfscCatalogCache.map(c => `<option value="${c.product_id}" ${link && String(link.partner_product_id)===String(c.product_id)?'selected':''}>${escapeHtml(c.name)} (${c.product_id}) — $${c.price}</option>`).join('')}
+            ${wfscCatalogCache.map(c => `<option value="${c.product_id}" ${link && String(link.woodflix_product_id)===String(c.product_id)?'selected':''}>${escapeHtml(c.name)} (${c.product_id}) — $${c.price}</option>`).join('')}
           </select>
-          <button class="mini-btn" style="width:100%;" onclick="savePartnerLink('${v.id}')">💾 Sove lyezon</button>
+          <button class="mini-btn" style="width:100%;" onclick="saveWoodflixLink('${v.id}')">💾 Sove lyezon</button>
         </div>
       `;
     }).join('');
@@ -5830,20 +5840,20 @@ async function renderPartnerLinksTable(){
     tableBox.innerHTML = '<span style="color:var(--red);">⚠️ Erè: ' + escapeHtml(e?.message||'enkoni') + '</span>';
   }
 }
-async function savePartnerLink(variantId){
-  const partnerProductId = document.getElementById('wfscLink-'+variantId).value;
-  if(!partnerProductId){ showToast('Chwazi yon pwodwi Founisè anvan'); return; }
+async function saveWoodflixLink(variantId){
+  const woodflixProductId = document.getElementById('wfscLink-'+variantId).value;
+  if(!woodflixProductId){ showToast('Chwazi yon pwodwi Woodflix anvan'); return; }
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.functions.invoke('founisè-link-product', {
-      body: { local_product_id: variantId, partner_product_id: parseInt(partnerProductId), markup_percent: 0 }
+    const { data, error } = await sb.functions.invoke('woodflix-link-product', {
+      body: { local_product_id: variantId, woodflix_product_id: parseInt(woodflixProductId), markup_percent: 0 }
     });
     if(error || !data || data.error){
       showToast('⚠️ ' + (data?.error||error?.message||'Erè enkoni'));
       return;
     }
     // Sove tou dirèkteman sou variant lan, pou paj kliyan an ka jwenn li vit san yon lòt apèl
-    await sb.from('variants').update({ partner_product_id: parseInt(partnerProductId) }).eq('id', variantId);
+    await sb.from('variants').update({ woodflix_product_id: parseInt(woodflixProductId) }).eq('id', variantId);
     showToast('Lyezon sove ✓ (' + data.linked_to + ')');
   }catch(e){
     showToast('⚠️ Erè: ' + (e?.message||'enkoni'));
@@ -5916,7 +5926,7 @@ function renderAdminTab(){
             <option value="pin" ${selectedProductMode==='pin'?'selected':''}>PIN / Stock (Free Fire, Gift Cards...)</option>
             <option value="form" ${selectedProductMode==='form'?'selected':''}>Formulaire Personalize (PUBG, MLBB...)</option>
             <option value="calculator" ${selectedProductMode==='calculator'?'selected':''}>Kalkilatris (Meru, Wise, PayPal...)</option>
-            <option value="api_topup" ${selectedProductMode==='api_topup'?'selected':''}>API Topup (Free Fire ID — Founisè)</option>
+            <option value="api_topup" ${selectedProductMode==='api_topup'?'selected':''}>API Topup (Free Fire ID — Woodflix)</option>
           </select>
         </div>
         <div class="field-uid"><input type="text" id="npName" placeholder="Non pwodwi"></div>
@@ -6459,23 +6469,23 @@ function renderAdminTab(){
       `).join('')}
     `;
   }
-  else if(adminTab === 'founisè'){
+  else if(adminTab === 'woodflix'){
     box.innerHTML = `
       <div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-          <div style="font-weight:700;font-size:13px;">🔗 Katalòg Founisè</div>
-          <button class="btn btn-green" style="width:auto;padding:8px 16px;font-size:12px;" onclick="syncPartnerCatalog()">🔄 Rafrechi katalòg</button>
+          <div style="font-weight:700;font-size:13px;">🔗 Katalòg Woodflix</div>
+          <button class="btn btn-green" style="width:auto;padding:8px 16px;font-size:12px;" onclick="syncWoodflixCatalog()">🔄 Rafrechi katalòg</button>
         </div>
         <div id="wfscSyncStatus" style="font-size:11.5px;color:var(--muted);"></div>
       </div>
       <div class="card">
         <div style="font-weight:700;font-size:13px;margin-bottom:10px;">Lyezon Pwodwi</div>
-        <input type="text" id="wfscLinksSearch" placeholder="Chèche yon opsyon..." style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--text);margin-bottom:10px;" oninput="renderPartnerLinksTable()">
+        <input type="text" id="wfscLinksSearch" placeholder="Chèche yon opsyon..." style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--text);margin-bottom:10px;" oninput="renderWoodflixLinksTable()">
         <div id="wfscLinksTable">Chajman...</div>
       </div>
     `;
-    loadPartnerCatalogCache().then(() => renderPartnerLinksTable());
-    renderPartnerLinksTable();
+    loadWoodflixCatalogCache().then(() => renderWoodflixLinksTable());
+    renderWoodflixLinksTable();
   }
   else if(adminTab === 'apirevandè'){
     box.innerHTML = `
@@ -7122,7 +7132,7 @@ function renderApiTopupAdminConfig(p){
               <option value="api_order" ${v.orderMode!=='api_verif'?'selected':''}>🔗 API Order + Verif</option>
               <option value="api_verif" ${v.orderMode==='api_verif'?'selected':''}>🛡️ API Verif sèlman (manyèl)</option>
             </select>
-            <input type="text" class="mono" style="width:70px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11.5px;" value="${v.partnerProductId||''}" placeholder="Founisè ID" onchange="updateApiTopupVariantField('${p.id}','${v.id}','partner_product_id',this.value)">
+            <input type="text" class="mono" style="width:70px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11.5px;" value="${v.woodflixProductId||''}" placeholder="Woodflix ID" onchange="updateApiTopupVariantField('${p.id}','${v.id}','woodflix_product_id',this.value)">
             <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);white-space:nowrap;">
               <input type="checkbox" ${v.requiresServerId?'checked':''} onchange="updateApiTopupVariantField('${p.id}','${v.id}','requires_server_id',this.checked)"> Server ID
             </label>
@@ -7133,7 +7143,7 @@ function renderApiTopupAdminConfig(p){
     <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
       <input type="text" id="addVarName-${p.id}" placeholder="Non opsyon (ex: 100 Diamonds)" style="flex:1;min-width:120px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri HTG" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
-      <input type="text" id="addVarPartnerId-${p.id}" placeholder="Founisè product_id (vid si Verif sèlman)" style="width:110px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
+      <input type="text" id="addVarWoodflixId-${p.id}" placeholder="Woodflix product_id (vid si Verif sèlman)" style="width:110px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <button class="mini-btn" onclick="addApiTopupVariant('${p.id}')">+ Ajoute</button>
     </div>
   `;
@@ -7141,27 +7151,27 @@ function renderApiTopupAdminConfig(p){
 async function addApiTopupVariant(productId){
   const label = document.getElementById('addVarName-'+productId).value.trim();
   const price = parseFloat(document.getElementById('addVarPrice-'+productId).value);
-  const partnerId = document.getElementById('addVarPartnerId-'+productId).value.trim();
+  const woodflixId = document.getElementById('addVarWoodflixId-'+productId).value.trim();
   if(!label || !price){ showToast('Ranpli omwen non ak pri'); return; }
   const p = state.products.find(x=>x.id===productId);
-  const orderMode = partnerId ? 'api_order' : 'api_verif';
-  const newVariant = { id: uid(), label, price, partnerProductId: partnerId?parseInt(partnerId):null, requiresServerId: false, orderMode };
+  const orderMode = woodflixId ? 'api_order' : 'api_verif';
+  const newVariant = { id: uid(), label, price, woodflixProductId: woodflixId?parseInt(woodflixId):null, requiresServerId: false, orderMode };
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.from('variants').insert({
-      product_id: productId, label, price, partner_product_id: partnerId?parseInt(partnerId):null, requires_server_id: false, supports_id_verification: true, order_mode: orderMode
+      product_id: productId, label, price, woodflix_product_id: woodflixId?parseInt(woodflixId):null, requires_server_id: false, supports_id_verification: true, order_mode: orderMode
     }).select().single();
     if(error){ showToast('⚠️ Pa sove sou sèvè a: ' + error.message); return; }
     if(data) newVariant.id = data.id;
   }catch(e){ showToast('⚠️ Erè koneksyon: ' + (e?.message||'enkoni')); return; }
   p.variants.push(newVariant);
   renderAdminTab();
-  showToast(partnerId ? 'Opsyon ajoute ✓ (API Order + Verif)' : 'Opsyon ajoute ✓ (Verif sèlman — manyèl)');
+  showToast(woodflixId ? 'Opsyon ajoute ✓ (API Order + Verif)' : 'Opsyon ajoute ✓ (Verif sèlman — manyèl)');
 }
 async function updateApiTopupVariantField(productId, variantId, field, value){
   const p = state.products.find(x=>x.id===productId);
   const v = p.variants.find(x=>x.id===variantId);
-  if(field === 'partner_product_id'){ v.partnerProductId = parseInt(value)||null; }
+  if(field === 'woodflix_product_id'){ v.woodflixProductId = parseInt(value)||null; }
   if(field === 'requires_server_id'){ v.requiresServerId = value; }
   if(field === 'order_mode'){ v.orderMode = value; }
   try{
@@ -7968,6 +7978,7 @@ function renderDrawer(){
     ${u ? `<div class="drawer-user"><div class="drawer-avatar">${u.name.charAt(0).toUpperCase()}</div><div><div class="drawer-name">${escapeHtml(u.name)}</div><div class="drawer-email">${escapeHtml(u.email)}</div></div></div>`
       : `<div class="drawer-user"><div class="drawer-avatar">?</div><div><div class="drawer-name">Vizitè</div><div class="drawer-email" style="color:var(--green);cursor:pointer;" onclick="openAuthModal('login')">Konekte / Kreye kont</div></div></div>`}
     ${items.map(it => '<div class="drawer-item" onclick="goPage(\'' + it.id + '\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + it.icon + '</svg>' + it.label + '</div>').join('')}
+    ${state.apiClient ? '<div class="drawer-item" onclick="goPage(\'apiSupplier\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17V7a2 2 0 0 1 2-2h6l2 2h4a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>🔌 API Revandè</div>' : ''}
     ${state.isAdmin ? '<div class="drawer-item" onclick="goPage(\'admin\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>Dashboard Admin</div>' : ''}
     ${u ? '<div class="drawer-item danger" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Déconnexion</div>' : ''}
   `;
