@@ -244,9 +244,10 @@ input,textarea,select{font-family:'Inter',sans-serif;}
   display:flex;justify-content:center;
 }
 .bottomnav-inner{
-  width:100%;max-width:1200px;background:rgba(10,13,11,0.92);backdrop-filter:blur(12px);
+  width:100%;max-width:1200px;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);
   border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));
 }
+html.dark .bottomnav-inner{background:rgba(22,27,34,0.92);}
 @media (min-width:640px){
   .bottomnav-inner{padding-left:32px;padding-right:32px;}
 }
@@ -259,6 +260,9 @@ input,textarea,select{font-family:'Inter',sans-serif;}
 .nav-btn svg{width:20px;height:20px;}
 .nav-btn span{font-size:9.5px;font-weight:600;}
 .nav-btn.active{color:var(--green);}
+.nav-btn .icon-wrap{padding:5px 14px;border-radius:12px;transition:background 0.15s;}
+.nav-btn.active .icon-wrap{background:var(--green-dim);margin-bottom:1px;}
+.nav-btn.active span{font-weight:800;}
 
 /* ---------- Auth modal ---------- */
 .modal-bg{position:fixed;inset:0;background:rgba(4,6,5,0.7);z-index:90;display:none;align-items:center;justify-content:center;padding:20px;}
@@ -463,8 +467,30 @@ textarea.admin-ta{
 .skel-card{ background:var(--panel); border-radius:14px; padding:10px; }
 .skel-img{ width:100%; aspect-ratio:1; border-radius:10px; background:linear-gradient(90deg, var(--panel-2) 25%, #e8ebee 37%, var(--panel-2) 63%); background-size:400px 100%; animation:skelShimmer 1.4s infinite linear; }
 .skel-line{ border-radius:6px; background:linear-gradient(90deg, var(--panel-2) 25%, #e8ebee 37%, var(--panel-2) 63%); background-size:400px 100%; animation:skelShimmer 1.4s infinite linear; }
+
+/* ===== Régénérer les identifiants API ===== */
+.regen-danger{background:#fff5f5;border:1px solid #ff9f9f;border-radius:18px;padding:20px;margin-bottom:22px;}
+.regen-danger h3{color:#c93232;margin:0 0 8px;font-size:15px;}
+.regen-danger p{margin:0;line-height:1.5;font-size:13px;color:#17202a;}
+.regen-card{background:#fff;border:1px solid #e2eae5;border-radius:20px;padding:22px;margin-bottom:22px;box-shadow:0 5px 18px #163b2410;}
+.regen-step{font-size:20px;font-weight:800;display:flex;align-items:center;gap:10px;margin-bottom:12px;color:#17202a;font-family:'Rajdhani',sans-serif;}
+.regen-num{width:32px;height:32px;border-radius:50%;background:#00c968;color:#fff;display:grid;place-items:center;flex-shrink:0;font-size:16px;}
+.regen-help{color:#66716d;line-height:1.5;font-size:13px;margin:0 0 12px;}
+.regen-word{background:#f1faf5;border:1px solid #cdebdc;color:#079c55;text-align:center;font-size:21px;font-weight:900;padding:15px;border-radius:13px;}
+.regen-input{width:100%;height:54px;margin-top:12px;border:1px solid #d4dfd9;border-radius:13px;padding:0 15px;font-size:16px;outline:0;box-sizing:border-box;color:#17202a;}
+.regen-input:focus{border-color:#00c968;box-shadow:0 0 0 3px #00c96820;}
+.regen-btn{width:100%;height:55px;margin-top:13px;border:0;border-radius:13px;background:#00b95e;color:#fff;font-size:16px;font-weight:800;box-sizing:border-box;}
+.regen-btn:disabled{background:#e0e6e2!important;color:#78827e!important;}
+.regen-status{background:#fff9e8;border:1px solid #f0df9d;border-radius:14px;padding:16px;color:#79652c;margin-bottom:15px;font-size:13px;}
+.regen-rows{border:1px solid #e2eae5;border-radius:14px;overflow:hidden;}
+.regen-row{display:flex;justify-content:space-between;gap:10px;padding:16px;border-bottom:1px solid #e2eae5;font-size:14px;color:#17202a;}
+.regen-row:last-child{border:0;}
+.regen-badge{background:#e5f8ef;color:#07844a;border-radius:999px;padding:5px 9px;font-weight:800;font-size:12.5px;}
+.regen-info{margin-top:15px;background:#f1f8ff;border:1px solid #c9e1ff;border-radius:14px;padding:16px;line-height:1.6;font-size:13px;color:#17202a;}
+.regen-info ul{margin:6px 0 0;padding-left:18px;}
+.regen-secure{text-align:center;background:#eefaf3;color:#4d896f;padding:14px;border-radius:13px;margin-bottom:0;font-size:13px;}
 </style>
-<script>(function(){ try{ if(localStorage.getItem('kt_dark')==='1'){ document.documentElement.classList.add('dark'); } }catch(e){} })();</script>
+<script>(function(){ try{ localStorage.removeItem('kt_dark'); document.documentElement.classList.remove('dark'); }catch(e){} })();</script>
 </head>
 <body>
 <div id="videoPopupBg" style="display:none;position:fixed;inset:0;background:rgba(4,6,5,0.75);z-index:9000;align-items:center;justify-content:center;padding:16px;"></div>
@@ -528,6 +554,9 @@ textarea.admin-ta{
     <button style="background:#00D26A;color:#fff;border:none;border-radius:20px;padding:8px 18px;font-size:12.5px;font-weight:700;flex-shrink:0;" onclick="triggerPWAInstall()">Installer</button>
     <button onclick="dismissInstallBanner()" style="background:none;border:none;color:#111827;font-size:18px;font-weight:700;padding:0 4px;flex-shrink:0;">✕</button>
   </div>
+
+  <!-- ===== IMAJ PWODWI (deyò .content, san padding) ===== -->
+  <div id="productHeroWrap"></div>
 
   <!-- ===== CONTENT ===== -->
   <div class="content" id="content"></div>
@@ -2169,6 +2198,7 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
       await sb.from('profiles').insert({ id: authUser.id, name, email: authUser.email, is_admin: authUser.email===ADMIN_EMAIL, is_super_admin: authUser.email===ADMIN_EMAIL });
     }catch(e){ /* best-effort — row may already exist from a race, or RLS may need adjustment */ }
     await grantWelcomeBonusIfEligible(authUser.id, authUser.email);
+    sendNtfyNotification('🆕 Nouvo kliyan', '👤 Non : ' + name + '\n📧 Imèl : ' + authUser.email, 'default', 'bust_in_silhouette');
   } else {
     try{ await sb.from('profiles').update({ email: authUser.email }).eq('id', authUser.id); }catch(e){ /* non-blocking backfill */ }
   }
@@ -2347,7 +2377,6 @@ async function doRegister(){
     await saveState();
     closeAuthModal();
     showToast('Byenveni ' + name + ' 👋');
-    sendNtfyNotification('🆕 Nouvo kliyan', '👤 Non : ' + name + '\n📧 Imèl : ' + email, 'default', 'bust_in_silhouette');
     afterAuthSuccess();
   }catch(e){
     console.error('Erè enskripsyon:', e);
@@ -2556,9 +2585,23 @@ function render(){
   else if(currentPage === 'conditions') body = pageInfoFull('terms', 'Conditions');
   else if(currentPage === 'notifications') body = pageNotifications();
   else if(currentPage === 'apiSupplier') body = pageApiSupplier();
+  else if(currentPage === 'apiRegenerate') body = pageApiRegenerate();
   else if(currentPage && currentPage.indexOf('custompage:')===0) body = pageCustomInfo(currentPage.slice('custompage:'.length));
   c.innerHTML = '<div id="pageBodyWrap" style="flex:1;display:flex;flex-direction:column;">' + body + '</div>';
+  const heroWrap = document.getElementById('productHeroWrap');
+  if(currentPage === 'product'){
+    const p = state.products.find(x=>x.id===viewingProductId);
+    heroWrap.innerHTML = p && p.image ? `
+      <div style="position:relative;width:100%;height:220px;background:#0B0F0C;">
+        <img src="${p.image.replace(/"/g,'')}" alt="${escapeHtml(p.name)}" style="width:100%;height:100%;object-fit:cover;display:block;">
+        <button onclick="goPage('shop')" style="position:absolute;top:12px;left:12px;z-index:5;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.92);border:none;border-radius:50%;width:38px;height:38px;box-shadow:0 2px 8px rgba(0,0,0,0.25);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#11151A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+      </div>
+    ` : '';
+  } else {
+    heroWrap.innerHTML = '';
+  }
   if(currentPage === 'wallet') renderWalletTab();
+  startRegenCountdownIfPresent();
   if(currentPage === 'shop') renderShop();
   if(currentPage === 'admin') renderAdminTab();
   if(currentPage !== 'admin') c.innerHTML += renderFooter();
@@ -2682,6 +2725,7 @@ function getUnseenNotifCount(){
 function pageNotifications(){
   const items = getNotifItems();
   if(!state.seenNotifIds) state.seenNotifIds = [];
+  const unseenSnapshot = items.filter(n => !state.seenNotifIds.includes(n.id)).map(n=>n.id);
   const STATUS_META = {
     processing: { bar:'#3B82F6', icon:'⏳', badgeIcon:'🔵', badgeText:'Processing', badgeColor:'#3B82F6' },
     complete: { bar:'#22C55E', icon:'check', badgeIcon:'✅', badgeText:'Konplè', badgeColor:'#22C55E' },
@@ -2689,19 +2733,24 @@ function pageNotifications(){
   };
   const renderItem = (n) => {
     const meta = STATUS_META[n.status] || STATUS_META.processing;
+    const isUnread = unseenSnapshot.includes(n.id);
     const iconHtml = meta.icon === 'check'
       ? `<div style="width:36px;height:36px;border-radius:10px;background:#22C55E;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`
       : `<div style="width:36px;height:36px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">${meta.icon}</div>`;
     return `
-    <div style="position:relative;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 40px 14px 16px;margin-bottom:10px;border-left:4px solid ${meta.bar};">
+    <div style="position:relative;background:${isUnread?'var(--green-dim)':'var(--panel)'};border:1px solid ${isUnread?'var(--green)':'var(--line)'};border-radius:14px;padding:14px 40px 14px 16px;margin-bottom:10px;border-left:4px solid ${meta.bar};">
       <button onclick="dismissNotif('${n.id}')" style="position:absolute;top:12px;right:12px;width:22px;height:22px;border:none;background:none;color:var(--muted);font-size:16px;cursor:pointer;">✕</button>
       <div style="display:flex;gap:12px;">
         ${iconHtml}
         <div style="flex:1;min-width:0;">
-          <div style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:3px;">${escapeHtml(n.title)}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+            ${isUnread ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>' : ''}
+            <div style="font-size:14px;font-weight:${isUnread?'800':'600'};color:var(--text);">${escapeHtml(n.title)}</div>
+          </div>
           <div style="font-size:12.5px;color:var(--muted);line-height:1.4;">${escapeHtml(n.text)}</div>
           <div style="font-size:11.5px;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:5px;">
             ${timeAgoText(n.date)} · <span>${meta.badgeIcon}</span> <span style="color:${meta.badgeColor};font-weight:700;">${meta.badgeText}</span>
+            ${isUnread ? '<span style="margin-left:auto;color:var(--green);font-weight:800;font-size:10.5px;">NOUVO</span>' : ''}
           </div>
         </div>
       </div>
@@ -2719,9 +2768,7 @@ function pageNotifications(){
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
       </button>
       <h2 style="font-family:'Rajdhani',sans-serif;font-size:20px;margin:0;">Notifikasyon</h2>
-      <button class="icon-btn" id="darkModeBtn" onclick="toggleDarkMode()" style="width:40px;height:40px;border-radius:50%;background:var(--panel-2);">
-        <svg id="darkModeIcon" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-      </button>
+      <div style="width:40px;"></div>
     </div>
     <p style="color:var(--muted);font-size:12.5px;margin:-10px 0 16px;">${items.length} notifikasyon</p>
     <div style="display:flex;gap:10px;margin-bottom:16px;">
@@ -2823,7 +2870,7 @@ function renderBottomNav(){
   const nav = document.getElementById('bottomNav');
   nav.innerHTML = NAV_ITEMS.map(it =>
     '<button class="nav-btn ' + (currentPage===it.id?'active':'') + '" onclick="goPage(\'' + it.id + '\')">' +
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + it.icon + '</svg>' +
+    '<div class="icon-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + it.icon + '</svg></div>' +
     '<span>' + it.label + '</span></button>'
   ).join('');
 }
@@ -2953,7 +3000,8 @@ function openProduct(productId, opts){
   if(!p) return;
   viewingProductId = productId;
   if(p.type === 'form' || p.type === 'pin' || p.type === 'api_topup' || !p.type){
-    selectedVariantId = p.variants[0] ? p.variants[0].id : null;
+    const sv = sortedVariants(p);
+    selectedVariantId = sv[0] ? sv[0].id : null;
   }
   currentPage = 'product';
   render();
@@ -3014,7 +3062,7 @@ function pageProduct(){
   else if(p.type === 'api_topup'){ inner = renderApiTopupSheet(p); }
   else { inner = renderVariantSheet(p); }
   inner = inner.replace('<div class="sheet-handle"></div>', '');
-  return `<button onclick="goPage('shop')" style="display:inline-flex;align-items:center;gap:6px;background:var(--panel-2);border:1px solid var(--line);border-radius:20px;color:var(--text);padding:8px 14px;font-size:12.5px;font-weight:600;margin-bottom:14px;width:auto;">🚪 Retounen</button>${inner}`;
+  return `${p.image ? '' : '<button onclick="goPage(\'shop\')" style="display:inline-flex;align-items:center;gap:6px;background:var(--panel-2);border:1px solid var(--line);border-radius:20px;color:var(--text);padding:8px 14px;font-size:12.5px;font-weight:600;margin-bottom:14px;width:auto;">🚪 Retounen</button>'}${inner}`;
 }
 function renderApiTopupSheet(p){
   const sv = sortedVariants(p);
@@ -3023,7 +3071,7 @@ function renderApiTopupSheet(p){
   const selected = p.variants.find(v=>v.id===selectedVariantId) || sv[0];
   return `
     <div class="sheet-handle"></div>
-    ${p.image ? `<img src="${p.image.replace(/"/g,'')}" alt="${escapeHtml(p.name)}" style="width:100%;max-height:160px;object-fit:contain;border-radius:14px;margin-bottom:12px;background:var(--panel-2);">` : ''}
+    
     <h3>${p.image?'':escapeHtml(p.icon)+' '}${escapeHtml(p.name)}</h3>
     <div class="sub">${p.description ? escapeHtml(p.description) : 'Rechaje kont ou rapid'}</div>
     ${renderDescriptionBlocks(p, 'above')}
@@ -3100,7 +3148,7 @@ function addApiTopupToCart(productId){
 async function verifyPlayerId(productId){
   const p = state.products.find(x=>x.id===productId);
   let variant = p.variants.find(v=>v.id===selectedVariantId);
-  if(!variant && p.variants.length > 0){ variant = p.variants[0]; selectedVariantId = variant.id; }
+  if(!variant && p.variants.length > 0){ variant = sortedVariants(p)[0]; selectedVariantId = variant.id; }
   if(!variant){ showToast('⚠️ Pa gen opsyon disponib pou pwodwi sa a — kontakte Admin'); return; }
   const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = document.getElementById('apiServerId-'+productId);
@@ -3216,7 +3264,7 @@ async function confirmApiTopupPurchase(productId){
   if(buyBtn){ buyBtn.disabled = true; buyBtn.style.opacity = '0.6'; buyBtn.textContent = '⏳ Ap trete...'; }
   const p = state.products.find(x=>x.id===productId);
   let variant = p.variants.find(v=>v.id===selectedVariantId);
-  if(!variant && p.variants.length > 0){ variant = p.variants[0]; selectedVariantId = variant.id; }
+  if(!variant && p.variants.length > 0){ variant = sortedVariants(p)[0]; selectedVariantId = variant.id; }
   if(!variant){ showToast('⚠️ Pa gen opsyon disponib pou pwodwi sa a — kontakte Admin'); if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.textContent='⚡ Acheter maintenant';} return; }
   const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = document.getElementById('apiServerId-'+productId);
@@ -3297,7 +3345,7 @@ function renderFormSheet(p){
   const minP = Math.min(...prices), maxP = Math.max(...prices);
   return `
     <div class="sheet-handle"></div>
-    ${p.image ? `<img src="${p.image.replace(/"/g,'')}" alt="${escapeHtml(p.name)}" style="width:100%;max-height:160px;object-fit:contain;border-radius:14px;margin-bottom:12px;background:var(--panel-2);">` : ''}
+    
     <h3>${p.image?'':escapeHtml(p.icon)+' '}${escapeHtml(p.name)}</h3>
     <div class="sub">${p.description ? escapeHtml(p.description) : 'Chwazi opsyon w vle achte a'}</div>
     ${renderDescriptionBlocks(p, 'above')}
@@ -3395,7 +3443,7 @@ function renderVariantSheet(p){
   const minP = Math.min(...prices), maxP = Math.max(...prices);
   return `
     <div class="sheet-handle"></div>
-    ${p.image ? `<img src="${p.image.replace(/"/g,'')}" alt="${escapeHtml(p.name)}" style="width:100%;max-height:160px;object-fit:contain;border-radius:14px;margin-bottom:12px;background:var(--panel-2);">` : ''}
+    
     <h3>${p.image?'':escapeHtml(p.icon)+' '}${escapeHtml(p.name)}</h3>
     <div class="sub">${p.description ? escapeHtml(p.description) : 'Chwazi opsyon w vle achte a'}</div>
     ${renderDescriptionBlocks(p, 'above')}
@@ -3429,7 +3477,7 @@ function renderManualSheet(p){
   const c = p.manualConfig || {taux:145, frais:2, min:5, max:500, fields:[]};
   return `
     <div class="sheet-handle"></div>
-    ${p.image ? `<img src="${p.image.replace(/"/g,'')}" alt="${escapeHtml(p.name)}" style="width:100%;max-height:160px;object-fit:contain;border-radius:14px;margin-bottom:12px;background:var(--panel-2);">` : ''}
+    
     <h3>${p.image?'':escapeHtml(p.icon)+' '}${escapeHtml(p.name)}</h3>
     <div class="sub">${p.description ? escapeHtml(p.description) : 'Ranpli enfòmasyon yo pou kontinye'}</div>
     ${renderDescriptionBlocks(p, 'above')}
@@ -3779,7 +3827,7 @@ async function fetchApiClient(){
     const sb = await getSupabase();
     const { data, error } = await sb.from('api_clients').select('*').eq('user_id', state.currentUserId).maybeSingle();
     if(error){ console.warn('fetchApiClient erè:', error.message); state.apiClientLoaded = true; if(currentPage==='apiSupplier') render(); return; }
-    state.apiClient = data ? { id:data.id, apiKey:data.api_key, apiSecret:data.api_secret, active:data.active } : null;
+    state.apiClient = data ? { id:data.id, apiKey:data.api_key, apiSecret:data.api_secret, active:data.active, regeneratedAt:data.regenerated_at||null } : null;
     state.apiClientLoaded = true;
     if(state.apiClient) await fetchApiOrders();
     if(currentPage === 'apiSupplier') render();
@@ -3824,17 +3872,44 @@ function testApiConnection(){
   box.style.color = 'var(--green,#0FA654)';
   box.innerHTML = '✅ Connexion réussie — solde : ' + money(walletBalance());
 }
+let regenCountdownInterval = null;
+function startRegenCountdownIfPresent(){
+  if(regenCountdownInterval){ clearInterval(regenCountdownInterval); regenCountdownInterval = null; }
+  const pill = document.getElementById('regenCooldownPill');
+  if(!pill) return;
+  const until = parseInt(pill.dataset.until, 10);
+  const tick = () => {
+    const remaining = until - Date.now();
+    if(remaining <= 0){
+      clearInterval(regenCountdownInterval); regenCountdownInterval = null;
+      render();
+      return;
+    }
+    const h = String(Math.floor(remaining/3600000)).padStart(2,'0');
+    const m = String(Math.floor((remaining%3600000)/60000)).padStart(2,'0');
+    const s = String(Math.floor((remaining%60000)/1000)).padStart(2,'0');
+    const el = document.getElementById('regenCooldownText');
+    if(el) el.textContent = h+':'+m+':'+s;
+  };
+  tick();
+  regenCountdownInterval = setInterval(tick, 1000);
+}
 async function regenerateApiCredentials(){
   if(!state.apiClient) return;
-  if(!confirm('Si w régénère, ANSYEN kle/sekrè yo p ap mache ankò. Nenpòt entegrasyon k ap itilize yo ap sispann fonksyone jiskaske w mete nouvo yo. Kontinye?')) return;
+  if(state.apiClient.regeneratedAt){
+    const elapsed = Date.now() - new Date(state.apiClient.regeneratedAt).getTime();
+    if(elapsed < 24*60*60*1000){ showToast('⏳ Ou deja régénère jodi a — eseye ankò demen'); return; }
+  }
   const newKey = generateApiKey();
   const newSecret = generateApiSecret();
+  const now = new Date().toISOString();
   try{
     const sb = await getSupabase();
-    const { error } = await sb.from('api_clients').update({ api_key:newKey, api_secret:newSecret }).eq('id', state.apiClient.id);
+    const { error } = await sb.from('api_clients').update({ api_key:newKey, api_secret:newSecret, regenerated_at:now }).eq('id', state.apiClient.id);
     if(error){ showCustomerError('⚠️ Pa ka régénère kle yo kounye a — eseye ankò.', error.message, 'Régénérer kle API'); return; }
     state.apiClient.apiKey = newKey;
     state.apiClient.apiSecret = newSecret;
+    state.apiClient.regeneratedAt = now;
     showToast('Nouvo kle API jenere ✓');
     render();
   }catch(e){ showCustomerError('⚠️ Pa ka régénère kle yo kounye a — eseye ankò.', e?.message||'enkoni', 'Régénérer kle API'); }
@@ -4007,10 +4082,16 @@ function pageApiSupplier(){
       <button class="mini-btn" onclick="copyApiField('secret')">📋</button>
     </div>
 
-    <button class="btn" style="width:100%;background:var(--ink);color:#fff;margin-bottom:10px;" onclick="testApiConnection()">🛰️ Tester la connexion</button>
+    <button class="btn" style="width:100%;background:var(--ink);color:#fff;margin-bottom:14px;" onclick="testApiConnection()">🛰️ Tester la connexion</button>
     <div id="apiTestResult" style="display:none;padding:12px;border-radius:10px;text-align:center;font-weight:700;font-size:13px;margin-bottom:14px;"></div>
-
-    <div style="color:var(--muted);font-size:12.5px;font-weight:600;cursor:pointer;" onclick="regenerateApiCredentials()">▶ Régénérer les identifiants</div>
+    ${(() => {
+      const lastRegen = c.regeneratedAt ? new Date(c.regeneratedAt) : null;
+      const cooldownMs = lastRegen ? (24*60*60*1000) - (Date.now() - lastRegen.getTime()) : 0;
+      if(cooldownMs > 0){
+        return `<div id="regenCooldownPill" data-until="${lastRegen.getTime() + 24*60*60*1000}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff9e8;border:1px solid #f0df9d;border-radius:10px;padding:11px 13px;font-size:13px;color:#79652c;font-weight:700;">🔄 Réinitialisation dans <b id="regenCooldownText" style="font-family:'Rajdhani',sans-serif;font-weight:800;color:#c93232;">--:--:--</b></div>`;
+      }
+      return `<div onclick="goPage('apiRegenerate')" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--text);font-weight:700;cursor:pointer;">▶ Régénérer les identifiants</div>`;
+    })()}
   </div>
 
   <div class="card">
@@ -4039,6 +4120,49 @@ function pageApiSupplier(){
     `}
   </div>
   `}
+  `;
+}
+function pageApiRegenerate(){
+  const c = state.apiClient;
+  if(!c) return `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">Ou pa gen aksè API</div></div>`;
+  const lastRegen = c.regeneratedAt ? new Date(c.regeneratedAt) : null;
+  const cooldownMs = lastRegen ? (24*60*60*1000) - (Date.now() - lastRegen.getTime()) : 0;
+  const onCooldown = cooldownMs > 0;
+  return `
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+    <button onclick="goPage('apiSupplier')" style="background:var(--panel-2);border:1px solid var(--line);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:16px;">←</button>
+    <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">Régénérer les identifiants API</div>
+  </div>
+
+  <div class="regen-danger">
+    <h3>⚠️ Attention importante</h3>
+    <p>Régénérer vos identifiants remplacera immédiatement votre clé API et votre secret. Toute intégration existante cessera de fonctionner jusqu'à ce que vous mettiez à jour les nouveaux identifiants.</p>
+  </div>
+
+  <div class="regen-card">
+    <div class="regen-step"><span class="regen-num">1</span>Confirmer l'action</div>
+    ${onCooldown ? `
+      <div id="regenCooldownPill" data-until="${lastRegen.getTime() + 24*60*60*1000}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff9e8;border:1px solid #f0df9d;border-radius:10px;padding:14px;font-size:14px;color:#79652c;font-weight:700;">🔄 Réinitialisation dans <b id="regenCooldownText" style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:18px;color:#c93232;">--:--:--</b></div>
+    ` : `
+      <p class="regen-help">Pour des raisons de sécurité, tapez le mot ci-dessous pour confirmer que vous souhaitez régénérer vos identifiants.</p>
+      <div class="regen-word">REGENERER</div>
+      <input id="regenConfirmInput" class="regen-input" placeholder="Tapez REGENERER ici" autocomplete="off" oninput="document.getElementById('regenBtn').disabled = this.value.trim().toUpperCase() !== 'REGENERER'">
+      <button id="regenBtn" class="regen-btn" disabled onclick="regenerateApiCredentials()">🔒 Régénérer maintenant</button>
+    `}
+  </div>
+
+  <div class="regen-card">
+    <div class="regen-step"><span class="regen-num">2</span>Statut des identifiants</div>
+    <div class="regen-status">⌛ &nbsp; <b>${c.regeneratedAt ? 'Déjà régénéré' : 'Non encore régénéré'}</b><br>Vos identifiants actuels sont actifs.</div>
+    <div class="regen-rows">
+      <div class="regen-row"><span>🔑 &nbsp; Clé API</span><span class="regen-badge">Actif ✓</span></div>
+      <div class="regen-row"><span>🛡️ &nbsp; Secret API</span><span class="regen-badge">Actif ✓</span></div>
+      <div class="regen-row"><span>📅 &nbsp; Dernière mise à jour</span><span>${c.regeneratedAt ? new Date(c.regeneratedAt).toLocaleString('fr-FR',{dateStyle:'long',timeStyle:'short'}) : '—'}</span></div>
+    </div>
+    <div class="regen-info"><b>ⓘ &nbsp; À savoir</b><ul><li>Les nouveaux identifiants seront générés immédiatement.</li><li>Copiez-les et mettez à jour votre intégration sans délai.</li><li>Les anciens identifiants ne fonctionneront plus après la régénération.</li></ul></div>
+  </div>
+
+  <div class="regen-secure">🔒 &nbsp; Sécurisé à 100% • Vos données sont protégées</div>
   `;
 }
 function pageWallet(){
@@ -4417,7 +4541,7 @@ async function submitRecharge(){
   try{
     const sb = await getSupabase();
     const { error } = await sb.from('recharge_requests').insert({
-      id: req.id, user_id: req.userId, amount: req.amount, txn_id: req.txnId, ref: req.ref,
+      user_id: req.userId, amount: req.amount, txn_id: req.txnId, ref: req.ref,
       status: req.status, ocr_checks: req.ocrChecks, receipt_hash: req.receiptHash, proof_url: proofPath
     });
     if(error){
@@ -4439,7 +4563,7 @@ async function submitRecharge(){
     try{
       const sb = await getSupabase();
       const { error: retryErr } = await sb.from('recharge_requests').insert({
-        id: uid(), user_id: req.userId, amount: req.amount, txn_id: req.txnId, ref: req.ref,
+        user_id: req.userId, amount: req.amount, txn_id: req.txnId, ref: req.ref,
         status: 'a_verifier', ocr_checks: req.ocrChecks, receipt_hash: req.receiptHash, proof_url: proofPath
       });
       if(retryErr){ console.warn('recharge_requests retry insert failed:', retryErr.message); }
