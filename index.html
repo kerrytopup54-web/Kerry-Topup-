@@ -1494,14 +1494,16 @@ async function incrementRewardProgress(userId, variantId){
       const current = state.rewardProgress[program.id] || 0;
       const newCount = current + 1;
       if(newCount >= program.purchasesRequired){
-        await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:0, updated_at:new Date().toISOString() });
+        const { error } = await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:0, updated_at:new Date().toISOString() });
+        if(error){ console.warn('incrementRewardProgress upsert (reset) erè:', error.message); sendNtfyNotification('⚠️ Erè Reward', 'Pa ka sove pwogrè rekonpans (reset): ' + error.message, 'high', 'warning'); continue; }
         state.rewardProgress[program.id] = 0;
         await claimRewardForProgram(userId, program);
       } else {
-        await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:newCount, updated_at:new Date().toISOString() });
+        const { error } = await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:newCount, updated_at:new Date().toISOString() });
+        if(error){ console.warn('incrementRewardProgress upsert erè:', error.message); sendNtfyNotification('⚠️ Erè Reward', 'Pa ka sove pwogrè rekonpans: ' + error.message, 'high', 'warning'); continue; }
         state.rewardProgress[program.id] = newCount;
       }
-    }catch(e){ console.warn('incrementRewardProgress failed:', e?.message || e); }
+    }catch(e){ console.warn('incrementRewardProgress failed:', e?.message || e); sendNtfyNotification('⚠️ Erè Reward', 'Exception: ' + (e?.message||e), 'high', 'warning'); }
   }
 }
 async function claimRewardForProgram(userId, program){
@@ -2515,7 +2517,7 @@ let activeCategory = 'Tout';
 function slugify(name){
   return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 }
-const PAGE_PATHS = { shop:'/', wallet:'/wallet', commandes:'/commandes', redeem:'/redeem', historique:'/historique', parametres:'/parametres', panye:'/panier', admin:'/admin', tutoriel:'/tutoriel', checkout:'/checkout', kerryRewards:'/programme-fidelite', suspended:'/suspendu', aboutUs:'/a-propos', conditions:'/conditions', notifications:'/notifications' };
+const PAGE_PATHS = { shop:'/', wallet:'/wallet', commandes:'/commandes', redeem:'/redeem', historique:'/historique', parametres:'/parametres', panye:'/panier', admin:'/admin', tutoriel:'/tutoriel', checkout:'/checkout', kerryRewards:'/programme-fidelite', suspended:'/suspendu', aboutUs:'/a-propos', conditions:'/conditions', notifications:'/notifications', apiSupplier:'/api1', apiRegenerate:'/api1/regenerer' };
 const PATH_PAGES = { '/':'shop', '/wallet':'wallet', '/commandes':'commandes', '/redeem':'redeem', '/historique':'historique', '/parametres':'parametres', '/panier':'panye', '/admin':'admin', '/tutoriel':'tutoriel', '/checkout':'checkout', '/programme-fidelite':'kerryRewards', '/suspendu':'suspended', '/a-propos':'aboutUs', '/conditions':'conditions', '/notifications':'notifications', '/api1':'apiSupplier' };
 let pendingProductSlug = null;
 
@@ -3828,8 +3830,14 @@ async function fetchApiClient(){
     const { data, error } = await sb.from('api_clients').select('*').eq('user_id', state.currentUserId).maybeSingle();
     if(error){ console.warn('fetchApiClient erè:', error.message); state.apiClientLoaded = true; if(currentPage==='apiSupplier') render(); return; }
     state.apiClient = data ? { id:data.id, apiKey:data.api_key, apiSecret:data.api_secret, active:data.active, regeneratedAt:data.regenerated_at||null } : null;
+    if(state.apiClient){
+      try{
+        const { data: profile } = await sb.from('profiles').select('name').eq('id', state.currentUserId).maybeSingle();
+        state.apiClient.resellerName = profile?.name || 'Revandè';
+      }catch(e){ state.apiClient.resellerName = 'Revandè'; }
+      await fetchApiOrders();
+    }
     state.apiClientLoaded = true;
-    if(state.apiClient) await fetchApiOrders();
     if(currentPage === 'apiSupplier') render();
   }catch(e){ console.warn('fetchApiClient exception:', e?.message||e); state.apiClientLoaded = true; }
 }
@@ -3951,6 +3959,72 @@ async function toggleApiClientActive(clientId, val){
     showToast(val ? 'Aksè reaktive ✓' : 'Aksè sispann ✓');
   }catch(e){}
 }
+let apiClientProductsView = null;
+function openApiClientProducts(clientId, clientName){
+  apiClientProductsView = { id: clientId, name: clientName };
+  renderAdminTab();
+}
+async function renderApiClientProductsAdmin(){
+  const box = document.getElementById('apiClientProductsTable');
+  if(!box || !apiClientProductsView) return;
+  const search = (document.getElementById('apiClientProductSearch')?.value || '').toLowerCase();
+  try{
+    const sb = await getSupabase();
+    const { data: assigned, error: aErr } = await sb.from('api_client_products').select('api_product_id, price').eq('api_client_id', apiClientProductsView.id);
+    if(aErr){ box.innerHTML = '<div style="color:var(--red);font-size:12.5px;">⚠️ ' + escapeHtml(aErr.message) + '</div>'; return; }
+    const assignedMap = {};
+    (assigned||[]).forEach(a => { assignedMap[a.api_product_id] = a.price; });
+
+    const rows = [];
+    state.products.forEach(p => (p.variants||[]).forEach(v => {
+      if(!v.apiProductId) return;
+      if(search && !(p.name+' '+v.label).toLowerCase().includes(search)) return;
+      rows.push({ productName:p.name, label:v.label, apiProductId:v.apiProductId, retailPrice:v.price });
+    }));
+
+    if(rows.length===0){ box.innerHTML = '<div style="color:var(--muted);font-size:12.5px;">Pa gen opsyon ki gen ID API konfigire toujou. Ale nan "Opsyon disponib atravè API" pou aktive yo premye.</div>'; return; }
+
+    box.innerHTML = rows.map(r => {
+      const checked = assignedMap.hasOwnProperty(r.apiProductId);
+      const price = checked ? assignedMap[r.apiProductId] : '';
+      return `
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--line);flex-wrap:wrap;">
+        <input type="checkbox" ${checked?'checked':''} onchange="toggleApiClientProduct(${r.apiProductId},this.checked)">
+        <div style="flex:1;min-width:100px;font-size:12.5px;">
+          ${escapeHtml(r.productName)} — ${escapeHtml(r.label)}
+          <div style="color:var(--muted);font-size:10.5px;">Detay: ${money(r.retailPrice)} · ID: ${r.apiProductId}</div>
+        </div>
+        <input type="text" inputmode="decimal" placeholder="Pri" value="${price}" ${checked?'':'disabled style="opacity:0.4;"'} style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12px;" onchange="updateApiClientProductPrice(${r.apiProductId},this.value)">
+      </div>
+    `;}).join('');
+  }catch(e){ box.innerHTML = '<div style="color:var(--red);font-size:12.5px;">⚠️ Erè koneksyon.</div>'; }
+}
+async function toggleApiClientProduct(apiProductId, checked){
+  if(!apiClientProductsView) return;
+  try{
+    const sb = await getSupabase();
+    if(checked){
+      const { error } = await sb.from('api_client_products').upsert({ api_client_id: apiClientProductsView.id, api_product_id: apiProductId, price: 0 }, { onConflict:'api_client_id,api_product_id' });
+      if(error){ showToast('⚠️ ' + error.message); return; }
+    } else {
+      const { error } = await sb.from('api_client_products').delete().eq('api_client_id', apiClientProductsView.id).eq('api_product_id', apiProductId);
+      if(error){ showToast('⚠️ ' + error.message); return; }
+    }
+    showToast(checked ? 'Ajoute pou revandè sa a ✓' : 'Retire pou revandè sa a ✓');
+    renderApiClientProductsAdmin();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+async function updateApiClientProductPrice(apiProductId, value){
+  if(!apiClientProductsView) return;
+  const price = parseFloat(value);
+  if(isNaN(price)){ showToast('⚠️ Antre yon pri valab'); return; }
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('api_client_products').update({ price }).eq('api_client_id', apiClientProductsView.id).eq('api_product_id', apiProductId);
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    showToast('Pri sove ✓');
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
 async function renderApiClientsAdmin(){
   const box = document.getElementById('apiClientsList');
   if(!box) return;
@@ -3968,18 +4042,31 @@ async function renderApiClientsAdmin(){
     box.innerHTML = data.map(c => {
       const prof = profilesById[c.user_id];
       const name = prof ? ((prof.prenom||'')+' '+(prof.nom||'')).trim() : '';
+      const displayName = name || 'Revandè';
+      const initials = displayName.split(' ').map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase() || 'RV';
       return `
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);gap:8px;flex-wrap:wrap;">
-        <div style="flex:1;min-width:120px;">
-          <div style="font-weight:700;font-size:13px;">${escapeHtml(name) || 'Revandè'}</div>
-          <div style="font-family:monospace;font-size:11px;color:var(--muted);">${escapeHtml(c.api_key)}</div>
+      <div style="background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;">
+        <div class="apiClientRow" data-client-id="${c.id}" data-client-name="${escapeHtml(displayName)}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding-bottom:10px;margin-bottom:10px;border-bottom:1px dashed var(--line);">
+          <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),#0C8A45);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:14px;flex-shrink:0;">${escapeHtml(initials)}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:700;font-size:13.5px;">${escapeHtml(displayName)}</div>
+            <div style="font-family:monospace;font-size:10.5px;color:var(--muted);">${escapeHtml(c.api_key)}</div>
+          </div>
+          <div style="color:var(--muted);font-size:20px;flex-shrink:0;">›</div>
         </div>
-        <label style="display:flex;align-items:center;gap:4px;font-size:11px;">
-          <input type="checkbox" ${c.active?'checked':''} onchange="toggleApiClientActive('${c.id}',this.checked)"> Aktif
-        </label>
-        <button class="mini-btn" style="color:var(--red);" onclick="revokeApiAccess('${c.id}')">🗑️ Retire</button>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;">
+            <input type="checkbox" ${c.active?'checked':''} onchange="toggleApiClientActive('${c.id}',this.checked)"> Aktif
+          </label>
+          <button class="mini-btn" style="color:var(--red);" onclick="revokeApiAccess('${c.id}')">🗑️ Retire aksè</button>
+        </div>
       </div>
     `;}).join('');
+    box.querySelectorAll('.apiClientRow').forEach(row => {
+      row.addEventListener('click', () => {
+        openApiClientProducts(row.dataset.clientId, row.dataset.clientName);
+      });
+    });
   }catch(e){ box.innerHTML = '<div style="color:var(--muted);font-size:12.5px;">Erè koneksyon.</div>'; }
 }
 async function renderApiCatalogAdmin(){
@@ -4050,12 +4137,14 @@ function pageApiSupplier(){
     const [label,bg,fg] = map[s] || [s,'var(--panel-2)','var(--muted)'];
     return `<span style="background:${bg};color:${fg};padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;">${label}</span>`;
   };
+  const resellerName = c && c.resellerName ? c.resellerName : 'Revandè';
+  const initials = resellerName.split(' ').map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase() || 'KT';
   return `
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
-    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:16px;">KT</div>
+    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:16px;">${escapeHtml(initials)}</div>
     <div>
-      <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">Kerry Topup — Accès API</div>
-      <div style="color:var(--muted);font-size:11px;">kerrytopup.com/api1</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">${escapeHtml(resellerName)} — Accès API</div>
+      <div style="color:var(--muted);font-size:11px;">Connecté en tant que ${escapeHtml(resellerName)}</div>
     </div>
   </div>
 
@@ -6612,6 +6701,20 @@ function renderAdminTab(){
     renderFounisèLinksTable();
   }
   else if(adminTab === 'apirevandè'){
+    if(apiClientProductsView){
+      box.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button class="mini-btn" onclick="apiClientProductsView=null;renderAdminTab();">← Retounen</button>
+          <div style="font-weight:800;font-size:14px;">Pwodwi — ${escapeHtml(apiClientProductsView.name)}</div>
+        </div>
+        <div class="card">
+          <input type="text" id="apiClientProductSearch" placeholder="Chèche yon opsyon..." style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--text);margin-bottom:10px;" oninput="renderApiClientProductsAdmin()">
+          <div id="apiClientProductsTable">Chajman...</div>
+        </div>
+      `;
+      renderApiClientProductsAdmin();
+      return;
+    }
     box.innerHTML = `
       <div class="card">
         <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🔌 Bay aksè API</div>
@@ -6621,11 +6724,12 @@ function renderAdminTab(){
         </div>
       </div>
       <div class="card">
-        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">👥 Revandè ki gen aksè</div>
+        <div style="font-weight:700;font-size:13px;margin-bottom:6px;">👥 Revandè ki gen aksè</div>
+        <div style="color:var(--muted);font-size:11.5px;margin-bottom:10px;">Peze sou non yon revandè pou chwazi pwodwi/pri espesifik pou LI sèlman.</div>
         <div id="apiClientsList">Chajman...</div>
       </div>
       <div class="card">
-        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">💲 Opsyon disponib atravè API</div>
+        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">💲 Opsyon disponib atravè API (global)</div>
         <input type="text" id="apiCatalogSearch" placeholder="Chèche yon opsyon..." style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--text);margin-bottom:10px;" oninput="renderApiCatalogAdmin()">
         <div id="apiCatalogTable">Chajman...</div>
       </div>
@@ -7800,10 +7904,11 @@ function renderPromoBanner(){
   if(banners.length === 0){ box.innerHTML = ''; return; }
   promoBannerIndex = 0;
   box.innerHTML = `
-    <div style="position:relative;border-radius:16px;overflow:hidden;margin-bottom:16px;aspect-ratio:16/7;background:var(--panel-2);">
+    <div class="cat-heading" style="margin:0 0 10px;"><div class="bar"></div><h3>📣 Pub</h3><div class="line"></div></div>
+    <div style="position:relative;border-radius:16px;overflow:hidden;margin-bottom:16px;width:100%;aspect-ratio:16/9;height:auto;background:var(--panel-2);">
       ${banners.map((b,i) => `
         <a href="${b.linkUrl ? escapeHtml(b.linkUrl) : '#'}" ${b.linkUrl ? 'target="_blank"' : 'onclick="return false;"'} style="position:absolute;inset:0;opacity:${i===0?1:0};transition:opacity 0.6s ease;" data-banner-slide="${i}">
-          <img src="${b.imageUrl.replace(/"/g,'')}" style="width:100%;height:100%;object-fit:cover;display:block;">
+          <img src="${b.imageUrl.replace(/"/g,'')}" style="width:100%;height:100%;object-fit:contain;display:block;">
         </a>
       `).join('')}
       ${banners.length>1 ? `
