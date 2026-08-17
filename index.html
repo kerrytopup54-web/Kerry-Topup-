@@ -464,6 +464,32 @@ textarea.admin-ta{
 }
 @keyframes offlineBarMove { 0%{ transform:translateX(-100px); } 50%{ transform:translateX(180px); } 100%{ transform:translateX(-100px); } }
 @keyframes skelShimmer { 0%{ background-position:-200px 0; } 100%{ background-position:200px 0; } }
+@keyframes spin { to{ transform:rotate(360deg); } }
+
+/* ===== Bwat Kado Rekonpans ===== */
+.gift-wrap{ text-align:center; cursor:pointer; padding:20px 10px; }
+.gift-box-icon{ font-size:52px; display:inline-block; animation: giftShake 1.6s ease-in-out infinite; filter: drop-shadow(0 8px 14px rgba(15,166,84,0.35)); }
+@keyframes giftShake{
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  10% { transform: rotate(-8deg) scale(1.03); }
+  20% { transform: rotate(8deg) scale(1.03); }
+  30% { transform: rotate(-6deg); }
+  40% { transform: rotate(6deg); }
+  50% { transform: rotate(-3deg); }
+  60% { transform: rotate(3deg); }
+  70%, 100% { transform: rotate(0deg) scale(1); }
+}
+.gift-label{ font-family:'Rajdhani',sans-serif; font-weight:800; font-size:14px; margin-top:10px; color:var(--text); }
+.gift-sub{ font-size:11px; color:var(--muted); margin-top:2px; }
+.gift-reveal-card{ background:linear-gradient(180deg, var(--panel) 0%, var(--green-dim,#EAFBF1) 100%); border:1px solid var(--line); border-radius:16px; padding:18px; text-align:center; animation: giftPopIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes giftPopIn{ 0%{ transform:scale(0.7); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+.gift-reveal-icon{ font-size:34px; margin-bottom:4px; }
+.gift-reveal-title{ font-family:'Rajdhani',sans-serif; font-weight:800; font-size:15px; color:var(--green); margin-bottom:2px; }
+.gift-reveal-sub{ font-size:11px; color:var(--muted); margin-bottom:12px; }
+.gift-pin-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--panel); border:1.5px dashed var(--green); border-radius:10px; padding:10px 12px; }
+.gift-pin-code{ font-family:'Rajdhani',sans-serif; font-weight:800; font-size:14px; letter-spacing:0.04em; }
+.gift-copy-btn{ background:var(--green); color:#fff; border:none; border-radius:8px; padding:7px 12px; font-weight:700; font-size:11px; flex-shrink:0; transition:background 0.2s; }
+.gift-claim-btn{ width:100%; margin-top:10px; background:var(--green); color:#fff; border:none; border-radius:10px; padding:11px; font-weight:700; font-size:12.5px; }
 .skel-card{ background:var(--panel); border-radius:14px; padding:10px; }
 .skel-img{ width:100%; aspect-ratio:1; border-radius:10px; background:linear-gradient(90deg, var(--panel-2) 25%, #e8ebee 37%, var(--panel-2) 63%); background-size:400px 100%; animation:skelShimmer 1.4s infinite linear; }
 .skel-line{ border-radius:6px; background:linear-gradient(90deg, var(--panel-2) 25%, #e8ebee 37%, var(--panel-2) 63%); background-size:400px 100%; animation:skelShimmer 1.4s infinite linear; }
@@ -577,15 +603,19 @@ textarea.admin-ta{
   Je suis là pour t'aider 🐶
   <div style="position:absolute;bottom:-6px;right:20px;width:12px;height:12px;background:#fff;transform:rotate(45deg);"></div>
 </div>
-<button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶</button>
+<button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶<span id="supportFabBadge" style="display:none;position:absolute;top:2px;right:2px;width:12px;height:12px;background:#E23B57;border-radius:50%;border:2px solid #fff;"></span></button>
 <div id="supportChatBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:70;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)toggleSupportChat()">
   <div style="width:100%;max-width:480px;background:var(--panel);border-radius:18px 18px 0 0;height:65vh;max-height:520px;display:flex;flex-direction:column;overflow:hidden;">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);flex-shrink:0;">
-      <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;"><span style="font-size:20px;">🐶</span> Touski Bot</div>
+      <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;"><span style="font-size:20px;">🐶</span> Touski Bot <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:2px;">👤 Ajan</span></div>
       <button onclick="toggleSupportChat()" style="background:none;border:none;font-size:18px;color:var(--muted);">✕</button>
     </div>
     <div id="supportChatMessages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
+    <div id="supportHumanRow" style="display:flex;gap:6px;padding:8px 14px;border-top:1px solid var(--line);flex-shrink:0;">
+      <button onclick="requestHumanAgent()" id="supportHumanBtn" style="flex:1;background:#E3EEFC;color:#1565D8;border:1px solid #1565D8;border-radius:14px;padding:8px 10px;font-size:11.5px;font-weight:700;">💬 Pale ak yon moun</button>
+    </div>
     <div style="display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);flex-shrink:0;">
+      <label style="width:38px;height:38px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;cursor:pointer;">📷<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
       <input type="text" id="supportChatInput" placeholder="Ekri kesyon ou..." style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:10px 14px;color:var(--text);font-size:13px;" onkeydown="if(event.key==='Enter')sendSupportMessage()">
       <button onclick="sendSupportMessage()" style="background:var(--green);color:#fff;border:none;border-radius:20px;padding:10px 18px;font-size:13px;font-weight:600;">Voye</button>
     </div>
@@ -683,6 +713,7 @@ async function tryAdminLogin(){
     const sub = state.admins.find(a=>a.passcode===val && a.email===email);
     if(sub){
       state.isAdmin = true; state.isSuperAdmin = false;
+      state.currentAdminPerms = sub.perms || {};
       closeAuthModal();
       goPage('admin');
       showToast('⚠️ Kont sa a pa gen vrè otantifikasyon Supabase — chanjman ap rete lokal sèlman');
@@ -821,6 +852,10 @@ let state = {
   paymentSettings: { number: '42614967', name: 'CADET VANSKERRY', whatsapp: '50942614967', ntfyTopic: '' },
   rewardPrograms: [],
   rewardProgress: {},
+  referralData: null,
+  supportAgentActive: true,
+  currentAdminPerms: null,
+  rewardCycle: null,
   rewardClaims: [],
   rewardPending: [],
   rewardStock: {},
@@ -894,7 +929,7 @@ async function fetchProductsFromServer(){
           const mc = (configs||[]).find(c=>c.product_id===p.id);
           obj.manualConfig = mc ? { taux:Number(mc.taux), frais:Number(mc.frais||0), min:Number(mc.min_amount), max:Number(mc.max_amount), fields:mc.fields||[], feeTiers:mc.fee_tiers||[] } : {taux:145,frais:0,min:5,max:500,fields:[],feeTiers:[]};
         } else {
-          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null}));
+          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null, equivalenceGroup:v.equivalence_group||null}));
           if(p.type === 'form'){ obj.formFields = p.form_fields || []; }
         }
         return obj;
@@ -1008,7 +1043,8 @@ function toggleTutorialAccordionV2(id){
 async function fetchTutorialVideos(){
   try{
     const sb = await getSupabase();
-    const { data } = await sb.from('tutorial_videos').select('*');
+    const { data, error } = await sb.from('tutorial_videos').select('*');
+    if(error){ console.warn('fetchTutorialVideos erè:', error.message); sendNtfyNotification('⚠️ Erè Videyo', 'Pa ka chaje videyo tutoryèl yo: ' + error.message, 'high', 'warning'); return; }
     if(data){
       state.tutorialVideos = data.map(v => ({ id:v.id, title:v.title, videoUrl:v.video_url, contextType:v.context_type, productId:v.product_id }));
       if(currentPage === 'tutoriel') render();
@@ -1101,7 +1137,15 @@ async function uploadTutorialVideo(){
 }
 async function deleteTutorialVideo(id){
   openConfirm('Efase videyo sa a?', 'Aksyon sa a pa ka anile.', async ()=>{
-    try{ const sb = await getSupabase(); await sb.from('tutorial_videos').delete().eq('id', id); }catch(e){}
+    try{
+      const sb = await getSupabase();
+      const { data: vid } = await sb.from('tutorial_videos').select('video_url').eq('id', id).maybeSingle();
+      await sb.from('tutorial_videos').delete().eq('id', id);
+      if(vid?.video_url){
+        const match = vid.video_url.match(/\/storage\/v1\/object\/public\/tutorial-videos\/(.+)$/);
+        if(match) await sb.storage.from('tutorial-videos').remove([decodeURIComponent(match[1])]);
+      }
+    }catch(e){ console.warn('deleteTutorialVideo storage cleanup failed:', e?.message||e); }
     await fetchTutorialVideos();
     renderAdminTab();
     showToast('Videyo efase');
@@ -1272,12 +1316,128 @@ setTimeout(showSupportFabBubble, 6000);
 setInterval(showSupportFabBubble, 45000);
 let supportChatHistory = [];
 const SUPPORT_FN_URL = 'https://nzbnlecbtvbnulkknqbi.supabase.co/functions/v1/support-chat-';
-function toggleSupportChat(){
+let supportMode = 'bot'; // 'bot' oswa 'human'
+let supportConversationId = null;
+let supportRealtimeChannel = null;
+
+async function getOrRestoreSupportConversation(){
+  // Kliyan konekte → chèche pa user_id. Kliyan pa konekte → chèche pa ID sove nan localStorage.
+  try{
+    const sb = await getSupabase();
+    let convo = null;
+    if(state.currentUserId){
+      const { data } = await sb.from('support_conversations').select('*').eq('user_id', state.currentUserId).eq('status','human').order('created_at',{ascending:false}).limit(1).maybeSingle();
+      convo = data;
+    } else {
+      const savedId = localStorage.getItem('kt_support_convo_id');
+      if(savedId){
+        const { data } = await sb.from('support_conversations').select('*').eq('id', savedId).eq('status','human').maybeSingle();
+        convo = data;
+      }
+    }
+    if(convo){
+      supportConversationId = convo.id;
+      supportMode = 'human';
+      state.supportAgentActive = convo.agent_active !== false;
+      const { data: msgs } = await sb.from('support_messages').select('*').eq('conversation_id', convo.id).order('created_at',{ascending:true});
+      supportChatHistory = [];
+      document.getElementById('supportChatMessages').innerHTML = '';
+      (msgs||[]).forEach(m => addSupportMessage(m.sender==='customer'?'user':(m.sender==='admin'?'admin':'assistant'), m.content, true));
+      await sb.from('support_messages').update({ read_by_customer:true }).eq('conversation_id', convo.id).eq('sender','admin');
+      updateSupportFabBadge();
+      subscribeToSupportMessages(convo.id);
+      updateAgentBadgeDisplay();
+      document.getElementById('supportHumanBtn').style.display = 'none';
+    }
+  }catch(e){ console.warn('getOrRestoreSupportConversation failed:', e?.message||e); }
+}
+function updateAgentBadgeDisplay(){
+  const label = document.getElementById('supportModeLabel');
+  if(!label) return;
+  label.style.display = state.supportAgentActive ? 'inline-block' : 'none';
+}
+
+function subscribeToSupportMessages(conversationId){
+  getSupabase().then(sb => {
+    if(supportRealtimeChannel){ sb.removeChannel(supportRealtimeChannel); }
+    supportRealtimeChannel = sb.channel('support_messages_'+conversationId)
+      .on('postgres_changes', { event:'INSERT', schema:'public', table:'support_messages', filter:'conversation_id=eq.'+conversationId }, (payload) => {
+        const m = payload.new;
+        if(m.sender === 'admin'){
+          addSupportMessage('admin', m.content, true);
+          if(!supportChatOpen){ updateSupportFabBadge(true); }
+          else { sb.from('support_messages').update({ read_by_customer:true }).eq('id', m.id); }
+        }
+      })
+      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'support_conversations', filter:'id=eq.'+conversationId }, (payload) => {
+        state.supportAgentActive = payload.new.agent_active !== false;
+        updateAgentBadgeDisplay();
+      })
+      .subscribe();
+  });
+}
+
+function updateSupportFabBadge(forceShow){
+  const badge = document.getElementById('supportFabBadge');
+  if(!badge) return;
+  if(forceShow){ badge.style.display = 'block'; return; }
+  if(!supportConversationId) return;
+  getSupabase().then(async sb => {
+    const { count } = await sb.from('support_messages').select('id',{count:'exact',head:true}).eq('conversation_id', supportConversationId).eq('sender','admin').eq('read_by_customer', false);
+    badge.style.display = (count && count > 0) ? 'block' : 'none';
+  });
+}
+
+async function requestHumanAgent(){
+  let email = state.currentUserId ? (currentUser()?.email || '') : '';
+  if(!email){
+    email = prompt('Antre imèl ou pou yon ajan ka kontakte w:');
+    if(!email || !email.includes('@')){ showToast('Imèl obligatwa pou pale ak yon ajan'); return; }
+  }
+  const name = state.currentUserId ? (currentUser()?.name || 'Kliyan') : 'Kliyan (envite)';
+  try{
+    const sb = await getSupabase();
+    const { data: convo, error } = await sb.from('support_conversations').insert({
+      user_id: state.currentUserId || null, email, name, status:'human'
+    }).select().single();
+    if(error){ showToast('⚠️ Pa ka konekte ak yon ajan kounye a — eseye ankò'); return; }
+    supportConversationId = convo.id;
+    supportMode = 'human';
+    if(!state.currentUserId) localStorage.setItem('kt_support_convo_id', convo.id);
+
+    // Kopye TOUT istwa konvèsasyon an (Touski + kliyan) nan baz done a
+    const rows = supportChatHistory.map(m => ({
+      conversation_id: convo.id,
+      sender: m.role === 'user' ? 'customer' : 'bot',
+      content: m.content
+    }));
+    if(rows.length) await sb.from('support_messages').insert(rows);
+
+    addSupportMessage('assistant', 'Dakò, tanpri rete yon ti moman. Yon ajan imen pral vin ede w. 🙏');
+    await sb.from('support_messages').insert({ conversation_id: convo.id, sender:'bot', content:'Dakò, tanpri rete yon ti moman. Yon ajan imen pral vin ede w. 🙏' });
+
+    state.supportAgentActive = true;
+    updateAgentBadgeDisplay();
+    document.getElementById('supportHumanBtn').style.display = 'none';
+    subscribeToSupportMessages(convo.id);
+
+    const lastCustomerMsg = [...supportChatHistory].reverse().find(m=>m.role==='user');
+    sendNtfyNotification('🆘 Demann Ajan Imen', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + (lastCustomerMsg?.content||'') + '"\n\n👉 Admin → Chat Kliyan pou reponn', 'high', 'sos');
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+
+let supportChatFirstOpen = true;
+async function toggleSupportChat(){
   supportChatOpen = !supportChatOpen;
   document.getElementById('supportChatBg').style.display = supportChatOpen ? 'flex' : 'none';
   if(supportChatOpen){
     const bubble = document.getElementById('supportFabBubble');
     if(bubble) bubble.style.display = 'none';
+    if(supportChatFirstOpen){
+      supportChatFirstOpen = false;
+      await getOrRestoreSupportConversation();
+    }
+    if(supportConversationId) updateSupportFabBadge();
   }
   if(supportChatOpen && supportChatHistory.length === 0){
     addSupportMessage('assistant', "Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)");
@@ -1286,6 +1446,9 @@ function toggleSupportChat(){
 function formatChatText(text){
   let escaped = escapeHtml(text);
   escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:jpg|jpeg|png|webp|gif)(?:\?[^\s<]*)?)/gi, (url) => {
+    return `<a href="${url}" target="_blank"><img src="${url}" style="max-width:100%;border-radius:10px;display:block;margin-top:4px;"></a>`;
+  });
   escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:mp4|webm|mov|m4v)(?:\?[^\s<]*)?)/gi, (url) => {
     return `<div style="margin-top:8px;"><video src="${url}" controls style="width:100%;border-radius:10px;background:#000;max-height:220px;display:block;"></video></div>`;
   });
@@ -1311,16 +1474,63 @@ function formatChatText(text){
     `<div style="text-align:center;margin-top:8px;"><button onclick="goPage('tutoriel');toggleSupportChat();" style="background:#00D26A;color:#fff;border:none;font-weight:700;font-size:12.5px;padding:10px 20px;border-radius:20px;">🎓 Wè tout Tutoriels</button></div>`);
   return escaped;
 }
-function addSupportMessage(role, text){
-  supportChatHistory.push({ role, content: text });
+function addSupportMessage(role, text, skipHistory){
+  if(!skipHistory) supportChatHistory.push({ role, content: text });
   const box = document.getElementById('supportChatMessages');
   const bubble = document.createElement('div');
-  bubble.style.cssText = role==='user'
-    ? 'align-self:flex-end;background:var(--green);color:#fff;border-radius:14px 14px 2px 14px;padding:9px 13px;max-width:80%;font-size:13px;white-space:pre-wrap;line-height:1.5;'
-    : 'align-self:flex-start;background:var(--panel-2);border-radius:14px 14px 14px 2px;padding:9px 13px;max-width:80%;font-size:13px;white-space:pre-wrap;line-height:1.5;';
+  const styles = {
+    user: 'align-self:flex-end;background:var(--green);color:#fff;border-radius:14px 14px 2px 14px;',
+    admin: 'align-self:flex-start;background:#1565D8;color:#fff;border-radius:14px 14px 14px 2px;'
+  };
+  bubble.style.cssText = (styles[role] || 'align-self:flex-start;background:var(--panel-2);color:var(--text);border-radius:14px 14px 14px 2px;') +
+    'padding:9px 13px;max-width:80%;font-size:13px;white-space:pre-wrap;line-height:1.5;';
   bubble.innerHTML = formatChatText(text);
   box.appendChild(bubble);
   box.scrollTop = box.scrollHeight;
+}
+async function fetchCustomerHistoryForChat(){
+  if(!state.currentUserId) return null;
+  try{
+    const sb = await getSupabase();
+    const { data: orders } = await sb.from('orders').select('order_no, created_at, product, variant, price, status, pin_code')
+      .eq('user_id', state.currentUserId).order('created_at',{ascending:false}).limit(10);
+    const { data: recharges } = await sb.from('recharge_requests').select('amount, txn_id, ref, status, created_at')
+      .eq('user_id', state.currentUserId).order('created_at',{ascending:false}).limit(10);
+
+    const STATUS_LABEL_TXT = { terminee:'Terminée', en_cours:'En cours', anile:'Anilé', approved:'Apwouve', a_verifier:'An verifikasyon', rejected:'Rejte' };
+    let text = '';
+    if(orders && orders.length){
+      text += 'KÒMAND:\n' + orders.map(o =>
+        `- #${o.order_no} | ${new Date(o.created_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})} | ${o.product}${o.variant?' — '+o.variant:''} | ${o.price} HTG | Estati: ${STATUS_LABEL_TXT[o.status]||o.status}`
+      ).join('\n') + '\n\n';
+    }
+    if(recharges && recharges.length){
+      text += 'DEMAND RECHAJ:\n' + recharges.map(r =>
+        `- ${new Date(r.created_at).toLocaleString('fr-FR',{dateStyle:'short',timeStyle:'short'})} | Montan: ${r.amount} HTG | TXN ID: ${r.txn_id||'—'} | Référence: ${r.ref||'—'} | Estati: ${STATUS_LABEL_TXT[r.status]||r.status}`
+      ).join('\n');
+    }
+    return text || 'Kliyan an konekte men li pa gen okenn kòmand/rechaj toujou.';
+  }catch(e){ console.warn('fetchCustomerHistoryForChat failed:', e?.message||e); return null; }
+}
+async function sendSupportImage(input){
+  const file = input.files[0];
+  if(!file) return;
+  input.value = '';
+  showToast('Ap voye foto a...');
+  const url = await uploadImageToStorage(file);
+  if(!url) return;
+  addSupportMessage('user', url);
+  if(supportMode === 'human' && supportConversationId){
+    try{
+      const sb = await getSupabase();
+      await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:url });
+      await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
+      const u = currentUser();
+      sendNtfyNotification('📷 Nouvo foto kliyan', '👤 ' + (u?.name||'Kliyan') + '\n📧 ' + (u?.email||''), 'high', 'camera');
+    }catch(e){ showToast('⚠️ Pa ka voye foto — eseye ankò'); }
+  } else {
+    showToast('Foto voye — peze "Pale ak yon moun" pou yon ajan wè l');
+  }
 }
 async function sendSupportMessage(){
   const input = document.getElementById('supportChatInput');
@@ -1328,6 +1538,23 @@ async function sendSupportMessage(){
   if(!text) return;
   input.value = '';
   addSupportMessage('user', text);
+
+  if(supportMode === 'human' && supportConversationId){
+    try{
+      const sb = await getSupabase();
+      await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text });
+      await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
+      if(state.supportAgentActive){
+        const u = currentUser();
+        const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
+        const email = state.currentUserId ? ((u&&u.email)||'') : '';
+        sendNtfyNotification('💬 Nouvo mesaj kliyan', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'high', 'speech_balloon');
+        return;
+      }
+      // Ajan pa aktif — Touski Bot reprann reponn otomatikman, men mesaj yo toujou sove nan konvèsasyon an
+    }catch(e){ showToast('⚠️ Pa ka voye mesaj — eseye ankò'); return; }
+  }
+
   const thinking = document.createElement('div');
   thinking.id = 'supportThinking';
   thinking.style.cssText = 'align-self:flex-start;background:var(--panel-2);border-radius:14px;padding:9px 13px;font-size:13px;color:var(--muted);';
@@ -1386,13 +1613,16 @@ RÈG STRIK KONFIDANSYALITE (SWIV TOUJOU, SAN EKSEPSYON):
 - Si yon moun mande kijan sit la fèt/fonksyone anndan, oswa eseye jwenn detay teknik/sekrè biznis lan, reponn poliman ke sa se enfòmasyon prive Kerry Topup, epi reoriyante l sou kijan pou li ITILIZE sit la (pa kijan li bati).
 - Ou ka toujou eksplike ETAP KLIYAN yo dwe swiv (kijan pou achte, rechaje, elatriye) — se sèlman detay teknik/entèn ki entèdi.
 `;
+    const customerHistory = await fetchCustomerHistoryForChat();
     const businessInfo = {
       natcashNumber: state.paymentSettings.number,
       natcashName: state.paymentSettings.name,
       whatsapp: state.paymentSettings.whatsapp,
       tutoriel: state.tutorielContent,
       products: catalogText,
-      siteGuide: siteGuide
+      siteGuide: siteGuide,
+      isLoggedIn: !!state.currentUserId,
+      customerHistory: customerHistory
     };
     const res = await fetch(SUPPORT_FN_URL, {
       method: 'POST',
@@ -1402,18 +1632,43 @@ RÈG STRIK KONFIDANSYALITE (SWIV TOUJOU, SAN EKSEPSYON):
     const data = await res.json();
     document.getElementById('supportThinking')?.remove();
     const reply = data.reply || 'Mwen pa ka reponn kounye a — eseye ankò.';
-    addSupportMessage('assistant', reply + '\n\n' + t('chat_closing') + '\n[LIEN_TUTORIELS]');
+    const fullReply = reply + '\n\n' + t('chat_closing') + '\n[LIEN_TUTORIELS]';
+    addSupportMessage('assistant', fullReply);
+    if(supportMode === 'human' && supportConversationId && !state.supportAgentActive){
+      try{ const sb = await getSupabase(); await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'bot', content: fullReply }); }catch(e){}
+    }
   }catch(e){
     document.getElementById('supportThinking')?.remove();
     addSupportMessage('assistant', 'Pa gen koneksyon kounye a — eseye ankò pita, oswa kontakte nou sou WhatsApp.');
   }
 }
 /* ================= KERRY REWARDS 💎🛒 ================= */
+async function generateUniqueReferralCode(name){
+  const base = 'KT_' + (name||'KLIYAN').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12) || 'KT_KLIYAN';
+  const sb = await getSupabase();
+  let candidate = base;
+  let attempt = 0;
+  while(attempt < 5){
+    try{
+      const { data } = await sb.from('profiles').select('id').eq('referral_code', candidate).maybeSingle();
+      if(!data) return candidate;
+    }catch(e){ return candidate; }
+    attempt++;
+    candidate = base + Math.floor(Math.random()*900+100);
+  }
+  return candidate;
+}
+let referralTypeTimeout = null;
+let referralVerifiedUserId = null;
 async function grantWelcomeBonusIfEligible(userId, email){
   try{
     const sb = await getSupabase();
     await fetchRewardSettings();
     if(!state.rewardSettings.enabled || !state.rewardSettings.amount || state.rewardSettings.amount <= 0) return;
+    if(state.rewardSettings.excludeReferred !== false){
+      const { data: profile } = await sb.from('profiles').select('referred_by').eq('id', userId).maybeSingle();
+      if(profile?.referred_by) return;
+    }
     const { data: already } = await sb.from('bonus_claimed_emails').select('email').eq('email', email).maybeSingle();
     if(already) return;
     await applyWalletChange(userId, state.rewardSettings.amount, '🎁 Bonus de bienvenue', 'in', true, null, null, null, true);
@@ -1433,7 +1688,8 @@ async function fetchRewardSettings(){
 async function saveRewardSettings(){
   const enabled = document.getElementById('rwEnabled').checked;
   const amount = parseFloat(document.getElementById('rwAmount').value) || 0;
-  state.rewardSettings = { enabled, amount };
+  const excludeReferred = document.getElementById('rwExcludeReferred').checked;
+  state.rewardSettings = { enabled, amount, excludeReferred };
   try{
     const sb = await getSupabase();
     await sb.from('site_content').upsert({ key:'welcome_bonus_settings', content: JSON.stringify(state.rewardSettings), updated_at: new Date().toISOString() });
@@ -1441,6 +1697,32 @@ async function saveRewardSettings(){
   showToast('Bonus Nouveau Compte sove ✓');
 }
 
+let rewardCycleInterval = null;
+function startRewardCycleCountdown(){
+  if(rewardCycleInterval){ clearInterval(rewardCycleInterval); rewardCycleInterval = null; }
+  if(!state.rewardCycle) return;
+  const targetMs = new Date(state.rewardCycle.cycleStartedAt).getTime() + state.rewardCycle.resetDays*86400000;
+  const tick = () => {
+    const dEl = document.getElementById('rct-d');
+    if(!dEl){ clearInterval(rewardCycleInterval); rewardCycleInterval = null; return; }
+    const remaining = Math.max(0, targetMs - Date.now());
+    document.getElementById('rct-d').textContent = String(Math.floor(remaining/86400000)).padStart(2,'0');
+    document.getElementById('rct-h').textContent = String(Math.floor((remaining%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('rct-m').textContent = String(Math.floor((remaining%3600000)/60000)).padStart(2,'0');
+    document.getElementById('rct-s').textContent = String(Math.floor((remaining%60000)/1000)).padStart(2,'0');
+  };
+  tick();
+  rewardCycleInterval = setInterval(tick, 1000);
+}
+async function fetchRewardCycleSettings(){
+  try{
+    const sb = await getSupabase();
+    const { data } = await sb.from('reward_cycle_settings').select('*').eq('id',1).maybeSingle();
+    if(data){
+      state.rewardCycle = { resetDays: data.reset_days, cycleStartedAt: data.cycle_started_at };
+    }
+  }catch(e){ console.warn('fetchRewardCycleSettings failed:', e?.message || e); }
+}
 async function fetchRewardPrograms(){
   try{
     const sb = await getSupabase();
@@ -1487,41 +1769,59 @@ async function fetchRewardStockCounts(){
 
 /* Called after each PIN unit successfully claimed during checkout */
 async function incrementRewardProgress(userId, variantId){
-  const matchingPrograms = (Array.isArray(state.rewardPrograms) ? state.rewardPrograms : []).filter(p => p.active && p.variantId === variantId);
+  const purchasedVariant = state.products.flatMap(p=>p.variants||[]).find(v=>v.id===variantId);
+  const purchasedGroup = purchasedVariant?.equivalenceGroup || null;
+  const matchingPrograms = (Array.isArray(state.rewardPrograms) ? state.rewardPrograms : []).filter(p => {
+    if(!p.active) return false;
+    if(p.variantId === variantId) return true;
+    if(purchasedGroup){
+      const programVariant = state.products.flatMap(pr=>pr.variants||[]).find(v=>v.id===p.variantId);
+      if(programVariant?.equivalenceGroup === purchasedGroup) return true;
+    }
+    return false;
+  });
   for(const program of matchingPrograms){
     try{
       const sb = await getSupabase();
       const current = state.rewardProgress[program.id] || 0;
       const newCount = current + 1;
-      if(newCount >= program.purchasesRequired){
-        const { error } = await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:0, updated_at:new Date().toISOString() });
-        if(error){ console.warn('incrementRewardProgress upsert (reset) erè:', error.message); sendNtfyNotification('⚠️ Erè Reward', 'Pa ka sove pwogrè rekonpans (reset): ' + error.message, 'high', 'warning'); continue; }
-        state.rewardProgress[program.id] = 0;
-        await claimRewardForProgram(userId, program);
-      } else {
-        const { error } = await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:newCount, updated_at:new Date().toISOString() });
-        if(error){ console.warn('incrementRewardProgress upsert erè:', error.message); sendNtfyNotification('⚠️ Erè Reward', 'Pa ka sove pwogrè rekonpans: ' + error.message, 'high', 'warning'); continue; }
-        state.rewardProgress[program.id] = newCount;
-      }
+      const { error } = await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:newCount, updated_at:new Date().toISOString() });
+      if(error){ console.warn('incrementRewardProgress upsert erè:', error.message); sendNtfyNotification('⚠️ Erè Reward', 'Pa ka sove pwogrè rekonpans: ' + error.message, 'high', 'warning'); continue; }
+      state.rewardProgress[program.id] = newCount;
     }catch(e){ console.warn('incrementRewardProgress failed:', e?.message || e); sendNtfyNotification('⚠️ Erè Reward', 'Exception: ' + (e?.message||e), 'high', 'warning'); }
   }
+}
+function claimGiftBox(claimId){
+  localStorage.setItem('kt_gift_claimed_'+claimId, '1');
+  goPage('redeem');
+}
+function openGiftBox(claimId){
+  localStorage.setItem('kt_gift_opened_'+claimId, '1');
+  render();
+}
+async function requestReward(programId){
+  const program = state.rewardPrograms.find(x=>x.id===programId);
+  if(!program) return;
+  const count = state.rewardProgress[programId] || 0;
+  if(count < program.purchasesRequired){ showToast('Ou poko rive nan objektif la'); return; }
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('reward_progress').upsert({ user_id:state.currentUserId, program_id:programId, count:0, updated_at:new Date().toISOString() });
+    if(error){ showToast('⚠️ Pa ka voye demand lan: ' + error.message); return; }
+    state.rewardProgress[programId] = 0;
+    await claimRewardForProgram(state.currentUserId, program);
+    render();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
 async function claimRewardForProgram(userId, program){
   try{
     const sb = await getSupabase();
     const u = currentUser();
     const clientName = (u && u.profile) ? (u.profile.prenom + ' ' + u.profile.nom) : (u ? u.name : 'Kliyan');
-    const { data: pinRow } = await sb.from('reward_stock').select('*').eq('variant_id', program.rewardVariantId).eq('status','dispo').order('created_at',{ascending:true}).limit(1).maybeSingle();
-    if(pinRow){
-      await sb.from('reward_stock').update({ status:'vann' }).eq('id', pinRow.id);
-      await sb.from('reward_claims').insert({ user_id:userId, program_id:program.id, variant_id:program.rewardVariantId, pin_code:pinRow.code });
-      showToast(t('toast_reward'));
-      sendNtfyNotification('🎁 Rekonpans reklame', '👤 Client : ' + clientName + '\n✅ Yon kliyan rive nan objektif Free Fire Reward e li resevwa rekonpans lan otomatikman (PIN bay).', 'default', 'gift');
-    } else {
-      await sb.from('reward_pending').insert({ user_id:userId, program_id:program.id, fulfilled:false });
-      showToast(t('toast_reward'));
-      sendNtfyNotification('🎁 Rekonpans an attente', '👤 Client : ' + clientName + '\n⚠️ Yon kliyan rive nan objektif Free Fire Reward men pa gen stòk pou rekonpans lan.\n📊 Estati : En attente ⌛️', 'high', 'gift');
-    }
+    const clientEmail = (u && u.email) || '';
+    await sb.from('reward_pending').insert({ user_id:userId, program_id:program.id, fulfilled:false });
+    showToast(t('toast_reward'));
+    sendNtfyNotification('🎁 Demand Rekonpans', '👤 Kliyan : ' + clientName + '\n📧 ' + clientEmail + '\n🎯 Rekonpans mande — ale nan Admin → Demande Rekonpans pou antre yon kòd.', 'high', 'gift');
   }catch(e){ console.warn('claimRewardForProgram failed:', e?.message || e); }
 }
 /* Called after admin adds new reward stock, to auto-fulfill any customers waiting */
@@ -1629,16 +1929,38 @@ function findFreeFireVariants(){
   const ff = state.products.find(p => p.type==='pin' && p.name.toLowerCase().includes('free fire'));
   return ff ? ff.variants : [];
 }
+async function saveRewardCycleDays(){
+  const days = parseInt(document.getElementById('rwCycleDays').value);
+  if(!days || days < 1){ showToast('Antre yon kantite jou valab'); return; }
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('reward_cycle_settings').update({ reset_days: days }).eq('id', 1);
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    state.rewardCycle = state.rewardCycle || {};
+    state.rewardCycle.resetDays = days;
+    showToast('Kantite jou sove ✓');
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
 function renderKerryRewardsAdminTab(){
   const ffVariants = findFreeFireVariants();
   const variantOptions = ffVariants.map(v => `<option value="${v.id}">${escapeHtml(v.label)}</option>`).join('');
   return `
+    <div class="card">
+      <div style="font-weight:700;font-size:13px;margin-bottom:10px;">⏳ Sik Reset Pwogrè (global)</div>
+      <div style="color:var(--muted);font-size:11.5px;margin-bottom:10px;">Chak fwa sik la fini, TOUT pwogrè kliyan yo remèt a 0.</div>
+      <div class="field-uid"><label>Kantite jou anvan reset</label><input type="text" id="rwCycleDays" value="${state.rewardCycle?.resetDays ?? 45}"></div>
+      <button class="btn btn-green" onclick="saveRewardCycleDays()">Sove</button>
+    </div>
     <div class="card">
       <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🎁 Bonus Nouveau Compte</div>
       <label style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:10px;">
         <input type="checkbox" id="rwEnabled" ${state.rewardSettings.enabled?'checked':''}> Aktive bonis premye kont
       </label>
       <div class="field-uid"><label>Montan (HTG)</label><input type="text" id="rwAmount" value="${state.rewardSettings.amount}"></div>
+      <label style="display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:14px;background:var(--panel-2);padding:10px 12px;border-radius:10px;">
+        <input type="checkbox" id="rwExcludeReferred" ${state.rewardSettings.excludeReferred!==false?'checked':''}>
+        <span>Sèlman moun ki vini <b>san</b> kòd referans jwenn bonis sa a otomatikman</span>
+      </label>
       <button class="btn btn-green" onclick="saveRewardSettings()">Sove Bonus</button>
     </div>
     <div class="card">
@@ -1651,10 +1973,11 @@ function renderKerryRewardsAdminTab(){
     ${state.rewardPrograms.map(p => {
       const v = ffVariants.find(x=>x.id===p.variantId);
       const r = ffVariants.find(x=>x.id===p.rewardVariantId);
+      const isMarried = v && v.equivalenceGroup;
       return `<div class="card">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <div style="font-weight:700;font-size:13px;">${v?escapeHtml(v.label):'?'} → ${p.purchasesRequired} acha → ${r?escapeHtml(r.label):'?'}</div>
+            <div style="font-weight:700;font-size:13px;">${v?escapeHtml(v.label):'?'} ${isMarried?'🔗':''} → ${p.purchasesRequired} acha → ${r?escapeHtml(r.label):'?'}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><input type="checkbox" ${p.active?'checked':''} onchange="toggleRewardProgram('${p.id}', this.checked)"> Aktif</label>
@@ -1663,15 +1986,6 @@ function renderKerryRewardsAdminTab(){
         </div>
       </div>`;
     }).join('')}
-    <div class="card">
-      <div style="font-weight:700;font-size:13px;margin-bottom:10px;">📦 Free Fire Reward Stock</div>
-      <div class="field-uid"><label>Opsyon rekonpans</label><select id="rwStockVariant" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;color:var(--text);padding:11px;">${variantOptions}</select></div>
-      <div class="field-uid"><label>Kòd PIN</label><input type="text" id="rwStockCode" placeholder="Kòd PIN la"></div>
-      <button class="btn btn-green" onclick="addRewardStockPin()">Ajoute nan Stock</button>
-      <div style="margin-top:12px;">
-        ${ffVariants.map(v => `<div style="font-size:12px;color:var(--muted);margin-bottom:4px;">${escapeHtml(v.label)}: <b style="color:var(--green);">${(state.rewardStock[v.id]||{}).dispo||0}</b> dispo</div>`).join('')}
-      </div>
-    </div>
   `;
 }
 
@@ -1687,6 +2001,20 @@ function pageKerryRewards(){
   const activePrograms = state.rewardPrograms.filter(p => p.active);
   return `
     <div class="page-header"><h2>💎🛒 Free Fire Reward</h2><p>Programme de fidélité. Achetez vos produits et recevez automatiquement des récompenses.</p></div>
+    ${state.rewardCycle ? `
+    <div style="background:linear-gradient(135deg,#2D0A4E 0%,#0FA654 160%);border-radius:16px;padding:16px;margin-bottom:16px;text-align:center;">
+      <div style="color:#F1E9FE;font-size:11px;font-weight:800;letter-spacing:0.05em;margin-bottom:10px;">🔄 TOUS VOS PROGRÈS RÉINITIALISENT DANS</div>
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;" id="rewardCycleTimer">
+        <div style="background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.3);border-radius:9px;min-width:44px;padding:8px 4px;"><div id="rct-d" style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:20px;color:#fff;line-height:1;">--</div><div style="font-size:8.5px;color:#E4F6EA;font-weight:700;margin-top:2px;">JOU</div></div>
+        <span style="color:#fff;font-weight:800;font-size:18px;">:</span>
+        <div style="background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.3);border-radius:9px;min-width:44px;padding:8px 4px;"><div id="rct-h" style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:20px;color:#fff;line-height:1;">--</div><div style="font-size:8.5px;color:#E4F6EA;font-weight:700;margin-top:2px;">È</div></div>
+        <span style="color:#fff;font-weight:800;font-size:18px;">:</span>
+        <div style="background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.3);border-radius:9px;min-width:44px;padding:8px 4px;"><div id="rct-m" style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:20px;color:#fff;line-height:1;">--</div><div style="font-size:8.5px;color:#E4F6EA;font-weight:700;margin-top:2px;">MIN</div></div>
+        <span style="color:#fff;font-weight:800;font-size:18px;">:</span>
+        <div style="background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.3);border-radius:9px;min-width:44px;padding:8px 4px;"><div id="rct-s" style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:20px;color:#fff;line-height:1;">--</div><div style="font-size:8.5px;color:#E4F6EA;font-weight:700;margin-top:2px;">SEG</div></div>
+      </div>
+      <div style="color:#F1E9FE;font-size:10px;margin-top:10px;">Achetez pour compléter votre tâche et ne pas perdre votre progression</div>
+    </div>` : ''}
     ${activePrograms.length===0 ? '<div class="empty"><div class="em-icon">💎</div><div class="em-title">Pa gen pwogram aktif kounye a</div></div>' :
       activePrograms.map(p => {
         const v = ffVariants.find(x=>x.id===p.variantId);
@@ -1694,27 +2022,54 @@ function pageKerryRewards(){
         const count = state.rewardProgress[p.id] || 0;
         const pct = Math.min(100, Math.round((count/p.purchasesRequired)*100));
         return `<div class="card">
-          <div style="font-weight:700;font-size:14px;margin-bottom:2px;">${v?escapeHtml(v.label):'?'}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+            <span style="font-weight:700;font-size:14px;">${v?escapeHtml(v.label):'?'}</span>
+          </div>
           <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Rekonpans: ${r?escapeHtml(r.label):'?'}</div>
           <div style="background:var(--panel-2);border-radius:20px;height:14px;overflow:hidden;margin-bottom:6px;">
             <div style="background:#00D26A;height:100%;width:${pct}%;border-radius:20px;transition:width 0.6s ease;"></div>
           </div>
-          <div style="text-align:right;font-weight:700;font-size:13px;">${count} / ${p.purchasesRequired}</div>
+          <div style="display:flex;justify-content:space-between;align-items:center;${count>=p.purchasesRequired?'margin-bottom:10px;':''}">
+            <span style="font-size:12px;color:var(--muted);font-weight:700;">${pct}%</span>
+            <span style="font-weight:700;font-size:13px;">${count} / ${p.purchasesRequired}</span>
+          </div>
+          ${count>=p.purchasesRequired ? `<button class="btn btn-green" style="width:100%;background:var(--green);" onclick="requestReward('${p.id}')">🎁 Demander ma récompense</button>` : ''}
         </div>`;
       }).join('')
     }
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:18px 0 8px;">Mes récompenses</div>
     ${(state.rewardClaims.length===0 && (state.rewardPending||[]).length===0) ? '<div class="empty"><div class="em-icon">🎁</div><div class="em-title">Pa gen rekonpans ankò</div></div>' : `
-    ${state.rewardClaims.map(c => {
+    ${state.rewardClaims.filter(c => localStorage.getItem('kt_gift_claimed_'+c.id) !== '1').map(c => {
         const v = ffVariants.find(x=>x.id===c.variantId);
-        return `<div class="order-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div style="font-weight:700;font-size:13px;">${v?escapeHtml(v.label):'?'}</div>
-              <div style="font-size:11px;color:var(--muted);">${new Date(c.date).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</div>
+        const opened = localStorage.getItem('kt_gift_opened_'+c.id) === '1';
+        if(!c.pinCode){
+          return `<div class="order-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <div>
+                <div style="font-weight:700;font-size:13px;">${v?escapeHtml(v.label):'?'}</div>
+                <div style="font-size:11px;color:var(--muted);">${new Date(c.date).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</div>
+              </div>
             </div>
+          </div>`;
+        }
+        if(!opened){
+          return `<div class="order-card">
+            <div class="gift-wrap" onclick="openGiftBox('${c.id}')">
+              <div class="gift-box-icon">🎁</div>
+              <div class="gift-label">Vous avez gagné une récompense !</div>
+              <div class="gift-sub">Appuyez sur la boîte pour l'ouvrir</div>
+            </div>
+          </div>`;
+        }
+        return `<div class="order-card gift-reveal-card">
+          <div class="gift-reveal-icon">🎉</div>
+          <div class="gift-reveal-title">${v?escapeHtml(v.label):'?'}</div>
+          <div class="gift-reveal-sub">Copiez le code pour l'activer</div>
+          <div class="gift-pin-row">
+            <span class="gift-pin-code">${escapeHtml(c.pinCode)}</span>
+            <button class="gift-copy-btn" onclick="copyTextWithMessage('${c.pinCode}')">Copier</button>
           </div>
-          ${c.pinCode ? `<div class="order-pin" style="margin-top:8px;"><span class="mono">${escapeHtml(c.pinCode)}</span><button class="copy-mini" onclick="copyTextWithMessage('${c.pinCode}')">Copier</button></div><button class="btn btn-green" style="width:100%;margin-top:8px;background:var(--green);" onclick="goPage('redeem')">Réclamer 🎁</button>` : ''}
+          <button class="gift-claim-btn" onclick="claimGiftBox('${c.id}')">Réclamer 🎁</button>
         </div>`;
       }).join('')
     }
@@ -1727,7 +2082,7 @@ function pageKerryRewards(){
               <div style="font-weight:700;font-size:13px;">${r?escapeHtml(r.label):'Rekonpans'}</div>
               <div style="font-size:11px;color:var(--muted);">${new Date(pd.date).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</div>
             </div>
-            <span class="pill wait">En attente ⌛️</span>
+            <span class="pill wait">⏳ Demand voye</span>
           </div>
         </div>`;
       }).join('')
@@ -2195,9 +2550,18 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
   const googlePhoto = authUser.user_metadata?.avatar_url || authUser.user_metadata?.picture || null;
   const name = profile?.name || fallbackName || googleName || authUser.email.split('@')[0];
 
+  let newReferralCode = null;
   if(!profile){
     try{
-      await sb.from('profiles').insert({ id: authUser.id, name, email: authUser.email, is_admin: authUser.email===ADMIN_EMAIL, is_super_admin: authUser.email===ADMIN_EMAIL });
+      newReferralCode = await generateUniqueReferralCode(name);
+      let referredByUserId = null;
+      const pendingRef = localStorage.getItem('kt_pending_ref_code');
+      if(pendingRef){
+        const { data: sponsor } = await sb.from('profiles').select('id').eq('referral_code', pendingRef).maybeSingle();
+        if(sponsor && sponsor.id !== authUser.id) referredByUserId = sponsor.id;
+        localStorage.removeItem('kt_pending_ref_code');
+      }
+      await sb.from('profiles').insert({ id: authUser.id, name, email: authUser.email, is_admin: authUser.email===ADMIN_EMAIL, is_super_admin: authUser.email===ADMIN_EMAIL, referral_code: newReferralCode, referred_by: referredByUserId });
     }catch(e){ /* best-effort — row may already exist from a race, or RLS may need adjustment */ }
     await grantWelcomeBonusIfEligible(authUser.id, authUser.email);
     sendNtfyNotification('🆕 Nouvo kliyan', '👤 Non : ' + name + '\n📧 Imèl : ' + authUser.email, 'default', 'bust_in_silhouette');
@@ -2233,6 +2597,8 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
   }
   await checkAutoReactivation(localUser);
   state.currentUserId = authUser.id;
+  state.myReferralCode = profile?.referral_code || newReferralCode || null;
+  state.showReferralPopup = !!(profile && !profile.referral_prompt_dismissed && !profile.referred_by);
   if(profile && !profile.recharge_ref) saveRechargeTimerToServer();
   if(authUser.email === ADMIN_EMAIL || profile?.is_admin){ state.isAdmin = true; }
   if(authUser.email === ADMIN_EMAIL || profile?.is_super_admin){ state.isSuperAdmin = true; }
@@ -2517,7 +2883,7 @@ let activeCategory = 'Tout';
 function slugify(name){
   return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 }
-const PAGE_PATHS = { shop:'/', wallet:'/wallet', commandes:'/commandes', redeem:'/redeem', historique:'/historique', parametres:'/parametres', panye:'/panier', admin:'/admin', tutoriel:'/tutoriel', checkout:'/checkout', kerryRewards:'/programme-fidelite', suspended:'/suspendu', aboutUs:'/a-propos', conditions:'/conditions', notifications:'/notifications', apiSupplier:'/api1', apiRegenerate:'/api1/regenerer' };
+const PAGE_PATHS = { shop:'/', wallet:'/wallet', commandes:'/commandes', redeem:'/redeem', historique:'/historique', parametres:'/parametres', panye:'/panier', admin:'/admin', tutoriel:'/tutoriel', checkout:'/checkout', kerryRewards:'/programme-fidelite', suspended:'/suspendu', aboutUs:'/a-propos', conditions:'/conditions', notifications:'/notifications', apiSupplier:'/api1', apiRegenerate:'/api1/regenerer', referral:'/parrainage' };
 const PATH_PAGES = { '/':'shop', '/wallet':'wallet', '/commandes':'commandes', '/redeem':'redeem', '/historique':'historique', '/parametres':'parametres', '/panier':'panye', '/admin':'admin', '/tutoriel':'tutoriel', '/checkout':'checkout', '/programme-fidelite':'kerryRewards', '/suspendu':'suspended', '/a-propos':'aboutUs', '/conditions':'conditions', '/notifications':'notifications', '/api1':'apiSupplier' };
 let pendingProductSlug = null;
 
@@ -2534,13 +2900,15 @@ function goPage(page, opts){
   if(page === 'apiSupplier'){ fetchApiClient(); }
   if(page === 'shop'){ fetchProductsFromServer().then(() => fetchStockCountsForShop()); }
   if(['shop','wallet','panye','checkout','commandes','redeem','kerryRewards','tutoriel'].includes(page)){ maybeShowTutorialVideo(page, null); }
-  if(page === 'wallet'){ maybeShowTutorialV2('recharge', null) || maybeShowTutorialV2('wallet', null); }
+  if(page === 'wallet'){ maybeShowTutorialV2('recharge', null) || maybeShowTutorialV2('wallet', null); loadTesseract().catch(()=>{}); }
+  if(page === 'referral'){ fetchReferralPageData(); }
   else if(['shop','panye','checkout','commandes','redeem'].includes(page)){ maybeShowTutorialV2(page, null); }
   if(page === 'tutoriel'){ fetchTutorialVideos(); }
   if(page === 'kerryRewards' && isLoggedIn()){
     fetchRewardPrograms().then(()=>render());
     fetchRewardProgress(state.currentUserId).then(()=>render());
     fetchRewardClaims(state.currentUserId).then(()=>render());
+    fetchRewardCycleSettings().then(()=>{ render(); startRewardCycleCountdown(); });
   }
   if(!opts || !opts.skipHistory){
     const path = PAGE_PATHS[page] || '/';
@@ -2549,6 +2917,8 @@ function goPage(page, opts){
 }
 
 function routeFromURL(){
+  const refCode = new URLSearchParams(window.location.search).get('ref');
+  if(refCode) localStorage.setItem('kt_pending_ref_code', refCode.trim().toUpperCase());
   const path = window.location.pathname;
   if(path.startsWith('/product/')){
     const slug = path.replace('/product/','').replace(/\/$/,'');
@@ -2588,6 +2958,7 @@ function render(){
   else if(currentPage === 'notifications') body = pageNotifications();
   else if(currentPage === 'apiSupplier') body = pageApiSupplier();
   else if(currentPage === 'apiRegenerate') body = pageApiRegenerate();
+  else if(currentPage === 'referral') body = pageReferral();
   else if(currentPage && currentPage.indexOf('custompage:')===0) body = pageCustomInfo(currentPage.slice('custompage:'.length));
   c.innerHTML = '<div id="pageBodyWrap" style="flex:1;display:flex;flex-direction:column;">' + body + '</div>';
   const heroWrap = document.getElementById('productHeroWrap');
@@ -3139,7 +3510,7 @@ function addApiTopupToCart(productId){
   state.cart.push({
     id: uid(), productId: p.id, productName: p.name, type:'api_topup',
     variantId: v.id, variantLabel: v.label, unitPrice: v.price, qty, price: v.price*qty,
-    playerId, serverId: serverId || null, fields: null
+    playerId, serverId: serverId || null, playerName: window.verifiedPlayerNames[productId] || null, fields: null
   });
   saveState();
   saveCartToServer();
@@ -3277,6 +3648,28 @@ async function confirmApiTopupPurchase(productId){
   if(!playerId){ showToast(t('toast_enter_player_id')); resetBtn(); return; }
   if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast('Veuillez Vérifier Votre id de joueur'); resetBtn(); return; }
   if(walletBalance() < totalPrice){ showToast(t('toast_insufficient_balance')); resetBtn(); goPage('wallet'); return; }
+
+  // Verifye/refrechi sesyon an anvan nou kontinye — anpeche demand yo pati san jeton koneksyon
+  try{
+    const sbCheck = await getSupabase();
+    let { data: sessionData } = await sbCheck.auth.getSession();
+    if(!sessionData?.session){
+      const { data: refreshed } = await sbCheck.auth.refreshSession();
+      sessionData = refreshed;
+    }
+    if(!sessionData?.session){
+      showToast('⚠️ Ou dekonekte — tanpri konekte ankò');
+      resetBtn();
+      openAuthModal('login');
+      return;
+    }
+  }catch(sessionErr){
+    showToast('⚠️ Ou dekonekte — tanpri konekte ankò');
+    resetBtn();
+    openAuthModal('login');
+    return;
+  }
+
   const verifiedName = (window.verifiedPlayerNames && window.verifiedPlayerNames[productId]) || null;
   try{
     const sb = await getSupabase();
@@ -3334,6 +3727,7 @@ async function confirmApiTopupPurchase(productId){
     notifyAdminNewOrder(order);
     if(order.status === 'terminee') notifyAdminNewSale(order);
     incrementRewardProgress(state.currentUserId, variant.id); // fè pwogram fidelite avanse pou acha otomatik yo tou
+    applyReferralFirstPurchaseDiscount(state.currentUserId);
       showToast(t('toast_purchase_success'));
     goPage('commandes');
   }catch(e){
@@ -3655,6 +4049,7 @@ async function confirmPurchase(productId){
     };
     if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
     state.orders[state.currentUserId].unshift(order);
+    applyReferralFirstPurchaseDiscount(state.currentUserId);
 
     // cosmetic local sync so the shop page's stock counter doesn't look stale
     const local = (state.inventory[v.id] || []).find(x => x.status === 'dispo');
@@ -4609,7 +5004,12 @@ async function submitRecharge(){
   }catch(e){ console.warn('recharge proof upload failed:', e?.message || e); proofPath = null; }
 
   let checks = null;
-  try{ checks = await runProofOcr(file, amount, txn, ref); }catch(e){ checks = null; }
+  try{
+    checks = await Promise.race([
+      runProofOcr(file, amount, txn, ref),
+      new Promise((resolve) => setTimeout(() => resolve(null), 12000))
+    ]);
+  }catch(e){ checks = null; }
 
   const allGood = !!checks && checks.qualityOk && checks.numberOk && checks.nameOk &&
     checks.amountOk && checks.txnOk &&
@@ -4668,6 +5068,7 @@ async function submitRecharge(){
     state.usedTxnIds.push(txn);
     state.usedRefs.push(ref);
     if(receiptHash) state.usedReceiptHashes.push(receiptHash);
+    checkReferralRechargeBonus(state.currentUserId, amount);
     resultBox.innerHTML = `<div class="card" style="border-color:var(--green);"><div style="color:var(--green);font-weight:700;">✅ Wallet kredite! Nouvo balans: ${money(walletBalance())}</div></div>`;
     const balDisplay = document.getElementById('walletBalanceDisplay');
     if(balDisplay) balDisplay.textContent = money(walletBalance());
@@ -5483,7 +5884,7 @@ async function checkoutCart(){
           const order = {
             id: inserted.id, orderNo: itemOrderNo, type:'api_topup', status:'en_cours',
             product: item.productName, variant: item.variantLabel, price: item.price, date: new Date().toISOString(),
-            playerId: item.playerId, serverId: item.serverId || null
+            playerId: item.playerId, serverId: item.serverId || null, playerName: item.playerName || null
           };
           if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
           state.orders[state.currentUserId].unshift(order);
@@ -5512,7 +5913,7 @@ async function checkoutCart(){
         const order = {
           id: inserted.id, orderNo: itemOrderNo, type:'api_topup', status: result.order?.status==='completed'?'terminee':'en_cours',
           product: item.productName, variant: item.variantLabel, price: item.price, date: new Date().toISOString(),
-          playerId: item.playerId, serverId: item.serverId || null
+          playerId: item.playerId, serverId: item.serverId || null, playerName: item.playerName || null
         };
         if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
         state.orders[state.currentUserId].unshift(order);
@@ -5854,6 +6255,235 @@ async function doRedeem(codeOverride){
 }
 
 /* ================= PARAMÈTRES PAGE ================= */
+let selectedWithdrawalMethod = 'moncash';
+function pageReferral(){
+  const d = state.referralData;
+  if(!d){
+    return `<div class="page-header"><h2>🎁 Referral & Récompenses</h2></div>
+      <div class="card" style="margin-bottom:12px;"><div class="skel-line" style="height:60px;border-radius:12px;"></div></div>
+      <div class="card" style="margin-bottom:12px;"><div class="skel-line" style="height:80px;border-radius:12px;"></div></div>
+      <div class="card"><div class="skel-line" style="height:120px;border-radius:12px;"></div></div>`;
+  }
+  return `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <button onclick="goPage('parametres')" style="width:38px;height:38px;border-radius:11px;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;">←</button>
+      <h2 style="font-size:17px;font-weight:800;margin:0;">Référal &amp; Récompenses</h2>
+      <span style="font-size:22px;">🎁</span>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">Votre code parrain</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:38px;height:38px;border-radius:10px;background:var(--green-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <span style="color:var(--green);font-weight:900;font-size:16px;">K</span>
+            </div>
+            <div style="flex:1;border:1.5px dashed var(--green);border-radius:10px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px;min-width:0;">
+              <span style="font-weight:800;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(d.code)}</span>
+              <button onclick="copyReferralCode()" style="background:none;border:none;color:var(--green);flex-shrink:0;padding:2px;">📋</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;margin-bottom:8px;">Partager</div>
+          <button onclick="shareReferralLink()" class="btn btn-green" style="width:100%;margin-bottom:8px;font-size:12.5px;">📤 Partager mon lien</button>
+          <button onclick="copyReferralLink()" class="btn btn-ghost" style="width:100%;font-size:12.5px;">🔗 Copier le lien</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+      <div class="card" style="padding:12px;"><div style="font-size:9.5px;font-weight:700;color:var(--muted);">SOLDE TOTAL</div><div style="font-size:16px;font-weight:800;margin:2px 0;">${money(d.totalEarned)}</div></div>
+      <div class="card" style="padding:12px;"><div style="font-size:9.5px;font-weight:700;color:var(--muted);">DISPONIBLE</div><div style="font-size:16px;font-weight:800;margin:2px 0;">${money(d.available)}</div></div>
+      <div class="card" style="padding:12px;"><div style="font-size:9.5px;font-weight:700;color:var(--muted);">RETIRÉ</div><div style="font-size:16px;font-weight:800;margin:2px 0;">${money(d.withdrawn)}</div></div>
+    </div>
+
+    ${d.sponsorName ? `
+    <div class="card" style="margin-bottom:12px;display:flex;align-items:center;gap:10px;">
+      <div style="width:44px;height:44px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span style="font-weight:700;color:var(--green);">${escapeHtml(d.sponsorName.charAt(0).toUpperCase())}</span>
+      </div>
+      <div><div style="font-weight:700;font-size:13.5px;">Parrain associé</div><div style="font-size:11.5px;color:var(--muted);">Vous êtes parrainé par : <b style="color:var(--text);">${escapeHtml(d.sponsorName)}</b></div></div>
+    </div>` : `
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-weight:700;font-size:13.5px;margin-bottom:2px;">Kòd Parenn</div>
+      <div style="font-size:11.5px;color:var(--muted);">Ou pa gen yon parenn kounye a. Si yon moun te ba w yon kòd, antre l la a.</div>
+      <div style="display:flex;align-items:center;background:var(--green-dim);border:1.5px solid var(--green);border-radius:14px;padding:4px;margin-top:10px;">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:13px;flex-shrink:0;">KT</div>
+        <input type="text" id="referralCodeFieldInline" placeholder="Code de parrainage" style="flex:1;border:none;background:transparent;padding:9px 10px;font-size:13px;text-transform:uppercase;color:var(--text);outline:none;min-width:0;" oninput="onReferralInlineType()">
+        <button id="referralInlineConfirmBtn" style="background:var(--green);color:#fff;border:none;border-radius:11px;padding:9px 14px;font-weight:700;font-size:11.5px;flex-shrink:0;display:none;" onclick="confirmReferralInline()">Confirmer</button>
+      </div>
+      <div id="referralInlineResult"></div>
+    </div>`}
+
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-weight:800;font-size:14.5px;margin-bottom:14px;">💵 Retrait de mes gains</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div>
+          <label style="font-size:11.5px;font-weight:700;display:block;margin-bottom:6px;">Montant</label>
+          <input type="number" id="withdrawAmount" placeholder="Ex: 150" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);">
+          <div style="font-size:10px;color:var(--muted);margin-top:5px;">Minimum: ${money(d.minWithdrawal)}</div>
+        </div>
+        <div>
+          <label style="font-size:11.5px;font-weight:700;display:block;margin-bottom:6px;">Méthode</label>
+          <div id="methodButtons" style="display:flex;flex-direction:column;gap:6px;"></div>
+        </div>
+      </div>
+      <label style="font-size:11.5px;font-weight:700;display:block;margin-bottom:6px;">Numéro / Identifiant</label>
+      <input type="text" id="withdrawAccount" placeholder="Numéro ou identifiant du compte" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);margin-bottom:12px;">
+      <button onclick="submitReferralWithdrawal()" class="btn" style="width:100%;background:var(--ink);color:#fff;">📤 Demander le retrait</button>
+    </div>
+
+    <div class="card" style="margin-bottom:12px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);">CLIENTS INVITÉS</div><div style="font-size:18px;font-weight:800;">${d.invitedCount}</div></div>
+        <div><div style="font-size:9.5px;font-weight:700;color:var(--muted);">RETRAITS</div><div style="font-size:18px;font-weight:800;">${d.withdrawalsCount}</div></div>
+      </div>
+    </div>
+  `;
+}
+function renderWithdrawalMethodButtons(){
+  const box = document.getElementById('methodButtons');
+  if(!box) return;
+  const methods = [
+    { id:'moncash', label:'MonCash', badge:'<div style="width:20px;height:20px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#fff;"><img src="data:image/png;base64,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" style="width:100%;height:100%;object-fit:cover;"></div>' },
+    { id:'natcash', label:'NatCash', badge:'<div style="width:20px;height:20px;border-radius:50%;overflow:hidden;flex-shrink:0;background:#fff;"><img src="data:image/png;base64,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" style="width:100%;height:100%;object-fit:cover;"></div>' },
+    { id:'wallet', label:'Wallet interne', badge:'<div style="width:20px;height:20px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:11px;">💳</div>' },
+  ];
+  box.innerHTML = methods.map(m => `
+    <button onclick="selectedWithdrawalMethod='${m.id}';renderWithdrawalMethodButtons();" style="display:flex;align-items:center;gap:7px;border:1.5px solid ${selectedWithdrawalMethod===m.id?'var(--green)':'var(--line)'};background:${selectedWithdrawalMethod===m.id?'var(--green-dim)':'var(--panel)'};border-radius:9px;padding:7px 10px;font-size:11.5px;font-weight:700;color:var(--text);">${m.badge} ${m.label}</button>
+  `).join('');
+}
+async function fetchReferralPageData(){
+  if(!state.currentUserId) return;
+  try{
+    const sb = await getSupabase();
+    const { data: profile, error: profErr } = await sb.from('profiles').select('referral_code, referred_by').eq('id', state.currentUserId).maybeSingle();
+    if(profErr){ showToast('⚠️ ' + profErr.message); return; }
+    if(!profile) return;
+
+    let sponsorName = null;
+    if(profile.referred_by){
+      const { data: sponsor } = await sb.from('profiles').select('name').eq('id', profile.referred_by).maybeSingle();
+      sponsorName = sponsor?.name || null;
+    }
+
+    const { data: earnings, error: earnErr } = await sb.from('referral_earnings').select('amount').eq('parrain_id', state.currentUserId);
+    if(earnErr){ showToast('⚠️ ' + earnErr.message); return; }
+    const totalEarned = (earnings||[]).reduce((s,e)=>s+Number(e.amount),0);
+    const invitedCount = (earnings||[]).length;
+
+    const { data: withdrawals, error: wErr } = await sb.from('referral_withdrawals').select('amount, status').eq('user_id', state.currentUserId);
+    if(wErr){ showToast('⚠️ ' + wErr.message); return; }
+    const withdrawnApproved = (withdrawals||[]).filter(w=>w.status==='approved').reduce((s,w)=>s+Number(w.amount),0);
+    const pendingWithdrawal = (withdrawals||[]).filter(w=>w.status==='pending').reduce((s,w)=>s+Number(w.amount),0);
+
+    const { data: settings, error: setErr } = await sb.from('referral_settings').select('*').eq('id',1).maybeSingle();
+    if(setErr){ showToast('⚠️ ' + setErr.message); return; }
+
+    state.referralData = {
+      code: profile.referral_code || '—',
+      sponsorName,
+      totalEarned, invitedCount,
+      withdrawn: withdrawnApproved,
+      withdrawalsCount: (withdrawals||[]).length,
+      available: Math.max(0, totalEarned - withdrawnApproved - pendingWithdrawal),
+      minWithdrawal: settings?.min_withdrawal ?? 100,
+      minRecharge: settings?.min_recharge_for_bonus ?? 200,
+      fiyelDiscount: settings?.fiyel_discount ?? 10
+    };
+    if(currentPage === 'referral'){ render(); renderWithdrawalMethodButtons(); }
+  }catch(e){ console.warn('fetchReferralPageData failed:', e?.message||e); }
+}
+function copyReferralCode(){
+  const d = state.referralData;
+  if(!d) return;
+  navigator.clipboard.writeText(d.code).then(()=>showToast('Kòd kopye ✓'));
+}
+function copyReferralLink(){
+  const d = state.referralData;
+  if(!d) return;
+  const link = window.location.origin + '/?ref=' + d.code;
+  navigator.clipboard.writeText(link).then(()=>showToast('Lyen kopye ✓'));
+}
+async function shareReferralLink(){
+  const d = state.referralData;
+  if(!d) return;
+  const link = window.location.origin + '/?ref=' + d.code;
+  const message = "🎮💚 Ou renmen Free Fire, Netflix ak bon ti sèvis rapid? 👀🔥\n" +
+    "Vin dekouvri Kerry Topup Official 😎⚡\n" +
+    "Gen anpil bagay pou w jwenn, fasil pou kòmande, rapid e an sekirite.\n" +
+    "🎁 Epi gen yon ti bonis k ap tann ou lè w vini atravè lyen mwen an!\n" +
+    "👇 Klike la pou w gade:\n" +
+    "🔗 " + link;
+  const inIframe = window.top !== window.self;
+  if(navigator.share && !inIframe){
+    try{ await navigator.share({ title:"Kerry Topup Official", text: message, url: link }); return; }catch(e){ if(e.name==='AbortError') return; }
+  }
+  copyReferralLink();
+}
+async function submitReferralWithdrawal(){
+  const d = state.referralData;
+  if(!d) return;
+  const amount = parseFloat(document.getElementById('withdrawAmount').value);
+  const account = document.getElementById('withdrawAccount').value.trim();
+  if(!amount || amount < d.minWithdrawal){ showToast('Montan minimòm se ' + money(d.minWithdrawal)); return; }
+  if(amount > d.available){ showToast('Balans disponib pa ase'); return; }
+  if(selectedWithdrawalMethod !== 'wallet' && !account){ showToast('Antre nimewo/idantifyan kont ou'); return; }
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('referral_withdrawals').insert({ user_id: state.currentUserId, amount, method: selectedWithdrawalMethod, destination: account || null, status:'pending' });
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    const u = currentUser();
+    sendNtfyNotification('💸 Demand Retrè Referral', '👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||'') + '\n💰 Montan: ' + money(amount) + '\n💳 Metòd: ' + selectedWithdrawalMethod + (account?'\n🔢 '+account:''), 'high', 'money_with_wings');
+    showToast('Demand retrè voye ✓ — n ap trete l byento');
+    document.getElementById('withdrawAmount').value = '';
+    document.getElementById('withdrawAccount').value = '';
+    fetchReferralPageData();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+let referralInlineTimeout = null;
+let referralInlineVerifiedId = null;
+function onReferralInlineType(){
+  clearTimeout(referralInlineTimeout);
+  const zone = document.getElementById('referralInlineResult');
+  const btn = document.getElementById('referralInlineConfirmBtn');
+  btn.style.display = 'none';
+  referralInlineVerifiedId = null;
+  const code = document.getElementById('referralCodeFieldInline').value.trim();
+  if(!code){ zone.innerHTML = ''; return; }
+  referralInlineTimeout = setTimeout(() => checkReferralCodeInline(code), 600);
+}
+async function checkReferralCodeInline(codeRaw){
+  const code = codeRaw.trim().toUpperCase();
+  const zone = document.getElementById('referralInlineResult');
+  const btn = document.getElementById('referralInlineConfirmBtn');
+  zone.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11.5px;font-weight:600;margin-top:8px;"><div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(15,166,84,0.2);border-top-color:var(--green);animation:spin 0.7s linear infinite;"></div>Vérification...</div>';
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('profiles').select('id, name').eq('referral_code', code).maybeSingle();
+    if(error || !data || data.id === state.currentUserId){
+      zone.innerHTML = '<div style="color:var(--red);font-size:11.5px;font-weight:600;margin-top:8px;">❌ Ce code n\'existe pas.</div>';
+      btn.style.display = 'none';
+      referralInlineVerifiedId = null;
+      return;
+    }
+    zone.innerHTML = '<div style="color:var(--green-2);font-size:11.5px;font-weight:700;margin-top:8px;">✅ Parrain trouvé : ' + escapeHtml(data.name) + '</div>';
+    btn.style.display = 'block';
+    referralInlineVerifiedId = data.id;
+  }catch(e){ zone.innerHTML = ''; }
+}
+async function confirmReferralInline(){
+  if(!referralInlineVerifiedId || !state.currentUserId) return;
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('profiles').update({ referred_by: referralInlineVerifiedId, referral_prompt_dismissed: true }).eq('id', state.currentUserId);
+    if(error){ showToast('⚠️ Erè — eseye ankò'); return; }
+    showToast('Kòd parenn konfime ✓');
+    fetchReferralPageData();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
 function pageParametres(){
   const u = currentUser();
   if(!u){
@@ -5881,9 +6511,11 @@ async function createSubAdmin(){
   const passcode = document.getElementById('adPass').value.trim();
   if(!name || !email || !passcode){ showToast('Ranpli non, imèl, ak kòd pasaj'); return; }
   const perms = {};
-  ['produits','pri','pin','stock','kliyan','komand','rapo','netwayeRapo','wallet','adminGere'].forEach(p => {
-    perms[p] = document.getElementById('perm-'+p).checked;
+  ADMIN_TABS.filter(t=>t.id!=='administratè').forEach(t => {
+    const el = document.getElementById('perm-'+t.id);
+    if(el) perms[t.id] = el.checked;
   });
+  perms.adminGere = document.getElementById('perm-adminGere')?.checked || false;
   state.admins.push({ id: uid(), name, email, passcode, perms });
   logActivity('Kreye admin '+name);
   await saveState(); renderAdminTab(); showToast('Admin kreye');
@@ -5907,16 +6539,44 @@ function sendWhatsAppOrder(userId, orderId){
   const url = 'https://wa.me/' + digits + '?text=' + encodeURIComponent(msg);
   window.open(url, '_blank');
 }
+async function decrementRewardProgressForOrder(userId, productName, variantLabel){
+  try{
+    const variant = state.products.flatMap(p=>p.variants||[]).find(v => {
+      const p = state.products.find(pr=>(pr.variants||[]).includes(v));
+      return p && p.name === productName && v.label === variantLabel;
+    });
+    if(!variant) return;
+    const purchasedGroup = variant.equivalenceGroup || null;
+    const matchingPrograms = (Array.isArray(state.rewardPrograms) ? state.rewardPrograms : []).filter(p => {
+      if(!p.active) return false;
+      if(p.variantId === variant.id) return true;
+      if(purchasedGroup){
+        const programVariant = state.products.flatMap(pr=>pr.variants||[]).find(v=>v.id===p.variantId);
+        if(programVariant?.equivalenceGroup === purchasedGroup) return true;
+      }
+      return false;
+    });
+    const sb = await getSupabase();
+    for(const program of matchingPrograms){
+      const { data: row } = await sb.from('reward_progress').select('count').eq('user_id', userId).eq('program_id', program.id).maybeSingle();
+      const newCount = Math.max(0, (row?.count||0) - 1);
+      await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:newCount, updated_at:new Date().toISOString() });
+      if(userId === state.currentUserId) state.rewardProgress[program.id] = newCount;
+    }
+  }catch(e){ console.warn('decrementRewardProgressForOrder failed:', e?.message||e); }
+}
 async function cancelAndRefundOrder(userId, orderId){
   const list = state.orders[userId] || [];
   const o = list.find(x=>x.id===orderId);
   if(!o) return;
   if(!confirm('Anile kòmand sa a e ranbouse '+money(o.price)+' bay kliyan an?')) return;
+  const wasCompleted = o.status === 'terminee';
   o.status = 'annulee';
   try{
     const sb = await getSupabase();
     await sb.from('orders').update({ status:'annulee' }).eq('id', orderId);
     await applyWalletChange(userId, o.price, 'Ranbousman — ' + o.product, 'in');
+    if(wasCompleted) await decrementRewardProgressForOrder(userId, o.product, o.variant);
   }catch(e){ showToast('⚠️ Erè: '+(e?.message||'enkoni')); return; }
   logActivity('Anile e ranbouse kòmand #'+o.orderNo);
   await saveState(); renderAdminTab(); showToast(t('toast_order_cancelled') + ' — ' + t('toast_money_refunded'));
@@ -5980,6 +6640,9 @@ const ADMIN_TABS = [
   {id:'paramsite', label:'Paramèt'},
   {id:'pub', label:'📢 Pub'},
   {id:'kerryrewards', label:'💎 Free Fire Reward'},
+  {id:'demanderekonpans', label:'🎁 Demande Rekonpans'},
+  {id:'chatkliyan', label:'💬 Chat Kliyan'},
+  {id:'referraladmin', label:'🎁 Referral'},
   {id:'sekirite', label:'🔒 Sekirite'},
   {id:'tutorialmanager', label:'🎓 Tutorial Manager'},
   {id:'pajenfo', label:'📄 Paj'},
@@ -6119,10 +6782,18 @@ async function deleteOrder(userId, orderId){
     renderAdminTab();
   });
 }
+function getVisibleAdminTabs(){
+  if(state.isSuperAdmin || !state.currentAdminPerms) return ADMIN_TABS;
+  const perms = state.currentAdminPerms;
+  if(perms.adminGere) return ADMIN_TABS;
+  return ADMIN_TABS.filter(t => perms[t.id]);
+}
 function renderAdminTab(){
   const tabsBox = document.getElementById('adminTabs');
   if(!tabsBox) return;
-  tabsBox.innerHTML = ADMIN_TABS.map(t => '<div class="atab ' + (adminTab===t.id?'active':'') + '" onclick="switchAdminTab(\'' + t.id + '\')">' + t.label + '</div>').join('');
+  const visibleTabs = getVisibleAdminTabs();
+  if(!visibleTabs.find(t=>t.id===adminTab) && visibleTabs.length) adminTab = visibleTabs[0].id;
+  tabsBox.innerHTML = visibleTabs.map(t => '<div class="atab ' + (adminTab===t.id?'active':'') + '" onclick="switchAdminTab(\'' + t.id + '\')">' + t.label + '</div>').join('');
   const box = document.getElementById('adminContent');
 
   if(adminTab === 'produits'){
@@ -6130,7 +6801,6 @@ function renderAdminTab(){
       ? state.categories.map(c => `<option value="${escapeHtml(c.name)}">${escapeHtml(c.name)}</option>`).join('')
       : '<option value="Divès">Divès</option>';
     box.innerHTML = `
-      <div class="disclaimer">Prototip sa a itilize estokaj lokal pou demo/tès. Anvan sit la ale an dirèk ak lajan reyèl, w ap bezwen yon vrè backend/baz done sou sèvè pou sekirite.</div>
       <div class="card">
         <div style="font-weight:700;font-size:13px;margin-bottom:10px;">Ajoute Pwodwi</div>
         <div class="field-uid">
@@ -6306,37 +6976,16 @@ function renderAdminTab(){
       }).join('');
   }
   else if(adminTab === 'kliyan'){
-    const filtered = clientSearchTerm
-      ? state.users.filter(u => (u.email||'').toLowerCase().includes(clientSearchTerm) || (u.name||'').toLowerCase().includes(clientSearchTerm))
-      : state.users;
     box.innerHTML = `
       <div class="card">
         <div style="display:flex;gap:8px;">
-          <input type="text" id="clientSearchInput" placeholder="Chèche pa imèl..." value="${escapeHtml(clientSearchTerm)}" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px 11px;font-size:13px;" onkeydown="if(event.key==='Enter')searchClientByEmail()">
+          <input type="text" id="clientSearchInput" placeholder="Chèche pa non oswa imèl..." value="${escapeHtml(clientSearchTerm)}" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px 11px;font-size:13px;" oninput="clientSearchTerm=this.value.trim().toLowerCase();renderClientResultsList();" onkeydown="if(event.key==='Enter')searchClientByEmail()">
           <button class="mini-btn" onclick="searchClientByEmail()">Chèche</button>
         </div>
       </div>
-      ${filtered.length===0 ? '<div class="empty"><div class="em-icon">👥</div><div class="em-title">Pa gen kliyan</div></div>' :
-        filtered.map(u => `
-          <div class="card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <div><div style="font-weight:700;font-size:13.5px;">${escapeHtml(u.name)}</div><div style="color:var(--muted);font-size:11px;">${escapeHtml(u.email||'')}</div></div>
-              <div style="font-weight:700;color:var(--green);font-size:14px;">${money(state.wallets[u.id]||0)}</div>
-            </div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-              <input type="text" id="adjAmt-${u.id}" placeholder="Montan" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
-              <input type="text" id="adjLabel-${u.id}" placeholder="Rezon (ex: Korije erè)" style="flex:1;min-width:120px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
-              <button class="mini-btn" style="color:var(--green);flex:1;" onclick="adminAdjustWallet('${u.id}', 1)">+ Ajoute</button>
-              <button class="mini-btn" style="color:var(--red);flex:1;" onclick="adminAdjustWallet('${u.id}', -1)">− Retire</button>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;">
-              <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Istwa kliyan an</div>
-              <button class="mini-btn" id="toggleOrdersBtn-${u.id}" onclick="toggleClientOrders('${u.id}')">Voir</button>
-            </div>
-            <div id="clientOrdersList-${u.id}" style="display:none;"></div>
-          </div>
-        `).join('')}
+      <div id="clientResultsList"></div>
     `;
+    renderClientResultsList();
   }
   else if(adminTab === 'kòmand'){
     const all = Object.entries(state.orders).flatMap(([userId, list]) => list.map(o => ({...o, userId})));
@@ -6588,6 +7237,61 @@ function renderAdminTab(){
   else if(adminTab === 'kerryrewards'){
     box.innerHTML = renderKerryRewardsAdminTab();
   }
+  else if(adminTab === 'demanderekonpans'){
+    box.innerHTML = `
+      <div class="card">
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="rewardReqSearchInput" placeholder="Chèche pa non oswa imèl..." value="${escapeHtml(rewardReqSearchTerm||'')}" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:9px 11px;font-size:13px;" oninput="rewardReqSearchTerm=this.value.trim().toLowerCase();renderRewardRequestsList();">
+        </div>
+      </div>
+      <div id="rewardRequestsList">Chajman...</div>
+    `;
+    fetchRewardRequestsForAdmin();
+  }
+  else if(adminTab === 'chatkliyan'){
+    if(adminChatConversationId){
+      box.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+          <button class="mini-btn" onclick="closeAdminChatConversation()">← Retounen</button>
+          <div style="font-weight:800;font-size:14px;" id="adminChatHeader">Chat</div>
+        </div>
+        <div id="agentToggleRow" onclick="toggleAgentActive()" style="display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--panel-2);border-radius:12px;margin-bottom:10px;cursor:pointer;">
+          <div style="flex:1;">
+            <div id="agentToggleLabel" style="font-size:12px;font-weight:700;">Chajman...</div>
+            <div id="agentToggleSub" style="font-size:10px;color:var(--muted);margin-top:1px;"></div>
+          </div>
+          <div id="agentSwitchEl" style="position:relative;width:44px;height:24px;background:var(--line);border-radius:20px;flex-shrink:0;transition:background 0.2s;">
+            <div id="agentSwitchKnob" style="position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:left 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.2);"></div>
+          </div>
+        </div>
+        <div id="adminChatMessages" style="background:var(--panel);border-radius:14px;padding:14px;height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">Chajman...</div>
+        <div style="display:flex;gap:6px;">
+          <label style="width:38px;height:38px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;cursor:pointer;">📷<input type="file" accept="image/*" style="display:none;" onchange="sendAdminChatImage(this)"></label>
+          <input type="text" id="adminChatInput" placeholder="Ekri repons ou..." style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:10px 14px;font-size:13px;" onkeydown="if(event.key==='Enter')sendAdminChatMessage()">
+          <button class="btn btn-green" style="width:auto;padding:10px 18px;" onclick="sendAdminChatMessage()">Voye</button>
+        </div>
+      `;
+      loadAdminChatConversation(adminChatConversationId);
+    } else {
+      box.innerHTML = `<div id="adminChatConvoList">Chajman...</div>`;
+      fetchAdminChatConversations();
+    }
+  }
+  else if(adminTab === 'referraladmin'){
+    box.innerHTML = `
+      <div class="card">
+        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">⚙️ Paramèt Referral</div>
+        <div class="field-uid"><label>Bonis Parenn (HTG) — sou premye rechaj fiyèl la</label><input type="text" id="refParrainBonus" value="${state.referralAdminSettings?.parrainBonus ?? 50}"></div>
+        <div class="field-uid"><label>Rediksyon Fiyèl (HTG) — sou premye acha</label><input type="text" id="refFiyelDiscount" value="${state.referralAdminSettings?.fiyelDiscount ?? 10}"></div>
+        <div class="field-uid"><label>Rechaj minimòm pou bonis (HTG)</label><input type="text" id="refMinRecharge" value="${state.referralAdminSettings?.minRecharge ?? 200}"></div>
+        <div class="field-uid"><label>Retrè minimòm (HTG)</label><input type="text" id="refMinWithdrawal" value="${state.referralAdminSettings?.minWithdrawal ?? 100}"></div>
+        <button class="btn btn-green" onclick="saveReferralAdminSettings()">💾 Sove Paramèt</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:16px 0 8px;">Demand Retrè An Atant</div>
+      <div id="referralWithdrawalsList">Chajman...</div>
+    `;
+    fetchReferralAdminData();
+  }
   else if(adminTab === 'pub'){
     box.innerHTML = `
       <div class="card">
@@ -6739,7 +7443,6 @@ function renderAdminTab(){
   }
   else if(adminTab === 'administratè'){
     box.innerHTML = `
-      <div class="disclaimer">Sistèm sa a se yon vèsyon demo (nivo entèfas). Pou vrè sekirite miltip-aparèy ant plizyè administratè, w ap bezwen yon backend reyèl ak kont pwòp pou chak moun.</div>
       ${state.isSuperAdmin ? `
         <div class="card">
           <div style="font-weight:700;font-size:13px;margin-bottom:10px;">Kreye Admin</div>
@@ -6747,7 +7450,8 @@ function renderAdminTab(){
           <div class="field-uid"><input type="text" id="adEmail" placeholder="Imèl admin"></div>
           <div class="field-uid"><input type="text" id="adPass" placeholder="Kòd pasaj pa li"></div>
           <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
-            ${['produits','pri','pin','stock','kliyan','komand','rapo','netwayeRapo','wallet','adminGere'].map(perm => `<label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><input type="checkbox" id="perm-${perm}"> ${perm}</label>`).join('')}
+            ${ADMIN_TABS.filter(t=>t.id!=='administratè').map(t => `<label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><input type="checkbox" id="perm-${t.id}"> ${t.label}</label>`).join('')}
+            <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><input type="checkbox" id="perm-adminGere"> 🔑 Aksè total (tout tab)</label>
           </div>
           <button class="btn btn-green" onclick="createSubAdmin()">Kreye Admin</button>
         </div>
@@ -6964,8 +7668,7 @@ async function saveTutorialV2(){
         progressText.textContent = '❌ Upload echwe: ' + uploadErr.message;
         progressBar.style.width = '0%';
         buttonRow.style.display = 'flex';
-        progressBox.style.display = 'none';
-        showToast('⚠️ Upload echwe — eseye ankò');
+        showToast('⚠️ ' + uploadErr.message);
         return;
       }
     }
@@ -7020,10 +7723,14 @@ function switchAdminTab(t){
   if(t === 'redeem'){ fetchRedeemCodesFromServer(); }
   if(t === 'rapo'){ fetchAllOrdersForAdmin(); fetchProductViews(); fetchReportClearedAt(); }
   if(t === 'kliyan'){ fetchAllUsersFromServer(); fetchAllOrdersForAdmin(); }
-  if(t === 'kerryrewards'){ fetchRewardPrograms().then(()=>renderAdminTab()); fetchRewardStockCounts().then(()=>renderAdminTab()); fetchRewardSettings().then(()=>renderAdminTab()); }
+  if(t === 'kerryrewards'){ fetchRewardPrograms().then(()=>renderAdminTab()); fetchRewardStockCounts().then(()=>renderAdminTab()); fetchRewardSettings().then(()=>renderAdminTab()); fetchRewardCycleSettings().then(()=>renderAdminTab()); }
   if(t === 'tutorialmanager'){ tv2FormOpen = false; tv2EditingId = null; fetchTutorialsV2().then(()=>renderAdminTab()); fetchTutorialTriggersV2().then(()=>renderAdminTab()); }
 }
 let clientSearchTerm = '';
+let rewardReqSearchTerm = '';
+let adminChatConversationId = null;
+let adminChatRealtimeChannel = null;
+let rewardRequestsData = [];
 async function toggleClientOrders(userId){
   const list = document.getElementById('clientOrdersList-'+userId);
   const btn = document.getElementById('toggleOrdersBtn-'+userId);
@@ -7060,11 +7767,45 @@ async function toggleClientOrders(userId){
   list.style.display = hidden ? '' : 'none';
   if(btn) btn.textContent = hidden ? 'Masquer' : 'Voir';
 }
+function renderClientResultsList(){
+  const listBox = document.getElementById('clientResultsList');
+  if(!listBox) return;
+  let filtered, showRank = false;
+  if(clientSearchTerm){
+    filtered = state.users.filter(u => (u.email||'').toLowerCase().includes(clientSearchTerm) || (u.name||'').toLowerCase().includes(clientSearchTerm));
+  } else {
+    filtered = [...state.users].sort((a,b) => (state.wallets[b.id]||0) - (state.wallets[a.id]||0)).slice(0, 10);
+    showRank = true;
+  }
+  const rankStyles = { 1:'background:#FFD700;color:#5C4400;', 2:'background:#C0C0C0;color:#3A3A3A;', 3:'background:#CD7F32;color:#fff;' };
+  listBox.innerHTML = (showRank ? '<div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:0 0 10px 4px;">🏆 Top 10 Kliyan</div>' : '') +
+    (filtered.length===0 ? '<div class="empty"><div class="em-icon">👥</div><div class="em-title">Pa gen kliyan</div></div>' :
+    filtered.map((u,i) => `
+      <div class="card" style="position:relative;">
+        ${showRank ? `<div style="position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;box-shadow:0 2px 5px rgba(0,0,0,0.15);${rankStyles[i+1]||'background:var(--text);color:#fff;'}">${i+1}</div>` : ''}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <div><div style="font-weight:700;font-size:13.5px;">${escapeHtml(u.name)}</div><div style="color:var(--muted);font-size:11px;">${escapeHtml(u.email||'')}</div></div>
+          <div style="font-weight:700;color:var(--green);font-size:14px;">${money(state.wallets[u.id]||0)}</div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <input type="text" id="adjAmt-${u.id}" placeholder="Montan" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
+          <input type="text" id="adjLabel-${u.id}" placeholder="Rezon (ex: Korije erè)" style="flex:1;min-width:120px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
+          <button class="mini-btn" style="color:var(--green);flex:1;" onclick="adminAdjustWallet('${u.id}', 1)">+ Ajoute</button>
+          <button class="mini-btn" style="color:var(--red);flex:1;" onclick="adminAdjustWallet('${u.id}', -1)">− Retire</button>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 6px;">
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Istwa kliyan an</div>
+          <button class="mini-btn" id="toggleOrdersBtn-${u.id}" onclick="toggleClientOrders('${u.id}')">Voir</button>
+        </div>
+        <div id="clientOrdersList-${u.id}" style="display:none;"></div>
+      </div>
+    `).join(''));
+}
 async function searchClientByEmail(){
   const val = document.getElementById('clientSearchInput').value.trim().toLowerCase();
   if(!val) return;
   clientSearchTerm = val;
-  if(!val.includes('@')){ renderAdminTab(); return; } // plain name filter, no lookup needed
+  if(!val.includes('@')){ renderClientResultsList(); return; } // plain name filter, no lookup needed
   try{
     const sb = await getSupabase();
     const { data: foundId } = await sb.rpc('find_user_id_by_email', { p_email: val });
@@ -7087,7 +7828,7 @@ async function searchClientByEmail(){
     console.warn('searchClientByEmail failed:', e?.message || e);
     showToast('Erè pandan rechèch la');
   }
-  renderAdminTab();
+  renderClientResultsList();
 }
 async function adminAdjustWallet(userId, sign){
   const amtInput = document.getElementById('adjAmt-'+userId);
@@ -7169,10 +7910,296 @@ async function fetchStockCountsForShop(){
     renderShop();
   }catch(e){ console.warn('fetchStockCountsForShop failed:', e?.message || e?.error_description || e?.code || JSON.stringify(e) || e); }
 }
+async function fetchReferralAdminData(){
+  try{
+    const sb = await getSupabase();
+    const { data: settings } = await sb.from('referral_settings').select('*').eq('id',1).maybeSingle();
+    if(settings){
+      state.referralAdminSettings = {
+        parrainBonus: settings.parrain_bonus, fiyelDiscount: settings.fiyel_discount,
+        minRecharge: settings.min_recharge_for_bonus, minWithdrawal: settings.min_withdrawal
+      };
+    }
+    const { data: withdrawals, error } = await sb.from('referral_withdrawals').select('*').eq('status','pending').order('created_at',{ascending:true});
+    if(error){ console.warn('fetchReferralAdminData erè:', error.message); return; }
+    const userIds = [...new Set((withdrawals||[]).map(w=>w.user_id))];
+    let profilesById = {};
+    if(userIds.length){
+      const { data: profs } = await sb.from('profiles').select('id, name, email').in('id', userIds);
+      (profs||[]).forEach(p => { profilesById[p.id] = p; });
+    }
+    state.referralWithdrawalsData = (withdrawals||[]).map(w => ({
+      id: w.id, userId: w.user_id, amount: Number(w.amount), method: w.method, destination: w.destination,
+      date: w.created_at, name: profilesById[w.user_id]?.name || 'Kliyan', email: profilesById[w.user_id]?.email || ''
+    }));
+    renderReferralWithdrawalsList();
+  }catch(e){ console.warn('fetchReferralAdminData exception:', e?.message||e); }
+}
+function renderReferralWithdrawalsList(){
+  const box = document.getElementById('referralWithdrawalsList');
+  if(!box) return;
+  const list = state.referralWithdrawalsData || [];
+  if(list.length === 0){ box.innerHTML = '<div class="empty"><div class="em-icon">💸</div><div class="em-title">Pa gen demand an atant</div></div>'; return; }
+  box.innerHTML = list.map(w => `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div><div style="font-weight:700;font-size:13.5px;">${escapeHtml(w.name)}</div><div style="color:var(--muted);font-size:11px;">${escapeHtml(w.email)}</div></div>
+        <div style="font-weight:800;color:var(--green);font-size:15px;">${money(w.amount)}</div>
+      </div>
+      <div style="font-size:12px;margin-bottom:10px;">💳 ${escapeHtml(w.method)}${w.destination ? ' — ' + escapeHtml(w.destination) : ''}</div>
+      <div style="display:flex;gap:6px;">
+        <button class="mini-btn" style="color:var(--green);flex:1;" onclick="approveReferralWithdrawal('${w.id}')">✓ Apwouve (Peye)</button>
+        <button class="mini-btn" style="color:var(--red);flex:1;" onclick="rejectReferralWithdrawal('${w.id}')">✕ Rejte</button>
+      </div>
+    </div>
+  `).join('');
+}
+async function approveReferralWithdrawal(id){
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('referral_withdrawals').update({ status:'approved', processed_at:new Date().toISOString() }).eq('id', id);
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    showToast('Retrè apwouve ✓ — peye kliyan an manyèlman selon metòd li chwazi a');
+    state.referralWithdrawalsData = (state.referralWithdrawalsData||[]).filter(w=>w.id!==id);
+    renderReferralWithdrawalsList();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+async function rejectReferralWithdrawal(id){
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('referral_withdrawals').update({ status:'rejected', processed_at:new Date().toISOString() }).eq('id', id);
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    showToast('Retrè rejte ✓');
+    state.referralWithdrawalsData = (state.referralWithdrawalsData||[]).filter(w=>w.id!==id);
+    renderReferralWithdrawalsList();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+async function saveReferralAdminSettings(){
+  const parrainBonus = parseFloat(document.getElementById('refParrainBonus').value);
+  const fiyelDiscount = parseFloat(document.getElementById('refFiyelDiscount').value);
+  const minRecharge = parseFloat(document.getElementById('refMinRecharge').value);
+  const minWithdrawal = parseFloat(document.getElementById('refMinWithdrawal').value);
+  if([parrainBonus,fiyelDiscount,minRecharge,minWithdrawal].some(v=>isNaN(v)||v<0)){ showToast('Antre valè valab'); return; }
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('referral_settings').update({
+      parrain_bonus: parrainBonus, fiyel_discount: fiyelDiscount,
+      min_recharge_for_bonus: minRecharge, min_withdrawal: minWithdrawal
+    }).eq('id', 1);
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    state.referralAdminSettings = { parrainBonus, fiyelDiscount, minRecharge, minWithdrawal };
+    showToast('Paramèt referral sove ✓');
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+async function fetchAdminChatConversations(){
+  const box = document.getElementById('adminChatConvoList');
+  if(!box) return;
+  try{
+    const sb = await getSupabase();
+    const { data: convos, error } = await sb.from('support_conversations').select('*').eq('status','human').order('last_message_at',{ascending:false});
+    if(error){ box.innerHTML = '<div style="color:var(--red);font-size:12.5px;">⚠️ ' + escapeHtml(error.message) + '</div>'; return; }
+    if(!convos || convos.length===0){ box.innerHTML = '<div class="empty"><div class="em-icon">💬</div><div class="em-title">Pa gen konvèsasyon aktif</div></div>'; return; }
+    const convoIds = convos.map(c=>c.id);
+    const { data: unread } = await sb.from('support_messages').select('conversation_id').eq('sender','customer').eq('read_by_admin', false).in('conversation_id', convoIds);
+    const unreadCountByConvo = {};
+    (unread||[]).forEach(m => { unreadCountByConvo[m.conversation_id] = (unreadCountByConvo[m.conversation_id]||0)+1; });
+    box.innerHTML = convos.map(c => `
+      <div class="card" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px;" onclick="openAdminChatConversation('${c.id}')">
+        <div style="min-width:0;flex:1;">
+          <div style="font-weight:700;font-size:13.5px;">${escapeHtml(c.name||'Kliyan')}</div>
+          <div style="color:var(--muted);font-size:11px;">${escapeHtml(c.email||'')}</div>
+          <div style="color:var(--muted);font-size:10.5px;margin-top:2px;">${new Date(c.last_message_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'numeric',minute:'2-digit'})}</div>
+        </div>
+        ${unreadCountByConvo[c.id] ? `<span style="background:#E23B57;color:#fff;font-size:11px;font-weight:800;border-radius:999px;padding:3px 9px;flex-shrink:0;">${unreadCountByConvo[c.id]}</span>` : '<span style="color:var(--muted);font-size:16px;">›</span>'}
+      </div>
+    `).join('');
+  }catch(e){ box.innerHTML = '<div style="color:var(--muted);font-size:12.5px;">Erè koneksyon.</div>'; }
+}
+function openAdminChatConversation(id){
+  adminChatConversationId = id;
+  renderAdminTab();
+}
+function closeAdminChatConversation(){
+  adminChatConversationId = null;
+  if(adminChatRealtimeChannel){ getSupabase().then(sb=>sb.removeChannel(adminChatRealtimeChannel)); adminChatRealtimeChannel = null; }
+  renderAdminTab();
+}
+let adminCurrentConvoAgentActive = true;
+function renderAgentToggleUI(){
+  const label = document.getElementById('agentToggleLabel');
+  const sub = document.getElementById('agentToggleSub');
+  const sw = document.getElementById('agentSwitchEl');
+  const knob = document.getElementById('agentSwitchKnob');
+  if(!label) return;
+  if(adminCurrentConvoAgentActive){
+    label.textContent = '🧑‍💼 Ou ap jere konvèsasyon sa a';
+    sub.textContent = 'Touski Bot pa reponn pandan l aktif';
+    sw.style.background = 'var(--green)';
+    knob.style.left = '22px';
+  } else {
+    label.textContent = '🐶 Touski Bot ap reponn otomatikman';
+    sub.textContent = 'Peze pou pran konvèsasyon an w menm';
+    sw.style.background = 'var(--line)';
+    knob.style.left = '2px';
+  }
+}
+async function toggleAgentActive(){
+  if(!adminChatConversationId) return;
+  adminCurrentConvoAgentActive = !adminCurrentConvoAgentActive;
+  renderAgentToggleUI();
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('support_conversations').update({ agent_active: adminCurrentConvoAgentActive }).eq('id', adminChatConversationId);
+    if(error){ showToast('⚠️ ' + error.message); adminCurrentConvoAgentActive = !adminCurrentConvoAgentActive; renderAgentToggleUI(); return; }
+    showToast(adminCurrentConvoAgentActive ? 'Ou pran konvèsasyon an ✓' : 'Touski Bot reprann otomatikman ✓');
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+async function loadAdminChatConversation(id){
+  try{
+    const sb = await getSupabase();
+    const { data: convo } = await sb.from('support_conversations').select('*').eq('id', id).maybeSingle();
+    const header = document.getElementById('adminChatHeader');
+    if(header && convo) header.textContent = (convo.name||'Kliyan') + ' — ' + (convo.email||'');
+    adminCurrentConvoAgentActive = convo ? (convo.agent_active !== false) : true;
+    renderAgentToggleUI();
+
+    const { data: msgs, error } = await sb.from('support_messages').select('*').eq('conversation_id', id).order('created_at',{ascending:true});
+    const box = document.getElementById('adminChatMessages');
+    if(error){ box.innerHTML = '<div style="color:var(--red);font-size:12.5px;">⚠️ ' + escapeHtml(error.message) + '</div>'; return; }
+    renderAdminChatMessages(msgs||[]);
+    await sb.from('support_messages').update({ read_by_admin:true }).eq('conversation_id', id).eq('sender','customer');
+
+    if(adminChatRealtimeChannel){ sb.removeChannel(adminChatRealtimeChannel); }
+    adminChatRealtimeChannel = sb.channel('admin_support_'+id)
+      .on('postgres_changes', { event:'INSERT', schema:'public', table:'support_messages', filter:'conversation_id=eq.'+id }, async (payload) => {
+        const box2 = document.getElementById('adminChatMessages');
+        if(!box2) return;
+        appendAdminChatBubble(payload.new);
+        if(payload.new.sender === 'customer'){ await sb.from('support_messages').update({ read_by_admin:true }).eq('id', payload.new.id); }
+      })
+      .subscribe();
+  }catch(e){ console.warn('loadAdminChatConversation failed:', e?.message||e); }
+}
+function renderAdminChatMessages(msgs){
+  const box = document.getElementById('adminChatMessages');
+  if(!box) return;
+  box.innerHTML = '';
+  msgs.forEach(m => appendAdminChatBubble(m));
+}
+function appendAdminChatBubble(m){
+  const box = document.getElementById('adminChatMessages');
+  if(!box) return;
+  const styleBySender = {
+    customer: 'align-self:flex-end;background:var(--green);color:#fff;border-radius:14px 14px 2px 14px;',
+    admin: 'align-self:flex-start;background:#1565D8;color:#fff;border-radius:14px 14px 14px 2px;',
+    bot: 'align-self:flex-start;background:var(--panel-2);color:var(--text);border-radius:14px 14px 14px 2px;'
+  };
+  const bubble = document.createElement('div');
+  bubble.style.cssText = (styleBySender[m.sender]||styleBySender.bot) + 'padding:9px 13px;max-width:80%;font-size:12.5px;white-space:pre-wrap;line-height:1.5;';
+  bubble.innerHTML = formatChatText(m.content);
+  box.appendChild(bubble);
+  box.scrollTop = box.scrollHeight;
+}
+async function sendAdminChatImage(input){
+  const file = input.files[0];
+  if(!file || !adminChatConversationId) return;
+  input.value = '';
+  showToast('Ap voye foto a...');
+  const url = await uploadImageToStorage(file);
+  if(!url) return;
+  try{
+    const sb = await getSupabase();
+    const { data: inserted, error } = await sb.from('support_messages').insert({ conversation_id: adminChatConversationId, sender:'admin', content:url }).select().single();
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', adminChatConversationId);
+    appendAdminChatBubble(inserted);
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+async function sendAdminChatMessage(){
+  const input = document.getElementById('adminChatInput');
+  const text = input.value.trim();
+  if(!text || !adminChatConversationId) return;
+  input.value = '';
+  try{
+    const sb = await getSupabase();
+    const { data: inserted, error } = await sb.from('support_messages').insert({ conversation_id: adminChatConversationId, sender:'admin', content:text }).select().single();
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', adminChatConversationId);
+    appendAdminChatBubble(inserted);
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+async function fetchRewardRequestsForAdmin(){
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('reward_pending').select('*').eq('fulfilled', false).order('created_at',{ascending:true});
+    if(error){ console.warn('fetchRewardRequestsForAdmin erè:', error.message); return; }
+    const userIds = [...new Set((data||[]).map(d=>d.user_id))];
+    let profilesById = {};
+    if(userIds.length){
+      const { data: profs } = await sb.from('profiles').select('id, name, email').in('id', userIds);
+      (profs||[]).forEach(p => { profilesById[p.id] = p; });
+    }
+    rewardRequestsData = (data||[]).map(d => ({
+      id: d.id, userId: d.user_id, programId: d.program_id, date: d.created_at,
+      clientName: profilesById[d.user_id]?.name || 'Kliyan',
+      clientEmail: profilesById[d.user_id]?.email || ''
+    }));
+    renderRewardRequestsList();
+  }catch(e){ console.warn('fetchRewardRequestsForAdmin exception:', e?.message||e); }
+}
+function renderRewardRequestsList(){
+  const box = document.getElementById('rewardRequestsList');
+  if(!box) return;
+  const term = rewardReqSearchTerm || '';
+  const filtered = term
+    ? rewardRequestsData.filter(r => r.clientName.toLowerCase().includes(term) || r.clientEmail.toLowerCase().includes(term))
+    : rewardRequestsData;
+  if(filtered.length === 0){ box.innerHTML = '<div class="empty"><div class="em-icon">🎁</div><div class="em-title">Pa gen demand an atant</div></div>'; return; }
+  const ffVariants = findFreeFireVariants();
+  box.innerHTML = filtered.map(r => {
+    const prog = state.rewardPrograms.find(p=>p.id===r.programId);
+    const rewardVariant = prog ? ffVariants.find(v=>v.id===prog.rewardVariantId) : null;
+    return `
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div>
+          <div style="font-weight:700;font-size:13.5px;">${escapeHtml(r.clientName)}</div>
+          <div style="color:var(--muted);font-size:11px;">${escapeHtml(r.clientEmail)}</div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);">${new Date(r.date).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'numeric',minute:'2-digit'})}</div>
+      </div>
+      <div style="font-size:12.5px;margin-bottom:10px;">🎯 Rekonpans: <b>${rewardVariant?escapeHtml(rewardVariant.label):'?'}</b></div>
+      <div style="display:flex;gap:6px;">
+        <input type="text" id="rewardPinInput-${r.id}" placeholder="Antre kòd PIN a" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:8px 10px;font-size:12.5px;">
+        <button class="mini-btn" style="color:var(--green);" onclick="fulfillRewardRequest('${r.id}')">✓ Konfime</button>
+      </div>
+    </div>
+  `;}).join('');
+}
+async function fulfillRewardRequest(pendingId){
+  const pinInput = document.getElementById('rewardPinInput-'+pendingId);
+  const pinCode = pinInput.value.trim();
+  if(!pinCode){ showToast('Antre yon kòd PIN anvan'); return; }
+  const reqData = rewardRequestsData.find(r=>r.id===pendingId);
+  if(!reqData) return;
+  const prog = state.rewardPrograms.find(p=>p.id===reqData.programId);
+  if(!prog) return;
+  try{
+    const sb = await getSupabase();
+    const { error: insErr } = await sb.from('reward_claims').insert({ user_id:reqData.userId, program_id:reqData.programId, variant_id:prog.rewardVariantId, pin_code:pinCode });
+    if(insErr){ showToast('⚠️ ' + insErr.message); return; }
+    const { error: updErr } = await sb.from('reward_pending').update({ fulfilled:true }).eq('id', pendingId);
+    if(updErr){ showToast('⚠️ ' + updErr.message); return; }
+    showToast('Rekonpans konfime ✓');
+    rewardRequestsData = rewardRequestsData.filter(r=>r.id!==pendingId);
+    renderRewardRequestsList();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
 async function fetchAllOrdersForAdmin(){
   try{
     const sb = await getSupabase();
-    const { data } = await sb.from('orders').select('*').order('created_at',{ascending:false}).limit(300);
+    const { data, error } = await sb.from('orders').select('*').order('created_at',{ascending:false}).limit(300);
+    if(error){ console.warn('fetchAllOrdersForAdmin erè:', error.message); sendNtfyNotification('⚠️ Erè Dashboard', 'Pa ka chaje kòmand yo pou rapò a: ' + error.message, 'high', 'warning'); return; }
     if(data){
       const byUser = {};
       data.forEach(o => {
@@ -7183,10 +8210,10 @@ async function fetchAllOrdersForAdmin(){
           adminResponse:o.admin_response
         });
       });
-      Object.assign(state.orders, byUser);
+      state.orders = byUser;
       renderAdminTab();
     }
-  }catch(e){}
+  }catch(e){ console.warn('fetchAllOrdersForAdmin exception:', e?.message||e); }
   subscribeToAdminOrdersRealtime();
 }
 let adminOrdersChannel = null;
@@ -7288,8 +8315,16 @@ async function addProduct(){
 }
 async function deleteProduct(id){
   openConfirm('Efase pwodwi a?', 'Sa ap efase pwodwi a ak tout opsyon li yo.', async ()=>{
+    const p = state.products.find(x=>x.id===id);
     state.products = state.products.filter(p=>p.id!==id);
-    try{ const sb = await getSupabase(); await sb.from('products').delete().eq('id', id); }catch(e){}
+    try{
+      const sb = await getSupabase();
+      await sb.from('products').delete().eq('id', id);
+      if(p?.image){
+        const match = p.image.match(/\/storage\/v1\/object\/public\/images\/(.+)$/);
+        if(match) await sb.storage.from('images').remove([decodeURIComponent(match[1])]);
+      }
+    }catch(e){ console.warn('deleteProduct storage cleanup failed:', e?.message||e); }
     await saveState(); renderAdminTab(); showToast('Pwodwi efase');
   });
 }
@@ -7345,6 +8380,7 @@ function renderFormAdminConfig(p){
   `;
 }
 function renderApiTopupAdminConfig(p){
+  const allVariants = getAllVariantsFlat();
   return `
     <div id="vtbody-${p.id}">
       ${sortedVariants(p).map(v => `
@@ -7364,6 +8400,18 @@ function renderApiTopupAdminConfig(p){
             <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);white-space:nowrap;">
               <input type="checkbox" ${v.requiresServerId?'checked':''} onchange="updateApiTopupVariantField('${p.id}','${v.id}','requires_server_id',this.checked)"> Server ID
             </label>
+          </div>
+          <div style="margin-top:6px;">
+            ${getEquivalenceGroupMembers(v.equivalenceGroup, v.id).map(m => `
+              <div style="display:flex;align-items:center;gap:6px;background:var(--green-dim);border-radius:6px;padding:5px 8px;margin-bottom:4px;">
+                <span style="flex:1;font-size:11px;color:var(--green-2);font-weight:600;">🔗 ${escapeHtml(m.label)}</span>
+                <button onclick="unmarryVariant('${m.id}')" style="background:none;border:none;color:var(--red);font-size:12px;cursor:pointer;">✕</button>
+              </div>
+            `).join('')}
+            <select style="width:100%;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11px;" onchange="if(this.value)marryVariants('${v.id}',this.value);this.value='';">
+              <option value="">🔗 + Ajoute yon opsyon nan gwoup la...</option>
+              ${allVariants.filter(av=>av.id!==v.id && !(v.equivalenceGroup && av.equivalenceGroup===v.equivalenceGroup)).map(av => `<option value="${av.id}">${escapeHtml(av.label)}</option>`).join('')}
+            </select>
           </div>
         </div>
       `).join('')}
@@ -7409,14 +8457,24 @@ async function updateApiTopupVariantField(productId, variantId, field, value){
   }catch(e){ showToast('⚠️ Erè koneksyon — eseye ankò'); }
 }
 function renderPinAdminConfig(p){
+  const allVariants = getAllVariantsFlat();
   return `
-    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th>Stòk</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
+    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th>Stòk</th><th>🔗 Marye</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
       ${sortedVariants(p).map(v => `
         <tr id="vrow-${v.id}" data-vid="${v.id}">
         <td style="width:40px;padding:0;"><span onpointerdown="startVariantDrag(event,'${p.id}','${v.id}')" style="cursor:grab;touch-action:none;color:var(--text);font-size:22px;line-height:1;letter-spacing:-1px;user-select:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;">⣿</span></td>
         <td>${escapeHtml(v.label)}</td>
         <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.price}" onchange="updatePrice('${p.id}','${v.id}',this.value)"></td>
         <td>${(state.inventory[v.id]||[]).filter(x=>x.status==='dispo').length}</td>
+        <td style="min-width:130px;">
+          ${(() => { const members = getEquivalenceGroupMembers(v.equivalenceGroup, v.id);
+            return members.length ? `<div style="font-size:9.5px;color:var(--green-2);margin-bottom:3px;">🔗 ${members.map(m=>escapeHtml(m.label)).join(', ')}</div>` : '';
+          })()}
+          <select style="width:110px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 4px;font-size:10.5px;" onchange="if(this.value)marryVariants('${v.id}',this.value);this.value='';">
+            <option value="">+ Marye ak...</option>
+            ${allVariants.filter(av=>av.id!==v.id && !(v.equivalenceGroup && av.equivalenceGroup===v.equivalenceGroup)).map(av => `<option value="${av.id}">${escapeHtml(av.label)}</option>`).join('')}
+          </select>
+        </td>
         <td><button class="mini-btn" onclick="removeVariant('${p.id}','${v.id}')">✕</button></td></tr>
       `).join('')}
     </tbody></table>
@@ -7712,6 +8770,45 @@ async function onProductDragEnd(ev){
   await saveState();
   showToast('Lòd pwodwi mete ajou ✓');
 }
+function getEquivalenceGroupMembers(equivalenceGroup, excludeVariantId){
+  if(!equivalenceGroup) return [];
+  return getAllVariantsFlat().filter(v => v.equivalenceGroup === equivalenceGroup && v.id !== excludeVariantId);
+}
+function getAllVariantsFlat(){
+  const rows = [];
+  state.products.forEach(p => (p.variants||[]).forEach(v => {
+    rows.push({ id: v.id, label: p.name + ' — ' + v.label, equivalenceGroup: v.equivalenceGroup || null });
+  }));
+  return rows;
+}
+async function marryVariants(variantIdA, variantIdB){
+  if(!variantIdA || !variantIdB || variantIdA === variantIdB) return;
+  const allVariants = getAllVariantsFlat();
+  const vA = allVariants.find(v=>v.id===variantIdA);
+  const vB = allVariants.find(v=>v.id===variantIdB);
+  if(!vA || !vB) return;
+  const group = vA.equivalenceGroup || vB.equivalenceGroup || uid();
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('variants').update({ equivalence_group: group }).in('id', [variantIdA, variantIdB]);
+    if(error){ showToast('⚠️ Pa ka marye: ' + error.message); return; }
+    state.products.forEach(p => (p.variants||[]).forEach(v => {
+      if(v.id===variantIdA || v.id===variantIdB) v.equivalenceGroup = group;
+    }));
+    showToast('Marye ✓ — yo kounye a konte kòm menm bagay');
+    renderAdminTab();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+async function unmarryVariant(variantId){
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('variants').update({ equivalence_group: null }).eq('id', variantId);
+    if(error){ showToast('⚠️ Pa ka demarye: ' + error.message); return; }
+    state.products.forEach(p => (p.variants||[]).forEach(v => { if(v.id===variantId) v.equivalenceGroup = null; }));
+    showToast('Demarye ✓');
+    renderAdminTab();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
 function sortedVariants(p){
   return [...(p.variants||[])].sort((a,b)=>(a.sortOrder||0)-(b.sortOrder||0) || a.price-b.price);
 }
@@ -7879,7 +8976,15 @@ async function addSiteBanner(){
   renderAdminTab();
 }
 async function deleteSiteBanner(id){
-  try{ const sb = await getSupabase(); await sb.from('site_banners').delete().eq('id', id); }catch(e){}
+  const b = state.siteBanners.find(x=>x.id===id);
+  try{
+    const sb = await getSupabase();
+    await sb.from('site_banners').delete().eq('id', id);
+    if(b?.imageUrl){
+      const match = b.imageUrl.match(/\/storage\/v1\/object\/public\/images\/(.+)$/);
+      if(match) await sb.storage.from('images').remove([decodeURIComponent(match[1])]);
+    }
+  }catch(e){ console.warn('deleteSiteBanner storage cleanup failed:', e?.message||e); }
   state.siteBanners = state.siteBanners.filter(b=>b.id!==id);
   showToast('Pub efase');
   renderAdminTab();
@@ -7936,6 +9041,16 @@ function renderPromoBanner(){
 async function uploadImageToStorage(file){
   try{
     const sb = await getSupabase();
+    let { data: sessionData } = await sb.auth.getSession();
+    if(!sessionData?.session){
+      const { data: refreshed } = await sb.auth.refreshSession();
+      sessionData = refreshed;
+    }
+    if(!sessionData?.session){
+      showToast('⚠️ Ou dekonekte — tanpri konekte ankò');
+      openAuthModal('login');
+      return null;
+    }
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
     const path = 'uploads/' + uid() + '.' + ext;
     const { error } = await sb.storage.from('images').upload(path, file);
@@ -8149,6 +9264,7 @@ async function approveRecharge(id){
   }catch(e){ /* offline — proceed with local-only approval */ }
   r.status = 'approved';
   await applyWalletChange(r.userId, r.amount, 'Rechaj NatCash', 'in', false, r.txnId, r.proofUrl, r.ref, true);
+  checkReferralRechargeBonus(r.userId, r.amount);
   if(!state.usedTxnIds.includes(r.txnId)) state.usedTxnIds.push(r.txnId);
   if(r.ref && !state.usedRefs.includes(r.ref)) state.usedRefs.push(r.ref);
   if(r.receiptHash && !state.usedReceiptHashes.includes(r.receiptHash)) state.usedReceiptHashes.push(r.receiptHash);
@@ -8196,12 +9312,10 @@ function renderDrawer(){
   const u = currentUser();
   const items = [
     {id:'shop', label:'Accueil', icon:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'},
-    {id:'shop', label:'Boutique', icon:'<path d="M6 2l1.5 4h9L18 2"/><path d="M3 6h18l-1.5 13a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z"/>'},
-    {id:'wallet', label:'Wallet', icon:'<rect x="2" y="6" width="20" height="14" rx="2"/>'},
-    {id:'commandes', label:'Mes commandes', icon:'<path d="M20 7L12 3 4 7v10l8 4 8-4z"/>'},
-    {id:'kerryRewards', label:'Free Fire Reward 💎🥳', icon:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><path d="M2 9h20"/>'},
+    {id:'referral', label:'Referral & Récompenses 🎁', icon:'<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'},
     {id:'redeem', label:'Redeem Free Fire', icon:'<path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.59 3H4v5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.82 0l4.6-4.6a2 2 0 0 0 0-2.82z"/>'},
     {id:'historique', label:'Historique', icon:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>'},
+    {id:'kerryRewards', label:'Free Fire Reward 💎🥳', icon:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><path d="M2 9h20"/>'},
     {id:'parametres', label:'Paramètres', icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'},
   ];
   d.innerHTML = `
@@ -8440,6 +9554,17 @@ fetchFooterContent();
 (async () => {
   await tryRestoreSupabaseSession();
   routeFromURL();
+  try{
+    const sb = await getSupabase();
+    sb.auth.onAuthStateChange((event, session) => {
+      console.log('[auth] eta chanje:', event, '| sesyon prezan:', !!session);
+      if(event === 'SIGNED_OUT'){
+        state.currentUserId = null;
+        state.isAdmin = false;
+        state.isSuperAdmin = false;
+      }
+    });
+  }catch(e){ console.warn('onAuthStateChange setup failed:', e?.message||e); }
 })();
 </script>
 </body>
