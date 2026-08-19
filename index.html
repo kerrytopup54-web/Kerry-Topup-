@@ -45,8 +45,6 @@ html.dark{
   --red-dim:#331419;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{overflow-x:hidden;}
-img,svg{max-width:100%;height:auto;}
 html,body{margin:0;padding:0;}
 body{
   background:
@@ -56,14 +54,6 @@ body{
   color:var(--text);
   font-family:'Inter',sans-serif;
   min-height:100vh;
-}
-@media (min-width:640px){
-  body{ background: linear-gradient(135deg, #0B1A12 0%, #0F2A1C 100%); }
-  #app{
-    max-width:600px; margin:0 auto; min-height:100vh;
-    background:var(--bg); box-shadow:0 0 60px rgba(0,0,0,0.35);
-    position:relative;
-  }
 }
 .display{font-family:'Rajdhani',sans-serif;}
 .mono{font-family:'JetBrains Mono',monospace;}
@@ -95,7 +85,7 @@ input,textarea,select{font-family:'Inter',sans-serif;}
 @media (min-width:1440px){
   .topbar{padding:20px 96px 18px;}
 }
-.topbar-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:600px;margin:0 auto;}
+.topbar-row{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:1200px;margin:0 auto;}
 .logo{display:flex;align-items:center;gap:10px;}
 .logo-mark{
   width:38px;height:38px;border-radius:11px;
@@ -122,14 +112,14 @@ input,textarea,select{font-family:'Inter',sans-serif;}
 .search-bar{
   margin-top:12px;display:flex;align-items:center;gap:8px;
   background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:10px 14px;
-  max-width:600px;margin-left:auto;margin-right:auto;
+  max-width:1200px;margin-left:auto;margin-right:auto;
 }
 .search-bar svg{width:16px;height:16px;flex-shrink:0;color:var(--muted);}
 .search-bar input{background:none;border:none;outline:none;color:var(--text);font-size:13.5px;width:100%;}
 .search-bar input::placeholder{color:#5B6656;}
 
 /* ---------- Content ---------- */
-.content{padding:16px;max-width:600px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;}
+.content{padding:16px;max-width:1200px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;}
 @media (max-width:320px){
   .content{padding:10px;}
   .prod-grid{gap:8px;}
@@ -171,11 +161,9 @@ input,textarea,select{font-family:'Inter',sans-serif;}
 }
 .cat-heading .line{flex:1;height:1px;background:linear-gradient(90deg, var(--line), transparent);}
 
-.prod-grid{display:grid;grid-template-columns:repeat(2, 1fr);gap:12px;}
-@media (min-width:480px){.prod-grid{grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:14px;}}
+.prod-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:14px;}
 @media (min-width:640px){.prod-grid{grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));gap:18px;}}
 @media (min-width:1024px){.prod-grid{grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));gap:22px;}}
-.prod-card{ min-width:0; }
 .prod-card{
   background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;
   display:flex;flex-direction:column;cursor:pointer;
@@ -256,7 +244,7 @@ input,textarea,select{font-family:'Inter',sans-serif;}
   display:flex;justify-content:center;
 }
 .bottomnav-inner{
-  width:100%;max-width:600px;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);
+  width:100%;max-width:1200px;background:rgba(255,255,255,0.96);backdrop-filter:blur(12px);
   border-top:1px solid var(--line);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));
 }
 html.dark .bottomnav-inner{background:rgba(22,27,34,0.92);}
@@ -615,7 +603,7 @@ textarea.admin-ta{
   Je suis là pour t'aider 🐶
   <div style="position:absolute;bottom:-6px;right:20px;width:12px;height:12px;background:#fff;transform:rotate(45deg);"></div>
 </div>
-<button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶<span id="supportFabBadge" style="display:none;position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 5px;background:#E23B57;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;font-family:sans-serif;"></span></button>
+<button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶<span id="supportFabBadge" style="display:none;position:absolute;top:2px;right:2px;width:12px;height:12px;background:#E23B57;border-radius:50%;border:2px solid #fff;"></span></button>
 <div id="supportChatBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:70;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)toggleSupportChat()">
   <div style="width:100%;max-width:480px;background:var(--panel);border-radius:18px 18px 0 0;height:65vh;max-height:520px;display:flex;flex-direction:column;overflow:hidden;">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);flex-shrink:0;">
@@ -623,6 +611,9 @@ textarea.admin-ta{
       <button onclick="toggleSupportChat()" style="background:none;border:none;font-size:18px;color:var(--muted);">✕</button>
     </div>
     <div id="supportChatMessages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
+    <div id="supportHumanRow" style="display:flex;gap:6px;padding:8px 14px;border-top:1px solid var(--line);flex-shrink:0;">
+      <button onclick="requestHumanAgent()" id="supportHumanBtn" style="flex:1;background:#E3EEFC;color:#1565D8;border:1px solid #1565D8;border-radius:14px;padding:8px 10px;font-size:11.5px;font-weight:700;">💬 Pale ak yon moun</button>
+    </div>
     <div style="display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);flex-shrink:0;">
       <label style="width:38px;height:38px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;cursor:pointer;">📷<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
       <input type="text" id="supportChatInput" placeholder="Ekri kesyon ou..." style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:10px 14px;color:var(--text);font-size:13px;" onkeydown="if(event.key==='Enter')sendSupportMessage()">
@@ -1346,6 +1337,7 @@ async function getOrRestoreSupportConversation(){
     }
     if(convo){
       supportConversationId = convo.id;
+      supportMode = 'human';
       state.supportAgentActive = convo.agent_active !== false;
       const { data: msgs } = await sb.from('support_messages').select('*').eq('conversation_id', convo.id).order('created_at',{ascending:true});
       supportChatHistory = [];
@@ -1355,6 +1347,7 @@ async function getOrRestoreSupportConversation(){
       updateSupportFabBadge();
       subscribeToSupportMessages(convo.id);
       updateAgentBadgeDisplay();
+      document.getElementById('supportHumanBtn').style.display = 'none';
     }
   }catch(e){ console.warn('getOrRestoreSupportConversation failed:', e?.message||e); }
 }
@@ -1372,7 +1365,7 @@ function subscribeToSupportMessages(conversationId){
         const m = payload.new;
         if(m.sender === 'admin'){
           addSupportMessage('admin', m.content, true);
-          if(!supportChatOpen){ updateSupportFabBadge(); }
+          if(!supportChatOpen){ updateSupportFabBadge(true); }
           else { sb.from('support_messages').update({ read_by_customer:true }).eq('id', m.id); }
         }
       })
@@ -1384,31 +1377,32 @@ function subscribeToSupportMessages(conversationId){
   });
 }
 
-function updateSupportFabBadge(){
+function updateSupportFabBadge(forceShow){
   const badge = document.getElementById('supportFabBadge');
-  if(!badge || !supportConversationId) return;
+  if(!badge) return;
+  if(forceShow){ badge.style.display = 'block'; return; }
+  if(!supportConversationId) return;
   getSupabase().then(async sb => {
     const { count } = await sb.from('support_messages').select('id',{count:'exact',head:true}).eq('conversation_id', supportConversationId).eq('sender','admin').eq('read_by_customer', false);
-    if(count && count > 0){
-      badge.textContent = count > 99 ? '99+' : String(count);
-      badge.style.display = 'flex';
-    } else {
-      badge.style.display = 'none';
-    }
+    badge.style.display = (count && count > 0) ? 'block' : 'none';
   });
 }
 
 async function requestHumanAgent(){
-  const email = state.currentUserId ? (currentUser()?.email || '') : '';
+  let email = state.currentUserId ? (currentUser()?.email || '') : '';
+  if(!email){
+    email = prompt('Antre imèl ou pou yon ajan ka kontakte w:');
+    if(!email || !email.includes('@')){ showToast('Imèl obligatwa pou pale ak yon ajan'); return; }
+  }
   const name = state.currentUserId ? (currentUser()?.name || 'Kliyan') : 'Kliyan (envite)';
   try{
     const sb = await getSupabase();
     const { data: convo, error } = await sb.from('support_conversations').insert({
-      user_id: state.currentUserId || null, email, name, status:'human', agent_active:false
+      user_id: state.currentUserId || null, email, name, status:'human'
     }).select().single();
-    if(error){ showToast('⚠️ Pa ka konekte kounye a — eseye ankò'); return; }
+    if(error){ showToast('⚠️ Pa ka konekte ak yon ajan kounye a — eseye ankò'); return; }
     supportConversationId = convo.id;
-    // supportMode rete 'bot' — Touski Bot kontinye reponn nòmalman, se sèlman yon "tracking" k ap kòmanse
+    supportMode = 'human';
     if(!state.currentUserId) localStorage.setItem('kt_support_convo_id', convo.id);
 
     // Kopye TOUT istwa konvèsasyon an (Touski + kliyan) nan baz done a
@@ -1419,20 +1413,20 @@ async function requestHumanAgent(){
     }));
     if(rows.length) await sb.from('support_messages').insert(rows);
 
-    state.supportAgentActive = false;
+    addSupportMessage('assistant', 'Dakò, tanpri rete yon ti moman. Yon ajan imen pral vin ede w. 🙏');
+    await sb.from('support_messages').insert({ conversation_id: convo.id, sender:'bot', content:'Dakò, tanpri rete yon ti moman. Yon ajan imen pral vin ede w. 🙏' });
+
+    state.supportAgentActive = true;
+    updateAgentBadgeDisplay();
+    document.getElementById('supportHumanBtn').style.display = 'none';
     subscribeToSupportMessages(convo.id);
 
     const lastCustomerMsg = [...supportChatHistory].reverse().find(m=>m.role==='user');
-    sendNtfyNotification('👀 Konvèsasyon k ap kontinye', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + (lastCustomerMsg?.content||'') + '"\n\n👉 Admin → Chat Kliyan si w vle antre nan konvèsasyon an', 'default', 'eyes');
+    sendNtfyNotification('🆘 Demann Ajan Imen', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + (lastCustomerMsg?.content||'') + '"\n\n👉 Admin → Chat Kliyan pou reponn', 'high', 'sos');
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
 
 let supportChatFirstOpen = true;
-function isWithinBusinessHours(){
-  const now = new Date();
-  const h = now.getHours() + now.getMinutes()/60;
-  return h >= 8 && h < 20.5; // 8h00 AM - 8h30 PM
-}
 async function toggleSupportChat(){
   supportChatOpen = !supportChatOpen;
   document.getElementById('supportChatBg').style.display = supportChatOpen ? 'flex' : 'none';
@@ -1446,11 +1440,7 @@ async function toggleSupportChat(){
     if(supportConversationId) updateSupportFabBadge();
   }
   if(supportChatOpen && supportChatHistory.length === 0){
-    if(isWithinBusinessHours()){
-      addSupportMessage('assistant', "Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)");
-    } else {
-      addSupportMessage('assistant', "Bonjour et merci de nous avoir contactés 👋\n\nNotre service est actuellement fermé. Nous sommes disponibles tous les jours de 8h00AM à 8h30PM.\n\nN'hésitez pas à nous laisser votre message et votre email : nous y répondrons dès la réouverture.\n\nMerci de votre confiance et à très bientôt !");
-    }
+    addSupportMessage('assistant', "Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)");
   }
 }
 function formatChatText(text){
@@ -1530,16 +1520,16 @@ async function sendSupportImage(input){
   const url = await uploadImageToStorage(file);
   if(!url) return;
   addSupportMessage('user', url);
-  if(supportConversationId){
+  if(supportMode === 'human' && supportConversationId){
     try{
       const sb = await getSupabase();
       await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:url });
       await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
       const u = currentUser();
-      sendNtfyNotification('📷 Nouvo foto kliyan', '👤 ' + (u?.name||'Kliyan') + '\n📧 ' + (u?.email||''), 'default', 'camera');
+      sendNtfyNotification('📷 Nouvo foto kliyan', '👤 ' + (u?.name||'Kliyan') + '\n📧 ' + (u?.email||''), 'high', 'camera');
     }catch(e){ showToast('⚠️ Pa ka voye foto — eseye ankò'); }
   } else {
-    showToast('Foto voye ✓');
+    showToast('Foto voye — peze "Pale ak yon moun" pou yon ajan wè l');
   }
 }
 async function sendSupportMessage(){
@@ -1549,26 +1539,21 @@ async function sendSupportMessage(){
   input.value = '';
   addSupportMessage('user', text);
 
-  // Si sit la fèmen, kòmanse tracking imedyatman (pa tann 5 mesaj) e pa eseye reponn ak AI
-  if(!isWithinBusinessHours() && !supportConversationId){
-    await requestHumanAgent();
-  }
-
-  // Si tracking kòmanse (konvèsasyon kreye), sove mesaj la e voye ntfy — kèlkeswa si bot la ap reponn tou
-  if(supportConversationId){
+  if(supportMode === 'human' && supportConversationId){
     try{
       const sb = await getSupabase();
       await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text });
       await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
-      const u = currentUser();
-      const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
-      const email = state.currentUserId ? ((u&&u.email)||'') : '';
-      sendNtfyNotification('💬 Nouvo mesaj kliyan', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'default', 'speech_balloon');
-    }catch(e){ /* pa bloke chat la si tracking echwe */ }
+      if(state.supportAgentActive){
+        const u = currentUser();
+        const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
+        const email = state.currentUserId ? ((u&&u.email)||'') : '';
+        sendNtfyNotification('💬 Nouvo mesaj kliyan', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'high', 'speech_balloon');
+        return;
+      }
+      // Ajan pa aktif — Touski Bot reprann reponn otomatikman, men mesaj yo toujou sove nan konvèsasyon an
+    }catch(e){ showToast('⚠️ Pa ka voye mesaj — eseye ankò'); return; }
   }
-
-  // Si sit la fèmen, oswa OU (Admin) pran kontwòl manyèlman, Touski Bot rete an silans
-  if(!isWithinBusinessHours() || state.supportAgentActive) return;
 
   const thinking = document.createElement('div');
   thinking.id = 'supportThinking';
@@ -1649,23 +1634,24 @@ RÈG STRIK KONFIDANSYALITE (SWIV TOUJOU, SAN EKSEPSYON):
     const reply = data.reply || 'Mwen pa ka reponn kounye a — eseye ankò.';
     const fullReply = reply + '\n\n' + t('chat_closing') + '\n[LIEN_TUTORIELS]';
     addSupportMessage('assistant', fullReply);
-    if(supportConversationId){
+    if(supportMode === 'human' && supportConversationId && !state.supportAgentActive){
       try{ const sb = await getSupabase(); await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'bot', content: fullReply }); }catch(e){}
-    }
-    if(!supportConversationId){
-      const customerMsgCount = supportChatHistory.filter(m => m.role === 'user').length;
-      if(customerMsgCount >= 5){ requestHumanAgent(); }
     }
   }catch(e){
     document.getElementById('supportThinking')?.remove();
-    addSupportMessage('assistant', '⚠️ DEBUG erè: ' + (e?.message||e) + '\n\nPa gen koneksyon kounye a — eseye ankò pita, oswa kontakte nou sou WhatsApp.');
+    addSupportMessage('assistant', 'Pa gen koneksyon kounye a — eseye ankò pita, oswa kontakte nou sou WhatsApp.');
   }
 }
 /* ================= KERRY REWARDS 💎🛒 ================= */
 async function generateUniqueReferralCode(name){
-  const base = 'KT_' + (name||'KLIYAN').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12) || 'KT_KLIYAN';
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // san karaktè ki ka konfonn (0/O, 1/I)
+  function randomCode(){
+    let s = '';
+    for(let i=0;i<5;i++) s += chars.charAt(Math.floor(Math.random()*chars.length));
+    return 'KT_' + s;
+  }
   const sb = await getSupabase();
-  let candidate = base;
+  let candidate = randomCode();
   let attempt = 0;
   while(attempt < 5){
     try{
@@ -1673,7 +1659,7 @@ async function generateUniqueReferralCode(name){
       if(!data) return candidate;
     }catch(e){ return candidate; }
     attempt++;
-    candidate = base + Math.floor(Math.random()*900+100);
+    candidate = randomCode();
   }
   return candidate;
 }
@@ -1724,14 +1710,8 @@ function startRewardCycleCountdown(){
   const tick = () => {
     const dEl = document.getElementById('rct-d');
     if(!dEl){ clearInterval(rewardCycleInterval); rewardCycleInterval = null; return; }
-    const now = new Date();
-    const remaining = Math.max(0, targetMs - now.getTime());
-    // Jou a chanje SÈLMAN nan minwit (kalandriye), pa chak 24è brit soti nan kòmansman sik la
-    const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const target = new Date(targetMs);
-    const targetMidnight = new Date(target.getFullYear(), target.getMonth(), target.getDate()).getTime();
-    const daysRemaining = Math.max(0, Math.round((targetMidnight - nowMidnight) / 86400000));
-    document.getElementById('rct-d').textContent = String(daysRemaining).padStart(2,'0');
+    const remaining = Math.max(0, targetMs - Date.now());
+    document.getElementById('rct-d').textContent = String(Math.floor(remaining/86400000)).padStart(2,'0');
     document.getElementById('rct-h').textContent = String(Math.floor((remaining%86400000)/3600000)).padStart(2,'0');
     document.getElementById('rct-m').textContent = String(Math.floor((remaining%3600000)/60000)).padStart(2,'0');
     document.getElementById('rct-s').textContent = String(Math.floor((remaining%60000)/1000)).padStart(2,'0');
@@ -2614,7 +2594,7 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
   }
   if(profile?.dismissed_notif_ids) state.dismissedNotifIds = profile.dismissed_notif_ids;
   if(profile?.seen_notif_ids) state.seenNotifIds = profile.seen_notif_ids;
-  if(profile?.recharge_ref) currentRechargeRef = profile.recharge_ref;
+  if(profile?.recharge_ref && /^\d{5}$/.test(profile.recharge_ref)) currentRechargeRef = profile.recharge_ref;
   if(profile?.recharge_timer_ends_at){
     const endsAt = new Date(profile.recharge_timer_ends_at).getTime();
     rcTimerEndsAt = endsAt;
@@ -3576,14 +3556,6 @@ async function verifyPlayerId(productId){
         resultBox.innerHTML = '<div style="color:var(--red);font-size:12.5px;">⚠️ Pa kapab verifye kounye a — eseye ankò nan kèk minit.</div>';
         sendNtfyNotification('🚨 Erè teknik (paj kliyan)', '📄 Kontèks: Verifikasyon ID Free Fire\n🛠️ Detay: ' + (error?.message || 'Erè verifikasyon enkoni'), 'urgent', 'rotating_light');
       }
-      if(data && (data.debug_sent || data.debug_received || data.debug_body_received)){
-        resultBox.innerHTML += `
-          <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px;margin-top:10px;font-size:10.5px;font-family:monospace;color:#111;word-break:break-all;">
-            <b>🐛 HTTP: ${data.debug_http_status||'?'}</b><br>
-            <b>Voye:</b> ${escapeHtml(JSON.stringify(data.debug_sent||data.debug_body_received))}
-          </div>
-        `;
-      }
       console.warn('founisè-verify-player erè:', error, data);
       return;
     }
@@ -3602,14 +3574,6 @@ async function verifyPlayerId(productId){
       `;
     } else {
       resultBox.innerHTML = '<div style="background:rgba(214,69,69,0.08);border-radius:10px;padding:11px 13px;color:var(--red);font-weight:600;font-size:13px;margin-top:12px;">❌ Player ID sa a pa egziste</div>';
-      if(data.debug_sent || data.debug_received){
-        resultBox.innerHTML += `
-          <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px;margin-top:10px;font-size:10.5px;font-family:monospace;color:#111;word-break:break-all;">
-            <b>🐛 Voye:</b> ${escapeHtml(JSON.stringify(data.debug_sent))}<br><br>
-            <b>🐛 Resevwa:</b> ${escapeHtml(JSON.stringify(data.debug_received))}
-          </div>
-        `;
-      }
     }
   }catch(e){
     resultBox.innerHTML = '<div style="color:var(--red);font-size:12.5px;">⚠️ Erè: ' + escapeHtml(e?.message || 'enkoni') + '</div>';
@@ -3749,16 +3713,12 @@ async function confirmApiTopupPurchase(productId){
     if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
     state.orders[state.currentUserId].unshift(order);
     fetchWalletFromServer(state.currentUserId); // background — pa bezwen tann sa pou kontinye
-    showToast(t('toast_purchase_success'));
+    notifyAdminNewOrder(order);
+    if(order.status === 'terminee') notifyAdminNewSale(order);
+    incrementRewardProgress(state.currentUserId, variant.id); // fè pwogram fidelite avanse pou acha otomatik yo tou
+    applyReferralFirstPurchaseDiscount(state.currentUserId);
+      showToast(t('toast_purchase_success'));
     goPage('commandes');
-    // Aksyon segondè yo (notifikasyon, pwogrè rekonpans, rediksyon referral) — si youn nan yo echwe,
-    // sa PA dwe fè kliyan an panse acha a echwe, paske kòmand lan DEJA reyisi anlè a
-    try{
-      notifyAdminNewOrder(order);
-      if(order.status === 'terminee') notifyAdminNewSale(order);
-      incrementRewardProgress(state.currentUserId, variant.id);
-      applyReferralFirstPurchaseDiscount(state.currentUserId);
-    }catch(e2){ console.warn('Aksyon segondè apre acha echwe (pa kritik):', e2?.message||e2); }
   }catch(e){
     showToast('⚠️ Erè rezo pandan acha a');
     resetBtn();
@@ -4078,31 +4038,27 @@ async function confirmPurchase(productId){
     };
     if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
     state.orders[state.currentUserId].unshift(order);
+    applyReferralFirstPurchaseDiscount(state.currentUserId);
 
     // cosmetic local sync so the shop page's stock counter doesn't look stale
     const local = (state.inventory[v.id] || []).find(x => x.status === 'dispo');
     if(local) local.status = 'vann';
+
+    notifyAdminNewOrder(order);
+    if(outOfStock){
+      sendNtfyNotification('Stock ' + order.product + ' - ' + order.variant + ' fini', 'Yon kliyan an atant pou opsyon sa a.', 'default', 'package');
+      sendOrderReceivedEmail(order, currentUser());
+    } else {
+      checkStockAndNotifyIfEmpty(v.id, order.product, order.variant);
+      sendOrderReceiptEmail(order, currentUser());
+      notifyAdminNewSale(order);
+    }
 
     await fetchWalletFromServer(state.currentUserId);
     await fetchRewardProgress(state.currentUserId); // Kerry Rewards handled server-side inside the RPC now
     await saveState();
     showToast(outOfStock ? t('toast_order_processing') : t('toast_purchase_success'));
     goPage('commandes');
-
-    // Aksyon segondè yo (notifikasyon, referral) — si youn echwe, sa PA dwe fè kliyan an
-    // panse acha a echwe, paske kòmand lan DEJA reyisi anlè a
-    try{
-      applyReferralFirstPurchaseDiscount(state.currentUserId);
-      notifyAdminNewOrder(order);
-      if(outOfStock){
-        sendNtfyNotification('Stock ' + order.product + ' - ' + order.variant + ' fini', 'Yon kliyan an atant pou opsyon sa a.', 'default', 'package');
-        sendOrderReceivedEmail(order, currentUser());
-      } else {
-        checkStockAndNotifyIfEmpty(v.id, order.product, order.variant);
-        sendOrderReceiptEmail(order, currentUser());
-        notifyAdminNewSale(order);
-      }
-    }catch(e2){ console.warn('Aksyon segondè apre acha PIN echwe (pa kritik):', e2?.message||e2); }
   }catch(e){
     relayOrderError(e, 'Kòmand PIN');
   }
@@ -4235,7 +4191,7 @@ function genRechargeRef(){
   let ref;
   let attempts = 0;
   do{
-    ref = String(Math.floor(1000 + Math.random()*9000));
+    ref = String(Math.floor(10000 + Math.random()*90000));
     attempts++;
   } while((active.includes(ref) || used.includes(ref)) && attempts < 50);
   return ref;
@@ -6292,14 +6248,11 @@ let selectedWithdrawalMethod = 'moncash';
 function pageReferral(){
   const d = state.referralData;
   if(!d){
-    return `<div class="page-header"><h2>🎁 Referral & Récompenses</h2></div>
-      <div class="card" style="margin-bottom:12px;"><div class="skel-line" style="height:60px;border-radius:12px;"></div></div>
-      <div class="card" style="margin-bottom:12px;"><div class="skel-line" style="height:80px;border-radius:12px;"></div></div>
-      <div class="card"><div class="skel-line" style="height:120px;border-radius:12px;"></div></div>`;
+    return `<div class="page-header"><h2>🎁 Referral & Récompenses</h2></div><div class="empty"><div class="em-icon">⏳</div><div class="em-title">Chajman...</div></div>`;
   }
   return `
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-      <button onclick="goPage('shop')" style="width:38px;height:38px;border-radius:11px;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;">←</button>
+      <button onclick="goPage('parametres')" style="width:38px;height:38px;border-radius:11px;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;">←</button>
       <h2 style="font-size:17px;font-weight:800;margin:0;">Référal &amp; Récompenses</h2>
       <span style="font-size:22px;">🎁</span>
     </div>
@@ -6320,7 +6273,7 @@ function pageReferral(){
         </div>
         <div>
           <div style="font-size:12px;font-weight:700;margin-bottom:8px;">Partager</div>
-          <button onclick="shareReferralLink()" class="btn btn-green" style="width:100%;margin-bottom:8px;font-size:12.5px;display:flex;align-items:center;justify-content:center;gap:7px;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Partager mon lien</button>
+          <button onclick="shareReferralLink()" class="btn btn-green" style="width:100%;margin-bottom:8px;font-size:12.5px;">📤 Partager mon lien</button>
           <button onclick="copyReferralLink()" class="btn btn-ghost" style="width:100%;font-size:12.5px;">🔗 Copier le lien</button>
         </div>
       </div>
@@ -6363,10 +6316,8 @@ function pageReferral(){
           <div id="methodButtons" style="display:flex;flex-direction:column;gap:6px;"></div>
         </div>
       </div>
-      <div id="withdrawAccountRow">
-        <label style="font-size:11.5px;font-weight:700;display:block;margin-bottom:6px;">Numéro / Identifiant</label>
-        <input type="tel" inputmode="numeric" id="withdrawAccount" placeholder="Numéro du compte" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);margin-bottom:12px;">
-      </div>
+      <label style="font-size:11.5px;font-weight:700;display:block;margin-bottom:6px;">Numéro / Identifiant</label>
+      <input type="text" id="withdrawAccount" placeholder="Numéro ou identifiant du compte" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);margin-bottom:12px;">
       <button onclick="submitReferralWithdrawal()" class="btn" style="width:100%;background:var(--ink);color:#fff;">📤 Demander le retrait</button>
     </div>
 
@@ -6389,22 +6340,14 @@ function renderWithdrawalMethodButtons(){
   box.innerHTML = methods.map(m => `
     <button onclick="selectedWithdrawalMethod='${m.id}';renderWithdrawalMethodButtons();" style="display:flex;align-items:center;gap:7px;border:1.5px solid ${selectedWithdrawalMethod===m.id?'var(--green)':'var(--line)'};background:${selectedWithdrawalMethod===m.id?'var(--green-dim)':'var(--panel)'};border-radius:9px;padding:7px 10px;font-size:11.5px;font-weight:700;color:var(--text);">${m.badge} ${m.label}</button>
   `).join('');
-  const accountRow = document.getElementById('withdrawAccountRow');
-  if(accountRow) accountRow.style.display = selectedWithdrawalMethod === 'wallet' ? 'none' : 'block';
 }
 async function fetchReferralPageData(){
   if(!state.currentUserId) return;
   try{
     const sb = await getSupabase();
-    let { data: profile, error: profErr } = await sb.from('profiles').select('referral_code, referred_by, name').eq('id', state.currentUserId).maybeSingle();
+    const { data: profile, error: profErr } = await sb.from('profiles').select('referral_code, referred_by').eq('id', state.currentUserId).maybeSingle();
     if(profErr){ showToast('⚠️ ' + profErr.message); return; }
     if(!profile) return;
-
-    if(!profile.referral_code){
-      const newCode = await generateUniqueReferralCode(profile.name || 'kliyan');
-      const { error: updErr } = await sb.from('profiles').update({ referral_code: newCode }).eq('id', state.currentUserId);
-      if(!updErr) profile.referral_code = newCode;
-    }
 
     let sponsorName = null;
     if(profile.referred_by){
@@ -6460,9 +6403,8 @@ async function shareReferralLink(){
     "🎁 Epi gen yon ti bonis k ap tann ou lè w vini atravè lyen mwen an!\n" +
     "👇 Klike la pou w gade:\n" +
     "🔗 " + link;
-  const inIframe = window.top !== window.self;
-  if(navigator.share && !inIframe){
-    try{ await navigator.share({ title:"Kerry Topup Official", text: message }); return; }catch(e){ if(e.name==='AbortError') return; }
+  if(navigator.share){
+    try{ await navigator.share({ title:"Kerry Topup Official", text: message, url: link }); return; }catch(e){ if(e.name==='AbortError') return; }
   }
   copyReferralLink();
 }
@@ -6476,21 +6418,11 @@ async function submitReferralWithdrawal(){
   if(selectedWithdrawalMethod !== 'wallet' && !account){ showToast('Antre nimewo/idantifyan kont ou'); return; }
   try{
     const sb = await getSupabase();
-    const isInstant = selectedWithdrawalMethod === 'wallet';
-    const { error } = await sb.from('referral_withdrawals').insert({ user_id: state.currentUserId, amount, method: selectedWithdrawalMethod, destination: account || null, status: isInstant ? 'approved' : 'pending', processed_at: isInstant ? new Date().toISOString() : null });
+    const { error } = await sb.from('referral_withdrawals').insert({ user_id: state.currentUserId, amount, method: selectedWithdrawalMethod, destination: account || null, status:'pending' });
     if(error){ showToast('⚠️ ' + error.message); return; }
-
-    if(isInstant){
-      await applyWalletChange(state.currentUserId, amount, '🎁 Transfert balans referral', 'in');
-      await fetchWalletFromServer(state.currentUserId);
-      const u = currentUser();
-      sendNtfyNotification('✅ Retrè Wallet Interne (Otomatik)', '👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||'') + '\n💰 Montan: ' + money(amount) + '\nDeja kredite otomatikman nan wallet li — pa gen aksyon pou fè.', 'default', 'white_check_mark');
-      showToast('✅ ' + money(amount) + ' ajoute nan wallet ou imedyatman !');
-    } else {
-      const u = currentUser();
-      sendNtfyNotification('💸 Demand Retrè Referral', '👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||'') + '\n💰 Montan: ' + money(amount) + '\n💳 Metòd: ' + selectedWithdrawalMethod + (account?'\n🔢 '+account:''), 'high', 'money_with_wings');
-      showToast('Demand retrè voye ✓ — n ap trete l byento');
-    }
+    const u = currentUser();
+    sendNtfyNotification('💸 Demand Retrè Referral', '👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||'') + '\n💰 Montan: ' + money(amount) + '\n💳 Metòd: ' + selectedWithdrawalMethod + (account?'\n🔢 '+account:''), 'high', 'money_with_wings');
+    showToast('Demand retrè voye ✓ — n ap trete l byento');
     document.getElementById('withdrawAmount').value = '';
     document.getElementById('withdrawAccount').value = '';
     fetchReferralPageData();
@@ -9365,10 +9297,10 @@ function renderDrawer(){
   const u = currentUser();
   const items = [
     {id:'shop', label:'Accueil', icon:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'},
+    {id:'referral', label:'Referral & Récompenses 🎁', icon:'<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'},
+    {id:'kerryRewards', label:'Free Fire Reward 💎🥳', icon:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><path d="M2 9h20"/>'},
     {id:'redeem', label:'Redeem Free Fire', icon:'<path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.59 3H4v5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.82 0l4.6-4.6a2 2 0 0 0 0-2.82z"/>'},
     {id:'historique', label:'Historique', icon:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>'},
-    {id:'kerryRewards', label:'Free Fire Reward 💎🥳', icon:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><path d="M2 9h20"/>'},
-    {id:'referral', label:'Referral & Récompenses 🎁', icon:'<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'},
     {id:'parametres', label:'Paramètres', icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'},
   ];
   d.innerHTML = `
@@ -9605,10 +9537,6 @@ fetchTutorialTriggersV2();
 fetchPaymentSettings();
 fetchFooterContent();
 (async () => {
-  // Detekte ?ref= nan URL la ANVAN nou restore sesyon/kreye pwofil, pou kòd referans lan disponib sou tan
-  const refCode = new URLSearchParams(window.location.search).get('ref');
-  if(refCode) localStorage.setItem('kt_pending_ref_code', refCode.trim().toUpperCase());
-
   await tryRestoreSupabaseSession();
   routeFromURL();
   try{
