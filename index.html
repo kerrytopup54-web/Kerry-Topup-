@@ -465,6 +465,7 @@ textarea.admin-ta{
 @keyframes offlineBarMove { 0%{ transform:translateX(-100px); } 50%{ transform:translateX(180px); } 100%{ transform:translateX(-100px); } }
 @keyframes skelShimmer { 0%{ background-position:-200px 0; } 100%{ background-position:200px 0; } }
 @keyframes spin { to{ transform:rotate(360deg); } }
+@keyframes cherifShake{ 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-6deg);} 75%{transform:rotate(6deg);} }
 
 /* ===== Bwat Kado Rekonpans ===== */
 .gift-wrap{ text-align:center; cursor:pointer; padding:20px 10px; }
@@ -611,9 +612,6 @@ textarea.admin-ta{
       <button onclick="toggleSupportChat()" style="background:none;border:none;font-size:18px;color:var(--muted);">✕</button>
     </div>
     <div id="supportChatMessages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
-    <div id="supportHumanRow" style="display:flex;gap:6px;padding:8px 14px;border-top:1px solid var(--line);flex-shrink:0;">
-      <button onclick="requestHumanAgent()" id="supportHumanBtn" style="flex:1;background:#E3EEFC;color:#1565D8;border:1px solid #1565D8;border-radius:14px;padding:8px 10px;font-size:11.5px;font-weight:700;">💬 Pale ak yon moun</button>
-    </div>
     <div style="display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);flex-shrink:0;">
       <label style="width:38px;height:38px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;cursor:pointer;">📷<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
       <input type="text" id="supportChatInput" placeholder="Ekri kesyon ou..." style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:10px 14px;color:var(--text);font-size:13px;" onkeydown="if(event.key==='Enter')sendSupportMessage()">
@@ -849,7 +847,7 @@ let state = {
   cart: [],
   tutorielContent: '',
   tutorielVideo: '',
-  paymentSettings: { number: '42614967', name: 'CADET VANSKERRY', whatsapp: '50942614967', ntfyTopic: '' },
+  paymentSettings: { number: '42614967', name: 'CADET VANSKERRY', whatsapp: '50942614967', ntfyTopic: '', qrImageUrl: '', extraNtfyTopics: [] },
   rewardPrograms: [],
   rewardProgress: {},
   referralData: null,
@@ -929,7 +927,7 @@ async function fetchProductsFromServer(){
           const mc = (configs||[]).find(c=>c.product_id===p.id);
           obj.manualConfig = mc ? { taux:Number(mc.taux), frais:Number(mc.frais||0), min:Number(mc.min_amount), max:Number(mc.max_amount), fields:mc.fields||[], feeTiers:mc.fee_tiers||[] } : {taux:145,frais:0,min:5,max:500,fields:[],feeTiers:[]};
         } else {
-          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null, equivalenceGroup:v.equivalence_group||null}));
+          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), originalPrice:v.original_price!=null?Number(v.original_price):null, partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null, equivalenceGroup:v.equivalence_group||null}));
           if(p.type === 'form'){ obj.formFields = p.form_fields || []; }
         }
         return obj;
@@ -940,7 +938,18 @@ async function fetchProductsFromServer(){
       renderShop();
       if(document.getElementById('adminTabs')) renderAdminTab();
     }
-  }catch(e){ console.warn('fetchProductsFromServer failed:', e?.message || e?.error_description || e?.code || JSON.stringify(e) || e); }
+  }catch(e){
+    console.warn('fetchProductsFromServer failed:', e?.message || e?.error_description || e?.code || JSON.stringify(e) || e);
+    if(!state.productsLoaded){
+      fetchProductsRetryCount = (fetchProductsRetryCount||0) + 1;
+      if(fetchProductsRetryCount <= 3){
+        setTimeout(fetchProductsFromServer, 2000);
+      } else {
+        state.productsLoadFailed = true;
+        renderShop();
+      }
+    }
+  }
   await fetchCategoriesFromServer();
   if(pendingProductSlug){
     const found = state.products.find(p => slugify(p.name) === pendingProductSlug);
@@ -1044,7 +1053,12 @@ async function fetchTutorialVideos(){
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.from('tutorial_videos').select('*');
-    if(error){ console.warn('fetchTutorialVideos erè:', error.message); sendNtfyNotification('⚠️ Erè Videyo', 'Pa ka chaje videyo tutoryèl yo: ' + error.message, 'high', 'warning'); return; }
+    if(error){
+      console.warn('fetchTutorialVideos erè:', error.message);
+      const isClientClockIssue = /issued at future|clock/i.test(error.message||'');
+      if(!isClientClockIssue) sendNtfyNotification('⚠️ Erè Videyo', 'Pa ka chaje videyo tutoryèl yo: ' + error.message, 'high', 'warning', undefined, 'errors');
+      return;
+    }
     if(data){
       state.tutorialVideos = data.map(v => ({ id:v.id, title:v.title, videoUrl:v.video_url, contextType:v.context_type, productId:v.product_id }));
       if(currentPage === 'tutoriel') render();
@@ -1289,13 +1303,78 @@ async function fetchPaymentSettings(){
     }
   }catch(e){ console.warn('fetchPaymentSettings failed:', e?.message || e); }
 }
+const NTFY_CATEGORY_LIST = [
+  ['newCustomer','🆕 Nouvo kliyan'],
+  ['chat','💬 Mesaj chat kliyan'],
+  ['newOrder','🛒 Nouvo kòmand'],
+  ['newRecharge','⏳ Nouvo demand rechaj'],
+  ['referral','🎁 Referral (retrè/bonis)'],
+  ['rewards','💎 Demand rekonpans Free Fire'],
+  ['stock','📦 Alèt estòk'],
+  ['wallet','💳 Retrè wallet entèn'],
+  ['errors','🚨 Erè teknik']
+];
+function renderExtraNtfyTopics(){
+  const box = document.getElementById('extraNtfyList');
+  if(!box) return;
+  const list = state.paymentSettings.extraNtfyTopics || [];
+  box.innerHTML = list.map((entry, i) => `
+    <div style="background:var(--panel-2);border-radius:10px;padding:12px;margin-bottom:10px;">
+      <div style="display:flex;gap:6px;margin-bottom:8px;">
+        <input type="text" class="extraNtfyTopicInput" data-idx="${i}" placeholder="Ex: kerrytopup-admin2-x9k2m" value="${escapeHtml(entry.topic||'')}" style="flex:1;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12.5px;color:var(--text);">
+        <button class="mini-btn" style="color:var(--red);" onclick="removeExtraNtfyTopicRow(${i})">✕</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        ${NTFY_CATEGORY_LIST.map(([key,label]) => `<label style="display:flex;align-items:center;gap:8px;font-size:12px;"><input type="checkbox" class="extraNtfyCat" data-idx="${i}" data-key="${key}" ${entry.categories?.[key]?'checked':''}> ${label}</label>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+function addExtraNtfyTopicRow(){
+  syncExtraNtfyFromDom();
+  if(!state.paymentSettings.extraNtfyTopics) state.paymentSettings.extraNtfyTopics = [];
+  state.paymentSettings.extraNtfyTopics.push({ topic:'', categories:{} });
+  renderExtraNtfyTopics();
+}
+function removeExtraNtfyTopicRow(idx){
+  syncExtraNtfyFromDom();
+  state.paymentSettings.extraNtfyTopics.splice(idx, 1);
+  renderExtraNtfyTopics();
+}
+function syncExtraNtfyFromDom(){
+  const list = state.paymentSettings.extraNtfyTopics || [];
+  document.querySelectorAll('.extraNtfyTopicInput').forEach(inp => {
+    const i = parseInt(inp.dataset.idx);
+    if(list[i]) list[i].topic = inp.value.trim();
+  });
+  document.querySelectorAll('.extraNtfyCat').forEach(cb => {
+    const i = parseInt(cb.dataset.idx);
+    if(list[i]){ if(!list[i].categories) list[i].categories = {}; list[i].categories[cb.dataset.key] = cb.checked; }
+  });
+  state.paymentSettings.extraNtfyTopics = list;
+}
+async function handlePaymentQrUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  showToast('Ap telechaje QR a...');
+  const url = await uploadImageToStorage(file);
+  if(!url) return;
+  state.paymentSettings.qrImageUrl = url;
+  try{
+    const sb = await getSupabase();
+    await sb.from('site_content').upsert({ key:'payment_settings', content: JSON.stringify(state.paymentSettings), updated_at: new Date().toISOString() });
+  }catch(e){}
+  showToast('QR NatCash sove ✓');
+  renderAdminTab();
+}
 async function savePaymentSettings(){
+  syncExtraNtfyFromDom();
   const number = document.getElementById('paySetNumber').value.trim();
   const name = document.getElementById('paySetName').value.trim();
   const whatsapp = document.getElementById('paySetWhatsapp').value.trim();
   const ntfyTopic = document.getElementById('paySetNtfy').value.trim();
   if(!number || !name || !whatsapp){ showToast('Ranpli tout chan yo'); return; }
-  state.paymentSettings = { number, name, whatsapp, ntfyTopic };
+  state.paymentSettings = { ...state.paymentSettings, number, name, whatsapp, ntfyTopic };
   try{
     const sb = await getSupabase();
     await sb.from('site_content').upsert({ key:'payment_settings', content: JSON.stringify(state.paymentSettings), updated_at: new Date().toISOString() });
@@ -1337,7 +1416,6 @@ async function getOrRestoreSupportConversation(){
     }
     if(convo){
       supportConversationId = convo.id;
-      supportMode = 'human';
       state.supportAgentActive = convo.agent_active !== false;
       const { data: msgs } = await sb.from('support_messages').select('*').eq('conversation_id', convo.id).order('created_at',{ascending:true});
       supportChatHistory = [];
@@ -1350,6 +1428,28 @@ async function getOrRestoreSupportConversation(){
       document.getElementById('supportHumanBtn').style.display = 'none';
     }
   }catch(e){ console.warn('getOrRestoreSupportConversation failed:', e?.message||e); }
+}
+async function checkReferralRechargeBonus(userId, amount){
+  try{
+    const sb = await getSupabase();
+    const { data: profile } = await sb.from('profiles').select('referred_by, referral_bonus_given, name').eq('id', userId).maybeSingle();
+    if(!profile || !profile.referred_by || profile.referral_bonus_given) return;
+
+    const { data: settings } = await sb.from('referral_settings').select('*').eq('id', 1).maybeSingle();
+    const minRecharge = settings?.min_recharge_for_bonus ?? 200;
+    const parrainBonus = settings?.parrain_bonus ?? 50;
+
+    const { data: allRecharges } = await sb.from('recharge_requests').select('amount').eq('user_id', userId).eq('status', 'approved');
+    const totalRecharged = (allRecharges || []).reduce((s, r) => s + Number(r.amount), 0);
+    if(totalRecharged < minRecharge) return;
+
+    const { error: insErr } = await sb.from('referral_earnings').insert({ parrain_id: profile.referred_by, referred_user_id: userId, amount: parrainBonus });
+    if(insErr){ console.warn('checkReferralRechargeBonus insert erè:', insErr.message); return; }
+    await sb.from('profiles').update({ referral_bonus_given: true }).eq('id', userId);
+
+    const { data: parrainProfile } = await sb.from('profiles').select('name').eq('id', profile.referred_by).maybeSingle();
+    sendNtfyNotification('🎉 Bonis Referral bay', '👤 Fiyèl: ' + (profile.name||'') + '\n👤 Parenn: ' + (parrainProfile?.name||'') + '\n💰 Bonis: ' + money(parrainBonus), 'default', 'moneybag');
+  }catch(e){ console.warn('checkReferralRechargeBonus exception:', e?.message||e); }
 }
 function updateAgentBadgeDisplay(){
   const label = document.getElementById('supportModeLabel');
@@ -1389,23 +1489,17 @@ function updateSupportFabBadge(forceShow){
 }
 
 async function requestHumanAgent(){
-  let email = state.currentUserId ? (currentUser()?.email || '') : '';
-  if(!email){
-    email = prompt('Antre imèl ou pou yon ajan ka kontakte w:');
-    if(!email || !email.includes('@')){ showToast('Imèl obligatwa pou pale ak yon ajan'); return; }
-  }
+  const email = state.currentUserId ? (currentUser()?.email || '') : '';
   const name = state.currentUserId ? (currentUser()?.name || 'Kliyan') : 'Kliyan (envite)';
   try{
     const sb = await getSupabase();
     const { data: convo, error } = await sb.from('support_conversations').insert({
-      user_id: state.currentUserId || null, email, name, status:'human'
+      user_id: state.currentUserId || null, email, name, status:'human', agent_active:false
     }).select().single();
-    if(error){ showToast('⚠️ Pa ka konekte ak yon ajan kounye a — eseye ankò'); return; }
+    if(error){ showToast('⚠️ Pa ka konekte kounye a — eseye ankò'); return; }
     supportConversationId = convo.id;
-    supportMode = 'human';
     if(!state.currentUserId) localStorage.setItem('kt_support_convo_id', convo.id);
 
-    // Kopye TOUT istwa konvèsasyon an (Touski + kliyan) nan baz done a
     const rows = supportChatHistory.map(m => ({
       conversation_id: convo.id,
       sender: m.role === 'user' ? 'customer' : 'bot',
@@ -1413,20 +1507,20 @@ async function requestHumanAgent(){
     }));
     if(rows.length) await sb.from('support_messages').insert(rows);
 
-    addSupportMessage('assistant', 'Dakò, tanpri rete yon ti moman. Yon ajan imen pral vin ede w. 🙏');
-    await sb.from('support_messages').insert({ conversation_id: convo.id, sender:'bot', content:'Dakò, tanpri rete yon ti moman. Yon ajan imen pral vin ede w. 🙏' });
-
-    state.supportAgentActive = true;
-    updateAgentBadgeDisplay();
-    document.getElementById('supportHumanBtn').style.display = 'none';
+    state.supportAgentActive = false;
     subscribeToSupportMessages(convo.id);
 
     const lastCustomerMsg = [...supportChatHistory].reverse().find(m=>m.role==='user');
-    sendNtfyNotification('🆘 Demann Ajan Imen', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + (lastCustomerMsg?.content||'') + '"\n\n👉 Admin → Chat Kliyan pou reponn', 'high', 'sos');
+    sendNtfyNotification('👀 Konvèsasyon k ap kontinye', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + (lastCustomerMsg?.content||'') + '"\n\n👉 Admin → Chat Kliyan si w vle antre nan konvèsasyon an', 'default', 'eyes', undefined, 'chat');
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
 
 let supportChatFirstOpen = true;
+function isWithinBusinessHours(){
+  const now = new Date();
+  const h = now.getHours() + now.getMinutes()/60;
+  return h >= 8 && h < 20.5;
+}
 async function toggleSupportChat(){
   supportChatOpen = !supportChatOpen;
   document.getElementById('supportChatBg').style.display = supportChatOpen ? 'flex' : 'none';
@@ -1440,7 +1534,11 @@ async function toggleSupportChat(){
     if(supportConversationId) updateSupportFabBadge();
   }
   if(supportChatOpen && supportChatHistory.length === 0){
-    addSupportMessage('assistant', "Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)");
+    if(isWithinBusinessHours()){
+      addSupportMessage('assistant', "Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)");
+    } else {
+      addSupportMessage('assistant', "Bonjour et merci de nous avoir contactés 👋\n\nNotre service est actuellement fermé. Nous sommes disponibles tous les jours de 8h00AM à 8h30PM.\n\nN'hésitez pas à nous laisser votre message et votre email : nous y répondrons dès la réouverture.\n\nMerci de votre confiance et à très bientôt !");
+    }
   }
 }
 function formatChatText(text){
@@ -1520,16 +1618,16 @@ async function sendSupportImage(input){
   const url = await uploadImageToStorage(file);
   if(!url) return;
   addSupportMessage('user', url);
-  if(supportMode === 'human' && supportConversationId){
+  if(supportConversationId){
     try{
       const sb = await getSupabase();
       await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:url });
       await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
       const u = currentUser();
-      sendNtfyNotification('📷 Nouvo foto kliyan', '👤 ' + (u?.name||'Kliyan') + '\n📧 ' + (u?.email||''), 'high', 'camera');
+      sendNtfyNotification('📷 Nouvo foto kliyan', '👤 ' + (u?.name||'Kliyan') + '\n📧 ' + (u?.email||''), 'default', 'camera', undefined, 'chat');
     }catch(e){ showToast('⚠️ Pa ka voye foto — eseye ankò'); }
   } else {
-    showToast('Foto voye — peze "Pale ak yon moun" pou yon ajan wè l');
+    showToast('Foto voye ✓');
   }
 }
 async function sendSupportMessage(){
@@ -1539,21 +1637,23 @@ async function sendSupportMessage(){
   input.value = '';
   addSupportMessage('user', text);
 
-  if(supportMode === 'human' && supportConversationId){
+  if(!isWithinBusinessHours() && !supportConversationId){
+    await requestHumanAgent();
+  }
+
+  if(supportConversationId){
     try{
       const sb = await getSupabase();
       await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text });
       await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
-      if(state.supportAgentActive){
-        const u = currentUser();
-        const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
-        const email = state.currentUserId ? ((u&&u.email)||'') : '';
-        sendNtfyNotification('💬 Nouvo mesaj kliyan', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'high', 'speech_balloon');
-        return;
-      }
-      // Ajan pa aktif — Touski Bot reprann reponn otomatikman, men mesaj yo toujou sove nan konvèsasyon an
-    }catch(e){ showToast('⚠️ Pa ka voye mesaj — eseye ankò'); return; }
+      const u = currentUser();
+      const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
+      const email = state.currentUserId ? ((u&&u.email)||'') : '';
+      sendNtfyNotification('💬 Nouvo mesaj kliyan', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'default', 'speech_balloon', undefined, 'chat');
+    }catch(e){ /* pa bloke chat la si tracking echwe */ }
   }
+
+  if(!isWithinBusinessHours() || state.supportAgentActive) return;
 
   const thinking = document.createElement('div');
   thinking.id = 'supportThinking';
@@ -1634,8 +1734,12 @@ RÈG STRIK KONFIDANSYALITE (SWIV TOUJOU, SAN EKSEPSYON):
     const reply = data.reply || 'Mwen pa ka reponn kounye a — eseye ankò.';
     const fullReply = reply + '\n\n' + t('chat_closing') + '\n[LIEN_TUTORIELS]';
     addSupportMessage('assistant', fullReply);
-    if(supportMode === 'human' && supportConversationId && !state.supportAgentActive){
+    if(supportConversationId){
       try{ const sb = await getSupabase(); await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'bot', content: fullReply }); }catch(e){}
+    }
+    if(!supportConversationId){
+      const customerMsgCount = supportChatHistory.filter(m => m.role === 'user').length;
+      if(customerMsgCount >= 5){ requestHumanAgent(); }
     }
   }catch(e){
     document.getElementById('supportThinking')?.remove();
@@ -1822,7 +1926,7 @@ async function claimRewardForProgram(userId, program){
   try{
     const sb = await getSupabase();
     const u = currentUser();
-    const clientName = (u && u.profile) ? (u.profile.prenom + ' ' + u.profile.nom) : (u ? u.name : 'Kliyan');
+    const clientName = u ? (u.name || 'Kliyan') : 'Kliyan';
     const clientEmail = (u && u.email) || '';
     await sb.from('reward_pending').insert({ user_id:userId, program_id:program.id, fulfilled:false });
     showToast(t('toast_reward'));
@@ -2361,6 +2465,7 @@ function isLoggedIn(){ return !!state.currentUserId; }
 let toastTimer;
 function relayOrderError(error, context){
   const msg = (error && error.message) || '';
+  if(/insufficient|balance|solde|balans/i.test(msg)){ trackInsufficientBalanceAttempt(); }
   const looksTechnical = !msg || /constraint|column|relation|syntax|uuid|null value|violates|schema cache|does not exist|permission denied|policy/i.test(msg);
   if(looksTechnical){
     showCustomerError('⚠️ Nou pa t kapab konplete kòmand ou — eseye ankò.', msg || 'enkoni', context);
@@ -2371,7 +2476,7 @@ function relayOrderError(error, context){
 function showCustomerError(friendlyMsg, technicalDetail, context){
   showToast(friendlyMsg, 4000);
   const u = currentUser();
-  const clientName = (u && u.profile) ? (u.profile.prenom + ' ' + u.profile.nom) : (u ? u.name : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè'));
+  const clientName = u ? (u.name || 'Kliyan konekte') : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè');
   sendNtfyNotification('🚨 Erè teknik (paj kliyan)', '👤 Moun: ' + clientName + '\n📄 Kontèks: ' + (context||currentPage||'?') + '\n🛠️ Detay: ' + technicalDetail, 'urgent', 'rotating_light');
 }
 function showToast(msg, duration){
@@ -2381,7 +2486,7 @@ function showToast(msg, duration){
   toastTimer = setTimeout(()=>t.classList.remove('show'), duration || 3000);
   if(msg && msg.indexOf('⚠️') !== -1){
     const u = currentUser();
-    const clientName = (u && u.profile) ? (u.profile.prenom + ' ' + u.profile.nom) : (u ? u.name : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè'));
+    const clientName = u ? (u.name || 'Kliyan konekte') : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè');
     sendNtfyNotification('🚨 Erè sou sit la', '👤 Moun: ' + clientName + '\n📄 Paj: ' + (currentPage||'?') + '\n⚠️ Mesaj: ' + msg, 'urgent', 'rotating_light');
   }
 }
@@ -2613,6 +2718,7 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
 
   await fetchWalletFromServer(authUser.id);
   subscribeToWalletRealtime(authUser.id);
+  subscribeToSuspensionRealtime(authUser.id);
   await fetchCartFromServer(authUser.id);
   await fetchVideoDismissals(authUser.id);
   await fetchTutorialDismissalsV2(authUser.id);
@@ -2659,6 +2765,27 @@ async function fetchWalletFromServer(userId){
 }
 
 let walletRealtimeChannel = null;
+let suspensionRealtimeChannel = null;
+async function subscribeToSuspensionRealtime(userId){
+  try{
+    const sb = await getSupabase();
+    if(suspensionRealtimeChannel){ sb.removeChannel(suspensionRealtimeChannel); }
+    suspensionRealtimeChannel = sb.channel('suspension-rt-' + userId)
+      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'profiles', filter:'id=eq.'+userId }, payload => {
+        const status = payload.new?.account_status;
+        if(status === 'suspended_temp' || status === 'suspended_permanent'){
+          const u = state.users.find(x=>x.id===userId);
+          if(u){
+            u.accountStatus = status;
+            u.suspensionReason = payload.new.suspension_reason || u.suspensionReason;
+            u.suspendedUntil = payload.new.suspended_until || u.suspendedUntil;
+          }
+          if(!state.isAdmin) goPage('suspended');
+        }
+      })
+      .subscribe();
+  }catch(e){ console.warn('subscribeToSuspensionRealtime failed:', e?.message||e); }
+}
 async function subscribeToWalletRealtime(userId){
   try{
     const sb = await getSupabase();
@@ -2909,6 +3036,10 @@ function goPage(page, opts){
   if(page === 'referral'){ fetchReferralPageData(); }
   else if(['shop','panye','checkout','commandes','redeem'].includes(page)){ maybeShowTutorialV2(page, null); }
   if(page === 'tutoriel'){ fetchTutorialVideos(); }
+  if(page === 'suspended'){
+    const u = currentUser();
+    if(u && u.accountStatus === 'suspended_temp' && u.suspendedUntil){ startCherifTimer(u.suspendedUntil); }
+  }
   if(page === 'kerryRewards' && isLoggedIn()){
     fetchRewardPrograms().then(()=>render());
     fetchRewardProgress(state.currentUserId).then(()=>render());
@@ -3258,6 +3389,12 @@ function pageShop(){
   return `<div id="promoBannerBox"></div><div id="shopGrid"></div>`;
 }
 let shopHasRenderedOnce = false;
+function retryLoadProducts(){
+  state.productsLoadFailed = false;
+  fetchProductsRetryCount = 0;
+  renderShop();
+  fetchProductsFromServer();
+}
 function renderShop(){
   if(currentPage !== 'shop') return;
   renderPromoBanner();
@@ -3265,6 +3402,16 @@ function renderShop(){
   if(!grid) return;
 
   if(!state.productsLoaded){
+    if(state.productsLoadFailed){
+      grid.style.opacity = '1';
+      grid.innerHTML = `<div class="empty" style="grid-column:1/-1;">
+        <div class="em-icon">⚠️</div>
+        <div class="em-title">Pa ka chaje pwodwi yo</div>
+        <div style="font-size:12px;color:var(--muted);margin:6px 0 14px;">Verifye koneksyon entènèt ou epi eseye ankò.</div>
+        <button class="btn btn-green" style="max-width:200px;margin:0 auto;" onclick="retryLoadProducts()">🔄 Réessayer</button>
+      </div>`;
+      return;
+    }
     grid.style.opacity = '1';
     grid.innerHTML = Array(2).fill(0).map(()=>`
       <div class="cat-heading"><div class="bar" style="background:var(--panel-2);"></div><div class="skel-line" style="width:110px;height:15px;"></div></div>
@@ -3355,6 +3502,8 @@ function renderProductCard(p){
   const totalStock = p.type === 'pin'
     ? p.variants.reduce((s,v) => s + ((state.inventory[v.id]||[]).filter(x=>x.status==='dispo').length), 0)
     : 1; // form-type products are manually processed — never "out of stock"
+  const cheapestVariant = (p.variants && p.variants.length) ? p.variants.reduce((a,b) => a.price < b.price ? a : b) : null;
+  const hasDiscount = cheapestVariant && cheapestVariant.originalPrice && cheapestVariant.originalPrice > cheapestVariant.price;
   return '<div class="prod-card" onclick="openProduct(\'' + p.id + '\')" style="' + (p.outOfStock ? 'opacity:0.65;' : '') + '">' +
     '<div class="prod-cover" style="' + coverStyle + '">' +
       (p.image ? '' : '<span style="font-size:32px;">' + p.icon + '</span>') +
@@ -3362,7 +3511,10 @@ function renderProductCard(p){
     '</div>' +
     '<div class="prod-body">' +
       '<div class="prod-name">' + escapeHtml(p.name) + '</div>' +
-      '<div style="font-size:11.5px;color:var(--green);font-weight:600;margin:2px 0 8px;">À partir de ' + money(Math.min(...p.variants.map(v=>v.price))) + '</div>' +
+      '<div style="margin:2px 0 8px;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">' +
+        (hasDiscount ? '<span style="font-size:10px;color:var(--muted);text-decoration:line-through;">' + money(cheapestVariant.originalPrice) + '</span>' : '') +
+        '<span style="font-size:11.5px;color:var(--green);font-weight:600;">À partir de ' + (p.variants && p.variants.length ? money(Math.min(...p.variants.map(v=>v.price))) : '—') + '</span>' +
+      '</div>' +
       (p.outOfStock
         ? '<button class="buy-btn" style="width:100%;margin-top:auto;background:var(--panel-2);color:var(--muted);" disabled>Rupture de stock</button>'
         : '<button class="buy-btn" style="width:100%;margin-top:auto;" onclick="event.stopPropagation();openProduct(\'' + p.id + '\')">Voir</button>') +
@@ -3616,6 +3768,19 @@ async function verifyFormFieldPlayer(productId, fieldIndex){
     resultBox.innerHTML = '<div style="color:var(--red);font-size:12.5px;margin-top:8px;">⚠️ Erè: ' + escapeHtml(e?.message || 'enkoni') + '</div>';
   }
 }
+async function trackInsufficientBalanceAttempt(){
+  if(!state.currentUserId) return;
+  try{
+    const sb = await getSupabase();
+    const u = state.users.find(x=>x.id===state.currentUserId);
+    const currentCount = (u?.insufficientBalanceAttempts || 0) + 1;
+    if(u) u.insufficientBalanceAttempts = currentCount;
+    await sb.from('profiles').update({ insufficient_balance_attempts: currentCount }).eq('id', state.currentUserId);
+    if(currentCount >= 5){
+      await suspendAccount(state.currentUserId, 'permanent', "Tentatives répétées d'achat sans solde suffisant (5+)", null);
+    }
+  }catch(e){ console.warn('trackInsufficientBalanceAttempt failed:', e?.message||e); }
+}
 async function confirmApiTopupPurchase(productId){
   if(!isLoggedIn()){ openAuthModal('login'); return; }
   if(!state.currentUserId) return;
@@ -3636,7 +3801,7 @@ async function confirmApiTopupPurchase(productId){
   const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.textContent='⚡ Acheter maintenant';} };
   if(!playerId){ showToast(t('toast_enter_player_id')); resetBtn(); return; }
   if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast('Veuillez Vérifier Votre id de joueur'); resetBtn(); return; }
-  if(walletBalance() < totalPrice){ showToast(t('toast_insufficient_balance')); resetBtn(); goPage('wallet'); return; }
+  if(walletBalance() < totalPrice){ showToast(t('toast_insufficient_balance')); resetBtn(); trackInsufficientBalanceAttempt(); goPage('wallet'); return; }
 
   // Verifye/refrechi sesyon an anvan nou kontinye — anpeche demand yo pati san jeton koneksyon
   try{
@@ -4675,6 +4840,22 @@ function walletTabBarHtml(){
     </div>
   `;
 }
+function switchRechargeMethodTab(which){
+  const manualBox = document.getElementById('rcManualNumberBox');
+  const qrBox = document.getElementById('rcQrBox');
+  const tabManual = document.getElementById('rcTabManual');
+  const tabQr = document.getElementById('rcTabQr');
+  if(!manualBox || !qrBox) return;
+  if(which === 'qr'){
+    manualBox.style.display = 'none'; qrBox.style.display = 'block';
+    tabManual.style.background=''; tabManual.style.color='var(--muted)'; tabManual.style.boxShadow='';
+    tabQr.style.background='var(--panel)'; tabQr.style.color='var(--green)'; tabQr.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)';
+  } else {
+    manualBox.style.display = 'flex'; qrBox.style.display = 'none';
+    tabQr.style.background=''; tabQr.style.color='var(--muted)'; tabQr.style.boxShadow='';
+    tabManual.style.background='var(--panel)'; tabManual.style.color='var(--green)'; tabManual.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)';
+  }
+}
 function switchWalletTab(t){
   walletTab = t;
   const bar = document.getElementById('walletTabBar');
@@ -4691,12 +4872,21 @@ function renderWalletTab(){
           <h3 style="font-size:16px;font-weight:700;color:var(--text);margin:0;">Recharge ak NatCash</h3>
           <div style="font-weight:800;font-size:14px;"><span style="color:#007A43;">Nat</span><span style="color:#FF6600;">Cash</span></div>
         </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;background:#FFF9E8;border:1px solid #F9D976;border-radius:16px;padding:14px;margin-bottom:12px;">
+        ${state.paymentSettings.qrImageUrl ? `
+        <div style="display:flex;background:var(--panel-2);border-radius:12px;padding:4px;margin-bottom:14px;">
+          <div id="rcTabManual" onclick="switchRechargeMethodTab('manual')" style="flex:1;text-align:center;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;background:var(--panel);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,0.08);">Manuel</div>
+          <div id="rcTabQr" onclick="switchRechargeMethodTab('qr')" style="flex:1;text-align:center;padding:9px;border-radius:9px;font-size:12px;font-weight:700;cursor:pointer;color:var(--muted);">📷 Code QR NatCash</div>
+        </div>` : ''}
+        <div id="rcManualNumberBox" style="display:flex;align-items:center;justify-content:space-between;background:#FFF9E8;border:1px solid #F9D976;border-radius:16px;padding:14px;margin-bottom:12px;">
           <div style="display:flex;align-items:center;gap:12px;">
             <div style="background:#fff;border:1px solid #FDE68A;padding:9px;border-radius:10px;color:#007A43;display:flex;"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="0" width="10" height="20" rx="2"/><line x1="10" y1="16" x2="10" y2="16"/></svg></div>
             <div><div style="font-size:18px;font-weight:800;color:#B45309;">${escapeHtml(state.paymentSettings.number)}</div><div style="font-size:11px;font-weight:600;color:#9CA3AF;margin-top:2px;">${escapeHtml(state.paymentSettings.name)}</div></div>
           </div>
           <button onclick="copyNatCashNumber()" style="display:flex;align-items:center;gap:5px;background:#fff;border:1px solid #FCD34D;padding:7px 12px;border-radius:14px;font-size:11.5px;font-weight:700;color:#B45309;">📋 Copier</button>
+        </div>
+        <div id="rcQrBox" style="display:none;background:#FFF9E8;border:1px solid #F9D976;border-radius:16px;padding:18px;margin-bottom:12px;text-align:center;">
+          <img src="${escapeHtml(state.paymentSettings.qrImageUrl||'')}" style="width:160px;height:160px;border-radius:10px;margin-bottom:10px;object-fit:cover;">
+          <div style="font-size:11.5px;font-weight:600;color:#B45309;">Scannez avec votre application NatCash</div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;background:#FFF9E8;border:1px solid #F9D976;border-radius:16px;padding:14px;margin-bottom:12px;">
           <div style="display:flex;align-items:center;gap:12px;">
@@ -4927,7 +5117,7 @@ function showExpiredSubmitArea(){
 }
 function notifyAdminExpiredRecharge(){
   const u = currentUser();
-  const clientName = (u && u.profile) ? (u.profile.prenom + ' ' + u.profile.nom) : (u ? u.name : 'Kliyan');
+  const clientName = u ? (u.name || 'Kliyan') : 'Kliyan';
   const amount = document.getElementById('rcAmount')?.value.trim() || '?';
   const txn = document.getElementById('rcTxn')?.value.trim() || '?';
   let msg = '👤 Client : ' + clientName;
@@ -5064,7 +5254,7 @@ async function submitRecharge(){
     showToast('Wallet kredite ✓');
     sendWalletCreditedEmail(currentUser(), amount, txn);
     const u2 = currentUser();
-    const clientName2 = (u2 && u2.profile) ? (u2.profile.prenom + ' ' + u2.profile.nom) : (u2 ? u2.name : 'Kliyan');
+    const clientName2 = u2 ? (u2.name || 'Kliyan') : 'Kliyan';
     let successMsg = 'Client : ' + clientName2;
     successMsg += '\nEmail : ' + (u2 && u2.email ? u2.email : '—');
     successMsg += '\nMontant : HTG ' + amount.toLocaleString('fr-FR');
@@ -5085,7 +5275,7 @@ async function submitRecharge(){
     if(area) area.innerHTML = `<div style="text-align:center;background:var(--amber-dim);color:var(--amber);font-weight:700;font-size:13px;padding:14px;border-radius:12px;">Le recharge est en cours de validation par l'admin</div>`;
     showToast('Admin ap verifye kòmand ou');
     const u = currentUser();
-    const clientName = (u && u.profile) ? (u.profile.prenom + ' ' + u.profile.nom) : (u ? u.name : 'Kliyan');
+    const clientName = u ? (u.name || 'Kliyan') : 'Kliyan';
     const clientPhone = (u && u.profile) ? (u.profile.whatsapp||'') : '';
     const clientEmail = u ? u.email : '';
     let ntfyDetail = '👤 Client : ' + clientName;
@@ -5166,9 +5356,15 @@ async function suspendAccount(userId, kind, reason, hours){
   const history = (u?.suspensionHistory || []).concat([historyEntry]);
   try{
     const sb = await getSupabase();
-    await sb.from('profiles').update({ account_status: status, suspension_reason: reason, suspended_until: suspendedUntil, suspension_history: history }).eq('id', userId);
-  }catch(e){ console.warn('suspendAccount failed:', e?.message||e); }
+    const { error } = await sb.from('profiles').update({ account_status: status, suspension_reason: reason, suspended_until: suspendedUntil, suspension_history: history }).eq('id', userId);
+    if(error){
+      showToast('⚠️ SISPANSYON PA SOVE: ' + error.message);
+      console.warn('suspendAccount failed:', error.message);
+      return;
+    }
+  }catch(e){ showToast('⚠️ SISPANSYON PA SOVE: ' + (e?.message||e)); return; }
   if(u){ u.accountStatus = status; u.suspensionReason = reason; u.suspendedUntil = suspendedUntil; u.suspensionHistory = history; }
+  showToast('✅ Kont sispann e sove nan baz done a');
   if(userId === state.currentUserId && currentPage !== 'suspended') goPage('suspended');
 }
 async function reactivateAccount(userId, isAuto){
@@ -5215,14 +5411,6 @@ function pageSuspended(){
   const u = currentUser();
   if(!u) return '';
   const isPermanent = u.accountStatus === 'suspended_permanent';
-  let timeLeft = '';
-  if(!isPermanent && u.suspendedUntil){
-    const ms = new Date(u.suspendedUntil).getTime() - Date.now();
-    if(ms > 0){
-      const h = Math.floor(ms/3600000), m = Math.floor((ms%3600000)/60000);
-      timeLeft = h+' h '+m+' min';
-    }
-  }
   const waMsg = encodeURIComponent(
     'Bonjour,\n' +
     'Mon compte Kerry Topup est suspendu.\n' +
@@ -5231,24 +5419,44 @@ function pageSuspended(){
     'Nom : ' + (u.name||'') + '\n' +
     'Email : ' + (u.email||'') + '\n' +
     'Statut : ' + (isPermanent ? 'Suspension définitive' : 'Suspension temporaire') + '\n' +
-    'Raison : ' + (u.suspensionReason || (isPermanent?'Fraude confirmée':'Activité suspecte détectée')) + '\n' +
-    (timeLeft ? ('Temps restant : ' + timeLeft + '\n') : '')
+    'Raison : ' + (u.suspensionReason || (isPermanent?'Fraude confirmée':'Activité suspecte détectée'))
   );
   return `
-    <div style="text-align:center;padding:40px 20px;">
-      <div style="font-size:50px;margin-bottom:16px;">🚫</div>
-      <h2 style="margin-bottom:6px;">Votre compte est ${isPermanent?'suspendu définitivement':'suspendu'}</h2>
-      <div style="display:inline-block;background:${isPermanent?'rgba(255,60,60,0.15)':'rgba(255,160,0,0.15)'};color:${isPermanent?'var(--red)':'#FF9F0A'};font-weight:700;font-size:13px;padding:6px 14px;border-radius:20px;margin-bottom:20px;">
-        ${isPermanent?'🔴 Suspension définitive':'🟠 Suspension temporaire'}
+    <div style="min-height:80vh;background:linear-gradient(180deg,#2a0a10 0%,#150609 100%);margin:-16px;padding:32px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;">
+      <div style="font-size:64px;animation:cherifShake 0.6s ease-in-out infinite;filter:drop-shadow(0 0 20px rgba(226,59,87,0.6));">🤖👮</div>
+      <div style="background:var(--red);color:#fff;font-weight:800;font-size:11px;padding:5px 14px;border-radius:20px;margin:16px 0 10px;letter-spacing:0.05em;">
+        ⚠️ ${isPermanent ? 'COMPTE BLOQUÉ DÉFINITIVEMENT' : 'COMPTE SUSPENDU'}
       </div>
-      <div class="card" style="text-align:left;max-width:340px;margin:0 auto 20px;">
-        <div style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Raison</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:${timeLeft?'14px':'0'};">${escapeHtml(u.suspensionReason || (isPermanent?'Fraude confirmée':'Activité suspecte détectée'))}</div>
-        ${timeLeft ? `<div style="font-size:11px;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Temps restant</div><div style="font-size:14px;font-weight:700;color:#FF9F0A;">${timeLeft}</div>` : ''}
+      <h1 style="font-family:'Rajdhani',sans-serif;color:#fff;font-size:20px;margin:0 0 14px;line-height:1.3;">Le Shérif Robot a détecté<br>que tu es en train de tricher</h1>
+      <div style="background:rgba(226,59,87,0.12);border:1.5px solid rgba(226,59,87,0.4);border-radius:16px;padding:18px;margin-bottom:18px;max-width:340px;">
+        <p style="color:#F5C9D1;font-size:13px;line-height:1.6;margin:0;">${escapeHtml(u.suspensionReason || (isPermanent?'Fraude confirmée.':'Des tentatives répétées et suspectes ont été détectées sur ton compte.'))}</p>
       </div>
-      <button class="btn btn-green" style="width:100%;max-width:340px;" onclick="window.open('https://wa.me/${primaryWhatsapp()}?text=${waMsg}','_blank')">📲 Contacter le support</button>
+      ${isPermanent
+        ? `<div style="background:rgba(0,0,0,0.3);border-radius:14px;padding:14px 20px;margin-bottom:18px;"><div style="color:#F5C9D1;font-size:12px;font-weight:700;">🔴 Ce compte ne sera plus jamais éligible</div></div>`
+        : `<div style="background:rgba(0,0,0,0.3);border-radius:14px;padding:14px 20px;margin-bottom:18px;">
+            <div style="color:#F5C9D1;font-size:10.5px;font-weight:700;letter-spacing:0.05em;margin-bottom:8px;">⏳ VOTRE COMPTE SERA ÉLIGIBLE DANS</div>
+            <div id="cherifTimerVal" style="font-family:'Rajdhani',sans-serif;color:#fff;font-weight:800;font-size:22px;letter-spacing:0.05em;">--</div>
+          </div>`
+      }
+      <div style="color:#F5C9D1;font-size:12.5px;font-weight:700;margin-bottom:14px;">⚠️ Vous ne respectez pas les <a href="#" onclick="event.preventDefault();goPage('conditions')" style="color:#fff;text-decoration:underline;">conditions</a> de notre site</div>
+      <a class="btn btn-green" style="width:100%;max-width:340px;display:block;text-decoration:none;box-sizing:border-box;" href="mailto:kerrytopup54@gmail.com">✉️ Contacter le support</a>
     </div>
   `;
+}
+let cherifTimerInterval = null;
+function startCherifTimer(untilDate){
+  clearInterval(cherifTimerInterval);
+  const targetMs = new Date(untilDate).getTime();
+  const tick = () => {
+    const el = document.getElementById('cherifTimerVal');
+    if(!el){ clearInterval(cherifTimerInterval); return; }
+    const remaining = Math.max(0, targetMs - Date.now());
+    const h = Math.floor(remaining/3600000), m = Math.floor((remaining%3600000)/60000), s = Math.floor((remaining%60000)/1000);
+    el.textContent = h+'h '+String(m).padStart(2,'0')+'min '+String(s).padStart(2,'0')+'s';
+    if(remaining <= 0){ clearInterval(cherifTimerInterval); window.location.reload(); }
+  };
+  tick();
+  cherifTimerInterval = setInterval(tick, 1000);
 }
 const EMAILJS_SERVICE_ID = 'service_4a0jhq8';
 const EMAILJS_TEMPLATE_ID = 'template_b9i10zv';
@@ -5771,7 +5979,7 @@ async function checkoutCart(){
   if(blockIfSuspended()) return;
   const total = cartTotal();
   if(total <= 0){ return; }
-  if(walletBalance() < total){ showToast('Balans ou pa ase pou tout panye a — rechaje Wallet la'); return; }
+  if(walletBalance() < total){ showToast('Balans ou pa ase pou tout panye a — rechaje Wallet la'); trackInsufficientBalanceAttempt(); return; }
   const itemsToProcess = [...state.cart];
   const failed = [];
   const manualOrdersCreated = [];
@@ -5946,23 +6154,28 @@ async function checkoutCart(){
     goPage('commandes');
   }
 }
-function sendNtfyNotification(title, message, priority, tag, attachUrl){
+function sendNtfyNotification(title, message, priority, tag, attachUrl, category){
   const topic = state.paymentSettings.ntfyTopic;
-  if(!topic) return;
   const safeTitle = title.replace(/[^\x00-\x7F]/g, '').trim() || 'Kerry Topup';
+  const headers = { 'Title': safeTitle, 'Priority': priority || 'high', 'Tags': tag || 'bell' };
+  if(attachUrl) headers['Attach'] = attachUrl;
   try{
-    const headers = { 'Title': safeTitle, 'Priority': priority || 'high', 'Tags': tag || 'bell' };
-    if(attachUrl) headers['Attach'] = attachUrl;
-    fetch('https://ntfy.sh/' + topic, {
-      method: 'POST',
-      body: message,
-      headers
-    }).catch(e => console.warn('ntfy fetch failed:', e));
+    if(topic){
+      fetch('https://ntfy.sh/' + topic, { method: 'POST', body: message, headers }).catch(e => console.warn('ntfy fetch failed:', e));
+    }
   }catch(e){ console.warn('sendNtfyNotification failed:', e?.message || e); }
+  try{
+    const extraTopics = state.paymentSettings.extraNtfyTopics || [];
+    extraTopics.forEach(entry => {
+      if(entry.topic && category && entry.categories && entry.categories[category]){
+        fetch('https://ntfy.sh/' + entry.topic, { method: 'POST', body: message, headers }).catch(e => console.warn('ntfy sekondè fetch failed:', e));
+      }
+    });
+  }catch(e){ console.warn('sendNtfyNotification sekondè failed:', e?.message || e); }
 }
 function notifyAdminNewOrder(order){
   const u = currentUser();
-  const clientName = (u && u.profile) ? (u.profile.prenom + ' ' + u.profile.nom) : (u ? u.name : 'Kliyan');
+  const clientName = u ? (u.name || 'Kliyan') : 'Kliyan';
   let ntfyMsg = '👤 Client : ' + clientName + '\n📦 Produit : ' + order.product + '\n🎯 Opsyon : ' + order.variant + '\n💰 Montant : HTG ' + Number(order.price).toLocaleString('fr-FR');
   if(order.type === 'api_topup'){
     ntfyMsg += '\n🎮 Player ID : ' + (order.playerId||'');
@@ -5975,7 +6188,7 @@ function notifyAdminNewOrder(order){
 }
 function notifyAdminNewSale(order){
   const u = currentUser();
-  const clientName = (u && u.profile) ? (u.profile.prenom + ' ' + u.profile.nom) : (u ? u.name : 'Kliyan');
+  const clientName = u ? (u.name || 'Kliyan') : 'Kliyan';
   let ntfyMsg = '👤 Client : ' + clientName + '\n📦 Produit : ' + order.product + '\n🎯 Opsyon : ' + order.variant + '\n💰 Montant : HTG ' + Number(order.price).toLocaleString('fr-FR');
   if(order.type === 'pin' && order.pin){
     ntfyMsg += '\n🔑 PIN livre : ' + order.pin;
@@ -5991,7 +6204,7 @@ function notifyAdminNewSale(order){
 }
 function notifyAdminOfManualOrders(orders){
   const u = currentUser();
-  const clientName = (u && u.profile) ? (u.profile.prenom + ' ' + u.profile.nom) : (u ? u.name : 'Kliyan');
+  const clientName = u ? (u.name || 'Kliyan') : 'Kliyan';
   orders.forEach(o => {
     let ntfyMsg = 'Client : ' + clientName;
     ntfyMsg += '\nEmail : ' + (u && u.email ? u.email : '—');
@@ -6517,7 +6730,7 @@ function sendWhatsAppOrder(userId, orderId){
   const u = state.users.find(x=>x.id===userId);
   if(!o || !u || !u.profile){ showToast('Pa gen enfòmasyon WhatsApp pou kliyan sa'); return; }
   const digits = u.profile.whatsapp.replace(/\D/g,'');
-  let msg = `Bonjou ${u.profile.prenom}, men detay kòmand #${o.orderNo} ou a sou Kerry Topup Official:\n\n`;
+  let msg = `Bonjou ${u.name || 'Kliyan'}, men detay kòmand #${o.orderNo} ou a sou Kerry Topup Official:\n\n`;
   msg += `Pwodwi: ${o.product}\nMontan: ${o.variant}\nTotal: ${o.price.toLocaleString('fr-FR')} HTG\n`;
   if(o.fields){ Object.entries(o.fields).forEach(([k,v]) => { msg += `${k}: ${v}\n`; }); }
   msg += `\nN ap trete kòmand ou a kounye a. Mèsi pou konfyans ou!`;
@@ -7170,6 +7383,17 @@ function renderAdminTab(){
         <div class="field-uid"><label>Non ki afiche sou kont lan</label><input type="text" id="paySetName" value="${escapeHtml(state.paymentSettings.name)}"></div>
         <div class="field-uid"><label>Nimewo WhatsApp (kliyan ap voye la — ou ka mete plizyè, separe ak vigil, premye a se sa k resevwa)</label><input type="text" id="paySetWhatsapp" placeholder="Ex: 50942614967, 50931112222" value="${escapeHtml(state.paymentSettings.whatsapp)}"></div>
         <div class="field-uid"><label>Non-tit Notifikasyon (ntfy.sh) — vid = dezaktive</label><input type="text" id="paySetNtfy" placeholder="Ex: kerrytopup-alert-8k3m2" value="${escapeHtml(state.paymentSettings.ntfyTopic||'')}"></div>
+        <div class="field-uid">
+          <label>📷 Foto QR NatCash (opsyonèl — kliyan ka eskane l olye tape nimewo a)</label>
+          ${state.paymentSettings.qrImageUrl ? `<img src="${escapeHtml(state.paymentSettings.qrImageUrl)}" style="width:120px;border-radius:10px;margin-bottom:8px;display:block;">` : ''}
+          <input type="file" accept="image/*" onchange="handlePaymentQrUpload(this)" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:6px 8px;font-size:11px;">
+        </div>
+        <div style="border-top:1px solid var(--line);margin:16px 0;padding-top:16px;">
+          <div style="font-weight:700;font-size:13px;margin-bottom:4px;">🔐 Lòt Ntfy (Admin sekondè)</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Chak topic gen pwòp kategori pa li — ajoute otan ou vle.</div>
+          <div id="extraNtfyList"></div>
+          <button class="btn btn-ghost" style="width:100%;margin-top:6px;" onclick="addExtraNtfyTopicRow()">➕ Ajoute yon lòt topic</button>
+        </div>
         <button class="btn btn-green" onclick="savePaymentSettings()">Sove Paramèt Peman</button>
       </div>
       <div class="card">
@@ -7218,6 +7442,7 @@ function renderAdminTab(){
       </div>
     `;
     renderFooterEditors();
+    renderExtraNtfyTopics();
   }
   else if(adminTab === 'kerryrewards'){
     box.innerHTML = renderKerryRewardsAdminTab();
@@ -8323,15 +8548,17 @@ function renderFormAdminConfig(p){
   if(!p.formFields) p.formFields = [];
   return `
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Opsyon ak Pri</div>
-    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
+    <table><thead><tr><th></th><th>Opsyon</th><th>Pri Orij.</th><th>Pri</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
       ${sortedVariants(p).map(v => `
         <tr id="vrow-${v.id}" data-vid="${v.id}">
         <td style="width:40px;padding:0;"><span onpointerdown="startVariantDrag(event,'${p.id}','${v.id}')" style="cursor:grab;touch-action:none;color:var(--text);font-size:22px;line-height:1;letter-spacing:-1px;user-select:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;">⣿</span></td>
         <td>${escapeHtml(v.label)}</td>
+        <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.originalPrice||''}" placeholder="—" onchange="updateOriginalPrice('${p.id}','${v.id}',this.value)"></td>
         <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.price}" onchange="updatePrice('${p.id}','${v.id}',this.value)"></td>
         <td><button class="mini-btn" onclick="removeVariant('${p.id}','${v.id}')">✕</button></td></tr>
       `).join('')}
     </tbody></table>
+    <div style="font-size:9.5px;color:var(--muted);margin:-4px 0 8px;">💡 "Pri Orij." se pou montre yon rediksyon (pri bare). Kite l vid si pa gen rediksyon.</div>
     <div style="display:flex;gap:6px;margin-top:8px;margin-bottom:14px;">
       <input type="text" id="addVarName-${p.id}" placeholder="Non opsyon" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
@@ -8859,6 +9086,12 @@ async function updatePrice(pid, vid, val){
   try{ const sb = await getSupabase(); await sb.from('variants').update({ price:v.price }).eq('id', vid); }catch(e){}
   await saveState(); showToast('Pri mete ajou');
 }
+async function updateOriginalPrice(pid, vid, val){
+  const p = state.products.find(x=>x.id===pid); const v = p.variants.find(x=>x.id===vid);
+  v.originalPrice = val.trim() ? (parseFloat(val) || null) : null;
+  try{ const sb = await getSupabase(); await sb.from('variants').update({ original_price:v.originalPrice }).eq('id', vid); }catch(e){}
+  await saveState(); showToast('Pri orijinal mete ajou');
+}
 async function removeVariant(pid, vid){
   const p = state.products.find(x=>x.id===pid);
   p.variants = p.variants.filter(v=>v.id!==vid);
@@ -9297,10 +9530,10 @@ function renderDrawer(){
   const u = currentUser();
   const items = [
     {id:'shop', label:'Accueil', icon:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>'},
-    {id:'referral', label:'Referral & Récompenses 🎁', icon:'<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'},
-    {id:'kerryRewards', label:'Free Fire Reward 💎🥳', icon:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><path d="M2 9h20"/>'},
     {id:'redeem', label:'Redeem Free Fire', icon:'<path d="M20.59 13.41L11 3.83A2 2 0 0 0 9.59 3H4v5.59a2 2 0 0 0 .59 1.41l9.58 9.58a2 2 0 0 0 2.82 0l4.6-4.6a2 2 0 0 0 0-2.82z"/>'},
     {id:'historique', label:'Historique', icon:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>'},
+    {id:'kerryRewards', label:'Free Fire Reward 💎🥳', icon:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><path d="M2 9h20"/>'},
+    {id:'referral', label:'Referral & Récompenses 🎁', icon:'<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'},
     {id:'parametres', label:'Paramètres', icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'},
   ];
   d.innerHTML = `
