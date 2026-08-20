@@ -728,9 +728,9 @@ function detectLang(){
   const saved = localStorage.getItem('kt_lang');
   if(saved) return saved;
   const nav = (navigator.language || 'ht').toLowerCase();
-  if(nav.startsWith('fr')) return 'fr';
+  if(nav.startsWith('ht')) return 'ht';
   if(nav.startsWith('en')) return 'en';
-  return 'ht';
+  return 'fr'; // Kèlkeswa lòt lang (panyòl, elatriye) — franse pi jeneralman konprann pase kreyòl pou vizitè entènasyonal
 }
 let currentLang = detectLang();
 const TRANSLATIONS = {
@@ -741,6 +741,9 @@ const TRANSLATIONS = {
     btn_buy_now:'Acheter maintenant', btn_add_cart:'Ajouter au panier', btn_send:'Voye demand lan',
     toast_no_balance:'Balans ou pa ase',
     toast_purchase_success:'Achat Réussi 🛒✅️',
+    generic_error_msg:'⚠️ Yon ti pwoblèm rive. Tanpri eseye ankò.',
+    toast_wallet_credited:'✅ Wallet kredite avèk siksè',
+    toast_order_failed_refunded:'⚠️ Kòmand ou echwe. Ou ranbouse — eseye ankò pita.',
     toast_enter_player_id:'Antre ID Free Fire ou',
     toast_insufficient_balance:'Balans ou pa ase',
     toast_order_cancelled:'Kòmand anile ✖️',
@@ -762,6 +765,9 @@ const TRANSLATIONS = {
     btn_buy_now:'Acheter maintenant', btn_add_cart:'Ajouter au panier', btn_send:'Envoyer la demande',
     toast_no_balance:'Solde insuffisant',
     toast_purchase_success:'Achat Réussi 🛒✅️',
+    generic_error_msg:'⚠️ Une erreur est survenue. Veuillez réessayer.',
+    toast_wallet_credited:'✅ Wallet crédité avec succès',
+    toast_order_failed_refunded:'⚠️ Votre commande a échoué. Vous avez été remboursé — réessayez plus tard.',
     toast_enter_player_id:'Insérez votre id de joueur',
     toast_insufficient_balance:'Votre balance est insuffisante',
     toast_order_cancelled:'Commande annulée ✖️',
@@ -783,6 +789,9 @@ const TRANSLATIONS = {
     btn_buy_now:'Buy now', btn_add_cart:'Add to cart', btn_send:'Send request',
     toast_no_balance:'Insufficient balance',
     toast_purchase_success:'Purchase Successful 🛒✅️',
+    generic_error_msg:'⚠️ Something went wrong. Please try again.',
+    toast_wallet_credited:'✅ Wallet credited successfully',
+    toast_order_failed_refunded:'⚠️ Your order failed. You have been refunded — please try again later.',
     toast_enter_player_id:'Enter your player ID',
     toast_insufficient_balance:'Your balance is insufficient',
     toast_order_cancelled:'Order cancelled ✖️',
@@ -1346,6 +1355,133 @@ async function getOrRestoreSupportConversation(){
       updateAgentBadgeDisplay();
     }
   }catch(e){ console.warn('getOrRestoreSupportConversation failed:', e?.message||e); }
+}
+async function checkReferralRechargeBonus(userId, amount){
+  try{
+    const sb = await getSupabase();
+    const { data: profile } = await sb.from('profiles').select('referred_by, referral_bonus_given, name').eq('id', userId).maybeSingle();
+    if(!profile || !profile.referred_by || profile.referral_bonus_given) return; // deja bay bonis pou fiyèl sa a — pa bay ankò
+
+    const { data: settings } = await sb.from('referral_settings').select('*').eq('id', 1).maybeSingle();
+    const minRecharge = settings?.min_recharge_for_bonus ?? 200;
+    const parrainBonus = settings?.parrain_bonus ?? 50;
+
+    // Kimilatif: total TOUT rechaj APWOUVE kliyan an fè yo (istorik + nouvo a), pa sèlman dènye a
+    const { data: allRecharges } = await sb.from('recharge_requests').select('amount').eq('user_id', userId).eq('status', 'approved');
+    const totalRecharged = (allRecharges || []).reduce((s, r) => s + Number(r.amount), 0);
+    if(totalRecharged < minRecharge) return;
+
+    // Mete referral_bonus_given=true AVAN insert la — evite doub kredi si fonksyon an rele de fwa an paralèl
+    const { data: flagUpdate, error: flagErr } = await sb.from('profiles').update({ referral_bonus_given: true }).eq('id', userId).eq('referral_bonus_given', false).select();
+    if(flagErr || !flagUpdate || flagUpdate.length === 0) return; // yon lòt apèl deja pran l — sispann isit la
+
+    const { error: insErr } = await sb.from('referral_earnings').insert({ parrain_id: profile.referred_by, referred_user_id: userId, amount: parrainBonus });
+    if(insErr){ console.warn('checkReferralRechargeBonus insert erè:', insErr.message); return; }
+
+    const { data: parrainProfile } = await sb.from('profiles').select('name').eq('id', profile.referred_by).maybeSingle();
+    sendNtfyNotification('🎉 Bonis Referral bay', '👤 Fiyèl: ' + (profile.name||'') + '\n👤 Parenn: ' + (parrainProfile?.name||'') + '\n💰 Bonis: ' + money(parrainBonus), 'default', 'moneybag');
+    sendPushToUser(profile.referred_by, '🎉 Bonus reçu !', 'Votre filleul a rechargé — vous avez gagné ' + money(parrainBonus) + ' de bonus referral !', '/');
+  }catch(e){ console.warn('checkReferralRechargeBonus exception:', e?.message||e); }
+}
+const VAPID_PUBLIC_KEY = 'BFYV0pKdkHX_z8s_RpOS5K9pkqemCcbWlyFMUlyPYa6OTBvfrraECcgyBHVBFZHhrht2JZF7mhg33w1-_VnngI0';
+function urlBase64ToUint8Array(base64String){
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return Uint8Array.from([...rawData].map(c => c.charCodeAt(0)));
+}
+async function checkAndRenderPushPrompt(){
+  const box = document.getElementById('pushPromptBanner');
+  if(!box) return;
+  if(!('serviceWorker' in navigator) || !('PushManager' in window) || !state.currentUserId){ box.innerHTML = ''; return; }
+  if(Notification.permission === 'granted'){
+    try{
+      const reg = await navigator.serviceWorker.ready;
+      const sub = await reg.pushManager.getSubscription();
+      if(sub){ box.innerHTML = ''; return; } // deja aktive
+    }catch(e){}
+  }
+  if(Notification.permission === 'denied'){ box.innerHTML = ''; return; } // kliyan deja refize — pa anmède l ankò
+  box.innerHTML = `
+    <div style="background:var(--green-dim);border:1px solid var(--green);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
+      <span style="font-size:24px;">🔔</span>
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:13px;">Activer les notifications</div>
+        <div style="color:var(--muted);font-size:11.5px;">Soyez alerté dès qu'une commande est prête.</div>
+      </div>
+      <button onclick="enablePushNotifications().then(checkAndRenderPushPrompt)" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-weight:700;font-size:12px;flex-shrink:0;">Activer</button>
+    </div>
+  `;
+}
+async function enablePushNotifications(){
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)){ showToast('Navigatè sa a pa sipòte notifikasyon push'); return; }
+  if(!state.currentUserId){ showToast('Konekte anvan pou aktive notifikasyon'); return; }
+  try{
+    const permission = await Notification.requestPermission();
+    if(permission !== 'granted'){ showToast('Ou refize pèmisyon notifikasyon'); return; }
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if(!sub){
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY)
+      });
+    }
+    const subJson = sub.toJSON();
+    const sb = await getSupabase();
+    await sb.from('push_subscriptions').upsert({
+      user_id: state.currentUserId,
+      endpoint: subJson.endpoint,
+      p256dh: subJson.keys.p256dh,
+      auth: subJson.keys.auth
+    }, { onConflict: 'endpoint' });
+    showToast('✅ Notifikasyon aktive!');
+  }catch(e){ console.warn('enablePushNotifications failed:', e?.message||e); showToast('⚠️ Pa ka aktive notifikasyon'); }
+}
+async function disablePushNotifications(){
+  try{
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if(sub){
+      const sb = await getSupabase();
+      await sb.from('push_subscriptions').delete().eq('endpoint', sub.endpoint);
+      await sub.unsubscribe();
+    }
+    showToast('Notifikasyon dezaktive');
+  }catch(e){ console.warn('disablePushNotifications failed:', e?.message||e); }
+}
+async function sendPushToUser(userId, title, body, url){
+  try{
+    const sb = await getSupabase();
+    await sb.functions.invoke('send-push', { body: { userId, title, body, url: url || '/' } });
+  }catch(e){ console.warn('sendPushToUser failed:', e?.message||e); }
+}
+async function sendPushToAll(title, body, url){
+  try{
+    const sb = await getSupabase();
+    await sb.functions.invoke('send-push', { body: { broadcast: true, title, body, url: url || '/' } });
+  }catch(e){ console.warn('sendPushToAll failed:', e?.message||e); }
+}
+async function applyReferralFirstPurchaseDiscount(userId, orderAmount){
+  try{
+    if(!orderAmount || orderAmount <= 0) return;
+    const sb = await getSupabase();
+    const { data: profile } = await sb.from('profiles').select('referred_by, referral_discount_used, name').eq('id', userId).maybeSingle();
+    if(!profile || !profile.referred_by || profile.referral_discount_used) return; // deja itilize rediksyon premye acha a — pa bay ankò
+
+    const { data: settings } = await sb.from('referral_settings').select('fiyel_discount').eq('id', 1).maybeSingle();
+    const discountPercent = settings?.fiyel_discount ?? 10;
+    if(discountPercent <= 0) return;
+    const refundAmount = Math.round(orderAmount * discountPercent / 100);
+    if(refundAmount <= 0) return;
+
+    // Mete referral_discount_used=true AVAN kredite — evite doub ranbousman si fonksyon an rele de fwa an paralèl
+    const { data: flagUpdate, error: flagErr } = await sb.from('profiles').update({ referral_discount_used: true }).eq('id', userId).eq('referral_discount_used', false).select();
+    if(flagErr || !flagUpdate || flagUpdate.length === 0) return;
+
+    await applyWalletChange(userId, refundAmount, '🎁 Rediksyon premye acha (referral)', 'in', true, null, null, null, false);
+    showToast('🎁 Rediksyon premye acha: +' + money(refundAmount));
+  }catch(e){ console.warn('applyReferralFirstPurchaseDiscount exception:', e?.message||e); }
 }
 function updateAgentBadgeDisplay(){
   const label = document.getElementById('supportModeLabel');
@@ -2395,8 +2531,8 @@ function relayOrderError(error, context){
     showToast('⚠️ ' + msg);
   }
 }
-function showCustomerError(friendlyMsg, technicalDetail, context){
-  showToast(friendlyMsg, 4000);
+function showCustomerError(friendlyMsg, technicalDetail, context, translationKeyOverride){
+  showToast(translationKeyOverride ? t(translationKeyOverride) : t('generic_error_msg'), 4000);
   const u = currentUser();
   const clientName = u ? (u.name || 'Kliyan konekte') : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè');
   sendNtfyNotification('🚨 Erè teknik (paj kliyan)', '👤 Moun: ' + clientName + '\n📄 Kontèks: ' + (context||currentPage||'?') + '\n🛠️ Detay: ' + technicalDetail, 'urgent', 'rotating_light');
@@ -2647,8 +2783,9 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
   if(profile && !profile.recharge_ref) saveRechargeTimerToServer();
   if(authUser.email === ADMIN_EMAIL || profile?.is_admin){ state.isAdmin = true; }
   if(authUser.email === ADMIN_EMAIL || profile?.is_super_admin){ state.isSuperAdmin = true; }
-  // Nòt: kont sispann NON redireksyone otomatikman — kliyan an rete sou paj li ye a,
-  // men chak aksyon (klik) bloke pa entèsepsyon global la ak mesaj "compte suspendu".
+  if(!state.isAdmin && (localUser.accountStatus === 'suspended_temp' || localUser.accountStatus === 'suspended_permanent')){
+    goPage('suspended');
+  }
 
   await fetchWalletFromServer(authUser.id);
   subscribeToWalletRealtime(authUser.id);
@@ -2714,7 +2851,7 @@ async function subscribeToSuspensionRealtime(userId){
             u.suspensionReason = payload.new.suspension_reason || u.suspensionReason;
             u.suspendedUntil = payload.new.suspended_until || u.suspendedUntil;
           }
-          if(!state.isAdmin) showToast('🚫 Votre compte vient d\'être suspendu.');
+          if(!state.isAdmin) goPage('suspended');
         }
       })
       .subscribe();
@@ -2970,6 +3107,7 @@ function goPage(page, opts){
   if(page === 'referral'){ fetchReferralPageData(); }
   else if(['shop','panye','checkout','commandes','redeem'].includes(page)){ maybeShowTutorialV2(page, null); }
   if(page === 'tutoriel'){ fetchTutorialVideos(); }
+  if(page === 'notifications'){ checkAndRenderPushPrompt(); }
   if(page === 'suspended'){
     const u = currentUser();
     if(u && u.accountStatus === 'suspended_temp' && u.suspendedUntil){ startCherifTimer(u.suspendedUntil); }
@@ -3214,6 +3352,7 @@ function pageNotifications(){
       <div style="width:40px;"></div>
     </div>
     <p style="color:var(--muted);font-size:12.5px;margin:-10px 0 16px;">${items.length} notifikasyon</p>
+    <div id="pushPromptBanner"></div>
     <div style="display:flex;gap:10px;margin-bottom:16px;">
       <button onclick="markAllNotifRead()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px;font-size:13px;font-weight:700;color:var(--text);">✓ Mak tout li</button>
       <button onclick="clearAllNotifications()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px;font-size:13px;font-weight:700;color:var(--red);">🗑 Efase tout</button>
@@ -3779,7 +3918,7 @@ async function confirmApiTopupPurchase(productId){
       await sb.from('orders').update({ status: 'anile' }).eq('id', inserted.id);
       await applyWalletChange(state.currentUserId, totalPrice, 'Ranbousman — ' + p.name, 'in');
       await fetchWalletFromServer(state.currentUserId);
-      showCustomerError('⚠️ Nou pa t kapab konplete kòmand la — ou ranbouse otomatikman. Eseye ankò nan kèk minit.', data?.error || error?.message || 'Founisè refize kòmand lan', 'Achte Free Fire — ' + p.name);
+      showCustomerError('', data?.error || error?.message || 'Founisè refize kòmand lan', 'Achte Free Fire — ' + p.name, 'toast_order_failed_refunded');
       resetBtn();
       return;
     }
@@ -3797,9 +3936,9 @@ async function confirmApiTopupPurchase(productId){
     goPage('commandes');
     try{ fetchWalletFromServer(state.currentUserId); }catch(e){} // background — pa bezwen tann sa pou kontinye
     try{ notifyAdminNewOrder(order); }catch(e){}
-    try{ if(order.status === 'terminee') notifyAdminNewSale(order); }catch(e){}
+    // notifyAdminNewSale retire — trigger SQL notify_order_terminee deja voye 'Vente confirmée' otomatikman, evite doub
     try{ incrementRewardProgress(state.currentUserId, variant.id); }catch(e){} // fè pwogram fidelite avanse pou acha otomatik yo tou
-    try{ applyReferralFirstPurchaseDiscount(state.currentUserId); }catch(e){}
+    try{ applyReferralFirstPurchaseDiscount(state.currentUserId, order.price); }catch(e){}
   }catch(e){
     showToast('⚠️ Erè rezo pandan acha a');
     resetBtn();
@@ -4119,7 +4258,7 @@ async function confirmPurchase(productId){
     };
     if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
     state.orders[state.currentUserId].unshift(order);
-    applyReferralFirstPurchaseDiscount(state.currentUserId);
+    try{ applyReferralFirstPurchaseDiscount(state.currentUserId, order.price); }catch(e){}
 
     // cosmetic local sync so the shop page's stock counter doesn't look stale
     const local = (state.inventory[v.id] || []).find(x => x.status === 'dispo');
@@ -4132,7 +4271,7 @@ async function confirmPurchase(productId){
     } else {
       checkStockAndNotifyIfEmpty(v.id, order.product, order.variant);
       sendOrderReceiptEmail(order, currentUser());
-      notifyAdminNewSale(order);
+      // notifyAdminNewSale retire — trigger SQL notify_order_terminee deja voye 'Vente confirmée' otomatikman, evite doub
     }
 
     await fetchWalletFromServer(state.currentUserId);
@@ -4234,9 +4373,9 @@ function pageHistorique(onlyRecharges){
           ${visible.map((t,i) => {
             const isRechargeType = t.type === 'in' && /rechaj/i.test(t.label||'');
             const hasProof = isRechargeType && t.txnId;
-            const clickAttr = hasProof ? `onclick="openRechargeProof(${allTxs.indexOf(t)})" style="cursor:pointer;"` : '';
+            const clickAttr = hasProof ? `onclick="openRechargeProof(${allTxs.indexOf(t)})"` : '';
             return `
-            <div ${clickAttr} style="display:flex;flex-wrap:nowrap;align-items:center;gap:12px;padding:14px 18px;${i!==visible.length-1?'border-bottom:1px solid var(--line);':''}">
+            <div ${clickAttr} style="display:flex;flex-wrap:nowrap;align-items:center;gap:12px;padding:14px 18px;${hasProof?'cursor:pointer;':''}${i!==visible.length-1?'border-bottom:1px solid var(--line);':''}">
               <div style="flex-shrink:0;flex-grow:0;width:42px;height:42px;border-radius:12px;background:${t.type==='in'?'rgba(15,166,84,0.1)':'rgba(16,20,28,0.06)'};display:flex;align-items:center;justify-content:center;">
                 <div style="width:30px;height:30px;border-radius:50%;background:${t.type==='in'?'var(--green)':'var(--ink)'};display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;">
                   ${isRechargeType ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>' : (t.type==='in'?'↓':'↑')}
@@ -4948,6 +5087,7 @@ function copyNatCashNumber(){
 }
 function copyRechargeRef(){
   copyTextWithMessage(currentRechargeRef);
+  if(!rcTimerEndsAt || rcTimerExpired){ startRechargeTimer(); }
 }
 async function copyTextWithMessage(t){
   try{ await navigator.clipboard.writeText(t); showToast('Kopye avèk siksè ✅'); }
@@ -5144,13 +5284,14 @@ async function submitRecharge(){
     state.usedRefs.push(ref);
     if(receiptHash) state.usedReceiptHashes.push(receiptHash);
     checkReferralRechargeBonus(state.currentUserId, amount);
-    resultBox.innerHTML = `<div class="card" style="border-color:var(--green);"><div style="color:var(--green);font-weight:700;">✅ Wallet kredite! Nouvo balans: ${money(walletBalance())}</div></div>`;
+    sendPushToUser(state.currentUserId, '💰 Recharge confirmée !', 'HTG ' + amount.toLocaleString('fr-FR') + ' ajouté à votre wallet.', '/');
+    resultBox.innerHTML = `<div class="card" style="border-color:var(--green);"><div style="color:var(--green);font-weight:700;">${t('toast_wallet_credited')}! ${t('wallet_balance')||'Balans'}: ${money(walletBalance())}</div></div>`;
     const balDisplay = document.getElementById('walletBalanceDisplay');
     if(balDisplay) balDisplay.textContent = money(walletBalance());
-    showToast('Wallet kredite ✓');
+    showToast(t('toast_wallet_credited'));
     sendWalletCreditedEmail(currentUser(), amount, txn);
     const u2 = currentUser();
-    const clientName2 = (u2 && u2.profile) ? (u2.profile.prenom + ' ' + u2.profile.nom) : (u2 ? u2.name : 'Kliyan');
+    const clientName2 = u2 ? (u2.name || 'Kliyan') : 'Kliyan';
     let successMsg = 'Client : ' + clientName2;
     successMsg += '\nEmail : ' + (u2 && u2.email ? u2.email : '—');
     successMsg += '\nMontant : HTG ' + amount.toLocaleString('fr-FR');
@@ -5228,17 +5369,11 @@ function isAccountUsable(){
   const u = currentUser();
   return !u || u.accountStatus === 'active';
 }
-let lastSuspendedBlockNtfyAt = 0;
 function blockIfSuspended(){
   const u = currentUser();
   if(!u) return false;
   if(u.accountStatus === 'suspended_temp' || u.accountStatus === 'suspended_permanent'){
-    showToast('🚫 Votre compte est suspendu — vous ne pouvez effectuer aucune action. Contactez le support.');
-    const now = Date.now();
-    if(now - lastSuspendedBlockNtfyAt > 30000){ // rate-limit: maksimòm 1 chak 30 segond pou pa spam Admin
-      lastSuspendedBlockNtfyAt = now;
-      sendNtfyNotification('🚫 Kliyan sispann k ap eseye aji', '👤 ' + (u.name||'') + '\n📧 ' + (u.email||'') + '\n📄 Paj: ' + currentPage, 'default', 'no_entry', undefined, 'errors');
-    }
+    goPage('suspended');
     return true;
   }
   return false;
@@ -5605,12 +5740,7 @@ async function subscribeToMyOrdersRealtime(){
     myOrdersChannel = sb.channel('my-orders-rt-'+state.currentUserId)
       .on('postgres_changes', { event:'UPDATE', schema:'public', table:'orders', filter:'user_id=eq.'+state.currentUserId }, payload => {
         showToast('Kòmand #'+payload.new.order_no+' vin '+(STATUS_LABEL[payload.new.status]||payload.new.status));
-        if(payload.new.status === 'terminee' && payload.old && payload.old.status !== 'terminee'){
-          notifyAdminNewSale({
-            orderNo: payload.new.order_no, product: payload.new.product, variant: payload.new.variant,
-            price: Number(payload.new.price), status: payload.new.status
-          });
-        }
+        // notifyAdminNewSale retire — trigger SQL notify_order_terminee deja voye 'Vente confirmée' otomatikman, evite doub
         fetchMyOrders();
       })
       .subscribe();
@@ -5912,7 +6042,7 @@ async function checkoutCart(){
           } else {
             checkStockAndNotifyIfEmpty(item.variantId, order.product, order.variant);
             sendOrderReceiptEmail(order, currentUser());
-            notifyAdminNewSale(order);
+            // notifyAdminNewSale retire — trigger SQL deja voye 'Vente confirmée' otomatikman
           }
           claimedCount++;
         }catch(e){ console.warn('purchase_pin_secure exception:', e?.message||e); break; }
@@ -6011,7 +6141,7 @@ async function checkoutCart(){
         if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
         state.orders[state.currentUserId].unshift(order);
         notifyAdminNewOrder(order);
-        if(order.status === 'terminee') notifyAdminNewSale(order);
+        // notifyAdminNewSale retire — trigger SQL deja voye 'Vente confirmée' otomatikman
         incrementRewardProgress(state.currentUserId, item.variantId); // fè pwogram fidelite avanse pou acha otomatik yo tou
         processedCount++;
       }catch(e){ console.warn('api_topup checkout exception:', e?.message||e); failed.push(item); }
@@ -6605,6 +6735,11 @@ function pageParametres(){
       </div>
     </div>
     ${state.isAdmin ? `<div class="card"><button class="btn btn-ghost" style="width:100%;" onclick="goPage('admin')">Dashboard Admin</button></div>` : ''}
+    <div class="card">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px;">🔔 Notifications</div>
+      <div style="color:var(--muted);font-size:12px;margin-bottom:12px;">Recevez une alerte directement sur votre téléphone (commande terminée, nouveaux produits, etc.)</div>
+      <button class="btn btn-green" onclick="enablePushNotifications()">Activer les notifications</button>
+    </div>
     <button class="btn btn-red-ghost" onclick="doLogout()">Dekonekte</button>
   `;
 }
@@ -6694,7 +6829,8 @@ async function updateOrderStatus(userId, orderId, newStatus){
   if(newStatus === 'terminee'){
     const u = state.users.find(x=>x.id===userId);
     sendOrderReceiptEmail(o, u);
-    notifyAdminNewSale(o);
+    // notifyAdminNewSale retire — trigger SQL deja voye 'Vente confirmée' otomatikman lè estati a chanje nan baz done a
+    sendPushToUser(userId, '✅ Commande terminée !', 'Votre commande #' + o.orderNo + ' a été livrée. Merci pour votre confiance !', '/');
   }
   await saveState(); renderAdminTab(); showToast('Estati mete ajou');
 }
@@ -6738,7 +6874,6 @@ const ADMIN_TABS = [
   {id:'rechaj', label:'Demand Rechaj'},
   {id:'kliyan', label:'Kliyan'},
   {id:'kòmand', label:'Kòmand'},
-  {id:'redeem', label:'Kòd Redeem'},
   {id:'rapo', label:'Rapò'},
   {id:'paramsite', label:'Paramèt'},
   {id:'pub', label:'📢 Pub'},
@@ -7100,19 +7235,6 @@ function renderAdminTab(){
       ${oldCount > 0 ? `<div style="font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px;">${oldCount} kòmand pi ansyen pase 30 jou kache isit la (yo rete vizib pou kliyan yo nan Mes Commandes)</div>` : ''}
       ${recent.length===0 ? '<div class="empty"><div class="em-icon">📦</div><div class="em-title">Pa gen kòmand resan</div></div>' :
         recent.slice(0,150).map(o => renderAdminOrderCard(o, o.userId)).join('')}
-    `;
-  }
-  else if(adminTab === 'redeem'){
-    box.innerHTML = `
-      <div class="card">
-        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">Kreye Kòd Redeem</div>
-        <div class="field-uid"><input type="text" id="rdCode" placeholder="Kòd (ex: KT-2026-XYZ)"></div>
-        <div class="field-uid"><input type="text" id="rdValue" placeholder="Valè (HTG)"></div>
-        <button class="btn btn-green" onclick="addRedeemCode()">Kreye Kòd</button>
-      </div>
-      <div class="card"><table><thead><tr><th>Kòd</th><th>Valè</th><th>Estati</th></tr></thead><tbody>
-        ${state.redeemCodes.map(c => `<tr><td class="mono">${escapeHtml(c.code)}</td><td>${money(c.value)}</td><td><span class="pill ${c.status==='dispo'?'ok':'no'}">${c.status==='dispo'?'Disponib':'Itilize'}</span></td></tr>`).join('')}
-      </tbody></table></div>
     `;
   }
   else if(adminTab === 'rapo'){
@@ -8421,6 +8543,7 @@ async function addProduct(){
   logActivity('Ajoute pwodwi '+name);
   selectedProductMode = 'pin';
   await saveState(); renderAdminTab(); showToast('Pwodwi ajoute');
+  sendPushToAll('🆕 Nouveau produit disponible !', name + ' est maintenant disponible sur Kerry Topup.', '/');
 }
 async function deleteProduct(id){
   openConfirm('Efase pwodwi a?', 'Sa ap efase pwodwi a ak tout opsyon li yo.', async ()=>{
@@ -9683,21 +9806,6 @@ fetchFooterContent();
     });
   }catch(e){ console.warn('onAuthStateChange setup failed:', e?.message||e); }
 })();
-
-document.addEventListener('click', function(e){
-  if(state.isAdmin) return; // Admin pa janm bloke pa lojik sispansyon kliyan an
-  if(isAccountUsable()) return;
-  // Kliyan sispann — bloke aksyon sou bouton/lyen, men kite navigasyon meni/lojot fonksyonalite konsiltasyon
-  const target = e.target.closest('button, a[onclick], [onclick]');
-  if(!target) return;
-  const skipIds = ['menuBtn','drawerCloseBtn','logoutBtn','profileIconBtn'];
-  if(skipIds.includes(target.id)) return;
-  if(target.closest('.drawer, .drawer-bg')) return; // kite meni ☰ mache (deconnexion, elatriye)
-  e.preventDefault();
-  e.stopPropagation();
-  e.stopImmediatePropagation();
-  blockIfSuspended();
-}, true);
 </script>
 </body>
 </html>
