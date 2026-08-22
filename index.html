@@ -3097,7 +3097,7 @@ let activeCategory = 'Tout';
 function slugify(name){
   return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 }
-const PAGE_PATHS = { shop:'/', wallet:'/wallet', commandes:'/commandes', redeem:'/redeem', historique:'/historique', parametres:'/parametres', panye:'/panier', admin:'/admin', tutoriel:'/tutoriel', checkout:'/checkout', kerryRewards:'/programme-fidelite', suspended:'/suspendu', aboutUs:'/a-propos', conditions:'/conditions', notifications:'/notifications', apiSupplier:'/api1', apiRegenerate:'/api1/regenerer', referral:'/parrainage' };
+const PAGE_PATHS = { shop:'/', wallet:'/wallet', commandes:'/commandes', redeem:'/redeem', historique:'/historique', parametres:'/parametres', panye:'/panier', admin:'/admin', tutoriel:'/tutoriel', checkout:'/checkout', kerryRewards:'/programme-fidelite', suspended:'/suspendu', aboutUs:'/a-propos', conditions:'/conditions', notifications:'/notifications', apiSupplier:'/api1', apiRegenerate:'/api1/regenerer', referral:'/parrainage', marche:'/marche' };
 const PATH_PAGES = { '/':'shop', '/wallet':'wallet', '/commandes':'commandes', '/redeem':'redeem', '/historique':'historique', '/parametres':'parametres', '/panier':'panye', '/admin':'admin', '/tutoriel':'tutoriel', '/checkout':'checkout', '/programme-fidelite':'kerryRewards', '/suspendu':'suspended', '/a-propos':'aboutUs', '/conditions':'conditions', '/notifications':'notifications', '/api1':'apiSupplier', '/marche':'marche' };
 let pendingProductSlug = null;
 
@@ -3119,7 +3119,7 @@ function goPage(page, opts){
   else if(['shop','panye','checkout','commandes','redeem'].includes(page)){ maybeShowTutorialV2(page, null); }
   if(page === 'tutoriel'){ fetchTutorialVideos(); }
   if(page === 'notifications'){ checkAndRenderPushPrompt(); }
-  if(page === 'marche'){ fetchActiveListings(); setTimeout(renderListingPhotosGrid, 0); }
+  if(page === 'marche'){ fetchActiveListings(); if(marcheTab === 'vendre') fetchMyListings(); setTimeout(renderListingPhotosGrid, 0); }
   if(page === 'listingDetail' && currentListingDetail){
     loadListingReviews(currentListingDetail.id);
     setTimeout(setupReviewStarPicker, 0);
@@ -6799,14 +6799,55 @@ async function setSellerName(){
   }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
 }
 let marcheTab = 'achete';
+async function fetchMyListings(){
+  if(!state.currentUserId) return;
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('game_account_listings').select('*').eq('seller_id', state.currentUserId).order('created_at', {ascending:false});
+    if(error){ console.warn('fetchMyListings erè:', error.message); return; }
+    state.myListings = data || [];
+    renderMyListings();
+  }catch(e){ console.warn('fetchMyListings exception:', e?.message||e); }
+}
+function renderMyListings(){
+  const box = document.getElementById('myListingsBox');
+  if(!box) return;
+  const list = state.myListings || [];
+  const statusLabel = { pending_review:'⏳ En attente', active:'✅ Actif sur le marché', rejected:'❌ Rejeté', sold:'💰 Vendu' };
+  const statusColor = { pending_review:'var(--amber)', active:'var(--green)', rejected:'var(--red)', sold:'var(--muted)' };
+  if(list.length === 0){ box.innerHTML = '<div style="color:var(--muted);font-size:12px;">Aucune annonce pour l\'instant.</div>'; return; }
+  box.innerHTML = list.map(l => `
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);">
+      <img src="${escapeHtml((l.photos&&l.photos[0])||'')}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--panel-2);">
+      <div style="flex:1;">
+        <div style="font-weight:700;font-size:12.5px;">${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+        <div style="font-size:11px;font-weight:700;color:${statusColor[l.status]||'var(--muted)'};">${statusLabel[l.status]||l.status}</div>
+      </div>
+      <div style="font-weight:800;color:var(--green);font-size:13px;">${money(l.price)}</div>
+    </div>
+  `).join('');
+}
 async function fetchActiveListings(){
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('game_account_listings').select('*, profiles(seller_name)').eq('status', 'active').order('created_at', {ascending:false});
-    if(error){ console.warn('fetchActiveListings erè:', error.message); return; }
-    state.gameListings = (data||[]).map(l => ({...l, sellerName: l.profiles?.seller_name || 'Vendeur'}));
+    const { data, error } = await sb.from('game_account_listings').select('*').eq('status', 'active').order('created_at', {ascending:false});
+    if(error){
+      console.warn('fetchActiveListings erè:', error.message);
+      sendNtfyNotification('🐛 DEBUG — fetchActiveListings echwe', '⚠️ ' + error.message + '\n📄 Kòd: ' + (error.code||''), 'high', 'bug', undefined, 'errors');
+      return;
+    }
+    const sellerIds = [...new Set((data||[]).map(l => l.seller_id))];
+    let namesById = {};
+    if(sellerIds.length){
+      const { data: profiles } = await sb.from('profiles').select('id, seller_name').in('id', sellerIds);
+      (profiles||[]).forEach(p => { namesById[p.id] = p.seller_name; });
+    }
+    state.gameListings = (data||[]).map(l => ({...l, sellerName: namesById[l.seller_id] || 'Vendeur'}));
     if(currentPage === 'marche') render();
-  }catch(e){ console.warn('fetchActiveListings exception:', e?.message||e); }
+  }catch(e){
+    console.warn('fetchActiveListings exception:', e?.message||e);
+    sendNtfyNotification('🐛 DEBUG — fetchActiveListings exception', '⚠️ ' + (e?.message||e), 'high', 'bug', undefined, 'errors');
+  }
 }
 function pageMarche(){
   const u = currentUser();
@@ -6881,6 +6922,10 @@ function pageMarche(){
   return `
     <div class="page-header"><h2>🎮 ACCOUNT FREE FIRE MARKET</h2></div>
     ${tabsHtml}
+    <div class="card">
+      <div style="font-weight:700;font-size:13px;margin-bottom:10px;">📋 Mes annonces</div>
+      <div id="myListingsBox">Chajman...</div>
+    </div>
     <div class="card">
       <div class="field-uid"><label>Photos du compte (1 minimum, 4 maximum)</label>
         <div id="listingPhotosGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
@@ -7023,8 +7068,15 @@ async function openListingDetail(id){
 async function loadListingReviews(listingId){
   try{
     const sb = await getSupabase();
-    const { data } = await sb.from('listing_reviews').select('*, profiles(name)').eq('listing_id', listingId).order('created_at', {ascending:false});
-    currentListingDetail.reviews = data || [];
+    const { data } = await sb.from('listing_reviews').select('*').eq('listing_id', listingId).order('created_at', {ascending:false});
+    const reviews = data || [];
+    const buyerIds = [...new Set(reviews.map(r => r.buyer_id))];
+    let namesById = {};
+    if(buyerIds.length){
+      const { data: profiles } = await sb.from('profiles').select('id, name').in('id', buyerIds);
+      (profiles||[]).forEach(p => { namesById[p.id] = p.name; });
+    }
+    currentListingDetail.reviews = reviews.map(r => ({...r, profiles: { name: namesById[r.buyer_id] || 'Client' }}));
     if(currentPage === 'listingDetail') render();
   }catch(e){ console.warn('loadListingReviews failed:', e?.message||e); }
 }
@@ -7119,9 +7171,10 @@ async function shareListing(id){
 async function openListingFromUrl(id){
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('game_account_listings').select('*, profiles(seller_name)').eq('id', id).eq('status', 'active').maybeSingle();
+    const { data, error } = await sb.from('game_account_listings').select('*').eq('id', id).eq('status', 'active').maybeSingle();
     if(error || !data){ showToast('Compte introuvable ou plus disponible'); goPage('shop'); return; }
-    currentListingDetail = { ...data, sellerName: data.profiles?.seller_name || 'Vendeur' };
+    const { data: profile } = await sb.from('profiles').select('seller_name').eq('id', data.seller_id).maybeSingle();
+    currentListingDetail = { ...data, sellerName: profile?.seller_name || 'Vendeur' };
     listingReviewsExpanded = false;
     goPage('listingDetail');
   }catch(e){ showToast('Erreur de chargement'); }
