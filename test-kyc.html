@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KerryTopup KYC Face Demo</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f8f5;font-family:Arial,sans-serif;color:#15221b}
+.wrap{min-height:100vh;display:grid;place-items:center;padding:18px}
+.card{width:min(430px,100%);background:white;border-radius:28px;padding:20px;box-shadow:0 12px 40px #0002}
+h1{margin:0 0 5px;font-size:22px}.sub{color:#728078;font-size:14px;margin-bottom:16px}
+.camera{position:relative;overflow:hidden;border-radius:24px;background:#111;aspect-ratio:3/4}
+video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.shade{position:absolute;inset:0;background:radial-gradient(circle at center,transparent 31%,#0009 32%,#0009 100%)}
+.ring{position:absolute;left:50%;top:50%;width:62%;aspect-ratio:1;transform:translate(-50%,-50%);border:5px solid #d7dce0;border-radius:50%;transition:.25s}
+.ring.warn{border-color:#ffd43b;box-shadow:0 0 0 8px #ffd43b22}
+.ring.ok{border-color:#18c76a;box-shadow:0 0 0 8px #18c76a33,0 0 32px #18c76a99}
+.msg{position:absolute;left:18px;right:18px;bottom:18px;background:#000c;color:white;border-radius:16px;padding:13px;text-align:center;font-size:15px}
+.status{display:flex;gap:9px;align-items:center;margin-top:15px;font-weight:700}
+.dot{width:11px;height:11px;border-radius:50%;background:#f0b400}.dot.green{background:#18c76a}
+button{width:100%;border:0;border-radius:15px;padding:14px;margin-top:15px;background:#101712;color:white;font-size:16px;font-weight:700}
+.note{font-size:11px;color:#77827d;margin-top:12px;line-height:1.45}
+</style>
+</head>
+<body>
+<div class="wrap"><main class="card">
+<h1>🔐 Vérification du visage</h1>
+<div class="sub">Démo KYC KerryTopup — interface seulement.</div>
+<div class="camera">
+<video id="video" autoplay muted playsinline></video>
+<div class="shade"></div>
+<div id="ring" class="ring"></div>
+<div id="msg" class="msg">Autorisez la caméra pour commencer.</div>
+</div>
+<div class="status"><span id="dot" class="dot"></span><span id="status">Caméra en attente</span></div>
+<button id="start">Activer la caméra</button>
+<div class="note">Cette démo ne confirme pas l'identité et ne stocke ni n'envoie la vidéo. Pour un vrai KYC, utilisez un service de vérification d'identité conforme.</div>
+</main></div>
+<script>
+const video=document.getElementById('video'), ring=document.getElementById('ring'),
+msg=document.getElementById('msg'), status=document.getElementById('status'),
+dot=document.getElementById('dot'), start=document.getElementById('start');
+
+let faceDetector=null, stableFrames=0, verified=false;
+const REQUIRED_STABLE_FRAMES=20; // ~2 segond
+
+function state(type,text){
+ ring.className='ring '+(type||''); msg.textContent=text; status.textContent=text;
+ dot.className='dot '+(type==='ok'?'green':'');
+}
+
+async function camera(){
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+  video.srcObject=stream; start.style.display='none';
+
+  if('FaceDetector' in window){
+    faceDetector=new FaceDetector({fastMode:true});
+    state('warn','Placez votre visage dans le cercle');
+    scanLoop();
+  } else {
+    // Aparèy/navigatè sa a pa sipòte deteksyon figi otomatik — mòd senp: 2 segond imobil
+    state('warn','Détection auto non supportée — restez immobile 2s');
+    setTimeout(()=>{ if(!verified) success(); }, 2000);
+  }
+ }catch(e){state('','Caméra refusée — autorisez la caméra.');}
+}
+
+async function scanLoop(){
+ if(verified) return;
+ try{
+   const faces=await faceDetector.detect(video);
+   if(faces.length===0){
+     state('warn','Placez votre visage dans le cercle');
+     stableFrames=0;
+   } else {
+     const box=faces[0].boundingBox;
+     const videoArea=video.videoWidth*video.videoHeight;
+     const faceArea=box.width*box.height;
+     const ratio=faceArea/videoArea;
+
+     if(ratio<0.10){
+       state('warn','Rapprochez-vous, placez votre visage au centre');
+       stableFrames=0;
+     } else if(ratio>0.32){
+       state('warn','Reculez-vous légèrement');
+       stableFrames=0;
+     } else {
+       state('warn','Parfait — restez immobile...');
+       stableFrames++;
+       if(stableFrames>=REQUIRED_STABLE_FRAMES){ success(); return; }
+     }
+   }
+ }catch(e){ /* silans, reeseye pwochen frame */ }
+ setTimeout(scanLoop,100);
+}
+
+function success(){
+ verified=true;
+ state('ok','✓ Vérification réussie');
+ if(video.srcObject) video.srcObject.getTracks().forEach(t=>t.stop());
+}
+
+start.onclick=camera;
+</script>
+</body>
+</html>
