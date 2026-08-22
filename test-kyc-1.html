@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KerryTopup KYC — Auto</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f4f8f5;font-family:Arial,sans-serif;color:#15221b}
+.wrap{min-height:100vh;display:grid;place-items:center;padding:18px}
+.card{width:min(430px,100%);background:white;border-radius:28px;padding:20px;box-shadow:0 12px 40px #0002}
+h1{margin:0 0 5px;font-size:22px}.sub{color:#728078;font-size:14px;margin-bottom:16px}
+.camera{position:relative;overflow:hidden;border-radius:24px;background:#111;aspect-ratio:3/4}
+video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+.shade{position:absolute;inset:0;background:radial-gradient(circle at center,transparent 31%,#0009 32%,#0009 100%)}
+.ring{position:absolute;left:50%;top:50%;width:62%;aspect-ratio:1;transform:translate(-50%,-50%);border:5px solid transparent;border-radius:50%;transition:.25s}
+.ring.warn{border-color:#ffd43b;box-shadow:0 0 0 8px #ffd43b22}
+.ring.ok{border-color:#18c76a;box-shadow:0 0 0 8px #18c76a33,0 0 32px #18c76a99}
+.msg{position:absolute;left:18px;right:18px;bottom:18px;background:#000c;color:white;border-radius:16px;padding:13px;text-align:center;font-size:15px}
+.note{font-size:11px;color:#77827d;margin-top:12px;line-height:1.45}
+</style>
+</head>
+<body>
+<div class="wrap"><main class="card">
+<h1>🔐 Vérification du visage</h1>
+<div class="sub">Placez votre visage dans le cercle pour accéder au Marché des comptes.</div>
+<div class="camera">
+<video id="video" autoplay muted playsinline></video>
+<div class="shade"></div>
+<div id="ring" class="ring"></div>
+<div id="msg" class="msg">Activation de la caméra...</div>
+</div>
+<div class="note">Cette vérification ne stocke ni n'envoie la vidéo — seule une confirmation est transmise.</div>
+</main></div>
+<script>
+const video=document.getElementById('video'), ring=document.getElementById('ring'), msg=document.getElementById('msg');
+let faceDetector=null, stableFrames=0, verified=false;
+const REQUIRED_STABLE_FRAMES=20;
+
+function state(type,text){ ring.className='ring '+(type||''); msg.textContent=text; }
+
+async function camera(){
+ try{
+  const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+  video.srcObject=stream;
+  if('FaceDetector' in window){
+    faceDetector=new FaceDetector({fastMode:true});
+    state('','Placez votre visage dans le cercle');
+    scanLoop();
+  } else {
+    state('warn','Restez immobile 2 secondes...');
+    setTimeout(()=>{ if(!verified) success(); }, 2000);
+  }
+ }catch(e){ msg.textContent='Caméra refusée — autorisez la caméra dans les réglages.'; }
+}
+
+async function scanLoop(){
+ if(verified) return;
+ try{
+   const faces=await faceDetector.detect(video);
+   if(faces.length===0){ state('','Placez votre visage dans le cercle'); stableFrames=0; }
+   else{
+     const box=faces[0].boundingBox;
+     const ratio=(box.width*box.height)/(video.videoWidth*video.videoHeight);
+     if(ratio<0.10){ state('warn','Rapprochez-vous'); stableFrames=0; }
+     else if(ratio>0.32){ state('warn','Reculez-vous légèrement'); stableFrames=0; }
+     else{
+       state('warn','Parfait — restez immobile...');
+       stableFrames++;
+       if(stableFrames>=REQUIRED_STABLE_FRAMES){ success(); return; }
+     }
+   }
+ }catch(e){}
+ setTimeout(scanLoop,100);
+}
+
+function success(){
+ verified=true;
+ state('ok','✓ Vérification réussie');
+ if(video.srcObject) video.srcObject.getTracks().forEach(t=>t.stop());
+}
+
+camera(); // demare otomatikman, san bouton
+</script>
+</body>
+</html>
