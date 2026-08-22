@@ -566,7 +566,7 @@ textarea.admin-ta{
     </div>
     <div class="search-bar" id="searchBarWrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="search" id="searchInput" name="product-search" autocomplete="off" placeholder="Chèche Free Fire, PUBG, Netflix..." oninput="renderShop()">
+      <input type="search" id="searchInput" name="product-search" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" placeholder="Chèche Free Fire, PUBG, Netflix..." oninput="renderShop()">
     </div>
   </div>
 
@@ -2744,7 +2744,8 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
   if(!localUser){
     localUser = { id: authUser.id, name, email: authUser.email, googlePhoto, savedWhatsapp: profile?.whatsapp || '',
       accountStatus: profile?.account_status || 'active', suspensionReason: profile?.suspension_reason || '',
-      suspendedUntil: profile?.suspended_until || null, suspensionHistory: profile?.suspension_history || [] };
+      suspendedUntil: profile?.suspended_until || null, suspensionHistory: profile?.suspension_history || [],
+      kycStatus: profile?.kyc_status || 'none', kycPhotoUrl: profile?.kyc_photo_url || null };
     state.users.push(localUser);
     state.wallets[authUser.id] = state.wallets[authUser.id] || 0;
     state.transactions[authUser.id] = state.transactions[authUser.id] || [];
@@ -2844,14 +2845,17 @@ async function subscribeToSuspensionRealtime(userId){
     suspensionRealtimeChannel = sb.channel('suspension-rt-' + userId)
       .on('postgres_changes', { event:'UPDATE', schema:'public', table:'profiles', filter:'id=eq.'+userId }, payload => {
         const status = payload.new?.account_status;
+        const u = state.users.find(x=>x.id===userId);
         if(status === 'suspended_temp' || status === 'suspended_permanent'){
-          const u = state.users.find(x=>x.id===userId);
           if(u){
             u.accountStatus = status;
             u.suspensionReason = payload.new.suspension_reason || u.suspensionReason;
             u.suspendedUntil = payload.new.suspended_until || u.suspendedUntil;
           }
           if(!state.isAdmin) goPage('suspended');
+        } else if(status === 'active'){
+          if(u){ u.accountStatus = 'active'; u.suspensionReason = ''; u.suspendedUntil = null; }
+          if(!state.isAdmin && currentPage === 'suspended'){ showToast('✅ Votre compte a été réactivé'); goPage('shop'); }
         }
       })
       .subscribe();
@@ -3154,6 +3158,7 @@ function render(){
   else if(currentPage === 'redeem') body = pageRedeem();
   else if(currentPage === 'historique') body = pageHistorique(false);
   else if(currentPage === 'parametres') body = pageParametres();
+  else if(currentPage === 'marche') body = pageMarche();
   else if(currentPage === 'admin') body = pageAdmin();
   else if(currentPage === 'panye') body = pagePanye();
   else if(currentPage === 'product') body = pageProduct();
@@ -6754,6 +6759,276 @@ async function confirmReferralInline(){
     fetchReferralPageData();
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
+let marcheTab = 'achete';
+function pageMarche(){
+  const u = currentUser();
+  if(!u) return `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">Connectez-vous pour continuer</div></div>`;
+  const status = u.kycStatus || 'none';
+
+  const tabsHtml = `
+    <div style="display:flex;background:var(--panel-2);border-radius:12px;padding:4px;margin-bottom:16px;">
+      <div onclick="marcheTab='achete';goPage('marche');" style="flex:1;text-align:center;padding:9px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;${marcheTab==='achete'?'background:var(--panel);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,0.08);':'color:var(--muted);'}">Acheter</div>
+      <div onclick="marcheTab='vendre';goPage('marche');" style="flex:1;text-align:center;padding:9px;border-radius:9px;font-size:12.5px;font-weight:700;cursor:pointer;${marcheTab==='vendre'?'background:var(--panel);color:var(--green);box-shadow:0 1px 3px rgba(0,0,0,0.08);':'color:var(--muted);'}">Vendre</div>
+    </div>
+  `;
+
+  if(marcheTab === 'achete'){
+    const listings = (state.gameListings||[]).filter(l => l.status === 'active');
+    return `
+      <div class="page-header"><h2>🎮 ACCOUNT FREE FIRE MARKET</h2></div>
+      ${tabsHtml}
+      ${listings.length === 0 ? '<div class="empty"><div class="em-icon">📭</div><div class="em-title">Aucun compte disponible</div></div>' : `
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          ${listings.map(l => `
+            <div class="card" style="padding:14px;">
+              <div style="display:flex;gap:12px;">
+                <img src="${escapeHtml((l.photos&&l.photos[0])||'')}" style="width:70px;height:70px;border-radius:10px;object-fit:cover;background:var(--panel-2);">
+                <div style="flex:1;">
+                  <div style="font-weight:700;font-size:13.5px;">Compte ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+                  <div style="font-size:12px;color:var(--muted);margin:2px 0 8px;">4 photos disponibles</div>
+                  <div style="font-weight:800;color:var(--green);font-size:15px;">${money(l.price)}</div>
+                </div>
+              </div>
+              <button class="btn btn-green" style="margin-top:10px;" onclick="openListingDetail('${l.id}')">Voir les détails</button>
+            </div>
+          `).join('')}
+        </div>
+      `}
+    `;
+  }
+
+  // Onglet Vendre
+  if(status !== 'approved'){
+    return `
+      <div class="page-header"><h2>🎮 ACCOUNT FREE FIRE MARKET</h2></div>
+      ${tabsHtml}
+      <div id="kycCaptureArea" style="text-align:center;">
+        ${status === 'rejected' ? '<div style="background:var(--red-dim);color:var(--red);border-radius:12px;padding:12px;font-size:12.5px;font-weight:600;margin-bottom:16px;">⚠️ Votre photo précédente n\'a pas été acceptée. Veuillez réessayer avec une photo plus claire.</div>' : ''}
+        ${status === 'pending' ? `
+          <div class="empty"><div class="em-icon">⏳</div><div class="em-title">Votre KYC est en cours de validation</div><p style="color:var(--muted);font-size:12.5px;">Cela prend généralement quelques heures.</p></div>
+          <button class="btn btn-ghost" style="max-width:200px;margin:14px auto 0;display:block;" onclick="refreshKycStatus()">🔄 Actualiser</button>
+        ` : `
+          <div style="font-size:44px;margin:24px 0 10px;">🔐</div>
+          <h3 style="font-family:'Rajdhani',sans-serif;font-size:17px;margin:0 0 8px;">Vérification requise</h3>
+          <p style="color:var(--muted);font-size:12.5px;line-height:1.6;max-width:280px;margin:0 auto 22px;">Pour vendre un compte de jeu, nous devons d'abord confirmer que vous êtes une vraie personne.</p>
+          <button class="btn btn-green" style="max-width:260px;margin:0 auto;" onclick="startKycCapture()">Vérifier mon identité</button>
+        `}
+      </div>
+    `;
+  }
+
+  return `
+    <div class="page-header"><h2>🎮 ACCOUNT FREE FIRE MARKET</h2></div>
+    ${tabsHtml}
+    <div class="card">
+      <div class="field-uid"><label>Photos du compte (4 requises)</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          ${[0,1,2,3].map(i => `
+            <label style="border:1.5px dashed var(--line);border-radius:10px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;">
+              <img id="listingPhotoPreview${i}" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
+              <span id="listingPhotoPlaceholder${i}" style="color:var(--muted);font-size:22px;">📷</span>
+              <input type="file" accept="image/*" style="display:none;" onchange="previewListingPhoto(${i}, this)">
+            </label>
+          `).join('')}
+        </div>
+      </div>
+      <div class="field-uid"><label>Rang</label>
+        <select id="listingRank" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);">
+          <option value="Héroïque">Héroïque</option>
+          <option value="Bronze">Bronze</option>
+          <option value="Diamant">Diamant</option>
+          <option value="Platine">Platine</option>
+          <option value="Grand Master">Grand Master</option>
+        </select>
+      </div>
+      <div class="field-uid"><label>Niveau du compte</label><input type="text" id="listingLevel" placeholder="Ex: 65"></div>
+      <div class="field-uid"><label>Prix (HTG)</label><input type="text" id="listingPrice" inputmode="numeric" placeholder="Ex: 5000"></div>
+
+      <div class="field-uid"><label>Email du compte</label><input type="text" id="listingEmail" placeholder="exemple@gmail.com"></div>
+      <div class="field-uid"><label>Mot de passe du compte</label><input type="text" id="listingPassword" placeholder="Mot de passe"></div>
+      <div style="background:var(--amber-dim);color:var(--amber);border-radius:10px;padding:10px 12px;font-size:11.5px;font-weight:600;margin-bottom:16px;">⚠️ N.B : Nous n'acceptons pas les comptes liés (Facebook/Google non détachable).</div>
+
+      <div class="field-uid"><label>Moyen de paiement à la vente</label>
+        <select id="listingPaymentMethod" onchange="toggleListingPaymentFields()" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);">
+          <option value="natcash">NatCash</option>
+          <option value="wallet">Wallet interne</option>
+        </select>
+      </div>
+      <div id="listingPaymentDetailsRow">
+        <div class="field-uid"><label>Numéro NatCash</label><input type="tel" inputmode="numeric" id="listingPaymentDetails" placeholder="Ex: 42614967"></div>
+        <div class="field-uid"><label>Nom sur le compte NatCash</label><input type="text" id="listingPaymentName" placeholder="Nom complet"></div>
+      </div>
+
+      <button class="btn btn-green" onclick="submitListing()">Publier mon compte</button>
+    </div>
+  `;
+}
+function toggleListingPaymentFields(){
+  const method = document.getElementById('listingPaymentMethod').value;
+  document.getElementById('listingPaymentDetailsRow').style.display = method === 'natcash' ? 'block' : 'none';
+}
+let listingPhotoFiles = [null,null,null,null];
+function previewListingPhoto(i, input){
+  const file = input.files[0];
+  if(!file) return;
+  listingPhotoFiles[i] = file;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    document.getElementById('listingPhotoPreview'+i).src = e.target.result;
+    document.getElementById('listingPhotoPreview'+i).style.display = 'block';
+    document.getElementById('listingPhotoPlaceholder'+i).style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+async function submitListing(){
+  const rank = document.getElementById('listingRank').value;
+  const level = document.getElementById('listingLevel').value.trim();
+  const price = parseFloat(document.getElementById('listingPrice').value);
+  const email = document.getElementById('listingEmail').value.trim();
+  const password = document.getElementById('listingPassword').value.trim();
+  const paymentMethod = document.getElementById('listingPaymentMethod').value;
+  const paymentDetails = paymentMethod === 'natcash' ? document.getElementById('listingPaymentDetails').value.trim() : null;
+  const paymentName = paymentMethod === 'natcash' ? document.getElementById('listingPaymentName').value.trim() : null;
+
+  if(!level || !price || price<=0){ showToast('Remplissez le niveau et le prix correctement'); return; }
+  if(!email || !password){ showToast('Email et mot de passe du compte requis'); return; }
+  if(paymentMethod === 'natcash' && (!paymentDetails || !paymentName)){ showToast('Numéro et nom NatCash requis'); return; }
+  if(listingPhotoFiles.filter(f=>f).length < 4){ showToast('Les 4 photos sont requises'); return; }
+
+  showToast('Envoi en cours...');
+  try{
+    const sb = await getSupabase();
+    const photoUrls = [];
+    for(let i=0; i<4; i++){
+      const fileName = `listings/${state.currentUserId}-${Date.now()}-${i}.jpg`;
+      const { error: upErr } = await sb.storage.from('listing-photos').upload(fileName, listingPhotoFiles[i]);
+      if(upErr){ showToast('⚠️ Erè foto: ' + upErr.message); return; }
+      const { data: urlData } = sb.storage.from('listing-photos').getPublicUrl(fileName);
+      photoUrls.push(urlData.publicUrl);
+    }
+
+    const { data: listing, error } = await sb.from('game_account_listings').insert({
+      seller_id: state.currentUserId, rank, level, price, photos: photoUrls,
+      account_email: email, account_password: password,
+      payment_method: paymentMethod, payment_details: paymentDetails, payment_name: paymentName,
+      status: 'pending_review'
+    }).select().single();
+    if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+
+    const u = currentUser();
+    const photoLinksMsg = photoUrls.map((url,i) => `📸 Photo ${i+1}: ${url}`).join('\n');
+    sendNtfyNotification('🎮 Nouveau compte à vérifier',
+      '👤 Vendeur: ' + (u?.name||'') + '\n📧 ' + (u?.email||'') +
+      '\n🏆 Rang: ' + rank + ' — Niveau ' + level +
+      '\n💰 Prix: ' + money(price) +
+      '\n🔑 Email compte: ' + email + '\n🔑 Mot de passe: ' + password +
+      '\n💳 Paiement: ' + paymentMethod + (paymentDetails ? ' — ' + paymentDetails + ' (' + paymentName + ')' : '') +
+      '\n' + photoLinksMsg,
+      'high', 'video_game', photoUrls[0], 'marche');
+
+    showToast('✅ Compte soumis — en attente de validation');
+    listingPhotoFiles = [null,null,null,null];
+    goPage('marche');
+  }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
+}
+async function openListingDetail(id){
+  // TODO: pwochen etap — paj detay ak flux acha (wallet, escrow, konfimasyon)
+  showToast('Détails — à venir prochainement');
+}
+async function refreshKycStatus(){
+  if(!state.currentUserId) return;
+  try{
+    const sb = await getSupabase();
+    const { data } = await sb.from('profiles').select('kyc_status, kyc_photo_url').eq('id', state.currentUserId).maybeSingle();
+    const u = currentUser();
+    if(u && data){ u.kycStatus = data.kyc_status || 'none'; u.kycPhotoUrl = data.kyc_photo_url || null; }
+  }catch(e){ console.warn('refreshKycStatus failed:', e?.message||e); }
+  goPage('marche');
+}
+let kycStream = null;
+async function startKycCapture(){
+  const area = document.getElementById('kycCaptureArea');
+  area.innerHTML = `
+    <div style="position:relative;width:min(280px,80vw);aspect-ratio:3/4;margin:0 auto 14px;border-radius:20px;overflow:hidden;background:#111;">
+      <video id="kycVideo" autoplay muted playsinline style="width:100%;height:100%;object-fit:cover;transform:scaleX(-1);"></video>
+    </div>
+    <div id="kycMsg" style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">Activation de la caméra...</div>
+    <button class="btn btn-green" style="max-width:260px;margin:0 auto;" id="kycCaptureBtn" onclick="captureKycPhoto()" disabled>📷 Prendre la photo</button>
+  `;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user' }, audio:false });
+    kycStream = stream;
+    const video = document.getElementById('kycVideo');
+    video.srcObject = stream;
+    video.onloadedmetadata = () => {
+      document.getElementById('kycMsg').textContent = 'Placez votre visage dans le cadre';
+      document.getElementById('kycCaptureBtn').disabled = false;
+    };
+  }catch(e){
+    document.getElementById('kycMsg').textContent = '⚠️ Caméra refusée — autorisez-la dans les réglages.';
+  }
+}
+function estimateBlurScore(canvas){
+  // Estimasyon senp klète: mezire varyans nivo gri antre pikèl vwazen (Laplacian aproksimatif)
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  const data = ctx.getImageData(0, 0, w, h).data;
+  const gray = new Float32Array(w*h);
+  for(let i=0, p=0; i<data.length; i+=4, p++){
+    gray[p] = 0.299*data[i] + 0.587*data[i+1] + 0.114*data[i+2];
+  }
+  let sum=0, sumSq=0, count=0;
+  for(let y=1; y<h-1; y+=2){
+    for(let x=1; x<w-1; x+=2){
+      const idx = y*w+x;
+      const lap = Math.abs(4*gray[idx] - gray[idx-1] - gray[idx+1] - gray[idx-w] - gray[idx+w]);
+      sum += lap; sumSq += lap*lap; count++;
+    }
+  }
+  const mean = sum/count;
+  const variance = (sumSq/count) - (mean*mean);
+  return variance; // pi gwo = pi klè/pi net; pi piti = pi flou
+}
+async function captureKycPhoto(){
+  const video = document.getElementById('kycVideo');
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.translate(canvas.width, 0); ctx.scale(-1, 1); // korije mirror la pou vrè foto a
+  ctx.drawImage(video, 0, 0);
+
+  const blurScore = estimateBlurScore(canvas);
+  const BLUR_THRESHOLD = 25; // ajistab selon tès reyèl
+  if(blurScore < BLUR_THRESHOLD){
+    document.getElementById('kycMsg').textContent = '⚠️ Photo floue — restez immobile et reprenez';
+    document.getElementById('kycMsg').style.color = 'var(--red)';
+    return;
+  }
+
+  document.getElementById('kycCaptureBtn').disabled = true;
+  document.getElementById('kycMsg').textContent = 'Envoi en cours...';
+  document.getElementById('kycMsg').style.color = '';
+
+  canvas.toBlob(async (blob) => {
+    try{
+      const sb = await getSupabase();
+      const fileName = `kyc/${state.currentUserId}-${Date.now()}.jpg`;
+      const { error: upErr } = await sb.storage.from('kyc-photos').upload(fileName, blob, { contentType:'image/jpeg' });
+      if(upErr){ document.getElementById('kycMsg').textContent = '⚠️ Erè: ' + upErr.message; document.getElementById('kycCaptureBtn').disabled=false; return; }
+      const { data: urlData } = sb.storage.from('kyc-photos').getPublicUrl(fileName);
+      const photoUrl = urlData.publicUrl;
+
+      await sb.from('profiles').update({ kyc_status:'pending', kyc_photo_url: photoUrl }).eq('id', state.currentUserId);
+      const u = currentUser();
+      if(u){ u.kycStatus = 'pending'; u.kycPhotoUrl = photoUrl; }
+
+      if(kycStream) kycStream.getTracks().forEach(t => t.stop());
+      sendNtfyNotification('🔐 Nouvelle vérification KYC', '👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||''), 'high', 'bust_in_silhouette', photoUrl, 'kyc');
+      goPage('marche');
+    }catch(e){ document.getElementById('kycMsg').textContent = '⚠️ Erè: ' + (e?.message||e); document.getElementById('kycCaptureBtn').disabled=false; }
+  }, 'image/jpeg', 0.9);
+}
 function pageParametres(){
   const u = currentUser();
   if(!u){
@@ -6911,6 +7186,8 @@ const ADMIN_TABS = [
   {id:'rechaj', label:'Demand Rechaj'},
   {id:'kliyan', label:'Kliyan'},
   {id:'kòmand', label:'Kòmand'},
+  {id:'founisè', label:'🔗 Katalòg Founisè'},
+  {id:'kyc', label:'🔐 Vérifications KYC'},
   {id:'rapo', label:'Rapò'},
   {id:'paramsite', label:'Paramèt'},
   {id:'pub', label:'📢 Pub'},
@@ -6945,13 +7222,30 @@ async function syncFounisèCatalog(){
       statusBox.innerHTML = '<span style="color:var(--red);">⚠️ ' + escapeHtml(data?.error||error?.message||JSON.stringify(error)||'Erè enkoni') + '</span>';
       return;
     }
-    statusBox.innerHTML = '<span style="color:var(--green);">✅ ' + data.synced + ' pwodwi senkronize</span>';
+    statusBox.innerHTML = '<span style="color:var(--green);">✅ ' + data.count + ' pwodwi senkronize</span>';
     await loadFounisèCatalogCache();
-    renderFounisèLinksTable();
+    renderFounisèCatalogList();
   }catch(e){
     console.error('founisè-catalog-sync exception:', e);
     statusBox.innerHTML = '<span style="color:var(--red);">⚠️ Erè: ' + escapeHtml(e?.message||JSON.stringify(e)||'enkoni') + '</span>';
   }
+}
+function renderFounisèCatalogList(){
+  const box = document.getElementById('wfscCatalogList');
+  if(!box) return;
+  const search = (document.getElementById('wfscCatalogSearch')?.value || '').trim().toLowerCase();
+  let list = partnerCatalogCache || [];
+  if(search) list = list.filter(c => (c.name||'').toLowerCase().includes(search));
+  if(list.length === 0){ box.innerHTML = '<div style="color:var(--muted);font-size:12.5px;">Pa gen pwodwi.</div>'; return; }
+  box.innerHTML = list.map(c => `
+    <div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-weight:700;font-size:12.5px;">${escapeHtml(c.name)}</div>
+        <div style="font-size:11px;color:var(--muted);">$${c.price} ${c.currency||'USD'} ${c.in_stock===false?'· <span style="color:var(--red);">Pa disponib</span>':''}</div>
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--green);background:var(--green-dim);padding:5px 10px;border-radius:8px;">${c.product_id}</div>
+    </div>
+  `).join('');
 }
 async function renderFounisèLinksTable(){
   const tableBox = document.getElementById('wfscLinksTable');
@@ -7285,15 +7579,16 @@ function renderAdminTab(){
     const isLastMonth = (d) => { const dt = new Date(d); const lm = new Date(now.getFullYear(), now.getMonth()-1, 1); return dt.getMonth()===lm.getMonth() && dt.getFullYear()===lm.getFullYear(); };
 
     const ordersToday = allOrders.filter(o => isToday(o.date));
-    const salesToday = ordersToday.reduce((s,o)=>s+o.price,0);
-    const salesThisMonth = allOrders.filter(o => isThisMonth(o.date)).reduce((s,o)=>s+o.price,0);
-    const salesLastMonth = allOrders.filter(o => isLastMonth(o.date)).reduce((s,o)=>s+o.price,0);
+    const completedOrders = allOrders.filter(o => o.status === 'terminee'); // sèlman kòmand ki reyisi konte kòm "vann"
+    const salesToday = completedOrders.filter(o => isToday(o.date)).reduce((s,o)=>s+o.price,0);
+    const salesThisMonth = completedOrders.filter(o => isThisMonth(o.date)).reduce((s,o)=>s+o.price,0);
+    const salesLastMonth = completedOrders.filter(o => isLastMonth(o.date)).reduce((s,o)=>s+o.price,0);
     const trendPct = salesLastMonth > 0 ? Math.round(((salesThisMonth - salesLastMonth) / salesLastMonth) * 100) : null;
     const monthName = now.toLocaleDateString('fr-FR', {month:'long', year:'numeric'});
 
     const last7 = Array(7).fill(0).map((_,i) => {
       const d = new Date(now); d.setDate(d.getDate() - (6-i));
-      const total = allOrders.filter(o => new Date(o.date).toDateString() === d.toDateString()).reduce((s,o)=>s+o.price,0);
+      const total = completedOrders.filter(o => new Date(o.date).toDateString() === d.toDateString()).reduce((s,o)=>s+o.price,0);
       return total;
     });
     const maxBar = Math.max(...last7, 1);
@@ -7655,16 +7950,35 @@ function renderAdminTab(){
           <div style="font-weight:700;font-size:13px;">🔗 Katalòg Founisè</div>
           <button class="btn btn-green" style="width:auto;padding:8px 16px;font-size:12px;" onclick="syncFounisèCatalog()">🔄 Rafrechi katalòg</button>
         </div>
-        <div id="wfscSyncStatus" style="font-size:11.5px;color:var(--muted);"></div>
-      </div>
-      <div class="card">
-        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">Lyezon Pwodwi</div>
-        <input type="text" id="wfscLinksSearch" placeholder="Chèche yon opsyon..." style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--text);margin-bottom:10px;" oninput="renderFounisèLinksTable()">
-        <div id="wfscLinksTable">Chajman...</div>
+        <div id="wfscSyncStatus" style="font-size:11.5px;color:var(--muted);margin-bottom:10px;"></div>
+        <input type="text" id="wfscCatalogSearch" placeholder="Chèche yon pwodwi..." style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--text);margin-bottom:10px;" oninput="renderFounisèCatalogList()">
+        <div id="wfscCatalogList">Chajman...</div>
       </div>
     `;
-    loadFounisèCatalogCache().then(() => renderFounisèLinksTable());
-    renderFounisèLinksTable();
+    loadFounisèCatalogCache().then(() => renderFounisèCatalogList());
+  }
+  else if(adminTab === 'kyc'){
+    const pending = state.users.filter(u => u.kycStatus === 'pending');
+    box.innerHTML = `
+      <div class="card">
+        <div style="font-weight:700;font-size:13px;margin-bottom:12px;">🔐 Vérifications KYC — En attente (${pending.length})</div>
+        ${pending.length === 0 ? '<div style="color:var(--muted);font-size:12.5px;text-align:center;padding:20px;">Aucune vérification en attente.</div>' : pending.map(u => `
+          <div style="border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;">
+            <div style="display:flex;gap:12px;margin-bottom:10px;">
+              <img src="${escapeHtml(u.kycPhotoUrl)}" style="width:80px;height:80px;border-radius:10px;object-fit:cover;background:var(--panel-2);" onclick="window.open('${escapeHtml(u.kycPhotoUrl)}','_blank')">
+              <div>
+                <div style="font-weight:700;font-size:13px;">${escapeHtml(u.name||'')}</div>
+                <div style="font-size:11.5px;color:var(--muted);">${escapeHtml(u.email||'')}</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="mini-btn" style="flex:1;color:var(--green);" onclick="reviewKyc('${u.id}','approved')">✅ Approuver</button>
+              <button class="mini-btn" style="flex:1;color:var(--red);" onclick="reviewKyc('${u.id}','rejected')">✕ Rejeter</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
   }
   else if(adminTab === 'apirevandè'){
     if(apiClientProductsView){
@@ -8111,6 +8425,17 @@ async function adminAdjustWallet(userId, sign){
   renderAdminTab();
   showToast('Wallet mete ajou ✓');
 }
+async function reviewKyc(userId, decision){
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('profiles').update({ kyc_status: decision }).eq('id', userId);
+    if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+    const u = state.users.find(x=>x.id===userId);
+    if(u) u.kycStatus = decision;
+    showToast(decision === 'approved' ? '✅ Kliyan apwouve pou Marché' : 'Kliyan rejte');
+    renderAdminTab();
+  }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
+}
 async function fetchAllUsersFromServer(){
   try{
     const sb = await getSupabase();
@@ -8120,10 +8445,18 @@ async function fetchAllUsersFromServer(){
       profiles.forEach(p => {
         let u = state.users.find(x=>x.id===p.id);
         if(!u){
-          u = { id:p.id, name:p.name, email:p.email||'', googlePhoto:null };
+          u = { id:p.id, name:p.name, email:p.email||'', googlePhoto:null,
+            accountStatus: p.account_status || 'active', suspensionReason: p.suspension_reason || '',
+            suspendedUntil: p.suspended_until || null, suspensionHistory: p.suspension_history || [],
+            kycStatus: p.kyc_status || 'none', kycPhotoUrl: p.kyc_photo_url || null };
           state.users.push(u);
-        } else if(!u.name){
-          u.name = p.name;
+        } else {
+          if(!u.name) u.name = p.name;
+          u.accountStatus = p.account_status || u.accountStatus || 'active';
+          u.suspensionReason = p.suspension_reason || u.suspensionReason || '';
+          u.suspendedUntil = p.suspended_until || u.suspendedUntil || null;
+          u.kycStatus = p.kyc_status || u.kycStatus || 'none';
+          u.kycPhotoUrl = p.kyc_photo_url || u.kycPhotoUrl || null;
         }
       });
     }
@@ -9593,6 +9926,7 @@ function renderDrawer(){
     {id:'historique', label:'Historique', icon:'<circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/>'},
     {id:'kerryRewards', label:'Free Fire Reward 💎🥳', icon:'<path d="M6 3h12l4 6-10 12L2 9z"/><path d="M11 3L8 9l4 12 4-12-3-6"/><path d="M2 9h20"/>'},
     {id:'referral', label:'Referral & Récompenses 🎁', icon:'<path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>'},
+    {id:'marche', label:'ACCOUNT FREE FIRE MARKET 🎮', icon:'<path d="M4 4h16v4H4z"/><path d="M4 8v12h16V8"/><path d="M9 12h6"/>'},
     {id:'parametres', label:'Paramètres', icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>'},
   ];
   d.innerHTML = `
