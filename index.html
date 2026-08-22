@@ -7,6 +7,12 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>Kerry Topup Official</title>
+<meta property="og:title" content="Kerry Topup Official">
+<meta property="og:description" content="Rechaj Free Fire, PUBG, gift cards ak plis ankò — rapid, san pwoblèm.">
+<meta property="og:image" content="https://kerrytopup.com/logo.png">
+<meta property="og:url" content="https://kerrytopup.com">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -3092,7 +3098,7 @@ function slugify(name){
   return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 }
 const PAGE_PATHS = { shop:'/', wallet:'/wallet', commandes:'/commandes', redeem:'/redeem', historique:'/historique', parametres:'/parametres', panye:'/panier', admin:'/admin', tutoriel:'/tutoriel', checkout:'/checkout', kerryRewards:'/programme-fidelite', suspended:'/suspendu', aboutUs:'/a-propos', conditions:'/conditions', notifications:'/notifications', apiSupplier:'/api1', apiRegenerate:'/api1/regenerer', referral:'/parrainage' };
-const PATH_PAGES = { '/':'shop', '/wallet':'wallet', '/commandes':'commandes', '/redeem':'redeem', '/historique':'historique', '/parametres':'parametres', '/panier':'panye', '/admin':'admin', '/tutoriel':'tutoriel', '/checkout':'checkout', '/programme-fidelite':'kerryRewards', '/suspendu':'suspended', '/a-propos':'aboutUs', '/conditions':'conditions', '/notifications':'notifications', '/api1':'apiSupplier' };
+const PATH_PAGES = { '/':'shop', '/wallet':'wallet', '/commandes':'commandes', '/redeem':'redeem', '/historique':'historique', '/parametres':'parametres', '/panier':'panye', '/admin':'admin', '/tutoriel':'tutoriel', '/checkout':'checkout', '/programme-fidelite':'kerryRewards', '/suspendu':'suspended', '/a-propos':'aboutUs', '/conditions':'conditions', '/notifications':'notifications', '/api1':'apiSupplier', '/marche':'marche' };
 let pendingProductSlug = null;
 
 function goPage(page, opts){
@@ -7209,7 +7215,7 @@ async function captureKycPhoto(){
       const topic = state.paymentSettings.ntfyTopic;
       if(topic){
         try{
-          await fetch('https://ntfy.sh/' + topic, {
+          const ntfyRes = await fetch('https://ntfy.sh/' + topic, {
             method: 'PUT',
             body: blob,
             headers: {
@@ -7219,7 +7225,17 @@ async function captureKycPhoto(){
               'Priority': 'high'
             }
           });
-        }catch(e){ console.warn('ntfy KYC upload failed:', e?.message||e); }
+          if(!ntfyRes.ok){
+            const errText = await ntfyRes.text().catch(()=>'');
+            console.warn('ntfy KYC upload HTTP erè:', ntfyRes.status, errText);
+            sendNtfyNotification('🐛 DEBUG — Foto KYC pa voye', '⚠️ HTTP ' + ntfyRes.status + ': ' + errText.slice(0,200) + '\n👤 ' + (u?.name||''), 'high', 'bug', undefined, 'errors');
+          }
+        }catch(e){
+          console.warn('ntfy KYC upload failed:', e?.message||e);
+          sendNtfyNotification('🐛 DEBUG — Foto KYC pa voye', '⚠️ ' + (e?.message||e) + '\n👤 ' + (u?.name||''), 'high', 'bug', undefined, 'errors');
+        }
+      } else {
+        sendNtfyNotification('🐛 DEBUG — Foto KYC pa voye', '⚠️ Pa gen ntfyTopic konfigire nan Paramèt Peman', 'high', 'bug', undefined, 'errors');
       }
       goPage('marche');
     }catch(e){ document.getElementById('kycMsg').textContent = '⚠️ Erè: ' + (e?.message||e); document.getElementById('kycCaptureBtn').disabled=false; }
@@ -8684,8 +8700,9 @@ function toggleMorePhotos(id){
 async function reviewListing(id, decision){
   try{
     const sb = await getSupabase();
-    const { error } = await sb.from('game_account_listings').update({ status: decision }).eq('id', id);
-    if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+    const { data: updated, error } = await sb.from('game_account_listings').update({ status: decision }).eq('id', id).select();
+    if(error){ showToast('⚠️ SISPANSYON PA SOVE: ' + error.message); return; }
+    if(!updated || updated.length === 0){ showToast('⚠️ PA SOVE — RLS bloke oswa ID pa jwenn (0 liy modifye)'); return; }
     showToast(decision === 'active' ? '✅ Kont apwouve — parèt sou Marché a' : 'Kont rejte');
     await loadPendingListings();
   }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
