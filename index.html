@@ -2745,7 +2745,8 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
     localUser = { id: authUser.id, name, email: authUser.email, googlePhoto, savedWhatsapp: profile?.whatsapp || '',
       accountStatus: profile?.account_status || 'active', suspensionReason: profile?.suspension_reason || '',
       suspendedUntil: profile?.suspended_until || null, suspensionHistory: profile?.suspension_history || [],
-      kycStatus: profile?.kyc_status || 'none', kycPhotoUrl: profile?.kyc_photo_url || null };
+      kycStatus: profile?.kyc_status || 'none', kycPhotoUrl: profile?.kyc_photo_url || null,
+      sellerName: profile?.seller_name || null };
     state.users.push(localUser);
     state.wallets[authUser.id] = state.wallets[authUser.id] || 0;
     state.transactions[authUser.id] = state.transactions[authUser.id] || [];
@@ -3112,6 +3113,11 @@ function goPage(page, opts){
   else if(['shop','panye','checkout','commandes','redeem'].includes(page)){ maybeShowTutorialV2(page, null); }
   if(page === 'tutoriel'){ fetchTutorialVideos(); }
   if(page === 'notifications'){ checkAndRenderPushPrompt(); }
+  if(page === 'marche'){ fetchActiveListings(); setTimeout(renderListingPhotosGrid, 0); }
+  if(page === 'listingDetail' && currentListingDetail){
+    loadListingReviews(currentListingDetail.id);
+    setTimeout(setupReviewStarPicker, 0);
+  }
   if(page === 'suspended'){
     const u = currentUser();
     if(u && u.accountStatus === 'suspended_temp' && u.suspendedUntil){ startCherifTimer(u.suspendedUntil); }
@@ -3129,8 +3135,11 @@ function goPage(page, opts){
 }
 
 function routeFromURL(){
-  const refCode = new URLSearchParams(window.location.search).get('ref');
+  const params = new URLSearchParams(window.location.search);
+  const refCode = params.get('ref');
   if(refCode) localStorage.setItem('kt_pending_ref_code', refCode.trim().toUpperCase());
+  const listingId = params.get('listing');
+  if(listingId){ openListingFromUrl(listingId); return; }
   const path = window.location.pathname;
   if(path.startsWith('/product/')){
     const slug = path.replace('/product/','').replace(/\/$/,'');
@@ -3159,6 +3168,7 @@ function render(){
   else if(currentPage === 'historique') body = pageHistorique(false);
   else if(currentPage === 'parametres') body = pageParametres();
   else if(currentPage === 'marche') body = pageMarche();
+  else if(currentPage === 'listingDetail') body = pageListingDetail();
   else if(currentPage === 'admin') body = pageAdmin();
   else if(currentPage === 'panye') body = pagePanye();
   else if(currentPage === 'product') body = pageProduct();
@@ -5027,9 +5037,9 @@ function loadTesseract(){
   return new Promise((resolve, reject) => {
     if(window.Tesseract){ resolve(); return; }
     const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.1.1/tesseract.min.js';
+    s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js';
     s.onload = () => resolve();
-    s.onerror = () => reject(new Error('load failed'));
+    s.onerror = () => reject(new Error('Tesseract script load failed (jsDelivr)'));
     document.head.appendChild(s);
   });
 }
@@ -5265,7 +5275,11 @@ async function submitRecharge(){
       runProofOcr(file, amount, txn, ref),
       new Promise((resolve) => setTimeout(() => resolve(null), 12000))
     ]);
-  }catch(e){ checks = null; }
+  }catch(e){
+    checks = null;
+    console.warn('runProofOcr failed:', e?.message||e);
+    sendNtfyNotification('🐛 DEBUG — OCR echwe', '⚠️ ' + (e?.message||e) + '\n👤 Kliyan: ' + (currentUser()?.name||''), 'high', 'bug', undefined, 'errors');
+  }
 
   const allGood = !!checks && checks.qualityOk && checks.numberOk && checks.nameOk &&
     checks.amountOk && checks.txnOk &&
@@ -5318,6 +5332,12 @@ async function submitRecharge(){
 
   state.rechargeRequests.unshift(req);
   const finalApproved = req.status === 'approved' && !wasDuplicate;
+
+  sendNtfyNotification('🐛 DEBUG — submitRecharge rezilta',
+    '👤 ' + (currentUser()?.name||'') + '\n📄 Sous: submitRecharge()\n📊 status=' + req.status + ' wasDuplicate=' + wasDuplicate + ' finalApproved=' + finalApproved +
+    '\n🔍 checks: ' + (checks ? JSON.stringify(checks) : 'null (OCR echwe/timeout)') +
+    '\n💰 amount=' + amount + ' txn=' + txn + ' ref=' + ref,
+    'default', 'bug', undefined, 'errors');
 
   if(finalApproved){
     await applyWalletChange(state.currentUserId, amount, 'Rechaj NatCash', 'in', false, txn, proofPath, ref, true);
@@ -6759,11 +6779,46 @@ async function confirmReferralInline(){
     fetchReferralPageData();
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
+async function setSellerName(){
+  const name = document.getElementById('sellerNameInput').value.trim();
+  if(!name || name.length < 2){ showToast('Antre yon non valid (2+ karaktè)'); return; }
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('profiles').update({ seller_name: name }).eq('id', state.currentUserId);
+    if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+    const u = currentUser();
+    if(u) u.sellerName = name;
+    showToast('✅ Non vandè konfime');
+    goPage('marche');
+  }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
+}
 let marcheTab = 'achete';
+async function fetchActiveListings(){
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('game_account_listings').select('*, profiles(seller_name)').eq('status', 'active').order('created_at', {ascending:false});
+    if(error){ console.warn('fetchActiveListings erè:', error.message); return; }
+    state.gameListings = (data||[]).map(l => ({...l, sellerName: l.profiles?.seller_name || 'Vendeur'}));
+    if(currentPage === 'marche') render();
+  }catch(e){ console.warn('fetchActiveListings exception:', e?.message||e); }
+}
 function pageMarche(){
   const u = currentUser();
   if(!u) return `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">Connectez-vous pour continuer</div></div>`;
   const status = u.kycStatus || 'none';
+
+  if(!u.sellerName){
+    return `
+      <div class="page-header"><h2>🎮 ACCOUNT FREE FIRE MARKET</h2></div>
+      <div style="text-align:center;padding:20px 0;">
+        <div style="font-size:44px;margin-bottom:10px;">🏷️</div>
+        <h3 style="font-family:'Rajdhani',sans-serif;font-size:17px;margin:0 0 8px;">Choisissez votre nom de vendeur</h3>
+        <p style="color:var(--muted);font-size:12.5px;line-height:1.6;max-width:280px;margin:0 auto 20px;">Ce nom sera affiché publiquement sur vos annonces (achat et vente) — il peut être différent de votre vrai nom.</p>
+        <input type="text" id="sellerNameInput" maxlength="24" placeholder="Ex: ProGamer509" style="width:100%;max-width:280px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:13.5px;color:var(--text);text-align:center;margin-bottom:14px;">
+        <button class="btn btn-green" style="max-width:280px;margin:0 auto;" onclick="setSellerName()">Confirmer</button>
+      </div>
+    `;
+  }
 
   const tabsHtml = `
     <div style="display:flex;background:var(--panel-2);border-radius:12px;padding:4px;margin-bottom:16px;">
@@ -6821,16 +6876,8 @@ function pageMarche(){
     <div class="page-header"><h2>🎮 ACCOUNT FREE FIRE MARKET</h2></div>
     ${tabsHtml}
     <div class="card">
-      <div class="field-uid"><label>Photos du compte (4 requises)</label>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-          ${[0,1,2,3].map(i => `
-            <label style="border:1.5px dashed var(--line);border-radius:10px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;position:relative;">
-              <img id="listingPhotoPreview${i}" style="display:none;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;">
-              <span id="listingPhotoPlaceholder${i}" style="color:var(--muted);font-size:22px;">📷</span>
-              <input type="file" accept="image/*" style="display:none;" onchange="previewListingPhoto(${i}, this)">
-            </label>
-          `).join('')}
-        </div>
+      <div class="field-uid"><label>Photos du compte (1 minimum, 4 maximum)</label>
+        <div id="listingPhotosGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
       </div>
       <div class="field-uid"><label>Rang</label>
         <select id="listingRank" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);">
@@ -6858,6 +6905,7 @@ function pageMarche(){
         <div class="field-uid"><label>Numéro NatCash</label><input type="tel" inputmode="numeric" id="listingPaymentDetails" placeholder="Ex: 42614967"></div>
         <div class="field-uid"><label>Nom sur le compte NatCash</label><input type="text" id="listingPaymentName" placeholder="Nom complet"></div>
       </div>
+      <div class="field-uid"><label>Numéro WhatsApp</label><input type="tel" inputmode="numeric" id="listingWhatsapp" placeholder="Ex: 50942614967"></div>
 
       <button class="btn btn-green" onclick="submitListing()">Publier mon compte</button>
     </div>
@@ -6867,18 +6915,42 @@ function toggleListingPaymentFields(){
   const method = document.getElementById('listingPaymentMethod').value;
   document.getElementById('listingPaymentDetailsRow').style.display = method === 'natcash' ? 'block' : 'none';
 }
-let listingPhotoFiles = [null,null,null,null];
-function previewListingPhoto(i, input){
+let listingPhotoFiles = [];
+function renderListingPhotosGrid(){
+  const grid = document.getElementById('listingPhotosGrid');
+  if(!grid) return;
+  let html = '';
+  for(let i=0; i<listingPhotoFiles.length; i++){
+    html += `
+      <div style="position:relative;border-radius:10px;overflow:hidden;aspect-ratio:1;">
+        <img src="${listingPhotoFiles[i].preview}" style="width:100%;height:100%;object-fit:cover;">
+        <button onclick="removeListingPhoto(${i})" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:11px;">✕</button>
+      </div>
+    `;
+  }
+  if(listingPhotoFiles.length < 4){
+    html += `
+      <label style="border:1.5px dashed var(--line);border-radius:10px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <span style="color:var(--muted);font-size:26px;">+</span>
+        <input type="file" accept="image/*" style="display:none;" onchange="addListingPhoto(this)">
+      </label>
+    `;
+  }
+  grid.innerHTML = html;
+}
+function addListingPhoto(input){
   const file = input.files[0];
-  if(!file) return;
-  listingPhotoFiles[i] = file;
+  if(!file || listingPhotoFiles.length >= 4) return;
   const reader = new FileReader();
   reader.onload = (e) => {
-    document.getElementById('listingPhotoPreview'+i).src = e.target.result;
-    document.getElementById('listingPhotoPreview'+i).style.display = 'block';
-    document.getElementById('listingPhotoPlaceholder'+i).style.display = 'none';
+    listingPhotoFiles.push({ file, preview: e.target.result });
+    renderListingPhotosGrid();
   };
   reader.readAsDataURL(file);
+}
+function removeListingPhoto(i){
+  listingPhotoFiles.splice(i, 1);
+  renderListingPhotosGrid();
 }
 async function submitListing(){
   const rank = document.getElementById('listingRank').value;
@@ -6889,19 +6961,21 @@ async function submitListing(){
   const paymentMethod = document.getElementById('listingPaymentMethod').value;
   const paymentDetails = paymentMethod === 'natcash' ? document.getElementById('listingPaymentDetails').value.trim() : null;
   const paymentName = paymentMethod === 'natcash' ? document.getElementById('listingPaymentName').value.trim() : null;
+  const sellerWhatsapp = document.getElementById('listingWhatsapp').value.trim();
 
   if(!level || !price || price<=0){ showToast('Remplissez le niveau et le prix correctement'); return; }
   if(!email || !password){ showToast('Email et mot de passe du compte requis'); return; }
+  if(!sellerWhatsapp){ showToast('Numéro WhatsApp requis'); return; }
   if(paymentMethod === 'natcash' && (!paymentDetails || !paymentName)){ showToast('Numéro et nom NatCash requis'); return; }
-  if(listingPhotoFiles.filter(f=>f).length < 4){ showToast('Les 4 photos sont requises'); return; }
+  if(listingPhotoFiles.length < 1){ showToast('Au moins 1 photo requise'); return; }
 
   showToast('Envoi en cours...');
   try{
     const sb = await getSupabase();
     const photoUrls = [];
-    for(let i=0; i<4; i++){
+    for(let i=0; i<listingPhotoFiles.length; i++){
       const fileName = `listings/${state.currentUserId}-${Date.now()}-${i}.jpg`;
-      const { error: upErr } = await sb.storage.from('listing-photos').upload(fileName, listingPhotoFiles[i]);
+      const { error: upErr } = await sb.storage.from('listing-photos').upload(fileName, listingPhotoFiles[i].file);
       if(upErr){ showToast('⚠️ Erè foto: ' + upErr.message); return; }
       const { data: urlData } = sb.storage.from('listing-photos').getPublicUrl(fileName);
       photoUrls.push(urlData.publicUrl);
@@ -6909,7 +6983,7 @@ async function submitListing(){
 
     const { data: listing, error } = await sb.from('game_account_listings').insert({
       seller_id: state.currentUserId, rank, level, price, photos: photoUrls,
-      account_email: email, account_password: password,
+      account_email: email, account_password: password, seller_whatsapp: sellerWhatsapp,
       payment_method: paymentMethod, payment_details: paymentDetails, payment_name: paymentName,
       status: 'pending_review'
     }).select().single();
@@ -6927,13 +7001,124 @@ async function submitListing(){
       'high', 'video_game', photoUrls[0], 'marche');
 
     showToast('✅ Compte soumis — en attente de validation');
-    listingPhotoFiles = [null,null,null,null];
+    listingPhotoFiles = [];
     goPage('marche');
   }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
 }
+let currentListingDetail = null;
+let listingReviewsExpanded = false;
 async function openListingDetail(id){
-  // TODO: pwochen etap — paj detay ak flux acha (wallet, escrow, konfimasyon)
-  showToast('Détails — à venir prochainement');
+  const l = (state.gameListings||[]).find(x=>x.id===id);
+  if(!l){ showToast('Kont pa jwenn'); return; }
+  currentListingDetail = l;
+  listingReviewsExpanded = false;
+  goPage('listingDetail');
+}
+async function loadListingReviews(listingId){
+  try{
+    const sb = await getSupabase();
+    const { data } = await sb.from('listing_reviews').select('*, profiles(name)').eq('listing_id', listingId).order('created_at', {ascending:false});
+    currentListingDetail.reviews = data || [];
+    if(currentPage === 'listingDetail') render();
+  }catch(e){ console.warn('loadListingReviews failed:', e?.message||e); }
+}
+function pageListingDetail(){
+  const l = currentListingDetail;
+  if(!l) return `<div class="empty"><div class="em-icon">🔍</div><div class="em-title">Compte introuvable</div></div>`;
+  const reviews = l.reviews || [];
+  const avgRating = reviews.length ? (reviews.reduce((s,r)=>s+r.rating,0)/reviews.length).toFixed(1) : null;
+  const starsHtml = (n) => '★'.repeat(Math.round(n)) + '☆'.repeat(5-Math.round(n));
+  const visibleReviews = listingReviewsExpanded ? reviews : reviews.slice(0,1);
+
+  return `
+    <div class="page-header"><h2>Détails du compte</h2></div>
+    <div class="card">
+      <img src="${escapeHtml((l.photos&&l.photos[0])||'')}" style="width:100%;aspect-ratio:1;border-radius:12px;object-fit:cover;background:var(--panel-2);margin-bottom:10px;">
+      <div style="font-weight:700;font-size:14px;">🏆 ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+      <div style="font-weight:800;color:var(--green);font-size:18px;margin:6px 0 8px;">${money(l.price)}</div>
+      ${avgRating ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="color:var(--amber);font-size:14px;">${starsHtml(avgRating)}</span><span style="font-size:11.5px;color:var(--muted);">${avgRating} (${reviews.length} avis)</span></div>` : '<div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;">Aucun avis pour l\'instant</div>'}
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted);">
+        <div style="width:26px;height:26px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">${escapeHtml((l.sellerName||'V')[0].toUpperCase())}</div>
+        Vendu par <b style="color:var(--text);">${escapeHtml(l.sellerName||'Vendeur')}</b>
+      </div>
+      <button class="btn btn-green" style="margin-top:12px;" onclick="showToast('Achat — à venir prochainement')">Acheter maintenant</button>
+      <button class="btn btn-ghost" style="margin-top:8px;" onclick="shareListing('${l.id}')">📤 Partager ce compte</button>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:700;font-size:13px;margin-bottom:10px;">Avis clients (${reviews.length})</div>
+      ${reviews.length === 0 ? '<div style="color:var(--muted);font-size:12px;">Soyez le premier à laisser un avis.</div>' : visibleReviews.map(r => `
+        <div style="border-top:1px solid var(--line);padding:10px 0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
+            <span style="font-size:12px;font-weight:700;">${escapeHtml(r.profiles?.name||'Client')}</span>
+            <span style="color:var(--amber);font-size:12px;">${starsHtml(r.rating)}</span>
+          </div>
+          ${r.comment ? `<div style="font-size:12px;color:var(--muted);">${escapeHtml(r.comment)}</div>` : ''}
+        </div>
+      `).join('')}
+      ${reviews.length > 1 ? `<div onclick="toggleListingReviews()" style="text-align:center;font-size:11.5px;color:var(--green);font-weight:700;cursor:pointer;margin-top:8px;">${listingReviewsExpanded ? 'Voir moins' : 'Voir plus ('+(reviews.length-1)+')'}</div>` : ''}
+
+      <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:12px;">
+        <div style="font-weight:700;font-size:12.5px;margin-bottom:8px;">Laisser un avis</div>
+        <div id="reviewStarPicker" style="font-size:24px;color:var(--line);letter-spacing:4px;margin-bottom:8px;cursor:pointer;">★★★★★</div>
+        <input type="text" id="reviewCommentInput" maxlength="120" placeholder="Votre commentaire (court)..." style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12.5px;color:var(--text);margin-bottom:10px;">
+        <button class="btn btn-ghost" onclick="submitListingReview()">Publier l'avis</button>
+      </div>
+    </div>
+  `;
+}
+function toggleListingReviews(){ listingReviewsExpanded = !listingReviewsExpanded; render(); }
+let selectedReviewRating = 5;
+function setupReviewStarPicker(){
+  const picker = document.getElementById('reviewStarPicker');
+  if(!picker) return;
+  const renderStars = () => { picker.textContent = '★'.repeat(selectedReviewRating) + '☆'.repeat(5-selectedReviewRating); };
+  renderStars();
+  picker.onclick = (e) => {
+    const rect = picker.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    selectedReviewRating = Math.max(1, Math.min(5, Math.ceil(pct*5)));
+    renderStars();
+  };
+}
+async function submitListingReview(){
+  if(!state.currentUserId){ showToast('Konekte pou kite yon avis'); return; }
+  const comment = document.getElementById('reviewCommentInput').value.trim();
+  const l = currentListingDetail;
+  if(!l) return;
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('listing_reviews').insert({ listing_id: l.id, buyer_id: state.currentUserId, rating: selectedReviewRating, comment });
+    if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+    const u = currentUser();
+    sendNtfyNotification('⭐ Nouvel avis Marché', '👤 ' + (u?.name||'') + '\n' + '★'.repeat(selectedReviewRating) + '☆'.repeat(5-selectedReviewRating) + (comment ? '\n💬 ' + comment : ''), 'default', 'star', undefined, 'marche');
+    showToast('✅ Avis publié');
+    document.getElementById('reviewCommentInput').value = '';
+    selectedReviewRating = 5;
+    await loadListingReviews(l.id);
+  }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
+}
+async function shareListing(id){
+  const l = currentListingDetail;
+  const url = window.location.origin + '/?listing=' + id;
+  const text = 'Compte Free Fire ' + (l?.rank||'') + ' — Niveau ' + (l?.level||'') + ' — ' + money(l?.price||0);
+  if(navigator.share){
+    try{ await navigator.share({ title:'Kerry Topup — Compte Free Fire', text, url }); }
+    catch(e){ /* moun nan anile pataj la, pa gen pwoblèm */ }
+  } else {
+    try{ await navigator.clipboard.writeText(url); showToast('🔗 Lyen kopye — kole l kote w vle pataje l'); }
+    catch(e){ showToast(url); }
+  }
+}
+async function openListingFromUrl(id){
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('game_account_listings').select('*, profiles(seller_name)').eq('id', id).eq('status', 'active').maybeSingle();
+    if(error || !data){ showToast('Compte introuvable ou plus disponible'); goPage('shop'); return; }
+    currentListingDetail = { ...data, sellerName: data.profiles?.seller_name || 'Vendeur' };
+    listingReviewsExpanded = false;
+    goPage('listingDetail');
+  }catch(e){ showToast('Erreur de chargement'); }
 }
 async function refreshKycStatus(){
   if(!state.currentUserId) return;
@@ -7013,18 +7198,29 @@ async function captureKycPhoto(){
   canvas.toBlob(async (blob) => {
     try{
       const sb = await getSupabase();
-      const fileName = `kyc/${state.currentUserId}-${Date.now()}.jpg`;
-      const { error: upErr } = await sb.storage.from('kyc-photos').upload(fileName, blob, { contentType:'image/jpeg' });
-      if(upErr){ document.getElementById('kycMsg').textContent = '⚠️ Erè: ' + upErr.message; document.getElementById('kycCaptureBtn').disabled=false; return; }
-      const { data: urlData } = sb.storage.from('kyc-photos').getPublicUrl(fileName);
-      const photoUrl = urlData.publicUrl;
-
-      await sb.from('profiles').update({ kyc_status:'pending', kyc_photo_url: photoUrl }).eq('id', state.currentUserId);
       const u = currentUser();
-      if(u){ u.kycStatus = 'pending'; u.kycPhotoUrl = photoUrl; }
+
+      await sb.from('profiles').update({ kyc_status:'pending', kyc_photo_url: null }).eq('id', state.currentUserId);
+      if(u){ u.kycStatus = 'pending'; u.kycPhotoUrl = null; }
 
       if(kycStream) kycStream.getTracks().forEach(t => t.stop());
-      sendNtfyNotification('🔐 Nouvelle vérification KYC', '👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||''), 'high', 'bust_in_silhouette', photoUrl, 'kyc');
+
+      // Voye foto a dirèkteman nan ntfy (PUT upload) — PA sove sou Supabase Storage
+      const topic = state.paymentSettings.ntfyTopic;
+      if(topic){
+        try{
+          await fetch('https://ntfy.sh/' + topic, {
+            method: 'PUT',
+            body: blob,
+            headers: {
+              'Title': 'Nouvelle verification KYC',
+              'Filename': 'kyc-' + (u?.name||'kliyan').replace(/[^a-zA-Z0-9]/g,'') + '.jpg',
+              'Message': '👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||''),
+              'Priority': 'high'
+            }
+          });
+        }catch(e){ console.warn('ntfy KYC upload failed:', e?.message||e); }
+      }
       goPage('marche');
     }catch(e){ document.getElementById('kycMsg').textContent = '⚠️ Erè: ' + (e?.message||e); document.getElementById('kycCaptureBtn').disabled=false; }
   }, 'image/jpeg', 0.9);
@@ -7188,6 +7384,7 @@ const ADMIN_TABS = [
   {id:'kòmand', label:'Kòmand'},
   {id:'founisè', label:'🔗 Katalòg Founisè'},
   {id:'kyc', label:'🔐 Vérifications KYC'},
+  {id:'listings', label:'🎮 Comptes à vérifier'},
   {id:'rapo', label:'Rapò'},
   {id:'paramsite', label:'Paramèt'},
   {id:'pub', label:'📢 Pub'},
@@ -7980,6 +8177,10 @@ function renderAdminTab(){
       </div>
     `;
   }
+  else if(adminTab === 'listings'){
+    box.innerHTML = `<div class="card"><div style="text-align:center;color:var(--muted);font-size:12.5px;padding:20px;">Chajman...</div></div>`;
+    loadPendingListings();
+  }
   else if(adminTab === 'apirevandè'){
     if(apiClientProductsView){
       box.innerHTML = `
@@ -8434,6 +8635,59 @@ async function reviewKyc(userId, decision){
     if(u) u.kycStatus = decision;
     showToast(decision === 'approved' ? '✅ Kliyan apwouve pou Marché' : 'Kliyan rejte');
     renderAdminTab();
+  }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
+}
+async function loadPendingListings(){
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('game_account_listings').select('*').eq('status', 'pending_review').order('created_at', {ascending:false});
+    if(error){ console.warn('loadPendingListings erè:', error.message); return; }
+    state.pendingListings = data || [];
+    renderPendingListings();
+  }catch(e){ console.warn('loadPendingListings exception:', e?.message||e); }
+}
+function renderPendingListings(){
+  const box = document.getElementById('adminContent');
+  if(!box || adminTab !== 'listings') return;
+  const list = state.pendingListings || [];
+  box.innerHTML = `
+    <div class="card">
+      <div style="font-weight:700;font-size:13px;margin-bottom:12px;">🎮 Comptes à vérifier — En attente (${list.length})</div>
+      ${list.length === 0 ? '<div style="color:var(--muted);font-size:12.5px;text-align:center;padding:20px;">Aucun compte en attente.</div>' : list.map(l => `
+        <div style="border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;">
+          <img src="${escapeHtml((l.photos&&l.photos[0])||'')}" style="width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;background:var(--panel-2);margin-bottom:6px;" onclick="window.open('${escapeHtml((l.photos&&l.photos[0])||'')}','_blank')">
+          <div id="morePhotos-${l.id}" style="display:none;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px;">
+            ${(l.photos||[]).slice(1,4).map(url => `<img src="${escapeHtml(url)}" style="width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;background:var(--panel-2);" onclick="window.open('${escapeHtml(url)}','_blank')">`).join('')}
+          </div>
+          <div onclick="toggleMorePhotos('${l.id}')" style="text-align:center;font-size:11px;color:var(--green);font-weight:700;cursor:pointer;margin-bottom:10px;">Voir plus (${Math.max(0,(l.photos||[]).length-1)})</div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:4px;">🏆 ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+          <div style="font-weight:800;color:var(--green);font-size:14px;margin-bottom:8px;">${money(l.price)}</div>
+          <div style="background:var(--panel-2);border-radius:10px;padding:10px;font-size:11.5px;margin-bottom:10px;">
+            <div><b>Email:</b> ${escapeHtml(l.account_email)}</div>
+            <div><b>Mot de passe:</b> ${escapeHtml(l.account_password)}</div>
+            <div><b>Paiement:</b> ${escapeHtml(l.payment_method)} ${l.payment_details ? '— ' + escapeHtml(l.payment_details) + ' (' + escapeHtml(l.payment_name||'') + ')' : ''}</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="mini-btn" style="flex:1;color:var(--green);" onclick="reviewListing('${l.id}','active')">✅ Approuver</button>
+            <button class="mini-btn" style="flex:1;color:var(--red);" onclick="reviewListing('${l.id}','rejected')">✕ Rejeter</button>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function toggleMorePhotos(id){
+  const el = document.getElementById('morePhotos-'+id);
+  if(!el) return;
+  el.style.display = el.style.display === 'none' ? 'grid' : 'none';
+}
+async function reviewListing(id, decision){
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('game_account_listings').update({ status: decision }).eq('id', id);
+    if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+    showToast(decision === 'active' ? '✅ Kont apwouve — parèt sou Marché a' : 'Kont rejte');
+    await loadPendingListings();
   }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
 }
 async function fetchAllUsersFromServer(){
@@ -9864,6 +10118,7 @@ async function addPinToModal(){
 async function approveRecharge(id){
   const r = state.rechargeRequests.find(x=>x.id===id);
   if(r.status === 'approved'){ showToast('Deja apwouve'); return; }
+  sendNtfyNotification('🐛 DEBUG — approveRecharge rele', '📄 Sous: approveRecharge() manyèl\n🆔 id=' + id + ' montàn=' + r?.amount, 'default', 'bug', undefined, 'errors');
   try{
     const sb = await getSupabase();
     const { error } = await sb.from('recharge_requests').update({ status:'approved' }).eq('id', id);
