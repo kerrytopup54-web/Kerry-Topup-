@@ -934,7 +934,7 @@ async function fetchProductsFromServer(){
       const { data: configs } = await sb.from('manual_configs').select('*');
       state.products = prods.map(p => {
         const obj = {
-          id:p.id, name:p.name, category:p.category, icon:p.icon, image:p.image, description:p.description,
+          id:p.id, name:p.name, category:p.category, icon:p.icon, image:p.image, heroImage:p.hero_image||null, description:p.description,
           type:p.type, popular:!!p.popular, active:p.active!==false, badge:p.badge||null, outOfStock:!!p.out_of_stock,
           redeemInstructions:p.redeem_instructions||'', redeemLink:p.redeem_link||'', descriptions:p.descriptions||[],
           sortOrder:p.sort_order||0
@@ -2753,7 +2753,7 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
       accountStatus: profile?.account_status || 'active', suspensionReason: profile?.suspension_reason || '',
       suspendedUntil: profile?.suspended_until || null, suspensionHistory: profile?.suspension_history || [],
       kycStatus: profile?.kyc_status || 'none', kycPhotoUrl: profile?.kyc_photo_url || null,
-      sellerName: profile?.seller_name || null };
+      sellerName: profile?.seller_name || null, marketBanned: profile?.market_banned || false };
     state.users.push(localUser);
     state.wallets[authUser.id] = state.wallets[authUser.id] || 0;
     state.transactions[authUser.id] = state.transactions[authUser.id] || [];
@@ -3200,7 +3200,7 @@ function render(){
   if(currentPage === 'product'){
     const p = state.products.find(x=>x.id===viewingProductId);
     heroWrap.innerHTML = p && p.image ? `
-      <div style="position:relative;width:100%;height:220px;background:#0B0F0C;">
+      <div style="position:relative;width:100%;height:290px;margin-top:14px;background:#0B0F0C;">
         <img src="${p.image.replace(/"/g,'')}" alt="${escapeHtml(p.name)}" style="width:100%;height:100%;object-fit:cover;display:block;">
         <button onclick="goPage('shop')" style="position:absolute;top:12px;left:12px;z-index:5;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.92);border:none;border-radius:50%;width:38px;height:38px;box-shadow:0 2px 8px rgba(0,0,0,0.25);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#11151A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
       </div>
@@ -3695,6 +3695,7 @@ function renderApiTopupSheet(p){
       `).join('')}
     </div>
 
+    ${selected && selected.orderMode === 'api_pin' ? '' : `
     <div style="border:1.5px solid #C4B5FD;border-radius:16px;padding:18px;margin-bottom:16px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
         <span style="font-size:20px;">🎮</span>
@@ -3711,6 +3712,7 @@ function renderApiTopupSheet(p){
       ${selected && selected.requiresServerId ? `<label style="font-size:13px;font-weight:700;color:var(--text);">Server ID <span style="color:#DC2626;">*</span></label><input type="text" id="apiServerId-${p.id}" placeholder="Entrez votre Server ID" style="width:100%;margin:8px 0 12px;background:var(--panel-2);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;color:var(--text);">` : ''}
       <div id="verifyResult-${p.id}"></div>
     </div>
+    `}
 
     <div style="display:flex;gap:10px;margin-bottom:16px;">
       <button class="btn btn-ghost" style="flex:1;${p.outOfStock?'opacity:0.5;pointer-events:none;':''}" onclick="addApiTopupToCart('${p.id}')" ${p.outOfStock?'disabled':''}>Ajouter au panier</button>
@@ -3875,14 +3877,17 @@ async function confirmApiTopupPurchase(productId){
   let variant = p.variants.find(v=>v.id===selectedVariantId);
   if(!variant && p.variants.length > 0){ variant = sortedVariants(p)[0]; selectedVariantId = variant.id; }
   if(!variant){ showToast('⚠️ Pa gen opsyon disponib pou pwodwi sa a — kontakte Admin'); if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.textContent='⚡ Acheter maintenant';} return; }
-  const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
-  const serverIdInput = document.getElementById('apiServerId-'+productId);
+  const isGiftCard = variant.orderMode === 'api_pin';
+  const playerId = isGiftCard ? '' : document.getElementById('apiPlayerId-'+productId).value.trim();
+  const serverIdInput = isGiftCard ? null : document.getElementById('apiServerId-'+productId);
   const serverId = serverIdInput ? serverIdInput.value.trim() : '';
   const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
   const totalPrice = variant.price * qty;
   const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.textContent='⚡ Acheter maintenant';} };
-  if(!playerId){ showToast(t('toast_enter_player_id')); resetBtn(); return; }
-  if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast('Veuillez Vérifier Votre id de joueur'); resetBtn(); return; }
+  if(!isGiftCard){
+    if(!playerId){ showToast(t('toast_enter_player_id')); resetBtn(); return; }
+    if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast('Veuillez Vérifier Votre id de joueur'); resetBtn(); return; }
+  }
   if(walletBalance() < totalPrice){ showToast(t('toast_insufficient_balance')); resetBtn(); goPage('wallet'); return; }
 
   // Verifye/refrechi sesyon an anvan nou kontinye — anpeche demand yo pati san jeton koneksyon
@@ -3906,18 +3911,50 @@ async function confirmApiTopupPurchase(productId){
     return;
   }
 
-  const verifiedName = (window.verifiedPlayerNames && window.verifiedPlayerNames[productId]) || null;
+  const verifiedName = isGiftCard ? null : ((window.verifiedPlayerNames && window.verifiedPlayerNames[productId]) || null);
   try{
     const sb = await getSupabase();
     const orderNo = 'KT-' + Math.random().toString(36).slice(2, 10).toUpperCase();
     const { data: inserted, error: insErr } = await sb.from('orders').insert({
-      order_no: orderNo, user_id: state.currentUserId, type: 'api_topup', status: 'en_cours',
+      order_no: orderNo, user_id: state.currentUserId, type: isGiftCard ? 'pin' : 'api_topup', status: 'en_cours',
       product: p.name, variant: variant.label + (qty>1?' × '+qty:''), price: totalPrice,
-      player_id: playerId, server_id: serverId || null, player_name: verifiedName,
+      player_id: playerId || null, server_id: serverId || null, player_name: verifiedName,
     }).select().single();
     if(insErr || !inserted){ showCustomerError('⚠️ Nou pa t kapab kreye kòmand ou — eseye ankò.', insErr?.message||'enkoni', 'Kreyasyon kòmand'); resetBtn(); return; }
 
     await applyWalletChange(state.currentUserId, -totalPrice, p.name + ' — ' + variant.label, 'out');
+
+    if(isGiftCard){
+      const { data, error } = await sb.functions.invoke('partner-order', {
+        body: { local_product_id: variant.id, local_order_id: inserted.id, quantity: qty }
+      });
+      if(error || !data || data.error){
+        await sb.from('orders').update({ status: 'anile' }).eq('id', inserted.id);
+        await applyWalletChange(state.currentUserId, totalPrice, 'Ranbousman — ' + p.name, 'in');
+        await fetchWalletFromServer(state.currentUserId);
+        showCustomerError('', data?.error || error?.message || 'Founisè refize kòmand lan', 'Achte Gift Card — ' + p.name, 'toast_order_failed_refunded');
+        resetBtn();
+        return;
+      }
+      // Chèche kòd la nan plizyè non chan posib — Woodflix poko konfime egzat kilès
+      const pinCode = data.order?.pin || data.order?.code || data.pin || data.code || data.order?.key || data.order?.voucher_code || null;
+      if(!pinCode){
+        sendNtfyNotification('🐛 DEBUG — Gift card san kòd', '⚠️ Repons API a pa gen okenn chan pin/code rekonèt\n📦 ' + p.name + '\n🔍 ' + JSON.stringify(data).slice(0,300), 'high', 'bug', undefined, 'errors');
+      }
+      await sb.from('orders').update({ status: pinCode ? 'terminee' : 'en_cours', pin_code: pinCode }).eq('id', inserted.id);
+      const order = {
+        id: inserted.id, orderNo, type:'pin', status: pinCode ? 'terminee' : 'en_cours',
+        product: p.name, variant: variant.label, price: totalPrice, date: new Date().toISOString(), pin: pinCode
+      };
+      if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
+      state.orders[state.currentUserId].unshift(order);
+      showToast(t('toast_purchase_success'));
+      goPage('commandes');
+      try{ fetchWalletFromServer(state.currentUserId); }catch(e){}
+      try{ notifyAdminNewOrder(order); }catch(e){}
+      try{ incrementRewardProgress(state.currentUserId, variant.id); }catch(e){}
+      return;
+    }
 
     if(variant.orderMode === 'api_verif'){
       // Sèlman verifikasyon te fèt — pa gen kòmand ki pase sou Founisè, rete manyèl
@@ -6977,6 +7014,13 @@ function pageMarche(){
   }
 
   // Onglet Vendre
+  if(u.marketBanned){
+    return `
+      <div class="page-header"><h2>🎮 ACCOUNT FREE FIRE MARKET</h2></div>
+      ${tabsHtml}
+      <div class="empty"><div class="em-icon">🚫</div><div class="em-title">Accès vente suspendu</div><p style="color:var(--muted);font-size:12.5px;">Votre accès pour vendre sur le Marché a été suspendu. Contactez le support pour plus d'informations.</p></div>
+    `;
+  }
   if(status !== 'approved'){
     return `
       <div class="page-header"><h2>🎮 ACCOUNT FREE FIRE MARKET</h2></div>
@@ -7082,6 +7126,8 @@ function removeListingPhoto(i){
   renderListingPhotosGrid();
 }
 async function submitListing(){
+  const u0 = currentUser();
+  if(u0?.marketBanned){ showToast('⚠️ Ou pa gen aksè pou vann sou Marché a — kontakte sipò'); return; }
   const listingName = document.getElementById('listingName').value.trim();
   const rank = document.getElementById('listingRank').value;
   const level = document.getElementById('listingLevel').value.trim();
@@ -8469,12 +8515,29 @@ function renderSecurityCard(u){
         <button class="mini-btn" style="color:var(--red);" onclick="adminSuspendPermanent('${u.id}')">🔴 Suspendre déf.</button>
         <button class="mini-btn" onclick="toggleSecurityHistory('${u.id}')">📜 Historique</button>
       </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+        ${u.marketBanned ?
+          `<button class="mini-btn" style="color:var(--green);" onclick="toggleMarketBan('${u.id}', false)">🎮 Débannir du Marché</button>` :
+          `<button class="mini-btn" style="color:var(--red);" onclick="toggleMarketBan('${u.id}', true)">🎮 Bannir du Marché</button>`}
+      </div>
       <div id="secHistory-${u.id}" style="display:none;margin-top:10px;border-top:1px solid var(--line);padding-top:8px;">
         ${(u.suspensionHistory||[]).length===0 ? '<div style="font-size:11.5px;color:var(--muted);">Pa gen istwa.</div>' :
           u.suspensionHistory.slice().reverse().map(h => `<div style="font-size:11.5px;color:var(--muted);margin-bottom:4px;">${new Date(h.date).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})} — <b style="color:var(--text);">${escapeHtml(h.action)}</b>${h.reason?' ('+escapeHtml(h.reason)+')':''}</div>`).join('')}
       </div>
     </div>
   `;
+}
+async function toggleMarketBan(userId, ban){
+  try{
+    const sb = await getSupabase();
+    const { data: updated, error } = await sb.from('profiles').update({ market_banned: ban }).eq('id', userId).select();
+    if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+    if(!updated || updated.length === 0){ showToast('⚠️ PA SOVE — 0 liy modifye'); return; }
+    const u = state.users.find(x=>x.id===userId);
+    if(u) u.marketBanned = ban;
+    showToast(ban ? '🚫 Vandè bannir sou Marché a' : '✅ Vandè débannir');
+    renderAdminTab();
+  }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
 }
 function toggleSecurityHistory(userId){
   const el = document.getElementById('secHistory-'+userId);
@@ -8994,7 +9057,8 @@ async function fetchAllUsersFromServer(){
           u = { id:p.id, name:p.name, email:p.email||'', googlePhoto:null,
             accountStatus: p.account_status || 'active', suspensionReason: p.suspension_reason || '',
             suspendedUntil: p.suspended_until || null, suspensionHistory: p.suspension_history || [],
-            kycStatus: p.kyc_status || 'none', kycPhotoUrl: p.kyc_photo_url || null };
+            kycStatus: p.kyc_status || 'none', kycPhotoUrl: p.kyc_photo_url || null,
+            marketBanned: p.market_banned || false };
           state.users.push(u);
         } else {
           if(!u.name) u.name = p.name;
@@ -9003,6 +9067,7 @@ async function fetchAllUsersFromServer(){
           u.suspendedUntil = p.suspended_until || u.suspendedUntil || null;
           u.kycStatus = p.kyc_status || u.kycStatus || 'none';
           u.kycPhotoUrl = p.kyc_photo_url || u.kycPhotoUrl || null;
+          u.marketBanned = p.market_banned || u.marketBanned || false;
         }
       });
     }
@@ -9541,8 +9606,9 @@ function renderApiTopupAdminConfig(p){
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
             <select onchange="updateApiTopupVariantField('${p.id}','${v.id}','order_mode',this.value)" style="flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11.5px;">
-              <option value="api_order" ${v.orderMode!=='api_verif'?'selected':''}>🔗 API Order + Verif</option>
+              <option value="api_order" ${v.orderMode!=='api_verif' && v.orderMode!=='api_pin'?'selected':''}>🔗 API Order + Verif</option>
               <option value="api_verif" ${v.orderMode==='api_verif'?'selected':''}>🛡️ API Verif sèlman (manyèl)</option>
+              <option value="api_pin" ${v.orderMode==='api_pin'?'selected':''}>🎁 API Gift Card (kòd livre)</option>
             </select>
             <input type="text" class="mono" style="width:70px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11.5px;" value="${v.partnerProductId||''}" placeholder="Founisè ID" onchange="updateApiTopupVariantField('${p.id}','${v.id}','partner_product_id',this.value)">
             <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);white-space:nowrap;">
@@ -9790,6 +9856,7 @@ async function updateProductRedeemInfo(pid, localField, dbField, val){
 async function updateProductField(pid, field, val){
   const p = state.products.find(x=>x.id===pid);
   p[field] = val;
+  if(field === 'hero_image') p.heroImage = val;
   try{ const sb = await getSupabase(); await sb.from('products').update({ [field]: val }).eq('id', pid); }catch(e){}
   await saveState(); showToast('Mete ajou');
 }
@@ -10234,6 +10301,13 @@ async function handleExistingProductImageUpload(input, pid){
   showToast('Ap telechaje foto a...');
   const url = await uploadImageToStorage(file);
   if(url){ await updateProductImage(pid, url); }
+}
+async function handleHeroImageUpload(input, pid){
+  const file = input.files[0];
+  if(!file) return;
+  showToast('Ap telechaje foto a...');
+  const url = await uploadImageToStorage(file);
+  if(url){ await updateProductField(pid, 'hero_image', url); }
 }
 async function handleCategoryImageUpload(input){
   const file = input.files[0];
