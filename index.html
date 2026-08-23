@@ -175,8 +175,9 @@ input,textarea,select{font-family:'Inter',sans-serif;}
   display:flex;flex-direction:column;cursor:pointer;
 }
 .prod-cover{
-  height:92px;display:flex;align-items:center;justify-content:center;
+  height:135px;display:flex;align-items:center;justify-content:center;
   font-size:30px;position:relative;
+  box-shadow:inset 0 -10px 14px -8px rgba(0,0,0,0.14);
 }
 .prod-badge{
   position:absolute;top:8px;left:8px;background:rgba(6,23,13,0.75);color:var(--green);
@@ -3110,7 +3111,7 @@ function goPage(page, opts){
   closeDrawer();
   render();
   window.scrollTo(0,0);
-  if(page === 'commandes'){ commandeVisibleCount = 5; fetchMyOrders(); subscribeToMyOrdersRealtime(); }
+  if(page === 'commandes'){ commandeVisibleCount = 5; fetchMyOrders(); subscribeToMyOrdersRealtime(); fetchMyMarketPurchases(); }
   if(page === 'apiSupplier'){ fetchApiClient(); }
   if(page === 'shop'){ fetchProductsFromServer().then(() => fetchStockCountsForShop()); }
   if(['shop','wallet','panye','checkout','commandes','redeem','kerryRewards','tutoriel'].includes(page)){ maybeShowTutorialVideo(page, null); }
@@ -3147,6 +3148,11 @@ function routeFromURL(){
   const listingId = params.get('listing');
   if(listingId){ openListingFromUrl(listingId); return; }
   const path = window.location.pathname;
+  if(path.startsWith('/marche/')){
+    const parts = path.replace(/\/$/,'').split('/').filter(Boolean); // ['marche', 'telefon', 'id']
+    const id = parts[parts.length - 1];
+    if(id){ openListingFromUrl(id); return; }
+  }
   if(path.startsWith('/product/')){
     const slug = path.replace('/product/','').replace(/\/$/,'');
     const found = state.products.find(p => slugify(p.name) === slug);
@@ -5339,11 +5345,13 @@ async function submitRecharge(){
   state.rechargeRequests.unshift(req);
   const finalApproved = req.status === 'approved' && !wasDuplicate;
 
-  sendNtfyNotification('🐛 DEBUG — submitRecharge rezilta',
-    '👤 ' + (currentUser()?.name||'') + '\n📄 Sous: submitRecharge()\n📊 status=' + req.status + ' wasDuplicate=' + wasDuplicate + ' finalApproved=' + finalApproved +
-    '\n🔍 checks: ' + (checks ? JSON.stringify(checks) : 'null (OCR echwe/timeout)') +
-    '\n💰 amount=' + amount + ' txn=' + txn + ' ref=' + ref,
-    'default', 'bug', undefined, 'errors');
+  if(!finalApproved){
+    sendNtfyNotification('🐛 DEBUG — submitRecharge rezilta',
+      '👤 ' + (currentUser()?.name||'') + '\n📄 Sous: submitRecharge()\n📊 status=' + req.status + ' wasDuplicate=' + wasDuplicate + ' finalApproved=' + finalApproved +
+      '\n🔍 checks: ' + (checks ? JSON.stringify(checks) : 'null (OCR echwe/timeout)') +
+      '\n💰 amount=' + amount + ' txn=' + txn + ' ref=' + ref,
+      'default', 'bug', undefined, 'errors');
+  }
 
   if(finalApproved){
     await applyWalletChange(state.currentUserId, amount, 'Rechaj NatCash', 'in', false, txn, proofPath, ref, true);
@@ -5902,6 +5910,11 @@ function renderCartItemCard(item, editable){
       <div style="font-size:11.5px;color:var(--muted);">ID Joueur: <span style="color:var(--text);font-weight:600;">${escapeHtml(item.playerId||'')}</span></div>
       ${item.serverId ? `<div style="font-size:11.5px;color:var(--muted);">Server ID: <span style="color:var(--text);font-weight:600;">${escapeHtml(item.serverId)}</span></div>` : ''}
     `;
+  } else if(item.type === 'market_listing'){
+    details = `
+      <div style="font-weight:700;font-size:13.5px;">🎮 ${escapeHtml(item.productName)}</div>
+      <div style="font-size:12px;color:var(--muted);margin:2px 0;">${escapeHtml(item.variantLabel)}</div>
+    `;
   } else { // calculator
     details = `
       <div style="font-weight:700;font-size:13.5px;">${escapeHtml(item.productName)}</div>
@@ -6213,6 +6226,23 @@ async function checkoutCart(){
         incrementRewardProgress(state.currentUserId, item.variantId); // fè pwogram fidelite avanse pou acha otomatik yo tou
         processedCount++;
       }catch(e){ console.warn('api_topup checkout exception:', e?.message||e); failed.push(item); }
+    } else if(item.type === 'market_listing'){
+      try{
+        const sb = await getSupabase();
+        const { data: updated, error } = await sb.from('game_account_listings')
+          .update({ status: 'sold', buyer_id: state.currentUserId, sold_at: new Date().toISOString() })
+          .eq('id', item.listingId).eq('status', 'active').select().maybeSingle();
+        if(error || !updated){ failed.push(item); continue; }
+        const u = currentUser();
+        sendNtfyNotification('🎮 Nouvel achat — Marché',
+          '👤 Achtè: ' + (u?.name||'') + '\n📧 ' + (u?.email||'') +
+          '\n🏆 ' + updated.rank + ' — Niveau ' + updated.level + '\n💰 ' + money(updated.price) +
+          '\n💳 Payer le vendeur via: ' + updated.payment_method + (updated.payment_details ? ' — ' + updated.payment_details + ' (' + updated.payment_name + ')' : '') +
+          '\n📱 WhatsApp vendeur: ' + (updated.seller_whatsapp||''),
+          'urgent', 'moneybag', updated.photos?.[0], 'marche');
+        processedAmount += item.price;
+        processedCount++;
+      }catch(e){ console.warn('market_listing checkout exception:', e?.message||e); failed.push(item); }
     } else {
       const order = {
         id: uid(), orderNo: nextOrderNo(), type:item.type, status:'en_cours',
@@ -6320,11 +6350,35 @@ function notifyAdminOfManualOrders(orders){
 let commandeVisibleCount = 5;
 function pageCommandes(){
   const orders = state.orders[state.currentUserId] || [];
+  const myPurchases = state.myMarketPurchases || [];
   const filters = ['tout','en_cours','terminee','annulee','remboursee'];
   const filtered = commandeFilter==='tout' ? orders : orders.filter(o=>o.status===commandeFilter);
   const visible = filtered.slice(0, commandeVisibleCount);
   return `
     <div class="page-header"><h2>Mes Commandes</h2><p>Tout acha ou</p></div>
+    ${myPurchases.length > 0 ? `
+      <div class="card">
+        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🎮 Achats Marché</div>
+        ${myPurchases.map(l => `
+          <div style="border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;">
+            <div style="font-weight:700;font-size:13px;">${escapeHtml(l.listing_name||l.rank)}</div><div style="font-size:11px;color:var(--muted);">🏆 ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+            <div style="font-weight:800;color:var(--green);font-size:14px;margin:4px 0 8px;">${money(l.price)}</div>
+            <div style="background:var(--green-dim);border-radius:10px;padding:10px 12px;">
+              <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:8px;">✅ Compte livré</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+                <div style="flex:1;font-size:12px;background:var(--panel);border-radius:8px;padding:7px 9px;">${escapeHtml(l.account_email)}</div>
+                <button onclick="copyToClipboard('${escapeHtml(l.account_email)}')" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;">📋</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;">
+                <div id="pwField-${l.id}" style="flex:1;font-size:12px;background:var(--panel);border-radius:8px;padding:7px 9px;font-family:monospace;">••••••••</div>
+                <button onclick="togglePurchasePassword('${l.id}', '${escapeHtml(l.account_password)}')" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:13px;">👁️</button>
+                <button onclick="copyToClipboard('${escapeHtml(l.account_password)}')" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;">📋</button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
     <div class="chip-row" style="margin-bottom:14px;">
       ${filters.map(f => `<div class="chip ${commandeFilter===f?'active':''}" onclick="setCommandeFilter('${f}')">${f==='tout'?'Tout':STATUS_LABEL[f]}</div>`).join('')}
     </div>
@@ -6801,13 +6855,24 @@ async function setSellerName(){
 let marcheTab = 'achete';
 async function fetchMyListings(){
   if(!state.currentUserId) return;
+  const box = document.getElementById('myListingsBox');
+  if(box) box.innerHTML = 'Chajman...';
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.from('game_account_listings').select('*').eq('seller_id', state.currentUserId).order('created_at', {ascending:false});
-    if(error){ console.warn('fetchMyListings erè:', error.message); return; }
+    if(error){
+      console.warn('fetchMyListings erè:', error.message);
+      if(box) box.innerHTML = '<div style="color:var(--red);font-size:12px;">⚠️ ' + escapeHtml(error.message) + '</div>';
+      sendNtfyNotification('🐛 DEBUG — fetchMyListings echwe', '⚠️ ' + error.message + '\n📄 Kòd: ' + (error.code||''), 'high', 'bug', undefined, 'errors');
+      return;
+    }
     state.myListings = data || [];
     renderMyListings();
-  }catch(e){ console.warn('fetchMyListings exception:', e?.message||e); }
+  }catch(e){
+    console.warn('fetchMyListings exception:', e?.message||e);
+    if(box) box.innerHTML = '<div style="color:var(--red);font-size:12px;">⚠️ ' + escapeHtml(e?.message||String(e)) + '</div>';
+    sendNtfyNotification('🐛 DEBUG — fetchMyListings exception', '⚠️ ' + (e?.message||e), 'high', 'bug', undefined, 'errors');
+  }
 }
 function renderMyListings(){
   const box = document.getElementById('myListingsBox');
@@ -6820,12 +6885,24 @@ function renderMyListings(){
     <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);">
       <img src="${escapeHtml((l.photos&&l.photos[0])||'')}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--panel-2);">
       <div style="flex:1;">
-        <div style="font-weight:700;font-size:12.5px;">${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+        <div style="font-weight:700;font-size:12.5px;">${escapeHtml(l.listing_name||l.rank)}</div><div style="font-size:10.5px;color:var(--muted);">${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
         <div style="font-size:11px;font-weight:700;color:${statusColor[l.status]||'var(--muted)'};">${statusLabel[l.status]||l.status}</div>
       </div>
       <div style="font-weight:800;color:var(--green);font-size:13px;">${money(l.price)}</div>
+      ${l.status !== 'sold' ? `<button onclick="deleteMyListing('${l.id}')" style="background:none;border:none;color:var(--red);font-size:16px;padding:4px 6px;">🗑️</button>` : ''}
     </div>
   `).join('');
+}
+async function deleteMyListing(id){
+  openConfirm('Supprimer cette annonce ?', 'Cette action est définitive.', async () => {
+    try{
+      const sb = await getSupabase();
+      const { error } = await sb.from('game_account_listings').delete().eq('id', id).eq('seller_id', state.currentUserId);
+      if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+      showToast('✅ Annonce supprimée');
+      await fetchMyListings();
+    }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
+  });
 }
 async function fetchActiveListings(){
   try{
@@ -6886,7 +6963,7 @@ function pageMarche(){
               <div style="display:flex;gap:12px;">
                 <img src="${escapeHtml((l.photos&&l.photos[0])||'')}" style="width:70px;height:70px;border-radius:10px;object-fit:cover;background:var(--panel-2);">
                 <div style="flex:1;">
-                  <div style="font-weight:700;font-size:13.5px;">Compte ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+                  <div style="font-weight:700;font-size:13.5px;">${escapeHtml(l.listing_name||l.rank)}</div><div style="font-size:11px;color:var(--muted);">${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
                   <div style="font-size:12px;color:var(--muted);margin:2px 0 8px;">4 photos disponibles</div>
                   <div style="font-weight:800;color:var(--green);font-size:15px;">${money(l.price)}</div>
                 </div>
@@ -6930,6 +7007,7 @@ function pageMarche(){
       <div class="field-uid"><label>Photos du compte (1 minimum, 4 maximum)</label>
         <div id="listingPhotosGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
       </div>
+      <div class="field-uid"><label>Nom de l'annonce</label><input type="text" id="listingName" maxlength="60" placeholder="Ex: Compte Free Fire Legend rare"></div>
       <div class="field-uid"><label>Rang</label>
         <select id="listingRank" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:13px;color:var(--text);">
           <option value="Héroïque">Héroïque</option>
@@ -7004,6 +7082,7 @@ function removeListingPhoto(i){
   renderListingPhotosGrid();
 }
 async function submitListing(){
+  const listingName = document.getElementById('listingName').value.trim();
   const rank = document.getElementById('listingRank').value;
   const level = document.getElementById('listingLevel').value.trim();
   const price = parseFloat(document.getElementById('listingPrice').value);
@@ -7014,6 +7093,8 @@ async function submitListing(){
   const paymentName = paymentMethod === 'natcash' ? document.getElementById('listingPaymentName').value.trim() : null;
   const sellerWhatsapp = document.getElementById('listingWhatsapp').value.trim();
 
+  if(!listingName){ showToast('Antre yon non pou anons lan'); return; }
+  if(!rank){ showToast('Antre rang kont lan'); return; }
   if(!level || !price || price<=0){ showToast('Remplissez le niveau et le prix correctement'); return; }
   if(!email || !password){ showToast('Email et mot de passe du compte requis'); return; }
   if(!sellerWhatsapp){ showToast('Numéro WhatsApp requis'); return; }
@@ -7033,7 +7114,7 @@ async function submitListing(){
     }
 
     const { data: listing, error } = await sb.from('game_account_listings').insert({
-      seller_id: state.currentUserId, rank, level, price, photos: photoUrls,
+      seller_id: state.currentUserId, listing_name: listingName, rank, level, price, photos: photoUrls,
       account_email: email, account_password: password, seller_whatsapp: sellerWhatsapp,
       payment_method: paymentMethod, payment_details: paymentDetails, payment_name: paymentName,
       status: 'pending_review'
@@ -7063,7 +7144,9 @@ async function openListingDetail(id){
   if(!l){ showToast('Kont pa jwenn'); return; }
   currentListingDetail = l;
   listingReviewsExpanded = false;
-  goPage('listingDetail');
+  const phone = (l.seller_whatsapp || 'vendeur').replace(/\D/g,'') || 'vendeur';
+  goPage('listingDetail', { skipHistory: true });
+  try{ history.pushState({ page:'listingDetail' }, '', '/marche/' + phone + '/' + id); }catch(e){}
 }
 async function loadListingReviews(listingId){
   try{
@@ -7092,14 +7175,15 @@ function pageListingDetail(){
     <div class="page-header"><h2>Détails du compte</h2></div>
     <div class="card">
       <img src="${escapeHtml((l.photos&&l.photos[0])||'')}" style="width:100%;aspect-ratio:1;border-radius:12px;object-fit:cover;background:var(--panel-2);margin-bottom:10px;">
-      <div style="font-weight:700;font-size:14px;">🏆 ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+      <div style="font-weight:700;font-size:14px;">${escapeHtml(l.listing_name||l.rank)}</div><div style="font-size:11.5px;color:var(--muted);margin-bottom:4px;">🏆 ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
       <div style="font-weight:800;color:var(--green);font-size:18px;margin:6px 0 8px;">${money(l.price)}</div>
       ${avgRating ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="color:var(--amber);font-size:14px;">${starsHtml(avgRating)}</span><span style="font-size:11.5px;color:var(--muted);">${avgRating} (${reviews.length} avis)</span></div>` : '<div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;">Aucun avis pour l\'instant</div>'}
       <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted);">
         <div style="width:26px;height:26px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">${escapeHtml((l.sellerName||'V')[0].toUpperCase())}</div>
         Vendu par <b style="color:var(--text);">${escapeHtml(l.sellerName||'Vendeur')}</b>
       </div>
-      <button class="btn btn-green" style="margin-top:12px;" onclick="showToast('Achat — à venir prochainement')">Acheter maintenant</button>
+      <button class="btn btn-green" style="margin-top:12px;" onclick="buyListing('${l.id}')">Acheter maintenant</button>
+      <button class="btn btn-ghost" style="margin-top:8px;" onclick="addListingToCart('${l.id}')">🛒 Ajouter au panier</button>
       <button class="btn btn-ghost" style="margin-top:8px;" onclick="shareListing('${l.id}')">📤 Partager ce compte</button>
     </div>
 
@@ -7118,7 +7202,7 @@ function pageListingDetail(){
 
       <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:12px;">
         <div style="font-weight:700;font-size:12.5px;margin-bottom:8px;">Laisser un avis</div>
-        <div id="reviewStarPicker" style="font-size:24px;color:var(--line);letter-spacing:4px;margin-bottom:8px;cursor:pointer;">★★★★★</div>
+        <div id="reviewStarPicker" style="font-size:26px;margin-bottom:8px;">${[1,2,3,4,5].map(n => `<span onclick="setReviewRating(${n})" style="cursor:pointer;color:var(--line);" id="star${n}">★</span>`).join('')}</div>
         <input type="text" id="reviewCommentInput" maxlength="120" placeholder="Votre commentaire (court)..." style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12.5px;color:var(--text);margin-bottom:10px;">
         <button class="btn btn-ghost" onclick="submitListingReview()">Publier l'avis</button>
       </div>
@@ -7126,21 +7210,24 @@ function pageListingDetail(){
   `;
 }
 function toggleListingReviews(){ listingReviewsExpanded = !listingReviewsExpanded; render(); }
-let selectedReviewRating = 5;
+let selectedReviewRating = 0;
 function setupReviewStarPicker(){
-  const picker = document.getElementById('reviewStarPicker');
-  if(!picker) return;
-  const renderStars = () => { picker.textContent = '★'.repeat(selectedReviewRating) + '☆'.repeat(5-selectedReviewRating); };
-  renderStars();
-  picker.onclick = (e) => {
-    const rect = picker.getBoundingClientRect();
-    const pct = (e.clientX - rect.left) / rect.width;
-    selectedReviewRating = Math.max(1, Math.min(5, Math.ceil(pct*5)));
-    renderStars();
-  };
+  selectedReviewRating = 0;
+  renderReviewStars();
+}
+function setReviewRating(n){
+  selectedReviewRating = n;
+  renderReviewStars();
+}
+function renderReviewStars(){
+  for(let i=1; i<=5; i++){
+    const star = document.getElementById('star'+i);
+    if(star) star.style.color = i <= selectedReviewRating ? 'var(--amber)' : 'var(--line)';
+  }
 }
 async function submitListingReview(){
   if(!state.currentUserId){ showToast('Konekte pou kite yon avis'); return; }
+  if(!selectedReviewRating){ showToast('Chwazi yon nòt (1 a 5 zetwal)'); return; }
   const comment = document.getElementById('reviewCommentInput').value.trim();
   const l = currentListingDetail;
   if(!l) return;
@@ -7158,7 +7245,8 @@ async function submitListingReview(){
 }
 async function shareListing(id){
   const l = currentListingDetail;
-  const url = window.location.origin + '/?listing=' + id;
+  const phone = (l?.seller_whatsapp || 'vendeur').replace(/\D/g,'') || 'vendeur';
+  const url = window.location.origin + '/marche/' + phone + '/' + id;
   const text = 'Compte Free Fire ' + (l?.rank||'') + ' — Niveau ' + (l?.level||'') + ' — ' + money(l?.price||0);
   if(navigator.share){
     try{ await navigator.share({ title:'Kerry Topup — Compte Free Fire', text, url }); }
@@ -7178,6 +7266,54 @@ async function openListingFromUrl(id){
     listingReviewsExpanded = false;
     goPage('listingDetail');
   }catch(e){ showToast('Erreur de chargement'); }
+}
+function addListingToCart(id){
+  if(!state.currentUserId){ openAuthModal('login'); return; }
+  const l = currentListingDetail;
+  if(!l || l.id !== id) return;
+  if(l.seller_id === state.currentUserId){ showToast('Ou pa ka achte pwòp kont ou'); return; }
+  if(state.cart.find(i => i.type==='market_listing' && i.listingId===id)){ showToast('Deja nan panye a'); return; }
+  state.cart.push({
+    id: uid(), type: 'market_listing', listingId: l.id,
+    productName: l.listing_name || l.rank, variantLabel: l.rank + ' — Niveau ' + l.level,
+    price: l.price, qty: 1
+  });
+  saveCartToServer();
+  showToast('🛒 Ajouté au panier');
+  render();
+}
+async function buyListing(id){
+  if(!state.currentUserId){ openAuthModal('login'); return; }
+  if(blockIfSuspended()) return;
+  const l = currentListingDetail;
+  if(!l || l.id !== id){ showToast('Erè — rechaje paj la'); return; }
+  if(l.seller_id === state.currentUserId){ showToast('Ou pa ka achte pwòp kont ou'); return; }
+  if(walletBalance() < l.price){ showToast('Balans ou pa ase — rechaje Wallet la'); return; }
+
+  openConfirm('Confirmer l\'achat ?', 'HTG ' + Number(l.price).toLocaleString('fr-FR') + ' ap retire nan wallet ou. Vous recevrez immédiatement les identifiants du compte.', async () => {
+    try{
+      const sb = await getSupabase();
+      const { data: updated, error } = await sb.from('game_account_listings')
+        .update({ status: 'sold', buyer_id: state.currentUserId, sold_at: new Date().toISOString() })
+        .eq('id', id).eq('status', 'active').select();
+      if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+      if(!updated || updated.length === 0){ showToast('⚠️ Kont sa a pa disponib ankò — yon lòt moun ka deja achte l'); return; }
+
+      await applyWalletChange(state.currentUserId, -l.price, 'Achat compte Free Fire (' + l.rank + ')', 'out', false, null, null, null, false);
+
+      const u = currentUser();
+      sendNtfyNotification('🎮 Nouvel achat — Marché', 
+        '👤 Achtè: ' + (u?.name||'') + '\n📧 ' + (u?.email||'') +
+        '\n🏆 ' + l.rank + ' — Niveau ' + l.level + '\n💰 ' + money(l.price) +
+        '\n💳 Payer le vendeur via: ' + l.payment_method + (l.payment_details ? ' — ' + l.payment_details + ' (' + l.payment_name + ')' : '') +
+        '\n📱 WhatsApp vendeur: ' + (l.seller_whatsapp||'') +
+        '\n\n👉 Le compte a été livré automatiquement à l\'acheteur. Payez le vendeur.',
+        'urgent', 'moneybag', l.photos?.[0], 'marche');
+
+      showToast('✅ Achat réussi — identifiants livrés');
+      goPage('commandes');
+    }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
+  });
 }
 async function refreshKycStatus(){
   if(!state.currentUserId) return;
@@ -7268,13 +7404,14 @@ async function captureKycPhoto(){
       const topic = state.paymentSettings.ntfyTopic;
       if(topic){
         try{
+          const cleanHeader = (s) => (s||'').replace(/[^\x00-\x7F]/g, '').trim();
           const ntfyRes = await fetch('https://ntfy.sh/' + topic, {
             method: 'PUT',
             body: blob,
             headers: {
               'Title': 'Nouvelle verification KYC',
               'Filename': 'kyc-' + (u?.name||'kliyan').replace(/[^a-zA-Z0-9]/g,'') + '.jpg',
-              'Message': '👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||''),
+              'Message': cleanHeader('Kliyan: ' + (u?.name||'') + ' | Email: ' + (u?.email||'')),
               'Priority': 'high'
             }
           });
@@ -7454,6 +7591,7 @@ const ADMIN_TABS = [
   {id:'founisè', label:'🔗 Katalòg Founisè'},
   {id:'kyc', label:'🔐 Vérifications KYC'},
   {id:'listings', label:'🎮 Comptes à vérifier'},
+  {id:'delivery', label:'🚚 Achats à livrer'},
   {id:'rapo', label:'Rapò'},
   {id:'paramsite', label:'Paramèt'},
   {id:'pub', label:'📢 Pub'},
@@ -8227,15 +8365,13 @@ function renderAdminTab(){
     const pending = state.users.filter(u => u.kycStatus === 'pending');
     box.innerHTML = `
       <div class="card">
-        <div style="font-weight:700;font-size:13px;margin-bottom:12px;">🔐 Vérifications KYC — En attente (${pending.length})</div>
+        <div style="font-weight:700;font-size:13px;margin-bottom:6px;">🔐 Vérifications KYC — En attente (${pending.length})</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">📸 Les photos ne sont pas stockées ici — regardez la notification ntfy pour voir la photo de chaque demande.</div>
         ${pending.length === 0 ? '<div style="color:var(--muted);font-size:12.5px;text-align:center;padding:20px;">Aucune vérification en attente.</div>' : pending.map(u => `
           <div style="border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;">
-            <div style="display:flex;gap:12px;margin-bottom:10px;">
-              <img src="${escapeHtml(u.kycPhotoUrl)}" style="width:80px;height:80px;border-radius:10px;object-fit:cover;background:var(--panel-2);" onclick="window.open('${escapeHtml(u.kycPhotoUrl)}','_blank')">
-              <div>
-                <div style="font-weight:700;font-size:13px;">${escapeHtml(u.name||'')}</div>
-                <div style="font-size:11.5px;color:var(--muted);">${escapeHtml(u.email||'')}</div>
-              </div>
+            <div style="margin-bottom:10px;">
+              <div style="font-weight:700;font-size:13px;">${escapeHtml(u.name||'')}</div>
+              <div style="font-size:11.5px;color:var(--muted);">${escapeHtml(u.email||'')}</div>
             </div>
             <div style="display:flex;gap:8px;">
               <button class="mini-btn" style="flex:1;color:var(--green);" onclick="reviewKyc('${u.id}','approved')">✅ Approuver</button>
@@ -8249,6 +8385,10 @@ function renderAdminTab(){
   else if(adminTab === 'listings'){
     box.innerHTML = `<div class="card"><div style="text-align:center;color:var(--muted);font-size:12.5px;padding:20px;">Chajman...</div></div>`;
     loadPendingListings();
+  }
+  else if(adminTab === 'delivery'){
+    box.innerHTML = `<div class="card"><div style="text-align:center;color:var(--muted);font-size:12.5px;padding:20px;">Chajman...</div></div>`;
+    loadPendingDeliveries();
   }
   else if(adminTab === 'apirevandè'){
     if(apiClientProductsView){
@@ -8729,7 +8869,7 @@ function renderPendingListings(){
             ${(l.photos||[]).slice(1,4).map(url => `<img src="${escapeHtml(url)}" style="width:100%;aspect-ratio:1;border-radius:8px;object-fit:cover;background:var(--panel-2);" onclick="window.open('${escapeHtml(url)}','_blank')">`).join('')}
           </div>
           <div onclick="toggleMorePhotos('${l.id}')" style="text-align:center;font-size:11px;color:var(--green);font-weight:700;cursor:pointer;margin-bottom:10px;">Voir plus (${Math.max(0,(l.photos||[]).length-1)})</div>
-          <div style="font-weight:700;font-size:13px;margin-bottom:4px;">🏆 ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+          <div style="font-weight:700;font-size:13px;margin-bottom:2px;">${escapeHtml(l.listing_name||l.rank)}</div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">🏆 ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
           <div style="font-weight:800;color:var(--green);font-size:14px;margin-bottom:8px;">${money(l.price)}</div>
           <div style="background:var(--panel-2);border-radius:10px;padding:10px;font-size:11.5px;margin-bottom:10px;">
             <div><b>Email:</b> ${escapeHtml(l.account_email)}</div>
@@ -8744,6 +8884,88 @@ function renderPendingListings(){
       `).join('')}
     </div>
   `;
+}
+async function loadPendingDeliveries(){
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('game_account_listings').select('*').eq('status', 'pending_delivery').order('created_at', {ascending:false});
+    if(error){ console.warn('loadPendingDeliveries erè:', error.message); return; }
+    const listings = data || [];
+    const buyerIds = [...new Set(listings.map(l => l.buyer_id).filter(Boolean))];
+    let buyersById = {};
+    if(buyerIds.length){
+      const { data: profiles } = await sb.from('profiles').select('id, name, email').in('id', buyerIds);
+      (profiles||[]).forEach(p => { buyersById[p.id] = p; });
+    }
+    state.pendingDeliveries = listings.map(l => ({ ...l, buyer: buyersById[l.buyer_id] || {} }));
+    renderPendingDeliveries();
+  }catch(e){ console.warn('loadPendingDeliveries exception:', e?.message||e); }
+}
+function renderPendingDeliveries(){
+  const box = document.getElementById('adminContent');
+  if(!box || adminTab !== 'delivery') return;
+  const list = state.pendingDeliveries || [];
+  box.innerHTML = `
+    <div class="card">
+      <div style="font-weight:700;font-size:13px;margin-bottom:12px;">🚚 Achats à livrer (${list.length})</div>
+      ${list.length === 0 ? '<div style="color:var(--muted);font-size:12.5px;text-align:center;padding:20px;">Aucun achat en attente de livraison.</div>' : list.map(l => `
+        <div style="border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:12px;">
+          <div style="font-weight:700;font-size:13px;margin-bottom:2px;">${escapeHtml(l.listing_name||l.rank)}</div><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">🏆 ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
+          <div style="font-weight:800;color:var(--green);font-size:14px;margin-bottom:8px;">${money(l.price)}</div>
+          <div style="background:var(--panel-2);border-radius:10px;padding:10px;font-size:11.5px;margin-bottom:10px;">
+            <div><b>Achtè:</b> ${escapeHtml(l.buyer?.name||'')} — ${escapeHtml(l.buyer?.email||'')}</div>
+            <div style="margin-top:6px;"><b>Payer le vendeur:</b> ${escapeHtml(l.payment_method)} ${l.payment_details ? '— ' + escapeHtml(l.payment_details) + ' (' + escapeHtml(l.payment_name||'') + ')' : ''}</div>
+            <div><b>WhatsApp vendeur:</b> ${escapeHtml(l.seller_whatsapp||'')}</div>
+          </div>
+          <button class="mini-btn" style="width:100%;color:var(--green);" onclick="confirmDelivery('${l.id}')">✅ J'ai payé le vendeur — Confirmer la livraison</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+async function confirmDelivery(id){
+  try{
+    const sb = await getSupabase();
+    const { data: updated, error } = await sb.from('game_account_listings').update({ status: 'sold', sold_at: new Date().toISOString() }).eq('id', id).eq('status', 'pending_delivery').select();
+    if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+    if(!updated || updated.length === 0){ showToast('⚠️ PA SOVE — 0 liy modifye'); return; }
+    const l = updated[0];
+
+    // Efase foto yo nan Storage (pa nesesè ankò apre vant lan) pou konsève espas Supabase
+    try{
+      const paths = (l.photos||[]).map(url => {
+        const idx = url.indexOf('/listing-photos/');
+        return idx !== -1 ? url.slice(idx + '/listing-photos/'.length) : null;
+      }).filter(Boolean);
+      if(paths.length){
+        await sb.storage.from('listing-photos').remove(paths);
+        await sb.from('game_account_listings').update({ photos: [] }).eq('id', id);
+      }
+    }catch(e){ console.warn('Efase foto storage echwe:', e?.message||e); }
+
+    sendNtfyNotification('✅ Livraison confirmée', '🏆 ' + l.rank + ' — Niveau ' + l.level + ' livré à l\'acheteur', 'default', 'white_check_mark', undefined, 'marche');
+    showToast('✅ Livraison confirmée — l\'acheteur voit maintenant les détails');
+    await loadPendingDeliveries();
+  }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
+}
+async function copyToClipboard(text){
+  try{ await navigator.clipboard.writeText(text); showToast('📋 Kopye'); }
+  catch(e){ showToast(text); }
+}
+function togglePurchasePassword(id, pw){
+  const el = document.getElementById('pwField-'+id);
+  if(!el) return;
+  if(el.textContent === '••••••••'){ el.textContent = pw; } else { el.textContent = '••••••••'; }
+}
+async function fetchMyMarketPurchases(){
+  if(!state.currentUserId) return;
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('game_account_listings').select('*').eq('buyer_id', state.currentUserId).in('status', ['pending_delivery','sold']).order('created_at', {ascending:false});
+    if(error){ console.warn('fetchMyMarketPurchases erè:', error.message); return; }
+    state.myMarketPurchases = data || [];
+    if(currentPage === 'commandes') render();
+  }catch(e){ console.warn('fetchMyMarketPurchases exception:', e?.message||e); }
 }
 function toggleMorePhotos(id){
   const el = document.getElementById('morePhotos-'+id);
