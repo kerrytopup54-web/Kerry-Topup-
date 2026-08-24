@@ -104,15 +104,15 @@ input,textarea,select{font-family:'Inter',sans-serif;}
 .logo-text span{display:block;font-family:'Inter',sans-serif;font-weight:400;font-size:10.5px;color:var(--muted);letter-spacing:0.03em;}
 .icon-row{display:flex;align-items:center;gap:6px;}
 .icon-btn{
-  width:38px;height:38px;border-radius:11px;background:var(--panel-2);border:1px solid var(--line);
+  width:38px;height:38px;border-radius:10px;background:#f4f7f5;border:none;color:#4b5259;
   display:flex;align-items:center;justify-content:center;position:relative;
 }
-.icon-btn svg{width:18px;height:18px;}
-#profileIconBtn{border-radius:50%;overflow:hidden;background:none;border:none;padding:0;}
+.icon-btn svg{width:17px;height:17px;}
+#profileIconBtn{border-radius:50%;overflow:hidden;background:#f4f7f5;border:1.5px solid #e2e6e3;padding:0;}
 .badge{
   position:absolute;top:-4px;right:-4px;background:var(--green);color:#FFFFFF;
-  font-size:9.5px;font-weight:700;border-radius:9px;min-width:16px;height:16px;
-  display:flex;align-items:center;justify-content:center;padding:0 3px;
+  font-size:10px;font-weight:700;border-radius:8px;min-width:16px;height:16px;
+  display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid #fff;
 }
 
 .search-bar{
@@ -358,24 +358,28 @@ html.dark .bottomnav-inner{background:rgba(22,27,34,0.92);}
 
 /* Orders */
 .order-card{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:14px;margin-bottom:10px;}
-.order-card-v2{background:var(--panel);border-radius:20px;padding:20px 18px 18px;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 1px 3px rgba(16,20,17,0.06), 0 8px 20px -12px rgba(16,20,17,0.10);}
-.order-card-v2::before{content:'';position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg, var(--green), var(--green-2));}
-.order-card-v2.status-en_cours::before{background:linear-gradient(90deg, var(--amber), #D99A2B);}
-.order-card-v2.status-anile::before{background:linear-gradient(90deg, var(--red), #C22D47);}
-.oc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:2px;}
-.oc-no{font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;color:#8A1F1F;}
-.oc-badge{font-size:11.5px;font-weight:700;padding:5px 12px;border-radius:999px;white-space:nowrap;flex-shrink:0;}
+.order-card-v2{background:var(--panel);border-radius:20px;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 18px 45px rgba(20,40,30,0.10), 0 2px 8px rgba(0,0,0,0.04);}
+.order-card-v2::before{content:'';display:block;height:6px;background:linear-gradient(90deg, #0a7c3d, #17a854, #0a7c3d);background-size:200% auto;animation:ocShimmer 3.5s linear infinite;}
+.order-card-v2.status-en_cours::before{background:linear-gradient(90deg, #E0A526, #F0C158, #E0A526);background-size:200% auto;}
+.order-card-v2.status-anile::before{background:linear-gradient(90deg, var(--red), #C22D47, var(--red));background-size:200% auto;}
+@keyframes ocShimmer{0%{background-position:0% 0;}100%{background-position:200% 0;}}
+.oc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;padding:20px 20px 0;}
+.oc-no{font-weight:800;font-size:16px;color:#0a7c3d;letter-spacing:-0.2px;}
+.oc-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:7px 13px;border-radius:999px;white-space:nowrap;flex-shrink:0;}
+.oc-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;animation:ocPulse 1.6s ease-in-out infinite;}
+@keyframes ocPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
 .oc-badge.terminee{background:var(--green-dim);color:var(--green-2);}
-.oc-badge.en_cours{background:var(--amber-dim);color:var(--amber);}
+.oc-badge.en_cours{background:linear-gradient(135deg,#ffe9c2,#ffd48a);color:#96650a;}
 .oc-badge.anile{background:var(--red-dim);color:var(--red);}
-.oc-date{color:var(--muted);font-size:12px;margin:2px 0 14px;}
-.oc-box{background:var(--panel-2);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
-.oc-label{font-size:10px;font-weight:700;letter-spacing:0.05em;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
-.oc-value{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14.5px;color:var(--text);}
-.oc-value.oc-total{color:#8A1F1F;font-size:17px;}
-.oc-btn{display:block;width:100%;text-align:center;padding:13px;border:none;border-radius:12px;font-family:'Inter',sans-serif;font-weight:700;font-size:14px;color:#fff;cursor:pointer;background:linear-gradient(135deg, var(--green), var(--green-2));box-shadow:0 6px 14px -6px rgba(15,166,84,0.5);}
-.oc-btn.en_cours{background:linear-gradient(135deg, var(--amber), #D99A2B);box-shadow:0 6px 14px -6px rgba(183,122,11,0.4);}
-.oc-btn.anile{background:linear-gradient(135deg, var(--red), #C22D47);box-shadow:0 6px 14px -6px rgba(226,59,87,0.4);}
+.oc-date{color:var(--muted);font-size:12.5px;margin:0 0 16px;padding:0 20px;}
+.oc-box{background:var(--panel-2);border-radius:14px;padding:13px 15px;margin:0 20px 10px;}
+.oc-label{font-size:10.5px;font-weight:700;letter-spacing:0.05em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+.oc-value{font-weight:700;font-size:14.5px;color:var(--text);}
+.oc-box.oc-total-box{background:linear-gradient(135deg,#eafaf0,#dcf5e6);}
+.oc-value.oc-total{color:#0a7c3d;font-size:19px;font-weight:800;}
+.oc-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 40px);margin:6px 20px 20px;text-align:center;padding:14px;border:none;border-radius:14px;font-weight:700;font-size:14.5px;color:#fff;cursor:pointer;background:linear-gradient(135deg, #0f9d4f, #0a7c3d);box-shadow:0 8px 20px rgba(10,124,61,0.30);}
+.oc-btn.en_cours{background:linear-gradient(135deg, #E0A526, #C4870F);box-shadow:0 8px 20px rgba(196,135,15,0.30);}
+.oc-btn.anile{background:linear-gradient(135deg, var(--red), #C22D47);box-shadow:0 8px 20px rgba(226,59,87,0.30);}
 .order-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
 .order-name{font-weight:700;font-size:13.5px;}
 .order-date{font-size:10.5px;color:var(--muted);}
@@ -402,15 +406,22 @@ html.dark .bottomnav-inner{background:rgba(22,27,34,0.92);}
   padding:20px;overflow-y:auto;
 }
 .drawer.show{transform:translateX(0);}
-.drawer-user{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--line);}
-.drawer-avatar{width:44px;height:44px;border-radius:50%;background:var(--green-dim);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:700;font-family:'Rajdhani',sans-serif;font-size:17px;}
-.drawer-name{font-weight:700;font-size:14px;}
-.drawer-email{font-size:11px;color:var(--muted);}
-.drawer-item{display:flex;align-items:center;gap:12px;padding:12px 8px;border-radius:11px;font-size:13.5px;font-weight:600;}
-.drawer-item:active{background:var(--panel-2);}
-.drawer-item svg{width:18px;height:18px;color:var(--muted);}
-.drawer-item.danger{color:var(--red);}
-.drawer-item.danger svg{color:var(--red);}
+.drawer-user{display:flex;align-items:center;gap:14px;margin-bottom:20px;}
+.drawer-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg, #d8f5e2, #b8ecc9);color:#0a7c3d;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px;flex-shrink:0;}
+.drawer-name{font-weight:800;font-size:16px;margin-bottom:2px;}
+.drawer-email{font-size:12.5px;color:#9aa39d;}
+.drawer-divider{height:1px;background:#eef1ef;margin-bottom:8px;}
+.drawer-item{display:flex;align-items:center;gap:16px;padding:14px 6px;border-radius:12px;font-size:15px;font-weight:700;color:var(--text);}
+.drawer-item:active{background:#f4f7f5;}
+.drawer-icon-box{width:38px;height:38px;border-radius:11px;background:#f4f7f5;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.drawer-item svg{width:18px;height:18px;color:#4b5259;}
+.drawer-item.active .drawer-icon-box{background:linear-gradient(135deg, #3fce7c, #0a9e3d);}
+.drawer-item.active svg{color:#fff;}
+.drawer-item.active{color:#0a9e3d;}
+.drawer-item.danger .drawer-icon-box{background:#ffe1e1;}
+.drawer-item.danger svg{color:#e0304a;}
+.drawer-item.danger{color:#e0304a;}
+.drawer-mid-divider{height:1px;background:#eef1ef;margin:10px 6px;}
 
 /* Toast */
 .rapo-bar:hover .rapo-tooltip{opacity:1;}
@@ -426,9 +437,11 @@ html.dark .bottomnav-inner{background:rgba(22,27,34,0.92);}
 .empty .em-icon{font-size:34px;margin-bottom:10px;}
 .empty .em-title{font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--text);margin-bottom:4px;}
 
-.pill{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700;}
-.pill.wait{background:var(--amber-dim);color:var(--amber);}
-.pill.ok{background:var(--green-dim);color:var(--green);}
+.pill{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:30px;font-size:13.5px;font-weight:700;}
+.pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;animation:pillPulse 1.6s ease-in-out infinite;}
+@keyframes pillPulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.4;transform:scale(0.7);}}
+.pill.wait{background:linear-gradient(135deg,#ffe9c2,#ffd48a);color:#96650a;}
+.pill.ok{background:var(--green-dim);color:var(--green-2);}
 .pill.no{background:var(--red-dim);color:var(--red);}
 
 /* Admin */
@@ -611,18 +624,24 @@ textarea.admin-ta{
   Je suis là pour t'aider 🐶
   <div style="position:absolute;bottom:-6px;right:20px;width:12px;height:12px;background:#fff;transform:rotate(45deg);"></div>
 </div>
-<button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:var(--green);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶<span id="supportFabBadge" style="display:none;position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 5px;background:#E23B57;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;font-family:sans-serif;"></span></button>
+<button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶<span id="supportFabBadge" style="display:none;position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 5px;background:#E23B57;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;font-family:sans-serif;"></span></button>
 <div id="supportChatBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:70;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)toggleSupportChat()">
-  <div style="width:100%;max-width:480px;background:var(--panel);border-radius:18px 18px 0 0;height:65vh;max-height:520px;display:flex;flex-direction:column;overflow:hidden;">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);flex-shrink:0;">
-      <div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;"><span style="font-size:20px;">🐶</span> Touski Bot <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:2px;">👤 Ajan</span></div>
-      <button onclick="toggleSupportChat()" style="background:none;border:none;font-size:18px;color:var(--muted);">✕</button>
+  <div style="width:100%;max-width:480px;background:var(--panel);border-radius:22px 22px 0 0;height:65vh;max-height:560px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(20,40,30,0.18);">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:linear-gradient(135deg, #12241a, #0a1710);color:#fff;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;">🐶</div>
+        <div>
+          <div style="font-weight:800;font-size:15.5px;">Touski Bot <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:4px;">👤 Ajan</span></div>
+          <div style="font-size:11.5px;color:#6fcf97;display:flex;align-items:center;gap:5px;margin-top:1px;"><span style="width:6px;height:6px;border-radius:50%;background:#3fce7c;"></span>An liy</div>
+        </div>
+      </div>
+      <button onclick="toggleSupportChat()" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;display:flex;align-items:center;justify-content:center;color:#cfd6d2;cursor:pointer;font-size:15px;">✕</button>
     </div>
-    <div id="supportChatMessages" style="flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;"></div>
-    <div style="display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line);flex-shrink:0;">
-      <label style="width:38px;height:38px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;cursor:pointer;">📷<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
-      <input type="text" id="supportChatInput" placeholder="Ekri kesyon ou..." style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:10px 14px;color:var(--text);font-size:13px;" onkeydown="if(event.key==='Enter')sendSupportMessage()">
-      <button onclick="sendSupportMessage()" style="background:var(--green);color:#fff;border:none;border-radius:20px;padding:10px 18px;font-size:13px;font-weight:600;">Voye</button>
+    <div id="supportChatMessages" style="flex:1;overflow-y:auto;padding:20px;background:#f7f9f8;display:flex;flex-direction:column;gap:10px;"></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid #eef1ef;background:#fff;flex-shrink:0;">
+      <label style="width:40px;height:40px;border-radius:50%;background:#f4f7f5;display:flex;align-items:center;justify-content:center;color:#4b5259;flex-shrink:0;cursor:pointer;font-size:17px;">📷<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
+      <input type="text" id="supportChatInput" placeholder="Ekri kesyon ou..." style="flex:1;border:1px solid #e2e6e3;border-radius:24px;padding:11px 16px;font-size:14px;color:var(--text);background:#f7f9f8;" onkeydown="if(event.key==='Enter')sendSupportMessage()">
+      <button onclick="sendSupportMessage()" style="border:none;border-radius:24px;padding:11px 22px;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 6px 14px rgba(10,158,61,0.28);flex-shrink:0;">Voye</button>
     </div>
   </div>
 </div>
@@ -637,12 +656,15 @@ textarea.admin-ta{
 
 <!-- Confirm modal -->
 <div class="modal-bg" id="confirmModal">
-  <div class="modal">
+  <div class="modal" style="text-align:center;">
+    <div id="cmIcon" style="width:52px;height:52px;border-radius:50%;background:#FFE1E1;color:#e0304a;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+    </div>
     <h2 id="cmTitle" style="font-size:18px;"></h2>
     <p class="sub" id="cmText"></p>
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-red-ghost" style="flex:1;" id="cmConfirmBtn">Konfime</button>
-      <button class="btn btn-ghost" style="flex:1;" onclick="closeConfirm()">Anile</button>
+      <button class="btn btn-ghost" style="flex:1;" onclick="closeConfirm()">Annuler</button>
+      <button class="btn btn-red-ghost" style="flex:1;" id="cmConfirmBtn">Confirmer</button>
     </div>
   </div>
 </div>
@@ -1619,15 +1641,18 @@ function formatChatText(text){
 function addSupportMessage(role, text, skipHistory){
   if(!skipHistory) supportChatHistory.push({ role, content: text });
   const box = document.getElementById('supportChatMessages');
-  const bubble = document.createElement('div');
+  const row = document.createElement('div');
+  const isBot = role === 'assistant';
+  row.style.cssText = 'display:flex;gap:10px;margin-bottom:4px;' + (role==='user' ? 'flex-direction:row-reverse;' : '');
+  const avatarHtml = isBot ? '<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🐶</div>' : '';
   const styles = {
-    user: 'align-self:flex-end;background:var(--green);color:#fff;border-radius:14px 14px 2px 14px;',
-    admin: 'align-self:flex-start;background:#1565D8;color:#fff;border-radius:14px 14px 14px 2px;'
+    user: 'background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border-radius:16px 4px 16px 16px;box-shadow:0 4px 10px rgba(15,166,84,0.2);',
+    admin: 'background:#1565D8;color:#fff;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);',
+    assistant: 'background:#fff;border:1px solid #eef1ef;color:#14181c;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.03);'
   };
-  bubble.style.cssText = (styles[role] || 'align-self:flex-start;background:var(--panel-2);color:var(--text);border-radius:14px 14px 14px 2px;') +
-    'padding:9px 13px;max-width:80%;font-size:13px;white-space:pre-wrap;line-height:1.5;';
-  bubble.innerHTML = formatChatText(text);
-  box.appendChild(bubble);
+  const bubbleStyle = (styles[role] || styles.assistant) + 'padding:14px 16px;max-width:82%;font-size:14.5px;white-space:pre-wrap;line-height:1.55;';
+  row.innerHTML = avatarHtml + '<div style="' + bubbleStyle + '">' + formatChatText(text) + '</div>';
+  box.appendChild(row);
   box.scrollTop = box.scrollHeight;
 }
 async function fetchCustomerHistoryForChat(){
@@ -2880,7 +2905,7 @@ async function subscribeToWalletRealtime(userId){
           if(!state.walletBonus) state.walletBonus = {};
           if(typeof payload.new.bonus_balance !== 'undefined') state.walletBonus[userId] = Number(payload.new.bonus_balance) || 0;
           const balDisplay = document.getElementById('walletBalanceDisplay');
-          if(balDisplay) balDisplay.textContent = money(walletBalance());
+          if(balDisplay) balDisplay.textContent = money(walletBalance()).replace(' HTG','').trim();
           renderTopIcons();
           if(returnToCheckoutAfterRecharge){
             returnToCheckoutAfterRecharge = false;
@@ -3077,7 +3102,10 @@ function afterAuthSuccess(){
   render();
   if(pendingAction){ const a = pendingAction; pendingAction = null; a(); }
 }
-async function doLogout(){
+function doLogout(){
+  openConfirm('Se confirmer la déconnexion ?', 'Vous devrez vous reconnecter pour accéder à votre compte.', doLogoutConfirmed);
+}
+async function doLogoutConfirmed(){
   state.currentUserId = null;
   state.isAdmin = false;
   state.isSuperAdmin = false;
@@ -3217,71 +3245,74 @@ function render(){
 
 function renderFooter(){
   return `
-    <div style="margin-top:20px;background:var(--ink);color:#fff;padding:14px 18px 10px;">
-      <div style="margin-bottom:9px;">
-        <div style="font-weight:800;font-size:14px;color:var(--green);margin-bottom:3px;">Kerry Topup Official</div>
-        <div style="font-size:10px;color:#9CA3AF;line-height:1.3;">Votre plateforme de confiance pour tous vos topups.</div>
+    <div style="margin-top:20px;position:relative;background:radial-gradient(120% 100% at 0% 0%, #1b241f 0%, #0d1210 60%);border-radius:20px 20px 0 0;color:#cfd6d2;padding:22px 20px 18px;overflow:hidden;">
+      <div style="position:absolute;top:-80px;right:-80px;width:220px;height:220px;background:radial-gradient(circle, rgba(15,157,79,0.22), transparent 70%);border-radius:50%;pointer-events:none;"></div>
+
+      <div style="position:relative;z-index:1;margin-bottom:12px;">
+        <div style="font-weight:800;font-size:17px;color:#3fce7c;margin-bottom:4px;">Kerry Topup Official</div>
+        <div style="font-size:12px;color:#9aa39d;">Votre plateforme de confiance pour tous vos topups.</div>
       </div>
 
-      <div style="border-top:1px solid rgba(255,255,255,0.1);margin-bottom:9px;"></div>
+      <div style="height:1px;background:rgba(255,255,255,0.08);margin:12px 0;position:relative;z-index:1;"></div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:9px;">
-        <div>
-          <div style="font-weight:700;font-size:10px;color:#fff;margin-bottom:5px;letter-spacing:0.05em;">LIENS RAPIDES</div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
+      <div style="display:flex;gap:16px;position:relative;z-index:1;margin-bottom:12px;">
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:10.5px;color:#6fcf97;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:9px;">Liens rapides</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
             ${(state.footerLiens||[]).map(renderFooterItem).join('')}
-            ${state.customPages.map(p => `<span style="font-size:11.5px;color:#B8C0BC;cursor:pointer;" onclick="goPage('custompage:${p.slug}')">${escapeHtml(p.title)}</span>`).join('')}
+            ${state.customPages.map(p => `<span style="font-size:12.5px;color:#b7bfba;cursor:pointer;" onclick="goPage('custompage:${p.slug}')">${escapeHtml(p.title)}</span>`).join('')}
           </div>
         </div>
-        <div>
-          <div style="font-weight:700;font-size:10px;color:#fff;margin-bottom:5px;letter-spacing:0.05em;">AIDE &amp; SUPPORT</div>
-          <div style="display:flex;flex-direction:column;gap:5px;">
+        <div style="flex:1;">
+          <div style="font-weight:700;font-size:10.5px;color:#6fcf97;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:9px;">Aide &amp; Support</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
             ${(state.footerAide||[]).map(renderFooterItem).join('')}
           </div>
         </div>
       </div>
 
-      <div style="border-top:1px solid rgba(255,255,255,0.1);margin-bottom:9px;"></div>
+      <div style="height:1px;background:rgba(255,255,255,0.08);margin:12px 0;position:relative;z-index:1;"></div>
 
-      <div style="margin-bottom:9px;">
-        <div style="font-weight:700;font-size:10px;color:#fff;margin-bottom:7px;letter-spacing:0.05em;">TÉLÉCHARGER L'APP</div>
-        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:8px;">
-          <button onclick="${state.appLinks.googlePlay ? `window.open('${state.appLinks.googlePlay.replace(/'/g,"")}','_blank')` : "showToast('Bientôt disponible sur Google Play')"}" style="display:flex;align-items:center;gap:8px;background:#000;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:7px 12px;width:100%;text-align:left;">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#00D9FF" d="M3.6 2.3c-.4.3-.6.8-.6 1.4v16.6c0 .6.2 1.1.6 1.4l.1.1L13.3 12v-.1L3.7 2.2l-.1.1z"/><path fill="#FFC900" d="M16.6 15.3l-3.3-3.3v-.1l3.3-3.3.1.1 3.9 2.2c1.1.6 1.1 1.6 0 2.2l-4 2.2z"/><path fill="#FF3D00" d="M16.7 15.2L13.3 12 3.6 21.7c.4.4 1 .4 1.7 0l11.4-6.5"/><path fill="#00F076" d="M16.7 8.8L5.3 2.3c-.7-.4-1.3-.3-1.7 0L13.3 12l3.4-3.2z"/></svg>
-            <div><div style="font-size:8px;color:#B8C0BC;line-height:1;">DISPONIBLE SUR</div><div style="font-size:12.5px;font-weight:700;color:#fff;line-height:1.3;">Google Play</div></div>
+      <div style="position:relative;z-index:1;margin-bottom:12px;">
+        <div style="font-weight:700;font-size:10.5px;color:#6fcf97;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;">Télécharger l'app</div>
+        <div style="display:flex;gap:10px;margin-bottom:14px;">
+          <button onclick="${state.appLinks.googlePlay ? `window.open('${state.appLinks.googlePlay.replace(/'/g,"")}','_blank')` : "showToast('Bientôt disponible sur Google Play')"}" style="flex:1;display:flex;align-items:center;gap:10px;background:#14181c;border:1px solid rgba(255,255,255,0.08);border-radius:13px;padding:11px 13px;min-width:0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" style="flex-shrink:0;"><path fill="#00D9FF" d="M3.6 2.3c-.4.3-.6.8-.6 1.4v16.6c0 .6.2 1.1.6 1.4l.1.1L13.3 12v-.1L3.7 2.2l-.1.1z"/><path fill="#FFC900" d="M16.6 15.3l-3.3-3.3v-.1l3.3-3.3.1.1 3.9 2.2c1.1.6 1.1 1.6 0 2.2l-4 2.2z"/><path fill="#FF3D00" d="M16.7 15.2L13.3 12 3.6 21.7c.4.4 1 .4 1.7 0l11.4-6.5"/><path fill="#00F076" d="M16.7 8.8L5.3 2.3c-.7-.4-1.3-.3-1.7 0L13.3 12l3.4-3.2z"/></svg>
+            <div style="min-width:0;overflow:hidden;"><div style="font-size:9.5px;color:#9aa39d;">DISPONIBLE SUR</div><div style="font-size:13.5px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Google Play</div></div>
           </button>
-          <button onclick="${state.appLinks.apk ? `window.open('${state.appLinks.apk.replace(/'/g,"")}','_blank')` : "showToast('Bientôt disponible — APK Android')"}" style="display:flex;align-items:center;gap:8px;background:transparent;border:1px solid var(--green);border-radius:8px;padding:7px 12px;width:100%;text-align:left;">
-            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#3DDC84" d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.43 11.43 0 0 0-8.94 0L5.65 5.67c-.19-.28-.55-.37-.83-.22-.3.16-.42.54-.26.85L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52M7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5m10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5"/></svg>
-            <div><div style="font-size:12.5px;font-weight:700;color:#fff;line-height:1.3;">Télécharger APK</div><div style="font-size:8px;color:#B8C0BC;line-height:1;">Version Android</div></div>
+          <button onclick="${state.appLinks.apk ? `window.open('${state.appLinks.apk.replace(/'/g,"")}','_blank')` : "showToast('Bientôt disponible — APK Android')"}" style="flex:1;display:flex;align-items:center;gap:10px;background:rgba(63,206,124,0.06);border:1.5px solid #2f8f4e;border-radius:13px;padding:11px 13px;min-width:0;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#3fce7c" style="flex-shrink:0;"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.43 11.43 0 0 0-8.94 0L5.65 5.67c-.19-.28-.55-.37-.83-.22-.3.16-.42.54-.26.85L6.4 9.48C3.3 11.25 1.28 14.44 1 18h22c-.28-3.56-2.3-6.75-5.4-8.52M7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5m10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5"/></svg>
+            <div style="min-width:0;overflow:hidden;"><div style="font-size:13.5px;font-weight:700;color:#fff;white-space:nowrap;">Télécharger APK</div><div style="font-size:10.5px;color:#9aa39d;">Version Android</div></div>
           </button>
         </div>
-        <div style="font-size:10.5px;color:#9CA3AF;">Recevez nos notifications et offres exclusives !</div>
+        <div style="font-size:12.5px;color:#9aa39d;text-align:center;">Recevez nos notifications et offres exclusives !</div>
       </div>
 
-      <div style="border-top:1px solid rgba(255,255,255,0.1);margin-bottom:9px;"></div>
+      <div style="height:1px;background:rgba(255,255,255,0.08);margin:12px 0;position:relative;z-index:1;"></div>
 
-
-      <div style="display:flex;justify-content:center;gap:10px;margin-bottom:9px;">
-        <a href="${state.footerSocial.whatsapp||'#'}" target="_blank" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.whatsapp?'flex':'none'};">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2m0 18.15h-.01c-1.48 0-2.94-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.26-8.24 2.21 0 4.28.86 5.84 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.55-3.7 8.24-8.26 8.24m4.53-6.17c-.25-.12-1.47-.72-1.69-.81-.23-.08-.4-.12-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43-.14-.01-.31-.01-.48-.01-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.57.12.17 1.75 2.67 4.25 3.74.59.26 1.06.41 1.42.52.6.19 1.14.16 1.57.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.23-.16-.48-.28"/></svg>
+      <div style="display:flex;justify-content:center;gap:10px;position:relative;z-index:1;margin-bottom:14px;">
+        <a href="${state.footerSocial.whatsapp||'#'}" target="_blank" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.whatsapp?'flex':'none'};">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#cfd6d2"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2m0 18.15h-.01c-1.48 0-2.94-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.26-8.24 2.21 0 4.28.86 5.84 2.42a8.19 8.19 0 0 1 2.42 5.83c0 4.55-3.7 8.24-8.26 8.24m4.53-6.17c-.25-.12-1.47-.72-1.69-.81-.23-.08-.4-.12-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.39-1.72-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43-.14-.01-.31-.01-.48-.01-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.57.12.17 1.75 2.67 4.25 3.74.59.26 1.06.41 1.42.52.6.19 1.14.16 1.57.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.1-.23-.16-.48-.28"/></svg>
         </a>
-        <a href="${state.footerSocial.facebook||'#'}" target="_blank" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.facebook?'flex':'none'};">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.86c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.58v1.9h2.78l-.44 2.91h-2.34V22c4.78-.76 8.44-4.92 8.44-9.94"/></svg>
+        <a href="${state.footerSocial.facebook||'#'}" target="_blank" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.facebook?'flex':'none'};">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#cfd6d2"><path d="M22 12.06C22 6.51 17.52 2 12 2S2 6.51 2 12.06c0 5.02 3.66 9.18 8.44 9.94v-7.03H7.9v-2.91h2.54V9.86c0-2.52 1.49-3.91 3.77-3.91 1.09 0 2.24.2 2.24.2v2.47h-1.26c-1.24 0-1.63.78-1.63 1.58v1.9h2.78l-.44 2.91h-2.34V22c4.78-.76 8.44-4.92 8.44-9.94"/></svg>
         </a>
-        <a href="${state.footerSocial.instagram||'#'}" target="_blank" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.instagram?'flex':'none'};">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M12 2c2.72 0 3.06.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.21.6 1.76 1.15.5.5.9 1.1 1.15 1.76.25.64.42 1.37.47 2.43.05 1.06.06 1.4.06 4.13s-.01 3.07-.06 4.13c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 0 1-1.15 1.76c-.5.5-1.1.9-1.76 1.15-.64.25-1.37.42-2.43.47-1.06.05-1.4.06-4.12.06s-3.07-.01-4.13-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 0 1-1.76-1.15 4.9 4.9 0 0 1-1.15-1.76c-.25-.64-.42-1.37-.47-2.43C2.01 15.07 2 14.73 2 12s.01-3.07.06-4.13c.05-1.06.22-1.79.47-2.43.26-.66.6-1.21 1.15-1.76A4.9 4.9 0 0 1 5.44.53c.64-.25 1.37-.42 2.43-.47C8.93 2.01 9.27 2 12 2m0 1.8c-2.68 0-3 .01-4.05.06-.87.04-1.34.18-1.65.3-.42.16-.71.36-1.02.67-.31.31-.5.6-.67 1.02-.12.31-.26.78-.3 1.65C4.21 8.75 4.2 9.07 4.2 12s.01 3.25.06 4.3c.04.87.18 1.34.3 1.65.16.42.36.71.67 1.02.31.31.6.5 1.02.67.31.12.78.26 1.65.3 1.05.05 1.37.06 4.05.06s3-.01 4.05-.06c.87-.04 1.34-.18 1.65-.3.42-.16.71-.36 1.02-.67.31-.31.5-.6.67-1.02.12-.31.26-.78.3-1.65.05-1.05.06-1.37.06-4.3s-.01-3.25-.06-4.3c-.04-.87-.18-1.34-.3-1.65a2.7 2.7 0 0 0-.67-1.02 2.7 2.7 0 0 0-1.02-.67c-.31-.12-.78-.26-1.65-.3-1.05-.05-1.37-.06-4.05-.06M12 6.87A5.13 5.13 0 1 1 12 17.13 5.13 5.13 0 0 1 12 6.87m0 1.8a3.33 3.33 0 1 0 0 6.66 3.33 3.33 0 0 0 0-6.66m5.34-1.98a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0"/></svg>
+        <a href="${state.footerSocial.instagram||'#'}" target="_blank" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.instagram?'flex':'none'};">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#cfd6d2"><path d="M12 2c2.72 0 3.06.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.21.6 1.76 1.15.5.5.9 1.1 1.15 1.76.25.64.42 1.37.47 2.43.05 1.06.06 1.4.06 4.13s-.01 3.07-.06 4.13c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 0 1-1.15 1.76c-.5.5-1.1.9-1.76 1.15-.64.25-1.37.42-2.43.47-1.06.05-1.4.06-4.12.06s-3.07-.01-4.13-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 0 1-1.76-1.15 4.9 4.9 0 0 1-1.15-1.76c-.25-.64-.42-1.37-.47-2.43C2.01 15.07 2 14.73 2 12s.01-3.07.06-4.13c.05-1.06.22-1.79.47-2.43.26-.66.6-1.21 1.15-1.76A4.9 4.9 0 0 1 5.44.53c.64-.25 1.37-.42 2.43-.47C8.93 2.01 9.27 2 12 2m0 1.8c-2.68 0-3 .01-4.05.06-.87.04-1.34.18-1.65.3-.42.16-.71.36-1.02.67-.31.31-.5.6-.67 1.02-.12.31-.26.78-.3 1.65C4.21 8.75 4.2 9.07 4.2 12s.01 3.25.06 4.3c.04.87.18 1.34.3 1.65.16.42.36.71.67 1.02.31.31.6.5 1.02.67.31.12.78.26 1.65.3 1.05.05 1.37.06 4.05.06s3-.01 4.05-.06c.87-.04 1.34-.18 1.65-.3.42-.16.71-.36 1.02-.67.31-.31.5-.6.67-1.02.12-.31.26-.78.3-1.65.05-1.05.06-1.37.06-4.3s-.01-3.25-.06-4.3c-.04-.87-.18-1.34-.3-1.65a2.7 2.7 0 0 0-.67-1.02 2.7 2.7 0 0 0-1.02-.67c-.31-.12-.78-.26-1.65-.3-1.05-.05-1.37-.06-4.05-.06M12 6.87A5.13 5.13 0 1 1 12 17.13 5.13 5.13 0 0 1 12 6.87m0 1.8a3.33 3.33 0 1 0 0 6.66 3.33 3.33 0 0 0 0-6.66m5.34-1.98a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0"/></svg>
         </a>
-        <a href="${state.footerSocial.tiktok||'#'}" target="_blank" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.tiktok?'flex':'none'};">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M16.6 5.82s.51.5 0 0A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.6 2.6 0 0 1-2.6 2.5c-1.4 0-2.6-1.16-2.6-2.6 0-1.7 1.62-2.97 3.31-2.45V9.66c-3.45-.46-6.47 2.22-6.47 5.63 0 3.26 2.7 5.71 5.75 5.71 3.28 0 5.94-2.66 5.94-5.94V9.05a7.31 7.31 0 0 0 4.27 1.37V7.33s-1.88.09-3.25-1.51"/></svg>
+        <a href="${state.footerSocial.tiktok||'#'}" target="_blank" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.tiktok?'flex':'none'};">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#cfd6d2"><path d="M16.6 5.82s.51.5 0 0A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.6 2.6 0 0 1-2.6 2.5c-1.4 0-2.6-1.16-2.6-2.6 0-1.7 1.62-2.97 3.31-2.45V9.66c-3.45-.46-6.47 2.22-6.47 5.63 0 3.26 2.7 5.71 5.75 5.71 3.28 0 5.94-2.66 5.94-5.94V9.05a7.31 7.31 0 0 0 4.27 1.37V7.33s-1.88.09-3.25-1.51"/></svg>
         </a>
-        <a href="${state.footerSocial.youtube||'#'}" target="_blank" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,0.1);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.youtube?'flex':'none'};">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><path d="M21.58 7.19a2.51 2.51 0 0 0-1.77-1.78C18.25 5 12 5 12 5s-6.25 0-7.81.41c-.86.23-1.54.91-1.77 1.78C2 8.76 2 12 2 12s0 3.24.42 4.81c.23.87.91 1.55 1.77 1.78C5.75 19 12 19 12 19s6.25 0 7.81-.41a2.51 2.51 0 0 0 1.77-1.78C22 15.24 22 12 22 12s0-3.24-.42-4.81M10 15.5v-7l6 3.5-6 3.5z"/></svg>
+        <a href="${state.footerSocial.youtube||'#'}" target="_blank" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);align-items:center;justify-content:center;text-decoration:none;display:${state.footerSocial.youtube?'flex':'none'};">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="#cfd6d2"><path d="M21.58 7.19a2.51 2.51 0 0 0-1.77-1.78C18.25 5 12 5 12 5s-6.25 0-7.81.41c-.86.23-1.54.91-1.77 1.78C2 8.76 2 12 2 12s0 3.24.42 4.81c.23.87.91 1.55 1.77 1.78C5.75 19 12 19 12 19s6.25 0 7.81-.41a2.51 2.51 0 0 0 1.77-1.78C22 15.24 22 12 22 12s0-3.24-.42-4.81M10 15.5v-7l6 3.5-6 3.5z"/></svg>
         </a>
       </div>
-      <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;display:flex;flex-direction:column;gap:6px;">
-        <div style="display:flex;align-items:center;gap:6px;font-size:10px;color:#B8C0BC;"><span>🛡️</span>Plus de 50 000 commandes livrées avec succès. Merci de votre confiance ! ❤️</div>
-        <div style="text-align:center;font-size:9.5px;color:#8AA391;">© ${new Date().getFullYear()} Kerry Topup Official. Tous droits réservés. Fait avec ❤️ en Haïti 🇭🇹</div>
+
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:#9aa39d;background:rgba(63,206,124,0.06);border-radius:10px;padding:10px 12px;margin-bottom:12px;position:relative;z-index:1;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3fce7c" stroke-width="2" style="flex-shrink:0;"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>
+        Plus de 50 000 commandes livrées avec succès. Merci de votre confiance ! ❤️
       </div>
+      <div style="text-align:center;font-size:11px;color:#6b7570;position:relative;z-index:1;">© ${new Date().getFullYear()} Kerry Topup Official. Tous droits réservés. Fait avec ❤️ en Haïti 🇭🇹</div>
     </div>
   `;
 }
@@ -3343,21 +3374,26 @@ function pageNotifications(){
     const meta = STATUS_META[n.status] || STATUS_META.processing;
     const isUnread = unseenSnapshot.includes(n.id);
     const iconHtml = meta.icon === 'check'
-      ? `<div style="width:36px;height:36px;border-radius:10px;background:#22C55E;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`
-      : `<div style="width:36px;height:36px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;">${meta.icon}</div>`;
+      ? `<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`
+      : `<div style="width:44px;height:44px;border-radius:50%;background:#eef2fb;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">${meta.icon}</div>`;
+    const statusTagHtml = n.status === 'complete'
+      ? `<span style="display:inline-flex;align-items:center;gap:5px;font-weight:700;color:#0a9e3d;"><span style="width:15px;height:15px;border-radius:4px;background:#0a9e3d;display:inline-flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4"><path d="M20 6L9 17l-5-5"/></svg></span>${meta.badgeText}</span>`
+      : `<span style="display:inline-flex;align-items:center;gap:5px;font-weight:700;color:${meta.badgeColor};"><span style="width:8px;height:8px;border-radius:50%;background:${meta.badgeColor};"></span>${meta.badgeText}</span>`;
     return `
-    <div style="position:relative;background:${isUnread?'var(--green-dim)':'var(--panel)'};border:1px solid ${isUnread?'var(--green)':'var(--line)'};border-radius:14px;padding:14px 40px 14px 16px;margin-bottom:10px;border-left:4px solid ${meta.bar};">
-      <button onclick="dismissNotif('${n.id}')" style="position:absolute;top:12px;right:12px;width:22px;height:22px;border:none;background:none;color:var(--muted);font-size:16px;cursor:pointer;">✕</button>
-      <div style="display:flex;gap:12px;">
+    <div style="position:relative;background:#fff;border-radius:16px;padding:16px 40px 16px 18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(20,40,30,0.05);border-left:4px solid ${meta.bar};">
+      <div onclick="dismissNotif('${n.id}')" style="position:absolute;top:14px;right:14px;color:#c2c8c5;cursor:pointer;">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </div>
+      <div style="display:flex;gap:14px;">
         ${iconHtml}
         <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
             ${isUnread ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>' : ''}
-            <div style="font-size:14px;font-weight:${isUnread?'800':'600'};color:var(--text);">${escapeHtml(n.title)}</div>
+            <div style="font-size:15px;font-weight:800;color:var(--text);padding-right:6px;">${escapeHtml(n.title)}</div>
           </div>
-          <div style="font-size:12.5px;color:var(--muted);line-height:1.4;">${escapeHtml(n.text)}</div>
-          <div style="font-size:11.5px;color:var(--muted);margin-top:8px;display:flex;align-items:center;gap:5px;">
-            ${timeAgoText(n.date)} · <span>${meta.badgeIcon}</span> <span style="color:${meta.badgeColor};font-weight:700;">${meta.badgeText}</span>
+          <div style="font-size:13px;color:#7c8a83;line-height:1.45;margin-bottom:10px;">${escapeHtml(n.text)}</div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#9aa39d;">
+            ${timeAgoText(n.date)} · ${statusTagHtml}
             ${isUnread ? '<span style="margin-left:auto;color:var(--green);font-weight:800;font-size:10.5px;">NOUVO</span>' : ''}
           </div>
         </div>
@@ -3371,18 +3407,23 @@ function pageNotifications(){
     renderTopIcons();
   }, 1200);
   return `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-      <button onclick="goBackFromNotifications()" style="width:40px;height:40px;border-radius:50%;background:var(--panel-2);border:none;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+    <div style="position:relative;display:flex;align-items:center;justify-content:center;margin-bottom:4px;">
+      <button onclick="goBackFromNotifications()" style="position:absolute;left:0;width:38px;height:38px;border-radius:50%;background:var(--panel);border:none;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.4"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
       </button>
-      <h2 style="font-family:'Rajdhani',sans-serif;font-size:20px;margin:0;">Notifikasyon</h2>
-      <div style="width:40px;"></div>
+      <h1 style="font-size:21px;font-weight:800;margin:0;">Notifikasyon</h1>
     </div>
-    <p style="color:var(--muted);font-size:12.5px;margin:-10px 0 16px;">${items.length} notifikasyon</p>
+    <p style="text-align:center;color:#8a9096;font-size:13px;margin:8px 0 18px;">${items.length} notifikasyon</p>
     <div id="pushPromptBanner"></div>
-    <div style="display:flex;gap:10px;margin-bottom:16px;">
-      <button onclick="markAllNotifRead()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px;font-size:13px;font-weight:700;color:var(--text);">✓ Mak tout li</button>
-      <button onclick="clearAllNotifications()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:11px;font-size:13px;font-weight:700;color:var(--red);">🗑 Efase tout</button>
+    <div style="display:flex;gap:10px;margin-bottom:18px;">
+      <button onclick="markAllNotifRead()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--panel);border:1px solid #eef1ef;border-radius:14px;padding:13px;font-size:13.5px;font-weight:700;color:var(--text);">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a9e3d" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+        Mak tout li
+      </button>
+      <button onclick="clearAllNotifications()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--panel);border:1px solid #eef1ef;border-radius:14px;padding:13px;font-size:13.5px;font-weight:700;color:#e0304a;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e0304a" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+        Efase tout
+      </button>
     </div>
     ${items.length===0 ? '<div class="empty"><div class="em-icon">🔔</div><div class="em-title">Pa gen notifikasyon</div></div>' : items.map(renderItem).join('')}
   `;
@@ -4425,12 +4466,14 @@ function pageHistorique(onlyRecharges){
   const countLabel = onlyRecharges ? 'rechaj' : 'tranzaksyon';
   return `
     <div class="card" style="padding:0;overflow:hidden;">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid var(--line);">
-        <div style="display:flex;align-items:center;gap:8px;">
-          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--text)" stroke-width="2.5"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg>
-          <h2 style="font-weight:800;font-size:14px;letter-spacing:0.03em;margin:0;">${titleText}</h2>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px 16px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:30px;height:30px;border-radius:9px;background:var(--panel-2);display:flex;align-items:center;justify-content:center;color:var(--text);flex-shrink:0;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3.5 2"/></svg>
+          </div>
+          <div style="font-weight:800;font-size:14px;letter-spacing:0.03em;">${titleText}</div>
         </div>
-        <span style="background:rgba(15,166,84,0.12);color:var(--green);font-size:12.5px;font-weight:700;padding:5px 12px;border-radius:20px;">${txs.length} ${countLabel}</span>
+        <span style="background:linear-gradient(135deg, #d8f5e2, #b8ecc9);color:#0a7c3d;font-weight:700;font-size:12.5px;padding:7px 14px;border-radius:30px;white-space:nowrap;">${txs.length} ${countLabel}</span>
       </div>
       ${txs.length===0 ? '<div class="empty"><div class="em-icon">📭</div><div class="em-title">Pa gen '+countLabel+'</div></div>' : `
         <div>
@@ -4439,26 +4482,24 @@ function pageHistorique(onlyRecharges){
             const hasProof = isRechargeType && t.txnId;
             const clickAttr = hasProof ? `onclick="openRechargeProof(${allTxs.indexOf(t)})"` : '';
             return `
-            <div ${clickAttr} style="display:flex;flex-wrap:nowrap;align-items:center;gap:12px;padding:14px 18px;${hasProof?'cursor:pointer;':''}${i!==visible.length-1?'border-bottom:1px solid var(--line);':''}">
-              <div style="flex-shrink:0;flex-grow:0;width:42px;height:42px;border-radius:12px;background:${t.type==='in'?'rgba(15,166,84,0.1)':'rgba(16,20,28,0.06)'};display:flex;align-items:center;justify-content:center;">
-                <div style="width:30px;height:30px;border-radius:50%;background:${t.type==='in'?'var(--green)':'var(--ink)'};display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:700;">
-                  ${isRechargeType ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>' : (t.type==='in'?'↓':'↑')}
-                </div>
+            <div ${clickAttr} style="display:flex;flex-wrap:nowrap;align-items:center;gap:14px;padding:15px 22px;border-top:1px solid #f2f4f3;${hasProof?'cursor:pointer;':''}">
+              <div class="tx-icon-v2" style="flex-shrink:0;width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;${t.type==='in'?'background:linear-gradient(135deg, #3fce7c, #17a854);':'background:#1b1f1d;'}color:#fff;">
+                ${isRechargeType ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>' : (t.type==='in'?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M6 13l6 6 6-6"/></svg>':'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5M6 11l6-6 6 6"/></svg>')}
               </div>
               <div style="flex:1 1 0%;min-width:0;">
-                <div style="font-weight:700;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.txnId ? escapeHtml(t.txnId) : (isRechargeType ? 'Ajouté par admin' : escapeHtml(t.label))}</div>
-                <div style="color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${new Date(t.date).toLocaleDateString('fr-FR')} · ${new Date(t.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
+                <div style="font-weight:700;font-size:14.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.txnId ? escapeHtml(t.txnId) : (isRechargeType ? 'Ajouté par admin' : escapeHtml(t.label))}</div>
+                <div style="color:#9aa39d;font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${new Date(t.date).toLocaleDateString('fr-FR')} · ${new Date(t.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</div>
               </div>
-              <div style="text-align:right;flex-shrink:0;flex-grow:0;white-space:nowrap;">
-                <span style="color:${t.type==='in'?'var(--green)':'var(--red)'};font-weight:800;font-size:16px;">${t.type==='in'?'+':'-'}${t.amount.toLocaleString('fr-FR')}</span>
-                <span style="color:${t.type==='in'?'var(--green)':'var(--red)'};font-weight:600;font-size:11px;"> HTG</span>
+              <div style="text-align:right;flex-shrink:0;white-space:nowrap;">
+                <span style="color:${t.type==='in'?'#0a9e3d':'#e0304a'};font-weight:800;font-size:16px;">${t.type==='in'?'+':'-'}${t.amount.toLocaleString('fr-FR')}</span>
+                <span style="color:#9aa39d;font-weight:600;font-size:11.5px;margin-left:3px;">HTG</span>
               </div>
             </div>
           `;}).join('')}
         </div>
         ${remaining > 0 ? `
-          <button onclick="historiqueExpanded=!historiqueExpanded;refreshHistoriqueView();" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:14px;color:var(--green);font-weight:700;font-size:13px;background:none;border:none;border-top:1px solid var(--line);cursor:pointer;">
-            <span style="display:inline-block;transition:transform 0.2s;transform:rotate(${historiqueExpanded?'180deg':'0deg'});">▼</span>
+          <button onclick="historiqueExpanded=!historiqueExpanded;refreshHistoriqueView();" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;color:#0a9e3d;font-weight:700;font-size:13.5px;background:none;border:none;border-top:1px solid #f2f4f3;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="transition:transform 0.2s;transform:rotate(${historiqueExpanded?'180deg':'0deg'});"><path d="M7 10l5 5 5-5z"/></svg>
             ${historiqueExpanded ? 'Montre mwens' : 'Wè ' + remaining + ' ' + countLabel + ' anplis'}
           </button>
         ` : ''}
@@ -4930,11 +4971,40 @@ function pageWallet(){
       <h1 style="font-size:24px;font-weight:800;color:var(--text);margin:0;">${t('wallet_title')}</h1>
       <p style="font-size:13px;color:var(--muted);margin:3px 0 0;">${t('wallet_sub')}</p>
     </div>
-    <div style="position:relative;border-radius:20px;background:linear-gradient(135deg,#F6FFF8 0%,#E8FFF2 40%,#F8FFF9 100%);border:1.5px solid #A7F3D0;padding:20px 22px;margin-bottom:16px;overflow:hidden;">
-      <svg style="position:absolute;right:-10px;top:50%;transform:translateY(-50%) rotate(8deg);opacity:0.16;" width="130" height="130" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.3"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M12 11h.01"/><path d="M22 10h-4a2 2 0 0 0-2 2v0a2 2 0 0 0 2 2h4"/></svg>
-      <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;">${t('wallet_balance')}</div>
-      <div style="font-size:38px;font-weight:800;color:var(--text);margin:8px 0 12px;letter-spacing:-0.01em;" id="walletBalanceDisplay">${money(bal)}</div>
-      <div style="display:inline-flex;align-items:center;gap:6px;background:#ECFDF5;color:#059669;font-size:12px;font-weight:700;padding:7px 13px;border-radius:999px;">✓ ${t('wallet_secure')}</div>
+    <style>
+      .solde-card{position:relative;width:100%;border-radius:20px;padding:26px 24px 24px;overflow:hidden;margin-bottom:16px;
+        background:radial-gradient(120% 90% at 105% -10%, rgba(255,255,255,0.35), transparent 55%), linear-gradient(150deg, #6d3f68 0%, #4d2b4b 55%, #331d33 100%);
+        box-shadow:0 24px 55px rgba(77,43,75,0.35), 0 4px 14px rgba(0,0,0,0.10); isolation:isolate;}
+      .solde-card::after{content:"";position:absolute;inset:0;background-image:repeating-linear-gradient(120deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 26px);z-index:0;}
+      .solde-card::before{content:"";position:absolute;top:-50%;left:-60%;width:55%;height:200%;background:linear-gradient(75deg, transparent 0%, rgba(230,190,220,0.12) 45%, rgba(240,210,230,0.30) 50%, rgba(230,190,220,0.12) 55%, transparent 100%);transform:rotate(8deg);animation:soldeSheen 5.5s ease-in-out infinite;z-index:0;}
+      @keyframes soldeSheen{0%{left:-60%;}45%{left:130%;}100%{left:130%;}}
+      .solde-wallet-mark{position:absolute;right:-16px;bottom:-16px;width:170px;height:170px;opacity:0.14;transform:rotate(-8deg);z-index:0;}
+      .solde-label{position:relative;z-index:1;font-size:11px;letter-spacing:2.2px;font-weight:700;color:#d9b8d4;margin-bottom:10px;text-transform:uppercase;}
+      .solde-amount-wrap{position:relative;z-index:1;display:flex;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+      .solde-amount{font-size:34px;font-weight:800;color:#fff;letter-spacing:-1px;line-height:1.05;text-shadow:0 2px 14px rgba(0,0,0,0.25);}
+      .solde-currency{font-size:16px;font-weight:700;background:linear-gradient(90deg, #e8b8de, #f4d9c8);-webkit-background-clip:text;background-clip:text;color:transparent;}
+      .solde-badge{position:relative;z-index:1;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.10);border:1px solid rgba(232,184,222,0.35);color:#f1d9ec;font-weight:700;font-size:12.5px;padding:8px 16px;border-radius:30px;}
+      .solde-badge svg{width:14px;height:14px;color:#e8b8de;}
+      .solde-accent-line{position:absolute;top:0;left:8%;width:84%;height:3px;border-radius:3px;background:linear-gradient(90deg, transparent, #e8b8de, #f4d9c8, transparent);opacity:0.7;z-index:1;}
+    </style>
+    <div class="solde-card">
+      <div class="solde-accent-line"></div>
+      <div class="solde-label">${t('wallet_balance')}</div>
+      <div class="solde-amount-wrap">
+        <span class="solde-amount" id="walletBalanceDisplay">${money(bal).replace(' HTG','').trim()}</span>
+        <span class="solde-currency">HTG</span>
+      </div>
+      <div class="solde-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/><path d="M9 12l2 2 4-4"/></svg>
+        ${t('wallet_secure')}
+      </div>
+      <svg class="solde-wallet-mark" viewBox="0 0 220 220" fill="none">
+        <g transform="rotate(38 110 110)">
+          <rect x="35" y="55" width="110" height="110" rx="24" fill="#ffffff" opacity="0.4"/>
+          <rect x="60" y="35" width="120" height="120" rx="26" fill="#ffffff" opacity="0.6"/>
+          <circle cx="152" cy="95" r="11" fill="#4d2b4b"/>
+        </g>
+      </svg>
     </div>
     <div id="walletTabBar">${walletTabBarHtml()}</div>
     <div id="walletTabContent"></div>
@@ -5027,11 +5097,35 @@ function renderWalletTab(){
     renderRechargeTimerState();
   } else if(walletTab === 'transfert'){
     box.innerHTML = `
-      <div class="card">
-        <div class="section-title" style="margin:0 0 10px;"><h3>Transfè Wallet</h3></div>
-        <div class="field-uid"><label>Imèl moun n ap voye a</label><input type="text" id="trEmail" placeholder="imel@egzanp.com"></div>
-        <div class="field-uid"><label>Montan (HTG)</label><input type="text" id="trAmount" placeholder="Ex: 500"></div>
-        <button class="btn btn-green" onclick="submitTransfer()">Voye Transfè</button>
+      <div class="card" style="border-radius:24px;padding:30px 28px 28px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+          <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 6px 14px rgba(10,158,61,0.28);">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 7h13l-3.5-3.5M17 17H4l3.5 3.5"/></svg>
+          </div>
+          <h1 style="font-size:20px;font-weight:800;margin:0;">Transfert de solde</h1>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">Email du destinataire</div>
+          <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #e6e9e7;border-radius:14px;padding:14px 16px;background:#fbfcfb;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa39d" stroke-width="2" style="flex-shrink:0;"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg>
+            <input type="text" id="trEmail" placeholder="email@exemple.com" style="border:none;outline:none;background:transparent;font-size:15px;color:var(--text);width:100%;">
+          </div>
+        </div>
+
+        <div style="margin-bottom:20px;">
+          <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">Montant (HTG)</div>
+          <div style="position:relative;display:flex;align-items:center;gap:10px;border:1.5px solid #e6e9e7;border-radius:14px;padding:14px 16px;background:#fbfcfb;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa39d" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5h4.5a1.5 1.5 0 0 1 0 3H10a1.5 1.5 0 0 0 0 3h5"/></svg>
+            <input type="text" id="trAmount" placeholder="Ex: 500" style="border:none;outline:none;background:transparent;font-size:15px;color:var(--text);width:100%;">
+            <span style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:#9aa39d;background:#eef1ef;padding:4px 10px;border-radius:8px;">HTG</span>
+          </div>
+        </div>
+
+        <button onclick="submitTransfer()" style="width:100%;border:none;border-radius:14px;padding:16px;background:linear-gradient(135deg, #1b2027, #0a0d11);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 24px rgba(10,13,17,0.30);">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          Envoyer le transfert
+        </button>
       </div>
     `;
   } else {
@@ -5399,7 +5493,7 @@ async function submitRecharge(){
     sendPushToUser(state.currentUserId, '💰 Recharge confirmée !', 'HTG ' + amount.toLocaleString('fr-FR') + ' ajouté à votre wallet.', '/');
     resultBox.innerHTML = `<div class="card" style="border-color:var(--green);"><div style="color:var(--green);font-weight:700;">${t('toast_wallet_credited')}! ${t('wallet_balance')||'Balans'}: ${money(walletBalance())}</div></div>`;
     const balDisplay = document.getElementById('walletBalanceDisplay');
-    if(balDisplay) balDisplay.textContent = money(walletBalance());
+    if(balDisplay) balDisplay.textContent = money(walletBalance()).replace(' HTG','').trim();
     showToast(t('toast_wallet_credited'));
     sendWalletCreditedEmail(currentUser(), amount, txn);
     const u2 = currentUser();
@@ -6434,11 +6528,14 @@ function pageCommandes(){
             <div class="oc-label">Produits</div>
             <div class="oc-value">${escapeHtml(o.product)} — ${escapeHtml(o.variant)}</div>
           </div>
-          <div class="oc-box">
+          <div class="oc-box oc-total-box">
             <div class="oc-label">Total</div>
             <div class="oc-value oc-total">${money(o.price)}</div>
           </div>
-          <button class="oc-btn ${badgeClass}" onclick="event.stopPropagation();openOrderDetail('${o.id}')">Voir</button>
+          <button class="oc-btn ${badgeClass}" onclick="event.stopPropagation();openOrderDetail('${o.id}')">
+            Voir
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" width="16" height="16"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
         </div>
       `;}).join('')
     }
@@ -6448,10 +6545,10 @@ function pageCommandes(){
 function loadMoreCommandes(){ commandeVisibleCount += 5; render(); }
 function setCommandeFilter(f){ commandeFilter = f; commandeVisibleCount = 5; render(); }
 
-function renderOrderField(label, valueHtml){
-  return `<div style="background:var(--panel-2);border-radius:12px;padding:11px 14px;margin-bottom:10px;">
-    <div style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">${label}</div>
-    <div style="color:var(--text);font-weight:700;font-size:14px;">${valueHtml}</div>
+function renderOrderField(label, valueHtml, isTotal){
+  return `<div style="background:${isTotal?'linear-gradient(135deg,#eafaf0,#dcf5e6)':'var(--panel-2)'};border-radius:16px;padding:14px 16px;margin-bottom:10px;">
+    <div style="font-size:11px;font-weight:700;letter-spacing:0.05em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">${label}</div>
+    <div style="color:${isTotal?'#0a7c3d':'var(--text)'};font-weight:${isTotal?800:700};font-size:${isTotal?'19px':'15px'};">${valueHtml}</div>
   </div>`;
 }
 function openOrderDetail(orderId){
@@ -6463,7 +6560,7 @@ function openOrderDetail(orderId){
 
   let bodyHtml = `
     ${renderOrderField('Produits', escapeHtml(o.product))}
-    ${renderOrderField('Total', money(o.price))}
+    ${renderOrderField('Total', money(o.price), true)}
     <div style="height:1px;background:var(--line);margin:14px 0;"></div>
     ${renderOrderField('Numéro', '#'+escapeHtml(o.orderNo||''))}
     ${renderOrderField('Statut', `<span class="pill ${STATUS_PILL[o.status]||'wait'}">${STATUS_LABEL[o.status]||o.status}</span>`)}
@@ -10552,11 +10649,12 @@ function renderDrawer(){
   ];
   d.innerHTML = `
     ${u ? `<div class="drawer-user"><div class="drawer-avatar">${u.name.charAt(0).toUpperCase()}</div><div><div class="drawer-name">${escapeHtml(u.name)}</div><div class="drawer-email">${escapeHtml(u.email)}</div></div></div>`
-      : `<div class="drawer-user"><div class="drawer-avatar">?</div><div><div class="drawer-name">Vizitè</div><div class="drawer-email" style="color:var(--green);cursor:pointer;" onclick="openAuthModal('login')">Konekte / Kreye kont</div></div></div>`}
-    ${items.map(it => '<div class="drawer-item" onclick="goPage(\'' + it.id + '\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + it.icon + '</svg>' + it.label + '</div>').join('')}
-    ${state.apiClient ? '<div class="drawer-item" onclick="goPage(\'apiSupplier\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17V7a2 2 0 0 1 2-2h6l2 2h4a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>🔌 API Revandè</div>' : ''}
-    ${state.isAdmin ? '<div class="drawer-item" onclick="goPage(\'admin\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>Dashboard Admin</div>' : ''}
-    ${u ? '<div class="drawer-item danger" onclick="doLogout()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Déconnexion</div>' : ''}
+      : `<div class="drawer-user"><div class="drawer-avatar" style="background:#f4f7f5;color:#9aa39d;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div><div class="drawer-name">Bienvenue</div><div class="drawer-email" style="color:var(--green);font-weight:700;cursor:pointer;" onclick="openAuthModal('login')">Se connecter / Créer un compte</div></div></div>`}
+    <div class="drawer-divider"></div>
+    ${items.map(it => '<div class="drawer-item' + (currentPage===it.id?' active':'') + '" onclick="goPage(\'' + it.id + '\')"><div class="drawer-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' + it.icon + '</svg></div>' + it.label + '</div>').join('')}
+    ${state.apiClient ? '<div class="drawer-item' + (currentPage==='apiSupplier'?' active':'') + '" onclick="goPage(\'apiSupplier\')"><div class="drawer-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 17V7a2 2 0 0 1 2-2h6l2 2h4a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg></div>🔌 API Revandè</div>' : ''}
+    ${state.isAdmin ? '<div class="drawer-item' + (currentPage==='admin'?' active':'') + '" onclick="goPage(\'admin\')"><div class="drawer-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg></div>Dashboard Admin</div>' : ''}
+    ${u ? `<div class="drawer-mid-divider"></div><div class="drawer-item danger" onclick="doLogout()"><div class="drawer-icon-box"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></div>Déconnexion</div>` : ''}
   `;
 }
 
