@@ -2219,7 +2219,7 @@ function pageKerryRewards(){
   const activePrograms = state.rewardPrograms.filter(p => p.active);
   return `
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;">
-      <div style="width:48px;height:48px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:9px;box-sizing:border-box;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAMAAAD6TlWYAAAC/VBMVEVHcEz/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugAnYVeNAAAA/3RSTlMA+P+kiaL+/Zr8+/kM+gUHCfH16g7lYSaj9C/p4ylZYrvo7sqW7RE2uIBQI+cLKr7m4LScLoTDjpINZ8EfGYpCY7Ms1qVrK7yHTm3Jp+JqQ6qh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" style="width:100%;height:100%;object-fit:contain;"></div>
+      <div style="width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 14px rgba(10,158,61,0.25);"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="6"/><circle cx="7.5" cy="12" r="1.5"/><path d="M6 12h3"/><circle cx="16" cy="10" r="1"/><circle cx="18" cy="12" r="1"/></svg></div>
       <h2 style="margin:0;">Free Fire Reward</h2>
     </div>
     <p style="color:var(--muted);font-size:13.5px;margin:0 0 16px;">Programme de fidélité. Achetez vos produits et recevez automatiquement des récompenses.</p>
@@ -4009,7 +4009,7 @@ async function confirmApiTopupPurchase(productId){
         body: { local_product_id: variant.id, local_order_id: inserted.id, quantity: qty }
       });
       if(error || !data || data.error){
-        await sb.from('orders').update({ status: 'anile' }).eq('id', inserted.id);
+        await sb.from('orders').update({ status: 'remboursee' }).eq('id', inserted.id);
         await applyWalletChange(state.currentUserId, totalPrice, 'Ranbousman — ' + p.name, 'in');
         await fetchWalletFromServer(state.currentUserId);
         showCustomerError('', data?.error || error?.message || 'Founisè refize kòmand lan', 'Achte Gift Card — ' + p.name, 'toast_order_failed_refunded');
@@ -4059,7 +4059,7 @@ async function confirmApiTopupPurchase(productId){
 
     if(error || !data || data.error){
       // Founisè refize — dedwi lajan an, mete kòmand la "echwe", epi RANBOUSE kliyan an
-      await sb.from('orders').update({ status: 'anile' }).eq('id', inserted.id);
+      await sb.from('orders').update({ status: 'remboursee' }).eq('id', inserted.id);
       await applyWalletChange(state.currentUserId, totalPrice, 'Ranbousman — ' + p.name, 'in');
       await fetchWalletFromServer(state.currentUserId);
       showCustomerError('', data?.error || error?.message || 'Founisè refize kòmand lan', 'Achte Free Fire — ' + p.name, 'toast_order_failed_refunded');
@@ -6001,7 +6001,8 @@ async function fetchMyOrders(){
       state.orders[state.currentUserId] = data.map(o => ({
         id:o.id, orderNo:o.order_no, type:o.type, status:o.status, product:o.product, variant:o.variant,
         price:Number(o.price), pin:o.pin_code, fields:o.fields, montantUSD:o.montant_usd, date:o.created_at,
-        adminResponse:o.admin_response, playerId:o.player_id, serverId:o.server_id, playerName:o.player_name
+        adminResponse:o.admin_response, playerId:o.player_id, serverId:o.server_id, playerName:o.player_name,
+        marketEmail:o.market_email, marketPassword:o.market_password
       }));
       if(currentPage==='commandes') render();
     }
@@ -6423,7 +6424,7 @@ async function checkoutCart(){
         });
 
         if(error || !result || result.error){
-          await sb.from('orders').update({ status: 'anile' }).eq('id', inserted.id);
+          await sb.from('orders').update({ status: 'remboursee' }).eq('id', inserted.id);
           await applyWalletChange(state.currentUserId, item.price, 'Ranbousman — ' + item.productName, 'in');
           console.warn('founisè-place-order erè:', result?.error||error?.message);
           failed.push(item);
@@ -6570,35 +6571,11 @@ function notifyAdminOfManualOrders(orders){
 let commandeVisibleCount = 5;
 function pageCommandes(){
   const orders = state.orders[state.currentUserId] || [];
-  const myPurchases = state.myMarketPurchases || [];
   const filters = ['tout','en_cours','terminee','annulee','remboursee'];
   const filtered = commandeFilter==='tout' ? orders : orders.filter(o=>o.status===commandeFilter);
   const visible = filtered.slice(0, commandeVisibleCount);
   return `
     <div class="page-header"><h2>Mes Commandes</h2><p>Tout acha ou</p></div>
-    ${myPurchases.length > 0 ? `
-      <div class="card">
-        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🎮 Achats Marché</div>
-        ${myPurchases.map(l => `
-          <div style="border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:10px;">
-            <div style="font-weight:700;font-size:13px;">${escapeHtml(l.listing_name||l.rank)}</div><div style="font-size:11px;color:var(--muted);">🏆 ${escapeHtml(l.rank)} — Niveau ${escapeHtml(l.level)}</div>
-            <div style="font-weight:800;color:var(--green);font-size:14px;margin:4px 0 8px;">${money(l.price)}</div>
-            <div style="background:var(--green-dim);border-radius:10px;padding:10px 12px;">
-              <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:8px;">✅ Compte livré</div>
-              <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-                <div style="flex:1;font-size:12px;background:var(--panel);border-radius:8px;padding:7px 9px;">${escapeHtml(l.account_email)}</div>
-                <button onclick="copyToClipboard('${escapeHtml(l.account_email)}')" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;">📋</button>
-              </div>
-              <div style="display:flex;align-items:center;gap:6px;">
-                <div id="pwField-${l.id}" style="flex:1;font-size:12px;background:var(--panel);border-radius:8px;padding:7px 9px;font-family:monospace;">••••••••</div>
-                <button onclick="togglePurchasePassword('${l.id}', '${escapeHtml(l.account_password)}')" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:13px;">👁️</button>
-                <button onclick="copyToClipboard('${escapeHtml(l.account_password)}')" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:7px 9px;font-size:12px;">📋</button>
-              </div>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    ` : ''}
     <div class="chip-row" style="margin-bottom:14px;">
       ${filters.map(f => `<div class="chip ${commandeFilter===f?'active':''}" onclick="setCommandeFilter('${f}')">${f==='tout'?'Tout':STATUS_LABEL[f]}</div>`).join('')}
     </div>
@@ -6653,7 +6630,7 @@ function openOrderDetail(orderId){
     <div style="height:1px;background:var(--line);margin:14px 0;"></div>
     ${renderOrderField('Numéro', '#'+escapeHtml(o.orderNo||''))}
     ${renderOrderField('Statut', `<span class="pill ${STATUS_PILL[o.status]||'wait'}">${STATUS_LABEL[o.status]||o.status}</span>`)}
-    ${renderOrderField('Paiement', money(o.price) + ' — Wallet')}
+    ${renderOrderField('Paiement', 'Wallet')}
     ${renderOrderField('Date', dateStr)}
   `;
 
@@ -6670,6 +6647,22 @@ function openOrderDetail(orderId){
           </div>
           ${renderRedeemHelp(o.product)}
         ` : `<div style="font-size:12.5px;color:var(--muted);">${renderNonPinStatusMessage(o.status)}</div>`}
+      </div>
+    `;
+  } else if(o.type === 'market_account'){
+    bodyHtml += renderOrderField('Compte', escapeHtml(o.variant));
+    bodyHtml += `
+      <div style="background:var(--green-dim);border-radius:12px;padding:14px;margin-top:14px;">
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;color:var(--green);text-transform:uppercase;margin-bottom:10px;">✅ Compte livré</div>
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;">
+          <div style="flex:1;font-size:12.5px;background:var(--panel);border-radius:8px;padding:9px 11px;">${escapeHtml(o.marketEmail||'')}</div>
+          <button onclick="copyToClipboard('${escapeHtml(o.marketEmail||'')}')" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12px;">📋</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div id="pwFieldDetail-${o.id}" style="flex:1;font-size:12.5px;background:var(--panel);border-radius:8px;padding:9px 11px;font-family:monospace;">••••••••</div>
+          <button onclick="togglePurchasePassword('${o.id}', '${escapeHtml(o.marketPassword||'').replace(/'/g,"\\'")}', 'pwFieldDetail-')" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:13px;">👁️</button>
+          <button onclick="copyToClipboard('${escapeHtml(o.marketPassword||'')}')" style="background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:12px;">📋</button>
+        </div>
       </div>
     `;
   } else {
@@ -7077,6 +7070,7 @@ async function setSellerName(){
 let marcheTab = 'achete';
 async function fetchMyListings(){
   if(!state.currentUserId) return;
+  cleanupSoldListings();
   const box = document.getElementById('myListingsBox');
   if(box) box.innerHTML = 'Chajman...';
   try{
@@ -7125,6 +7119,23 @@ async function deleteMyListing(id){
       await fetchMyListings();
     }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
   });
+}
+async function cleanupSoldListings(){
+  try{
+    const sb = await getSupabase();
+    const cutoff = new Date(Date.now() - 24*60*60*1000).toISOString();
+    const { data: expired } = await sb.from('game_account_listings').select('id, photos').eq('status', 'sold').lt('sold_at', cutoff);
+    if(!expired || expired.length === 0) return;
+    for(const l of expired){
+      const paths = (l.photos||[]).map(url => {
+        const idx = url.indexOf('/listing-photos/');
+        return idx !== -1 ? url.slice(idx + '/listing-photos/'.length) : null;
+      }).filter(Boolean);
+      if(paths.length){ try{ await sb.storage.from('listing-photos').remove(paths); }catch(e){} }
+    }
+    const ids = expired.map(l => l.id);
+    await sb.from('game_account_listings').delete().in('id', ids);
+  }catch(e){ console.warn('cleanupSoldListings failed:', e?.message||e); }
 }
 async function fetchActiveListings(){
   try{
@@ -7532,10 +7543,28 @@ async function buyListing(id){
 
       await applyWalletChange(state.currentUserId, -l.price, 'Achat compte Free Fire (' + l.rank + ')', 'out', false, null, null, null, false);
 
+      const orderNo = 'KT-' + Math.random().toString(36).slice(2, 10).toUpperCase();
+      const { data: orderRow } = await sb.from('orders').insert({
+        order_no: orderNo, user_id: state.currentUserId, type: 'market_account', status: 'terminee',
+        product: l.listing_name || l.rank, variant: l.rank + ' — Niveau ' + l.level, price: l.price,
+        market_email: l.account_email, market_password: l.account_password
+      }).select().single();
+      if(orderRow){
+        if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
+        state.orders[state.currentUserId].unshift({
+          id: orderRow.id, orderNo, type:'market_account', status:'terminee',
+          product: l.listing_name || l.rank, variant: l.rank + ' — Niveau ' + l.level, price: l.price,
+          date: new Date().toISOString(), marketEmail: l.account_email, marketPassword: l.account_password
+        });
+      }
+
       const u = currentUser();
+      const { data: sellerProfile } = await sb.from('profiles').select('name, email').eq('id', l.seller_id).maybeSingle();
+
       sendNtfyNotification('🎮 Nouvel achat — Marché', 
-        '👤 Achtè: ' + (u?.name||'') + '\n📧 ' + (u?.email||'') +
-        '\n🏆 ' + l.rank + ' — Niveau ' + l.level + '\n💰 ' + money(l.price) +
+        '🛒 ACHETEUR\n👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||'') +
+        '\n\n🏪 VENDEUR\n👤 ' + (sellerProfile?.name||'') + '\n📧 ' + (sellerProfile?.email||'') +
+        '\n\n🏆 ' + l.rank + ' — Niveau ' + l.level + '\n💰 Prix: ' + money(l.price) +
         '\n💳 Payer le vendeur via: ' + l.payment_method + (l.payment_details ? ' — ' + l.payment_details + ' (' + l.payment_name + ')' : '') +
         '\n📱 WhatsApp vendeur: ' + (l.seller_whatsapp||'') +
         '\n\n👉 Le compte a été livré automatiquement à l\'acheteur. Payez le vendeur.',
@@ -7754,10 +7783,10 @@ async function cancelAndRefundOrder(userId, orderId){
   if(!o) return;
   if(!confirm('Anile kòmand sa a e ranbouse '+money(o.price)+' bay kliyan an?')) return;
   const wasCompleted = o.status === 'terminee';
-  o.status = 'annulee';
+  o.status = 'remboursee';
   try{
     const sb = await getSupabase();
-    await sb.from('orders').update({ status:'annulee' }).eq('id', orderId);
+    await sb.from('orders').update({ status:'remboursee' }).eq('id', orderId);
     await applyWalletChange(userId, o.price, 'Ranbousman — ' + o.product, 'in');
     if(wasCompleted) await decrementRewardProgressForOrder(userId, o.product, o.variant);
   }catch(e){ showToast('⚠️ Erè: '+(e?.message||'enkoni')); return; }
@@ -9106,6 +9135,7 @@ async function reviewKyc(userId, decision){
   }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
 }
 async function loadPendingListings(){
+  cleanupSoldListings();
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.from('game_account_listings').select('*').eq('status', 'pending_review').order('created_at', {ascending:false});
@@ -9211,8 +9241,8 @@ async function copyToClipboard(text){
   try{ await navigator.clipboard.writeText(text); showToast('📋 Kopye'); }
   catch(e){ showToast(text); }
 }
-function togglePurchasePassword(id, pw){
-  const el = document.getElementById('pwField-'+id);
+function togglePurchasePassword(id, pw, prefix){
+  const el = document.getElementById((prefix||'pwField-')+id);
   if(!el) return;
   if(el.textContent === '••••••••'){ el.textContent = pw; } else { el.textContent = '••••••••'; }
 }
