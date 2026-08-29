@@ -638,9 +638,12 @@ textarea.admin-ta{
   <div style="width:100%;max-width:480px;background:var(--panel);border-radius:22px 22px 0 0;height:65vh;max-height:560px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(20,40,30,0.18);">
     <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:linear-gradient(135deg, #12241a, #0a1710);color:#fff;flex-shrink:0;">
       <div style="display:flex;align-items:center;gap:12px;">
-        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;">🐶</div>
+        <div style="position:relative;width:38px;height:38px;flex-shrink:0;">
+          <div style="width:100%;height:100%;border-radius:12px;background:linear-gradient(145deg, #17a854, #0a7c3d);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 6px 14px rgba(10,124,61,0.3);">🐶</div>
+          <span style="position:absolute;bottom:-2px;right:-2px;width:11px;height:11px;background:#3fce7c;border:2px solid #12241a;border-radius:50%;"></span>
+        </div>
         <div>
-          <div style="font-weight:800;font-size:15.5px;">Touski Bot <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:4px;">👤 Ajan</span></div>
+          <div style="font-weight:800;font-size:15.5px;">Touski Bot <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:4px;">👤 Kerry Cadet en ligne</span></div>
           <div style="font-size:11.5px;color:#6fcf97;display:flex;align-items:center;gap:5px;margin-top:1px;"><span style="width:6px;height:6px;border-radius:50%;background:#3fce7c;"></span>An liy</div>
         </div>
       </div>
@@ -1646,7 +1649,47 @@ function formatChatText(text){
     `<div style="text-align:center;margin-top:8px;"><button onclick="window.open('https://whatsapp.com/channel/0029Vb7SDqG1NCrMyxNOGo3Z','_blank')" style="background:#00D26A;color:#fff;border:none;font-weight:700;font-size:12.5px;padding:10px 20px;border-radius:20px;">👥 Rejoindre la Communauté</button></div>`);
   escaped = escaped.replace(/\[LIEN_TUTORIELS\]/g,
     `<div style="text-align:center;margin-top:8px;"><button onclick="goPage('tutoriel');toggleSupportChat();" style="background:#00D26A;color:#fff;border:none;font-weight:700;font-size:12.5px;padding:10px 20px;border-radius:20px;">🎓 Wè tout Tutoriels</button></div>`);
+  escaped = escaped.replace(/\[LIEN_RECHARGER\]/g,
+    `<div style="text-align:center;margin-top:8px;"><button onclick="walletTab='recharge';goPage('wallet');toggleSupportChat();" style="background:#00D26A;color:#fff;border:none;font-weight:700;font-size:12.5px;padding:10px 20px;border-radius:20px;">💰 Recharger mon Wallet</button></div>`);
+  escaped = escaped.replace(/(\*\d{2,4}#)/g, (code) => {
+    return `<a href="tel:${encodeURIComponent(code)}" style="color:var(--green);font-weight:800;text-decoration:underline;">${code}</a>`;
+  });
+  escaped = escaped.replace(/\[PRODUIT:([a-zA-Z0-9-]+)\]/g, (match, pid) => {
+    const p = state.products.find(x => x.id === pid);
+    if(!p) return '';
+    return `<a href="${window.location.origin}/product/${slugify(p.name)}" onclick="openProduct('${p.id}');toggleSupportChat();return false;" style="display:inline-block;margin-top:8px;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;font-size:12.5px;padding:10px 20px;border-radius:20px;">🛒 Voir le produit</a>`;
+  });
+  escaped = escaped.replace(/\[CALCULATRICE:([a-zA-Z0-9-]+)\]/g, (match, pid) => {
+    const p = state.products.find(x => x.id === pid);
+    if(!p || !p.manualConfig) return '';
+    const uid_ = 'chatCalc' + Math.random().toString(36).slice(2, 8);
+    return `
+      <div style="background:var(--panel-2);border-radius:14px;padding:14px;margin-top:10px;">
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;">✍️ Ekri kantite ou vle a pou wè konbyen w ap peye ak frè yo :</div>
+        <input type="number" id="${uid_}-input" placeholder="Ex: 20" oninput="updateChatCalculator('${uid_}','${pid}')" style="width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--text);margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;"><span style="color:var(--muted);">Montant</span><span id="${uid_}-amt">0 USD</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;"><span style="color:var(--muted);">Frais</span><span id="${uid_}-frais">+0 USD</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;padding:6px 0;border-top:1px solid var(--line);margin-top:4px;"><span>Total</span><span id="${uid_}-total" style="color:var(--green);">0 HTG</span></div>
+        <a href="${window.location.origin}/product/${slugify(p.name)}" style="display:block;text-align:center;margin-top:10px;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;font-size:12.5px;padding:10px 20px;border-radius:20px;">🛒 Voir le produit</a>
+      </div>
+    `;
+  });
   return escaped;
+}
+function updateChatCalculator(uid_, productId){
+  const p = state.products.find(x=>x.id===productId);
+  if(!p || !p.manualConfig) return;
+  const c = p.manualConfig;
+  const input = document.getElementById(uid_+'-input');
+  const amt = parseFloat(input?.value) || 0;
+  const frais = feeForAmount(c, amt);
+  const total = (amt + frais) * (c.taux||0);
+  const elAmt = document.getElementById(uid_+'-amt');
+  const elFrais = document.getElementById(uid_+'-frais');
+  const elTotal = document.getElementById(uid_+'-total');
+  if(elAmt) elAmt.textContent = amt + ' USD';
+  if(elFrais) elFrais.textContent = '+' + frais + ' USD';
+  if(elTotal) elTotal.textContent = money(Math.round(total));
 }
 function addSupportMessage(role, text, skipHistory){
   if(!skipHistory) supportChatHistory.push({ role, content: text });
@@ -1654,7 +1697,7 @@ function addSupportMessage(role, text, skipHistory){
   const row = document.createElement('div');
   const isBot = role === 'assistant';
   row.style.cssText = 'display:flex;gap:10px;margin-bottom:4px;' + (role==='user' ? 'flex-direction:row-reverse;' : '');
-  const avatarHtml = isBot ? '<div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;">🐶</div>' : '';
+  const avatarHtml = isBot ? '<div style="width:30px;height:30px;border-radius:10px;background:linear-gradient(145deg, #17a854, #0a7c3d);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🐶</div>' : '';
   const styles = {
     user: 'background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border-radius:16px 4px 16px 16px;box-shadow:0 4px 10px rgba(15,166,84,0.2);',
     admin: 'background:#1565D8;color:#fff;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);',
@@ -1997,11 +2040,10 @@ async function incrementRewardProgress(userId, variantId){
   for(const program of matchingPrograms){
     try{
       const sb = await getSupabase();
-      const current = state.rewardProgress[program.id] || 0;
-      const newCount = current + 1;
-      const { error } = await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:newCount, updated_at:new Date().toISOString() });
-      if(error){ console.warn('incrementRewardProgress upsert erè:', error.message); sendNtfyNotification('⚠️ Erè Reward', 'Pa ka sove pwogrè rekonpans: ' + error.message, 'high', 'warning'); continue; }
-      state.rewardProgress[program.id] = newCount;
+      const { error } = await sb.rpc('increment_reward_progress', { p_user_id: userId, p_program_id: program.id });
+      if(error){ console.warn('incrementRewardProgress RPC erè:', error.message); sendNtfyNotification('⚠️ Erè Reward', 'Pa ka sove pwogrè rekonpans: ' + error.message, 'high', 'warning'); continue; }
+      const { data: fresh } = await sb.from('reward_progress').select('count').eq('user_id', userId).eq('program_id', program.id).maybeSingle();
+      if(fresh) state.rewardProgress[program.id] = fresh.count;
     }catch(e){ console.warn('incrementRewardProgress failed:', e?.message || e); sendNtfyNotification('⚠️ Erè Reward', 'Exception: ' + (e?.message||e), 'high', 'warning'); }
   }
 }
@@ -3038,7 +3080,12 @@ async function doLogin(){
   if(!email || !pass){ showToast('Ranpli tout chan yo'); return; }
   if(document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
   const btn = document.getElementById('loginSubmitBtn');
-  if(btn){ btn.disabled = true; btn.textContent = 'Ap konekte...'; }
+  if(btn){
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.cursor = 'not-allowed';
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;vertical-align:-2px;margin-right:6px;"><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>Connexion en cours...';
+  }
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
@@ -3055,7 +3102,7 @@ async function doLogin(){
     console.error('Erè koneksyon:', e);
     showToast('Pa ka konekte ak sèvè a: ' + (e && e.message ? e.message : 'erè enkoni'));
   }finally{
-    if(btn){ btn.disabled = false; btn.textContent = 'Se connecter'; }
+    if(btn){ btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; btn.textContent = 'Se connecter'; }
   }
 }
 async function tryRestoreSupabaseSession(){
@@ -5096,11 +5143,11 @@ function renderWalletTab(){
               100% Sécurisé
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:14px;padding:6px 0;position:relative;z-index:1;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 0;position:relative;z-index:1;">
             <div style="width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg, #eafaf0, #d8f5e2);display:flex;align-items:center;justify-content:center;color:#0a7c3d;flex-shrink:0;box-shadow:inset 0 0 0 1px rgba(10,124,61,0.10);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2"/></svg></div>
             <div style="flex:1;min-width:0;">
               <div style="font-size:10.5px;letter-spacing:1px;font-weight:700;color:#9aa39d;text-transform:uppercase;margin-bottom:4px;">Numéro NatCash</div>
-              <div style="font-size:20px;font-weight:800;color:#b85606;line-height:1.2;">${escapeHtml(state.paymentSettings.number)}</div>
+              <div style="font-size:18px;font-weight:800;color:#b85606;line-height:1.2;word-break:break-word;">${escapeHtml(state.paymentSettings.number)}</div>
               <div style="font-size:12px;color:#8a9096;margin-top:3px;">${escapeHtml(state.paymentSettings.name)}</div>
             </div>
             <button onclick="copyNatCashNumber()" style="display:flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #f0d9a0;color:#b85606;font-weight:700;padding:9px 16px;border-radius:30px;font-size:12.5px;flex-shrink:0;">
@@ -5109,11 +5156,11 @@ function renderWalletTab(){
             </button>
           </div>
           <div style="height:1px;background:#eef1ef;margin:14px 0;position:relative;z-index:1;"></div>
-          <div style="display:flex;align-items:center;gap:14px;padding:6px 0;position:relative;z-index:1;">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:6px 0;position:relative;z-index:1;">
             <div style="width:46px;height:46px;border-radius:13px;background:linear-gradient(135deg, #eafaf0, #d8f5e2);display:flex;align-items:center;justify-content:center;color:#0a7c3d;flex-shrink:0;font-weight:800;font-size:18px;box-shadow:inset 0 0 0 1px rgba(10,124,61,0.10);">#</div>
             <div style="flex:1;min-width:0;">
               <div style="font-size:10.5px;letter-spacing:1px;font-weight:700;color:#9aa39d;text-transform:uppercase;margin-bottom:4px;">Référence</div>
-              <div style="font-size:20px;font-weight:800;color:#b85606;line-height:1.2;" id="rcRefDisplay">${currentRechargeRef}</div>
+              <div style="font-size:18px;font-weight:800;color:#b85606;line-height:1.2;word-break:break-word;" id="rcRefDisplay">${currentRechargeRef}</div>
               <div style="font-size:12px;color:#8a9096;margin-top:3px;">À mettre dans le contenu du transfert</div>
             </div>
             <button onclick="copyRechargeRef()" style="display:flex;align-items:center;gap:6px;background:#fff;border:1.5px solid #f0d9a0;color:#b85606;font-weight:700;padding:9px 16px;border-radius:30px;font-size:12.5px;flex-shrink:0;">
@@ -5161,9 +5208,11 @@ function renderWalletTab(){
           </button>
         </div>
         <div id="rcOcrResult" style="margin-top:12px;"></div>
-        <div style="display:flex;gap:9px;font-size:12.5px;color:#9aa39d;line-height:1.5;">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f7941d" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
-          Assurez-vous que l'image est bien claire, car si elle n'est pas claire, la recharge prendra plus de temps.
+        <div style="font-size:12.5px;color:#9aa39d;line-height:1.5;">
+          <b style="color:var(--text);">🔔 Message Important</b><br>
+          Merci de bien vérifier et soumettre correctement toutes les informations requises lors de votre dépôt. Toute erreur ou omission pourrait entraîner un rejet ou un retard de traitement de votre transaction.<br><br>
+          ❗ En cas d'erreur, la transaction ne sera pas traitée automatiquement. Veuillez contacter notre service d'assistance pour toute correction ou suivi.<br><br>
+          Merci de votre compréhension.
         </div>
       </div>
       <div id="rcRequestsList"></div>
@@ -5490,10 +5539,17 @@ async function submitRecharge(){
   }catch(e){ console.warn('recharge proof upload failed:', e?.message || e); proofPath = null; }
 
   let checks = null;
+  const submitBtn = document.getElementById('rcSubmitBtn');
+  if(submitBtn){
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.55';
+    submitBtn.style.cursor = 'not-allowed';
+    submitBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;"><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg> Vérification en cours...';
+  }
   try{
     checks = await Promise.race([
       runProofOcr(file, amount, txn, ref),
-      new Promise((resolve) => setTimeout(() => resolve(null), 12000))
+      new Promise((resolve) => setTimeout(() => resolve(null), 45000))
     ]);
   }catch(e){
     checks = null;
@@ -6732,8 +6788,60 @@ function openOrderDetail(orderId){
     <h3>Kòmand #${escapeHtml(o.orderNo||'')}</h3>
     <div class="sub">${dateStr}</div>
     ${bodyHtml}
+    <button onclick="downloadOrderReceipt('${orderId}')" style="width:100%;border:none;border-radius:13px;padding:13px;background:#14181c;color:#fff;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;cursor:pointer;">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
+      Télécharger le reçu
+    </button>
   `;
   document.getElementById('sheetBg').classList.add('show');
+}
+function loadHtml2Canvas(){
+  return new Promise((resolve, reject) => {
+    if(window.html2canvas){ resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = () => resolve();
+    s.onerror = () => reject(new Error('html2canvas load failed'));
+    document.head.appendChild(s);
+  });
+}
+async function downloadOrderReceipt(orderId, userId){
+  const uid_ = userId || state.currentUserId;
+  const orders = state.orders[uid_] || [];
+  const o = orders.find(x=>x.id===orderId);
+  if(!o) return;
+  showToast('Génération du reçu...');
+  try{
+    await loadHtml2Canvas();
+    const dateStr = new Date(o.date).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
+    const statusLabels = { terminee:'Terminée ✅', en_cours:'En cours ⏳', annulee:'Annulée ❌', remboursee:'Remboursée 💸' };
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:340px;background:#fff;border-radius:16px;padding:26px 22px;font-family:-apple-system,sans-serif;';
+    wrap.innerHTML = `
+      <div style="text-align:center;margin-bottom:18px;">
+        <div style="width:44px;height:44px;border-radius:50%;background:#eafaf0;color:#0a9e3d;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
+        </div>
+        <div style="font-weight:800;font-size:15px;color:#11151A;">Kerry Topup Official</div>
+        <div style="font-size:11.5px;color:#6B7A6E;margin-top:2px;">Reçu de commande</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>N° Commande</span><b>${escapeHtml(o.orderNo||'')}</b></div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>Date</span><b>${dateStr}</b></div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>Produit</span><b>${escapeHtml(o.product)}</b></div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>Statut</span><b>${statusLabels[o.status]||o.status}</b></div>
+      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>Paiement</span><b>Wallet</b></div>
+      <div style="display:flex;justify-content:space-between;font-weight:800;font-size:15px;padding:12px 0 0;color:#0a9e3d;"><span>Total</span><span>${money(o.price)}</span></div>
+      <div style="text-align:center;font-size:10.5px;color:#6B7A6E;margin-top:16px;">Merci pour votre confiance ❤️ 🇭🇹</div>
+    `;
+    document.body.appendChild(wrap);
+    const canvas = await window.html2canvas(wrap, { scale: 2, backgroundColor: '#fff' });
+    document.body.removeChild(wrap);
+    const link = document.createElement('a');
+    link.download = 'recu-' + (o.orderNo||orderId) + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('✅ Reçu téléchargé');
+  }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
 }
 function renderNonPinStatusMessage(status){
   const messages = {
@@ -8010,6 +8118,7 @@ function renderAdminOrderCard(o, userId){
           <option value="remboursee" ${o.status==='remboursee'?'selected':''}>Remboursée</option>
         </select>
         ${o.status==='en_cours' ? `<button class="mini-btn" style="background:var(--red);color:#fff;border:none;" onclick="cancelAndRefundOrder('${userId}','${o.id}')">✕ Anile + Ranbouse</button>` : ''}
+        <button class="mini-btn" onclick="downloadOrderReceipt('${o.id}','${userId}')">📥 Reçu</button>
         <button class="mini-btn" style="color:var(--red);" onclick="deleteOrder('${userId}','${o.id}')">🗑️ Efase</button>
       </div>
     </div>
@@ -9892,8 +10001,9 @@ async function updateApiTopupVariantField(productId, variantId, field, value){
   if(field === 'order_mode'){ v.orderMode = value; }
   try{
     const sb = await getSupabase();
-    const { error } = await sb.from('variants').update({ [field]: value }).eq('id', variantId);
-    if(error){ showToast('⚠️ Pa sove sou sèvè a: ' + error.message); console.warn('updateApiTopupVariantField erè:', field, error); }
+    const { data: updated, error } = await sb.from('variants').update({ [field]: value }).eq('id', variantId).select();
+    if(error){ showToast('⚠️ Pa sove sou sèvè a: ' + error.message); console.warn('updateApiTopupVariantField erè:', field, error); return; }
+    if(!updated || updated.length === 0){ showToast('⚠️ PA SOVE — RLS bloke (0 liy modifye)'); return; }
   }catch(e){ showToast('⚠️ Erè koneksyon — eseye ankò'); }
 }
 function renderPinAdminConfig(p){
