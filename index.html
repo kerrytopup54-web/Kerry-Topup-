@@ -1464,29 +1464,48 @@ async function getOrRestoreSupportConversation(){
 async function checkReferralRechargeBonus(userId, amount){
   try{
     const sb = await getSupabase();
-    const { data: profile } = await sb.from('profiles').select('referred_by, referral_bonus_given, name').eq('id', userId).maybeSingle();
-    if(!profile || !profile.referred_by || profile.referral_bonus_given) return; // deja bay bonis pou fiyèl sa a — pa bay ankò
+    const { data: profile, error: profErr } = await sb.from('profiles').select('referred_by, referral_bonus_given, name').eq('id', userId).maybeSingle();
+    if(profErr || !profile){
+      sendNtfyNotification('🐛 DEBUG Referral — 1) Pwofil', '⚠️ Pa jwenn pwofil kliyan an oswa erè\n👤 userId: ' + userId + '\n🔍 erè: ' + (profErr?.message||'okenn'), 'high', 'bug', undefined, 'errors');
+      return;
+    }
+    if(!profile.referred_by){
+      sendNtfyNotification('🐛 DEBUG Referral — 2) Pa gen parenn', '👤 ' + (profile.name||userId) + ' pa gen \'referred_by\' konfime nan pwofil li. Verifye si li konfime kòd parenn lan.', 'default', 'bug', undefined, 'errors');
+      return;
+    }
+    if(profile.referral_bonus_given){
+      sendNtfyNotification('🐛 DEBUG Referral — 3) Bonis deja bay', '👤 ' + (profile.name||userId) + ' — referral_bonus_given deja TRUE, bonis pa ka bay 2 fwa.', 'default', 'bug', undefined, 'errors');
+      return;
+    }
 
     const { data: settings } = await sb.from('referral_settings').select('*').eq('id', 1).maybeSingle();
     const minRecharge = settings?.min_recharge_for_bonus ?? 200;
     const parrainBonus = settings?.parrain_bonus ?? 50;
 
-    // Kimilatif: total TOUT rechaj APWOUVE kliyan an fè yo (istorik + nouvo a), pa sèlman dènye a
     const { data: allRecharges } = await sb.from('recharge_requests').select('amount').eq('user_id', userId).eq('status', 'approved');
     const totalRecharged = (allRecharges || []).reduce((s, r) => s + Number(r.amount), 0);
+    sendNtfyNotification('🐛 DEBUG Referral — 4) Total rechaj', '👤 ' + (profile.name||userId) + '\n💰 Total rechaje: ' + totalRecharged + ' HTG\n🎯 Minimòm mande: ' + minRecharge + ' HTG\n' + (totalRecharged >= minRecharge ? '✅ Ase — kontinye' : '❌ Poko ase — sispann isit la'), 'default', 'bug', undefined, 'errors');
     if(totalRecharged < minRecharge) return;
 
-    // Mete referral_bonus_given=true AVAN insert la — evite doub kredi si fonksyon an rele de fwa an paralèl
     const { data: flagUpdate, error: flagErr } = await sb.from('profiles').update({ referral_bonus_given: true }).eq('id', userId).eq('referral_bonus_given', false).select();
-    if(flagErr || !flagUpdate || flagUpdate.length === 0) return; // yon lòt apèl deja pran l — sispann isit la
+    if(flagErr || !flagUpdate || flagUpdate.length === 0){
+      sendNtfyNotification('🐛 DEBUG Referral — 5) Flag update echwe', '⚠️ Update referral_bonus_given echwe oswa 0 liy modifye (RLS?)\n🔍 erè: ' + (flagErr?.message||'okenn') + '\n📊 liy modifye: ' + (flagUpdate?.length||0), 'high', 'bug', undefined, 'errors');
+      return;
+    }
 
     const { error: insErr } = await sb.from('referral_earnings').insert({ parrain_id: profile.referred_by, referred_user_id: userId, amount: parrainBonus });
-    if(insErr){ console.warn('checkReferralRechargeBonus insert erè:', insErr.message); return; }
+    if(insErr){
+      sendNtfyNotification('🐛 DEBUG Referral — 6) Insert earnings echwe', '⚠️ Pa ka kreye liy nan referral_earnings\n🔍 erè: ' + insErr.message, 'high', 'bug', undefined, 'errors');
+      console.warn('checkReferralRechargeBonus insert erè:', insErr.message); return;
+    }
 
     const { data: parrainProfile } = await sb.from('profiles').select('name').eq('id', profile.referred_by).maybeSingle();
     sendNtfyNotification('🎉 Bonis Referral bay', '👤 Fiyèl: ' + (profile.name||'') + '\n👤 Parenn: ' + (parrainProfile?.name||'') + '\n💰 Bonis: ' + money(parrainBonus), 'default', 'moneybag');
     sendPushToUser(profile.referred_by, '🎉 Bonus reçu !', 'Votre filleul a rechargé — vous avez gagné ' + money(parrainBonus) + ' de bonus referral !', '/');
-  }catch(e){ console.warn('checkReferralRechargeBonus exception:', e?.message||e); }
+  }catch(e){
+    sendNtfyNotification('🐛 DEBUG Referral — EXCEPTION', '⚠️ ' + (e?.message||e), 'high', 'bug', undefined, 'errors');
+    console.warn('checkReferralRechargeBonus exception:', e?.message||e);
+  }
 }
 const VAPID_PUBLIC_KEY = 'BFYV0pKdkHX_z8s_RpOS5K9pkqemCcbWlyFMUlyPYa6OTBvfrraECcgyBHVBFZHhrht2JZF7mhg33w1-_VnngI0';
 function urlBase64ToUint8Array(base64String){
@@ -7321,11 +7340,13 @@ async function checkReferralCodeInline(codeRaw){
   }catch(e){ zone.innerHTML = ''; }
 }
 async function confirmReferralInline(){
-  if(!referralInlineVerifiedId || !state.currentUserId) return;
+  if(!state.currentUserId){ showToast('⚠️ Ou dwe konekte anvan'); return; }
+  if(!referralInlineVerifiedId){ showToast('⚠️ Verifye kòd la anvan (klike andeyò chan an epi tann)'); return; }
   try{
     const sb = await getSupabase();
-    const { error } = await sb.from('profiles').update({ referred_by: referralInlineVerifiedId, referral_prompt_dismissed: true }).eq('id', state.currentUserId);
-    if(error){ showToast('⚠️ Erè — eseye ankò'); return; }
+    const { data: updated, error } = await sb.from('profiles').update({ referred_by: referralInlineVerifiedId, referral_prompt_dismissed: true }).eq('id', state.currentUserId).select();
+    if(error){ showToast('⚠️ Erè: ' + error.message); console.warn('confirmReferralInline erè:', error); return; }
+    if(!updated || updated.length === 0){ showToast('⚠️ PA SOVE — RLS bloke (0 liy modifye)'); return; }
     showToast('Kòd parenn konfime ✓');
     fetchReferralPageData();
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
