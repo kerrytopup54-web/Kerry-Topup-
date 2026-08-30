@@ -494,6 +494,11 @@ textarea.admin-ta{
 @keyframes offlineBarMove { 0%{ transform:translateX(-100px); } 50%{ transform:translateX(180px); } 100%{ transform:translateX(-100px); } }
 @keyframes skelShimmer { 0%{ background-position:-200px 0; } 100%{ background-position:200px 0; } }
 @keyframes spin { to{ transform:rotate(360deg); } }
+@keyframes pageFadeOut{ to{ opacity:0; transform:translateY(-8px) scale(0.98); } }
+@keyframes pageFadeIn{ from{ opacity:0; transform:translateY(10px) scale(0.99); } to{ opacity:1; transform:translateY(0) scale(1); } }
+#topLoadingBar{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg, #4285F4, #34A853, #4285F4);background-size:200% 100%;z-index:9999;width:0%;transition:width 0.3s ease-out;box-shadow:0 0 8px rgba(66,133,244,0.6);}
+#topLoadingBar.running{animation:topBarShimmer 1.2s linear infinite;}
+@keyframes topBarShimmer{0%{background-position:200% 0;}100%{background-position:0% 0;}}
 @keyframes cherifShake{ 0%,100%{transform:rotate(0deg);} 25%{transform:rotate(-6deg);} 75%{transform:rotate(6deg);} }
 
 /* ===== Bwat Kado Rekonpans ===== */
@@ -568,6 +573,7 @@ textarea.admin-ta{
 
 
 
+<div id="topLoadingBar"></div>
 <div class="app" id="app">
   <!-- ===== TOP BAR ===== -->
   <div class="topbar">
@@ -782,6 +788,13 @@ const TRANSLATIONS = {
     btn_buy_now:'Acheter maintenant', btn_add_cart:'Ajouter au panier', btn_send:'Voye demand lan',
     toast_no_balance:'Balans ou pa ase',
     toast_purchase_success:'Achat Réussi 🛒✅️',
+    redeem_title:'Redeem Free Fire', redeem_sub:'Antre kòd PIN ou pou aktive li.',
+    redeem_instr_title:'Kijan pou reklame dyaman ou yo',
+    redeem_step1:'Kite dwèt ou pandan <b>2 segonn</b> nan ti kare pin lan — pou <span style="color:#17C267;font-weight:700;">Kole pin lan</span>',
+    redeem_step2:'Klike sou <span style="color:#17C267;font-weight:700;">Verificar</span>',
+    redeem_step3:'Antre ID Free Fire ou epi koche ti kazye a',
+    redeem_step4:'Klike sou <span style="color:#17C267;font-weight:700;">Verificar ID</span>',
+    redeem_step5:'Konfime non kont lan epi klike sou <span style="color:#17C267;font-weight:700;">Resgatar agora!</span>',
     generic_error_msg:'⚠️ Yon ti pwoblèm rive. Tanpri eseye ankò.',
     toast_wallet_credited:'✅ Wallet kredite avèk siksè',
     toast_order_failed_refunded:'⚠️ Kòmand ou echwe. Ou ranbouse — eseye ankò pita.',
@@ -806,6 +819,13 @@ const TRANSLATIONS = {
     btn_buy_now:'Acheter maintenant', btn_add_cart:'Ajouter au panier', btn_send:'Envoyer la demande',
     toast_no_balance:'Solde insuffisant',
     toast_purchase_success:'Achat Réussi 🛒✅️',
+    redeem_title:'Redeem Free Fire', redeem_sub:'Entrez votre code PIN pour l\'activer.',
+    redeem_instr_title:'Comment réclamer vos diamants',
+    redeem_step1:'Maintenez votre doigt pendant <b>2 secondes</b> sur la case du code — pour <span style="color:#17C267;font-weight:700;">coller le code</span>',
+    redeem_step2:'Cliquez sur <span style="color:#17C267;font-weight:700;">Verificar</span>',
+    redeem_step3:'Entrez votre ID Free Fire et cochez la case',
+    redeem_step4:'Cliquez sur <span style="color:#17C267;font-weight:700;">Verificar ID</span>',
+    redeem_step5:'Confirmez le nom du compte et cliquez sur <span style="color:#17C267;font-weight:700;">Resgatar agora!</span>',
     generic_error_msg:'⚠️ Une erreur est survenue. Veuillez réessayer.',
     toast_wallet_credited:'✅ Wallet crédité avec succès',
     toast_order_failed_refunded:'⚠️ Votre commande a échoué. Vous avez été remboursé — réessayez plus tard.',
@@ -830,6 +850,13 @@ const TRANSLATIONS = {
     btn_buy_now:'Buy now', btn_add_cart:'Add to cart', btn_send:'Send request',
     toast_no_balance:'Insufficient balance',
     toast_purchase_success:'Purchase Successful 🛒✅️',
+    redeem_title:'Redeem Free Fire', redeem_sub:'Enter your PIN code to activate it.',
+    redeem_instr_title:'How to claim your diamonds',
+    redeem_step1:'Hold your finger for <b>2 seconds</b> on the code box — to <span style="color:#17C267;font-weight:700;">paste the code</span>',
+    redeem_step2:'Click on <span style="color:#17C267;font-weight:700;">Verificar</span>',
+    redeem_step3:'Enter your Free Fire ID and check the box',
+    redeem_step4:'Click on <span style="color:#17C267;font-weight:700;">Verificar ID</span>',
+    redeem_step5:'Confirm the account name and click on <span style="color:#17C267;font-weight:700;">Resgatar agora!</span>',
     generic_error_msg:'⚠️ Something went wrong. Please try again.',
     toast_wallet_credited:'✅ Wallet credited successfully',
     toast_order_failed_refunded:'⚠️ Your order failed. You have been refunded — please try again later.',
@@ -1076,6 +1103,16 @@ async function closeTutorialV2Popup(){
   document.getElementById('videoPopupBg').style.display = 'none';
 }
 let openTutorialAccordionId = null;
+let redeemInstructionsExpanded = false;
+function toggleRedeemInstructions(){
+  redeemInstructionsExpanded = !redeemInstructionsExpanded;
+  const card = document.getElementById('redeemInstrCard');
+  const body = document.getElementById('redeemInstrBody');
+  const arrow = document.getElementById('redeemInstrArrow');
+  if(card) card.classList.toggle('open', redeemInstructionsExpanded);
+  if(body) body.style.maxHeight = redeemInstructionsExpanded ? '600px' : '0';
+  if(arrow) arrow.style.transform = redeemInstructionsExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+}
 function toggleTutorialAccordionV2(id){
   const wasOpen = openTutorialAccordionId === id;
   openTutorialAccordionId = wasOpen ? null : id;
@@ -1351,6 +1388,32 @@ async function savePaymentSettings(){
   }catch(e){}
   await saveState();
   showToast('Paramèt peman sove ✓');
+}
+async function saveDailyReportSchedule(){
+  const timeVal = document.getElementById('rptTime').value;
+  if(!timeVal){ showToast('Chwazi yon lè'); return; }
+  const [hourStr, minuteStr] = timeVal.split(':');
+  const hour = parseInt(hourStr);
+  const minute = parseInt(minuteStr);
+  if(isNaN(hour) || hour<0 || hour>23 || isNaN(minute) || minute<0 || minute>59){ showToast('Lè envalid'); return; }
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.rpc('update_daily_report_schedule', { p_hour_haiti: hour, p_minute_haiti: minute });
+    if(error){ showToast('⚠️ Erè: ' + error.message); return; }
+    state.dailyReportHour = hour;
+    state.dailyReportMinute = minute;
+    await saveState();
+    showToast('✅ Lè rapò a chanje — ' + String(hour).padStart(2,'0') + 'h' + String(minute).padStart(2,'0'));
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+async function testDailyReport(){
+  showToast('Ap voye rapò tès la...');
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.rpc('send_daily_report');
+    if(error){ showToast('⚠️ Erè: ' + error.message); console.error('testDailyReport erè:', error); return; }
+    showToast('✅ Rapò voye — verifye ntfy w la');
+  }catch(e){ showToast('⚠️ Erè koneksyon: ' + (e?.message||e)); }
 }
 /* ---- Support AI (Groq via Supabase Edge Function) ---- */
 let supportChatOpen = false;
@@ -2615,6 +2678,37 @@ async function seedProductsToServer(){
 }
 
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+function showTopLoadingBar(){
+  const bar = document.getElementById('topLoadingBar');
+  if(!bar) return;
+  bar.style.transition = 'none';
+  bar.style.width = '0%';
+  bar.classList.add('running');
+  requestAnimationFrame(() => {
+    bar.style.transition = 'width 2.5s cubic-bezier(0.1, 0.7, 0.5, 1)';
+    bar.style.width = '85%';
+  });
+}
+function finishTopLoadingBar(){
+  const bar = document.getElementById('topLoadingBar');
+  if(!bar) return;
+  bar.style.transition = 'width 0.25s ease-out';
+  bar.style.width = '100%';
+  setTimeout(() => {
+    bar.classList.remove('running');
+    bar.style.transition = 'opacity 0.3s ease-out';
+    bar.style.opacity = '0';
+    setTimeout(() => { bar.style.width = '0%'; bar.style.opacity = '1'; }, 300);
+  }, 250);
+}
+function hideTopLoadingBarInstant(){
+  const bar = document.getElementById('topLoadingBar');
+  if(!bar) return;
+  bar.classList.remove('running');
+  bar.style.transition = 'opacity 0.2s ease-out';
+  bar.style.opacity = '0';
+  setTimeout(() => { bar.style.width = '0%'; bar.style.opacity = '1'; }, 200);
+}
 function money(n){ return Number(n).toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' HTG'; }
 function currentUser(){ return state.users.find(u=>u.id===state.currentUserId) || null; }
 function walletBalance(){ return state.wallets[state.currentUserId] || 0; }
@@ -2840,7 +2934,8 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
       let referredByUserId = null;
       const pendingRef = localStorage.getItem('kt_pending_ref_code');
       if(pendingRef){
-        const { data: sponsor } = await sb.from('profiles').select('id').eq('referral_code', pendingRef).maybeSingle();
+        const { data: sponsorData } = await sb.rpc('lookup_referral_code', { p_code: pendingRef });
+        const sponsor = Array.isArray(sponsorData) ? sponsorData[0] : sponsorData;
         if(sponsor && sponsor.id !== authUser.id) referredByUserId = sponsor.id;
         localStorage.removeItem('kt_pending_ref_code');
       }
@@ -3221,10 +3316,27 @@ function goPage(page, opts){
   if(guarded.includes(page) && !isLoggedIn()){
     openAuthModal('login'); pendingAction = ()=>goPage(page); return;
   }
-  currentPage = page;
-  closeDrawer();
-  render();
-  window.scrollTo(0,0);
+  const contentEl = document.getElementById('content');
+  const doSwitch = () => {
+    currentPage = page;
+    closeDrawer();
+    render();
+    window.scrollTo(0,0);
+    if(contentEl){
+      contentEl.style.animation = 'none';
+      void contentEl.offsetWidth;
+      contentEl.style.animation = 'pageFadeIn 0.32s cubic-bezier(0.16,1,0.3,1) forwards';
+    }
+    goPagePart2(page, opts);
+  };
+  if(contentEl && page !== currentPage){
+    contentEl.style.animation = 'pageFadeOut 0.18s cubic-bezier(0.4,0,1,1) forwards';
+    setTimeout(doSwitch, 170);
+  } else {
+    doSwitch();
+  }
+}
+function goPagePart2(page, opts){
   if(page === 'commandes'){ commandeVisibleCount = 5; fetchMyOrders(); subscribeToMyOrdersRealtime(); fetchMyMarketPurchases(); }
   if(page === 'apiSupplier'){ fetchApiClient(); }
   if(page === 'shop'){ fetchProductsFromServer().then(() => fetchStockCountsForShop()); }
@@ -3244,10 +3356,12 @@ function goPage(page, opts){
     if(u && u.accountStatus === 'suspended_temp' && u.suspendedUntil){ startCherifTimer(u.suspendedUntil); }
   }
   if(page === 'kerryRewards' && isLoggedIn()){
-    fetchRewardPrograms().then(()=>render());
-    fetchRewardProgress(state.currentUserId).then(()=>render());
-    fetchRewardClaims(state.currentUserId).then(()=>render());
-    fetchRewardCycleSettings().then(()=>{ render(); startRewardCycleCountdown(); });
+    Promise.all([
+      fetchRewardPrograms(),
+      fetchRewardProgress(state.currentUserId),
+      fetchRewardClaims(state.currentUserId),
+      fetchRewardCycleSettings()
+    ]).then(()=>{ render(); startRewardCycleCountdown(); });
   }
   if(!opts || !opts.skipHistory){
     const path = PAGE_PATHS[page] || '/';
@@ -3883,6 +3997,27 @@ function addApiTopupToCart(productId){
   showToast('Ajoute nan panye ✓');
   goPage('shop');
 }
+function buyNowApiTopup(productId){
+  const p = state.products.find(x=>x.id===productId);
+  const v = p.variants.find(x=>x.id===selectedVariantId);
+  if(!v){ showToast('Chwazi yon opsyon'); return; }
+  const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
+  const serverIdInput = document.getElementById('apiServerId-'+productId);
+  const serverId = serverIdInput ? serverIdInput.value.trim() : '';
+  if(!playerId){ showToast(t('toast_enter_player_id')); return; }
+  if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast('Veuillez Vérifier Votre id de joueur'); return; }
+  if(v.requiresServerId && !serverId){ showToast('Antre Server ID ou anvan'); return; }
+  const qty = 1;
+  state.cart.push({
+    id: uid(), productId: p.id, productName: p.name, type:'api_topup',
+    variantId: v.id, variantLabel: v.label, unitPrice: v.price, qty, price: v.price*qty,
+    playerId, serverId: serverId || null, playerName: window.verifiedPlayerNames[productId] || null, fields: null
+  });
+  saveState();
+  saveCartToServer();
+  renderTopIcons();
+  goPage('checkout');
+}
 async function verifyPlayerId(productId){
   const p = state.products.find(x=>x.id===productId);
   let variant = p.variants.find(v=>v.id===selectedVariantId);
@@ -3999,7 +4134,7 @@ async function confirmApiTopupPurchase(productId){
   if(p0 && p0.outOfStock){ showToast('⚠️ ' + t('toast_out_of_stock')); return; }
   const buyBtn = document.getElementById('apiBuyBtn-'+productId);
   if(buyBtn && buyBtn.disabled) return; // deja ap trete — anpeche doub-klik
-  if(buyBtn){ buyBtn.disabled = true; buyBtn.style.opacity = '0.6'; buyBtn.textContent = '⏳ Ap trete...'; }
+  if(buyBtn){ buyBtn.disabled = true; buyBtn.style.opacity = '0.6'; buyBtn.style.cursor = 'not-allowed'; buyBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;vertical-align:-2px;margin-right:6px;"><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>En cours de traitement...'; }
   const p = state.products.find(x=>x.id===productId);
   let variant = p.variants.find(v=>v.id===selectedVariantId);
   if(!variant && p.variants.length > 0){ variant = sortedVariants(p)[0]; selectedVariantId = variant.id; }
@@ -4010,7 +4145,10 @@ async function confirmApiTopupPurchase(productId){
   const serverId = serverIdInput ? serverIdInput.value.trim() : '';
   const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
   const totalPrice = variant.price * qty;
-  const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.textContent='⚡ Acheter maintenant';} };
+  const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.style.cursor='';buyBtn.textContent='⚡ Acheter maintenant';} };
+  const finishPurchaseSuccess = () => {
+    setTimeout(() => { showToast(t('toast_purchase_success')); goPage('commandes'); }, 350);
+  };
   if(!isGiftCard){
     if(!playerId){ showToast(t('toast_enter_player_id')); resetBtn(); return; }
     if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast('Veuillez Vérifier Votre id de joueur'); resetBtn(); return; }
@@ -4075,8 +4213,7 @@ async function confirmApiTopupPurchase(productId){
       };
       if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
       state.orders[state.currentUserId].unshift(order);
-      showToast(t('toast_purchase_success'));
-      goPage('commandes');
+      finishPurchaseSuccess();
       try{ fetchWalletFromServer(state.currentUserId); }catch(e){}
       try{ notifyAdminNewOrder(order); }catch(e){}
       try{ incrementRewardProgress(state.currentUserId, variant.id); }catch(e){}
@@ -4092,8 +4229,7 @@ async function confirmApiTopupPurchase(productId){
       };
       if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
       state.orders[state.currentUserId].unshift(order);
-      showToast(t('toast_purchase_success'));
-      goPage('commandes');
+      finishPurchaseSuccess();
       try{ fetchWalletFromServer(state.currentUserId); }catch(e){}
       try{ notifyAdminNewOrder(order); }catch(e){}
       try{ incrementRewardProgress(state.currentUserId, variant.id); }catch(e){}
@@ -4123,8 +4259,7 @@ async function confirmApiTopupPurchase(productId){
     };
     if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
     state.orders[state.currentUserId].unshift(order);
-      showToast(t('toast_purchase_success'));
-    goPage('commandes');
+    finishPurchaseSuccess();
     try{ fetchWalletFromServer(state.currentUserId); }catch(e){} // background — pa bezwen tann sa pou kontinye
     try{ notifyAdminNewOrder(order); }catch(e){}
     // notifyAdminNewSale retire — trigger SQL notify_order_terminee deja voye 'Vente confirmée' otomatikman, evite doub
@@ -6813,8 +6948,33 @@ async function downloadOrderReceipt(orderId, userId){
   showToast('Génération du reçu...');
   try{
     await loadHtml2Canvas();
+    const sb = await getSupabase();
+    const { data: profile } = await sb.from('profiles').select('name, email').eq('id', uid_).maybeSingle();
     const dateStr = new Date(o.date).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true});
     const statusLabels = { terminee:'Terminée ✅', en_cours:'En cours ⏳', annulee:'Annulée ❌', remboursee:'Remboursée 💸' };
+    const row = (label, val) => `<div style="display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px dashed #eef1ef;color:#11151A;gap:10px;"><span style="color:#6B7A6E;flex-shrink:0;">${label}</span><b style="text-align:right;">${val}</b></div>`;
+    const sectionLabel = (t) => `<div style="font-size:9.5px;font-weight:800;letter-spacing:0.8px;color:#9aa39d;text-transform:uppercase;margin:14px 0 6px;">${t}</div>`;
+
+    let orderInfoHtml = row('Produit', escapeHtml(o.product));
+    if(o.type === 'form' && o.fields && typeof o.fields === 'object'){
+      orderInfoHtml += sectionLabel('Informations fournies');
+      for(const [key, val] of Object.entries(o.fields)){
+        orderInfoHtml += row(escapeHtml(key), escapeHtml(String(val)));
+      }
+    } else if(o.type === 'calculator'){
+      orderInfoHtml += sectionLabel('Détails du calcul');
+      orderInfoHtml += row('Montant envoyé', (o.montantUSD||0) + ' USD');
+      orderInfoHtml += row('Frais de service', '+' + (o.fraisUSD||0) + ' USD');
+    } else if(o.type === 'market_account'){
+      orderInfoHtml += row('Compte', escapeHtml(o.variant||''));
+    } else {
+      if(o.variant) orderInfoHtml += row('Option', escapeHtml(o.variant));
+      if(o.playerId) orderInfoHtml += row('ID Joueur', escapeHtml(o.playerId));
+      if(o.serverId) orderInfoHtml += row('Server ID', escapeHtml(o.serverId));
+      if(o.playerName) orderInfoHtml += row('Nom trouvé', escapeHtml(o.playerName));
+      if(o.pin) orderInfoHtml += row('Code PIN', escapeHtml(o.pin));
+    }
+
     const wrap = document.createElement('div');
     wrap.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:340px;background:#fff;border-radius:16px;padding:26px 22px;font-family:-apple-system,sans-serif;';
     wrap.innerHTML = `
@@ -6825,12 +6985,16 @@ async function downloadOrderReceipt(orderId, userId){
         <div style="font-weight:800;font-size:15px;color:#11151A;">Kerry Topup Official</div>
         <div style="font-size:11.5px;color:#6B7A6E;margin-top:2px;">Reçu de commande</div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>N° Commande</span><b>${escapeHtml(o.orderNo||'')}</b></div>
-      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>Date</span><b>${dateStr}</b></div>
-      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>Produit</span><b>${escapeHtml(o.product)}</b></div>
-      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>Statut</span><b>${statusLabels[o.status]||o.status}</b></div>
-      <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px dashed #eef1ef;color:#11151A;"><span>Paiement</span><b>Wallet</b></div>
-      <div style="display:flex;justify-content:space-between;font-weight:800;font-size:15px;padding:12px 0 0;color:#0a9e3d;"><span>Total</span><span>${money(o.price)}</span></div>
+      ${sectionLabel('Client')}
+      ${row('Nom', escapeHtml(profile?.name||'—'))}
+      ${row('Email', escapeHtml(profile?.email||'—'))}
+      ${sectionLabel('Commande')}
+      ${row('N° Commande', escapeHtml(o.orderNo||''))}
+      ${row('Date', dateStr)}
+      ${orderInfoHtml}
+      ${row('Statut', statusLabels[o.status]||o.status)}
+      ${row('Paiement', 'Wallet')}
+      <div style="display:flex;justify-content:space-between;font-weight:800;font-size:15px;padding:12px 0 0;color:#0a9e3d;margin-top:6px;"><span>Total</span><span>${money(o.price)}</span></div>
       <div style="text-align:center;font-size:10.5px;color:#6B7A6E;margin-top:16px;">Merci pour votre confiance ❤️ 🇭🇹</div>
     `;
     document.body.appendChild(wrap);
@@ -6877,25 +7041,28 @@ async function copyText(t){
 /* ================= REDEEM PAGE ================= */
 function pageRedeem(){
   const steps = [
-    'Kite dwèt ou pandan <b>2 segonn</b> nan ti kare pin lan — pou <span style="color:#17C267;font-weight:700;">Kole pin lan</span>',
-    'Klike sou <span style="color:#17C267;font-weight:700;">Verificar</span>',
-    'Antre ID Free Fire ou epi koche ti kazye a',
-    'Klike sou <span style="color:#17C267;font-weight:700;">Verificar ID</span>',
-    'Konfime non kont lan epi klike sou <span style="color:#17C267;font-weight:700;">Resgatar agora!</span>'
+    t('redeem_step1'), t('redeem_step2'), t('redeem_step3'), t('redeem_step4'), t('redeem_step5')
   ];
   return `
-    <div class="page-header"><h2>Redeem Free Fire</h2><p>Antre kòd PIN ou pou aktive li.</p></div>
-    <div style="background:#0B1F14;border-radius:20px;padding:22px 20px;margin-bottom:16px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+    <div class="page-header"><h2>${t('redeem_title')}</h2><p>${t('redeem_sub')}</p></div>
+    <div class="instr-card${redeemInstructionsExpanded?' open':''}" id="redeemInstrCard" style="background:#0B1F14;border-radius:20px;overflow:hidden;margin-bottom:16px;">
+      <div onclick="toggleRedeemInstructions()" style="display:flex;align-items:center;gap:10px;padding:20px;cursor:pointer;">
         <div style="width:34px;height:34px;border-radius:10px;background:#17C267;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📋</div>
-        <div style="color:#17C267;font-weight:800;font-size:13.5px;letter-spacing:0.03em;text-transform:uppercase;">Kijan pou reklame dyaman ou yo</div>
-      </div>
-      ${steps.map((s,i) => `
-        <div style="display:flex;gap:12px;margin-bottom:${i<steps.length-1?'16px':'0'};">
-          <div style="width:24px;height:24px;border-radius:50%;background:#17C267;color:#0B1F14;font-weight:800;font-size:12.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
-          <div style="color:#E5F5EC;font-size:13px;line-height:1.55;">${s}</div>
+        <div style="flex:1;color:#17C267;font-weight:800;font-size:13.5px;letter-spacing:0.03em;text-transform:uppercase;">${t('redeem_instr_title')}</div>
+        <div id="redeemInstrArrow" style="width:26px;height:26px;border-radius:50%;background:rgba(23,194,103,0.15);color:#17C267;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.3s;transform:rotate(${redeemInstructionsExpanded?'180deg':'0deg'});">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
         </div>
-      `).join('')}
+      </div>
+      <div id="redeemInstrBody" style="max-height:${redeemInstructionsExpanded?'600px':'0'};overflow:hidden;transition:max-height 0.35s ease;">
+        <div style="padding:0 20px 20px;">
+          ${steps.map((s,i) => `
+            <div style="display:flex;gap:12px;margin-bottom:${i<steps.length-1?'16px':'0'};">
+              <div style="width:24px;height:24px;border-radius:50%;background:#17C267;color:#0B1F14;font-weight:800;font-size:12.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
+              <div style="color:#E5F5EC;font-size:13px;line-height:1.55;">${s}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
     </div>
     <div class="card" style="padding:0;overflow:hidden;">
       <iframe src="https://redeem.hype.games/widget/" title="Kerry Topup Redeem" style="width:100%;height:1000px;border:none;display:block;" loading="lazy"></iframe>
@@ -7140,16 +7307,17 @@ async function checkReferralCodeInline(codeRaw){
   zone.innerHTML = '<div style="display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11.5px;font-weight:600;margin-top:8px;"><div style="width:14px;height:14px;border-radius:50%;border:2px solid rgba(15,166,84,0.2);border-top-color:var(--green);animation:spin 0.7s linear infinite;"></div>Vérification...</div>';
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('profiles').select('id, name').eq('referral_code', code).maybeSingle();
-    if(error || !data || data.id === state.currentUserId){
+    const { data, error } = await sb.rpc('lookup_referral_code', { p_code: code });
+    const found = Array.isArray(data) ? data[0] : data;
+    if(error || !found || found.id === state.currentUserId){
       zone.innerHTML = '<div style="color:var(--red);font-size:11.5px;font-weight:600;margin-top:8px;">❌ Ce code n\'existe pas.</div>';
       btn.style.display = 'none';
       referralInlineVerifiedId = null;
       return;
     }
-    zone.innerHTML = '<div style="color:var(--green-2);font-size:11.5px;font-weight:700;margin-top:8px;">✅ Parrain trouvé : ' + escapeHtml(data.name) + '</div>';
+    zone.innerHTML = '<div style="color:var(--green-2);font-size:11.5px;font-weight:700;margin-top:8px;">✅ Parrain trouvé : ' + escapeHtml(found.name) + '</div>';
     btn.style.display = 'block';
-    referralInlineVerifiedId = data.id;
+    referralInlineVerifiedId = found.id;
   }catch(e){ zone.innerHTML = ''; }
 }
 async function confirmReferralInline(){
@@ -7878,10 +8046,12 @@ async function decrementRewardProgressForOrder(userId, productName, variantLabel
     });
     const sb = await getSupabase();
     for(const program of matchingPrograms){
-      const { data: row } = await sb.from('reward_progress').select('count').eq('user_id', userId).eq('program_id', program.id).maybeSingle();
-      const newCount = Math.max(0, (row?.count||0) - 1);
-      await sb.from('reward_progress').upsert({ user_id:userId, program_id:program.id, count:newCount, updated_at:new Date().toISOString() });
-      if(userId === state.currentUserId) state.rewardProgress[program.id] = newCount;
+      const { error } = await sb.rpc('decrement_reward_progress', { p_user_id: userId, p_program_id: program.id });
+      if(error){ console.warn('decrementRewardProgressForOrder RPC erè:', error.message); continue; }
+      if(userId === state.currentUserId){
+        const { data: fresh } = await sb.from('reward_progress').select('count').eq('user_id', userId).eq('program_id', program.id).maybeSingle();
+        if(fresh) state.rewardProgress[program.id] = fresh.count;
+      }
     }
   }catch(e){ console.warn('decrementRewardProgressForOrder failed:', e?.message||e); }
 }
@@ -8527,6 +8697,15 @@ function renderAdminTab(){
         <div class="field-uid"><label>Nimewo WhatsApp (kliyan ap voye la — ou ka mete plizyè, separe ak vigil, premye a se sa k resevwa)</label><input type="text" id="paySetWhatsapp" placeholder="Ex: 50942614967, 50931112222" value="${escapeHtml(state.paymentSettings.whatsapp)}"></div>
         <div class="field-uid"><label>Non-tit Notifikasyon (ntfy.sh) — vid = dezaktive</label><input type="text" id="paySetNtfy" placeholder="Ex: kerrytopup-alert-8k3m2" value="${escapeHtml(state.paymentSettings.ntfyTopic||'')}"></div>
         <button class="btn btn-green" onclick="savePaymentSettings()">Sove Paramèt Peman</button>
+      </div>
+      <div class="card">
+        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">📊 Rapò Jounalye Otomatik</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">Chak jou, sistèm nan voye yon rezime vant/kòmand/rechaj ba ou sou ntfy, nan lè ou chwazi a (lè Ayiti).</div>
+        <div class="field-uid"><label>Lè rapò a (lè Ayiti)</label><input type="time" id="rptTime" value="${String(state.dailyReportHour ?? 22).padStart(2,'0')}:${String(state.dailyReportMinute ?? 0).padStart(2,'0')}"></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-green" style="flex:1;" onclick="saveDailyReportSchedule()">Sove Lè Rapò a</button>
+          <button class="btn btn-ghost" style="flex:1;" onclick="testDailyReport()">🧪 Teste kounye a</button>
+        </div>
       </div>
       <div class="card">
         <div style="font-weight:700;font-size:13px;margin-bottom:10px;">Kontni Tutoriel</div>
