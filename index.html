@@ -1039,7 +1039,7 @@ async function fetchProductsFromServer(){
           const mc = (configs||[]).find(c=>c.product_id===p.id);
           obj.manualConfig = mc ? { taux:Number(mc.taux), frais:Number(mc.frais||0), min:Number(mc.min_amount), max:Number(mc.max_amount), fields:mc.fields||[], feeTiers:mc.fee_tiers||[] } : {taux:145,frais:0,min:5,max:500,fields:[],feeTiers:[]};
         } else {
-          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null, equivalenceGroup:v.equivalence_group||null}));
+          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, fixedServerId:v.fixed_server_id||null, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null, equivalenceGroup:v.equivalence_group||null}));
           if(p.type === 'form'){ obj.formFields = p.form_fields || []; }
         }
         return obj;
@@ -2810,6 +2810,17 @@ function openConfirm(title, text, onYes){
 }
 function closeConfirm(){ document.getElementById('confirmModal').classList.remove('show'); }
 
+async function extractFunctionError(error){
+  if(!error) return 'Erè enkoni';
+  try{
+    if(error.context && typeof error.context.json === 'function'){
+      const body = await error.context.json();
+      if(body && body.error) return body.error;
+      if(body && body.message) return body.message;
+    }
+  }catch(e){}
+  return error.message || 'Erè enkoni';
+}
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
@@ -4066,7 +4077,7 @@ function renderApiTopupSheet(p){
         <input type="text" inputmode="numeric" pattern="[0-9]*" id="apiPlayerId-${p.id}" placeholder="Entrez votre ID joueur" oninput="clearVerifiedPlayer('${p.id}')" style="flex:1;min-width:0;background:none;border:none;outline:none;font-size:14px;color:var(--text);padding:8px 0;">
         <button onclick="verifyPlayerId('${p.id}')" style="display:flex;align-items:center;gap:6px;background:rgba(15,166,84,0.12);color:var(--green);border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:700;white-space:nowrap;flex-shrink:0;">🛡️ Vérifier</button>
       </div>
-      ${selected && selected.requiresServerId ? `<label style="font-size:13px;font-weight:700;color:var(--text);">Server ID <span style="color:#DC2626;">*</span></label><input type="text" id="apiServerId-${p.id}" placeholder="Entrez votre Server ID" style="width:100%;margin:8px 0 12px;background:var(--panel-2);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;color:var(--text);">` : ''}
+      ${selected && selected.requiresServerId && !selected.fixedServerId ? `<label style="font-size:13px;font-weight:700;color:var(--text);">Server ID <span style="color:#DC2626;">*</span></label><input type="text" id="apiServerId-${p.id}" placeholder="Entrez votre Server ID" style="width:100%;margin:8px 0 12px;background:var(--panel-2);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;color:var(--text);">` : ''}
       <div id="verifyResult-${p.id}"></div>
     </div>
     `}
@@ -4097,10 +4108,10 @@ function addApiTopupToCart(productId){
   if(!v){ showToast('Chwazi yon opsyon'); return; }
   const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = document.getElementById('apiServerId-'+productId);
-  const serverId = serverIdInput ? serverIdInput.value.trim() : '';
+  const serverId = v.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast('Veuillez Vérifier Votre id de joueur'); return; }
-  if(v.requiresServerId && !serverId){ showToast('Antre Server ID ou anvan'); return; }
+  if(v.requiresServerId && !v.fixedServerId && !serverId){ showToast('Antre Server ID ou anvan'); return; }
   const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
   state.cart.push({
     id: uid(), productId: p.id, productName: p.name, type:'api_topup',
@@ -4119,10 +4130,10 @@ function buyNowApiTopup(productId){
   if(!v){ showToast('Chwazi yon opsyon'); return; }
   const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = document.getElementById('apiServerId-'+productId);
-  const serverId = serverIdInput ? serverIdInput.value.trim() : '';
+  const serverId = v.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast('Veuillez Vérifier Votre id de joueur'); return; }
-  if(v.requiresServerId && !serverId){ showToast('Antre Server ID ou anvan'); return; }
+  if(v.requiresServerId && !v.fixedServerId && !serverId){ showToast('Antre Server ID ou anvan'); return; }
   const qty = 1;
   state.cart.push({
     id: uid(), productId: p.id, productName: p.name, type:'api_topup',
@@ -4141,7 +4152,7 @@ async function verifyPlayerId(productId){
   if(!variant){ showToast('⚠️ Pa gen opsyon disponib pou pwodwi sa a — kontakte Admin'); return; }
   const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = document.getElementById('apiServerId-'+productId);
-  const serverId = serverIdInput ? serverIdInput.value.trim() : '';
+  const serverId = variant.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   const resultBox = document.getElementById('verifyResult-'+productId);
   resultBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:8px;"><span class="verif-spinner"></span>Vérification en cours...</div>';
@@ -4258,7 +4269,7 @@ async function confirmApiTopupPurchase(productId){
   const isGiftCard = variant.orderMode === 'api_pin';
   const playerId = isGiftCard ? '' : document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = isGiftCard ? null : document.getElementById('apiServerId-'+productId);
-  const serverId = serverIdInput ? serverIdInput.value.trim() : '';
+  const serverId = variant.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
   const totalPrice = variant.price * qty;
   const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.style.cursor='';buyBtn.textContent='⚡ Acheter maintenant';} };
@@ -4313,7 +4324,8 @@ async function confirmApiTopupPurchase(productId){
         await sb.from('orders').update({ status: 'remboursee' }).eq('id', inserted.id);
         await applyWalletChange(state.currentUserId, totalPrice, 'Ranbousman — ' + p.name, 'in');
         await fetchWalletFromServer(state.currentUserId);
-        showCustomerError('', data?.error || error?.message || 'Founisè refize kòmand lan', 'Achte Gift Card — ' + p.name, 'toast_order_failed_refunded');
+        const realErr = data?.error || await extractFunctionError(error);
+        showCustomerError('', realErr, 'Achte Gift Card — ' + p.name, 'toast_order_failed_refunded');
         resetBtn();
         return;
       }
@@ -4361,7 +4373,8 @@ async function confirmApiTopupPurchase(productId){
       await sb.from('orders').update({ status: 'remboursee' }).eq('id', inserted.id);
       await applyWalletChange(state.currentUserId, totalPrice, 'Ranbousman — ' + p.name, 'in');
       await fetchWalletFromServer(state.currentUserId);
-      showCustomerError('', data?.error || error?.message || 'Founisè refize kòmand lan', 'Achte Free Fire — ' + p.name, 'toast_order_failed_refunded');
+      const realErr = data?.error || await extractFunctionError(error);
+      showCustomerError('', realErr, 'Achte Free Fire — ' + p.name, 'toast_order_failed_refunded');
       resetBtn();
       return;
     }
@@ -6747,7 +6760,13 @@ async function checkoutCart(){
         if(error || !result || result.error){
           await sb.from('orders').update({ status: 'remboursee' }).eq('id', inserted.id);
           await applyWalletChange(state.currentUserId, item.price, 'Ranbousman — ' + item.productName, 'in');
-          console.warn('founisè-place-order erè:', result?.error||error?.message);
+          const u_ = currentUser();
+          const realErr = result?.error || await extractFunctionError(error);
+          sendNtfyNotification('🚨 Erè teknik (Checkout)', '👤 Moun: ' + (u_?u_.name:'Kliyan konekte') +
+            '\n📦 Produit : ' + item.productName + ' — ' + (item.variantLabel||'') +
+            '\n👤 player_id: ' + (item.playerId||'okenn') + ' | server_id: ' + (item.serverId||'okenn') +
+            '\n🛠️ Detay: ' + realErr, 'urgent', 'rotating_light');
+          console.warn('founisè-place-order erè:', realErr);
           failed.push(item);
           continue;
         }
@@ -8427,9 +8446,9 @@ let partnerCatalogCache = [];
 async function loadFounisèCatalogCache(){
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('woodflix_catalog').select('*').order('name');
+    const { data, error } = await sb.from('partner_catalog').select('*').order('name');
     console.log('loadFounisèCatalogCache:', { count: data?.length, error });
-    if(error){ partnerCatalogCache = []; console.warn('woodflix_catalog erè:', error.message); return; }
+    if(error){ partnerCatalogCache = []; console.warn('partner_catalog erè:', error.message); return; }
     partnerCatalogCache = data || [];
   }catch(e){ partnerCatalogCache = []; console.warn('loadFounisèCatalogCache exception:', e); }
 }
@@ -10446,6 +10465,7 @@ function renderApiTopupAdminConfig(p){
             <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);white-space:nowrap;">
               <input type="checkbox" ${v.requiresServerId?'checked':''} onchange="updateApiTopupVariantField('${p.id}','${v.id}','requires_server_id',this.checked)"> Server ID
             </label>
+            <input type="text" class="mono" style="width:90px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11.5px;" value="${v.fixedServerId||''}" placeholder="Server ID fiks" title="Si ranpli: kliyan pa wè chan Server ID, sistèm voye VALÈ SA A otomatikman pou TOUT achte. Si vid: kliyan antre pwòp ID li." onchange="updateApiTopupVariantField('${p.id}','${v.id}','fixed_server_id',this.value)">
           </div>
           <div style="margin-top:6px;">
             ${getEquivalenceGroupMembers(v.equivalenceGroup, v.id).map(m => `
@@ -10495,6 +10515,7 @@ async function updateApiTopupVariantField(productId, variantId, field, value){
   const v = p.variants.find(x=>x.id===variantId);
   if(field === 'partner_product_id'){ v.partnerProductId = parseInt(value)||null; }
   if(field === 'requires_server_id'){ v.requiresServerId = value; }
+  if(field === 'fixed_server_id'){ v.fixedServerId = value || null; }
   if(field === 'order_mode'){ v.orderMode = value; }
   try{
     const sb = await getSupabase();
