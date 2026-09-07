@@ -4145,17 +4145,17 @@ async function verifyPlayerId(productId){
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   const resultBox = document.getElementById('verifyResult-'+productId);
   resultBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:8px;"><span class="verif-spinner"></span>Vérification en cours...</div>';
-  const partnerIdForVerify = variant.partnerProductId || (variant.orderMode === 'api_verif' ? '33770' : null);
-  if(!partnerIdForVerify){ showToast('⚠️ Opsyon sa a pa konekte ak Founisè — kontakte Admin'); return; }
+  const partnerIdForVerify = variant.partnerProductId != null ? String(variant.partnerProductId) : null;
+  if(!partnerIdForVerify){ showToast('⚠️ Opsyon sa a pa konekte ak Founisè — kontakte Admin'); resultBox.innerHTML=''; return; }
   try{
     const sb = await getSupabase();
-    let { data, error } = await sb.functions.invoke('woodflix-verify-player', {
+    let { data, error } = await sb.functions.invoke('partner-verify', {
       body: { partner_product_id: partnerIdForVerify, player_id: playerId, server_id: serverId || undefined }
     });
     // Si demand lan echwe pou rezon rezo (pa yon repons Founisè), eseye ankò yon sèl fwa anvan nou montre erè
     if(error && !data){
       await new Promise(r => setTimeout(r, 900));
-      const retry = await sb.functions.invoke('woodflix-verify-player', {
+      const retry = await sb.functions.invoke('partner-verify', {
         body: { partner_product_id: partnerIdForVerify, player_id: playerId, server_id: serverId || undefined }
       });
       data = retry.data; error = retry.error;
@@ -4220,7 +4220,7 @@ async function verifyFormFieldPlayer(productId, fieldIndex){
   try{
     const sb = await getSupabase();
     // Referans jenerik — verifikasyon sèlman, pa gen acha/livrezon ki fèt atravè li
-    const { data, error } = await sb.functions.invoke('woodflix-verify-player', {
+    const { data, error } = await sb.functions.invoke('partner-verify', {
       body: { partner_product_id: '33770', player_id: playerId }
     });
     if(error || !data || data.error || !data.valid){
@@ -4306,7 +4306,7 @@ async function confirmApiTopupPurchase(productId){
     await applyWalletChange(state.currentUserId, -totalPrice, p.name + ' — ' + variant.label, 'out');
 
     if(isGiftCard){
-      const { data, error } = await sb.functions.invoke('woodflix-place-order', {
+      const { data, error } = await sb.functions.invoke('partner-order', {
         body: { local_product_id: variant.id, local_order_id: inserted.id, quantity: qty }
       });
       if(error || !data || data.error){
@@ -4352,7 +4352,7 @@ async function confirmApiTopupPurchase(productId){
       return;
     }
 
-    const { data, error } = await sb.functions.invoke('woodflix-place-order', {
+    const { data, error } = await sb.functions.invoke('partner-order', {
       body: { local_product_id: variant.id, local_order_id: inserted.id, player_id: playerId, server_id: serverId || undefined, quantity: qty }
     });
 
@@ -6740,7 +6740,7 @@ async function checkoutCart(){
           continue;
         }
 
-        const { data: result, error } = await sb.functions.invoke('woodflix-place-order', {
+        const { data: result, error } = await sb.functions.invoke('partner-order', {
           body: { local_product_id: item.variantId, local_order_id: inserted.id, player_id: item.playerId, server_id: item.serverId || undefined, quantity: item.qty || 1 }
         });
 
@@ -8427,9 +8427,9 @@ let partnerCatalogCache = [];
 async function loadFounisèCatalogCache(){
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('partner_catalog').select('*').order('name');
+    const { data, error } = await sb.from('woodflix_catalog').select('*').order('name');
     console.log('loadFounisèCatalogCache:', { count: data?.length, error });
-    if(error){ partnerCatalogCache = []; console.warn('partner_catalog erè:', error.message); return; }
+    if(error){ partnerCatalogCache = []; console.warn('woodflix_catalog erè:', error.message); return; }
     partnerCatalogCache = data || [];
   }catch(e){ partnerCatalogCache = []; console.warn('loadFounisèCatalogCache exception:', e); }
 }
@@ -8438,7 +8438,7 @@ async function syncFounisèCatalog(){
   statusBox.textContent = 'Ap rale katalòg la...';
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.functions.invoke('woodflix-catalog-sync', { body: {} });
+    const { data, error } = await sb.functions.invoke('partner-catalog-sync', { body: {} });
     console.log('founisè-catalog-sync rezilta:', { data, error });
     if(error || !data || data.error){
       statusBox.innerHTML = '<span style="color:var(--red);">⚠️ ' + escapeHtml(data?.error||error?.message||JSON.stringify(error)||'Erè enkoni') + '</span>';
@@ -8520,8 +8520,15 @@ async function saveFounisèLink(variantId){
       return;
     }
     // Sove tou dirèkteman sou variant lan, pou paj kliyan an ka jwenn li vit san yon lòt apèl
-    await sb.from('variants').update({ partner_product_id: parseInt(partnerProductId) }).eq('id', variantId);
-    showToast('Lyezon sove ✓ (' + data.linked_to + ')');
+    // AK kopye requires_server_id/requires_player_id OTOMATIKMAN soti nan katalòg senkwonize a
+    // — evite Admin bezwen konfigire sa MANYÈLMAN e ka fè erè.
+    const catalogEntry = partnerCatalogCache.find(c => String(c.product_id) === String(partnerProductId));
+    const updatePayload = { partner_product_id: parseInt(partnerProductId) };
+    if(catalogEntry){
+      updatePayload.requires_server_id = !!catalogEntry.requires_server_id;
+    }
+    await sb.from('variants').update(updatePayload).eq('id', variantId);
+    showToast('Lyezon sove ✓ (' + data.linked_to + ')' + (catalogEntry ? (catalogEntry.requires_server_id ? ' — Server ID otomatikman aktive' : '') : ''));
   }catch(e){
     showToast('⚠️ Erè: ' + (e?.message||'enkoni'));
   }
