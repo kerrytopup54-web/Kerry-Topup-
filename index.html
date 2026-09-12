@@ -121,13 +121,17 @@ input,textarea,select{font-family:'Inter',sans-serif;}
 }
 
 .search-bar{
-  margin-top:12px;display:flex;align-items:center;gap:8px;
-  background:var(--panel-2);border:1px solid var(--line);border-radius:13px;padding:10px 14px;
+  margin-top:12px;display:flex;align-items:center;gap:10px;
+  background:var(--panel);border:none;border-radius:26px;padding:11px 16px;
+  box-shadow:0 4px 16px rgba(20,40,30,0.08);
   max-width:1200px;margin-left:auto;margin-right:auto;
 }
-.search-bar svg{width:16px;height:16px;flex-shrink:0;color:var(--muted);}
+.search-bar svg{width:16px;height:16px;flex-shrink:0;color:#0a9e3d;}
 .search-bar input{background:none;border:none;outline:none;color:var(--text);font-size:13.5px;width:100%;}
 .search-bar input::placeholder{color:#5B6656;}
+.search-mic-btn{background:none;border:none;padding:0;flex-shrink:0;color:#c2c8c4;cursor:pointer;display:flex;align-items:center;}
+.search-mic-btn.listening{color:#E23B57;animation:micPulse 1s ease-in-out infinite;}
+@keyframes micPulse{0%,100%{opacity:1;}50%{opacity:0.4;}}
 
 /* ---------- Content ---------- */
 .content{padding:16px;max-width:1200px;margin:0 auto;width:100%;flex:1;display:flex;flex-direction:column;}
@@ -617,6 +621,8 @@ textarea.admin-ta{
   .we-cta-label{position:relative;z-index:1;}
   .we-cta-sheen{position:absolute;top:-50%;left:-60%;width:40%;height:200%;background:linear-gradient(75deg,transparent,rgba(255,255,255,0.55),transparent);transform:rotate(10deg);animation:weSheenSweep 3.2s ease-in-out infinite;animation-delay:1.4s;}
   @keyframes weSheenSweep{0%{left:-60%;}35%{left:130%;}100%{left:130%;}}
+  @keyframes weCtaDance{0%{transform:scale(1) rotate(0);}20%{transform:scale(0.92) rotate(-3deg);}40%{transform:scale(1.06) rotate(3deg);}60%{transform:scale(0.97) rotate(-2deg);}80%{transform:scale(1.03) rotate(1deg);}100%{transform:scale(1) rotate(0);}}
+  .we-cta.dancing{animation:weCtaDance 0.55s cubic-bezier(0.36,0.07,0.19,0.97);}
 </style>
 <div class="we-screen">
   <div class="we-glow-ring"></div>
@@ -638,6 +644,7 @@ textarea.admin-ta{
   <button class="we-cta" onclick="enterShopFromWelcome()"><span class="we-cta-sheen"></span><span class="we-cta-label">Découvrir la boutique →</span></button>
 </div>
 </div>
+<script>if(window.location.pathname === '/'){ document.getElementById('welcomeOverlay').style.display = 'block'; }</script>
 <div id="offlineOverlay" style="display:none;position:fixed;inset:0;background:#ffffff;z-index:99999;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;">
   <div style="width:96px;height:96px;border-radius:50%;background:#e3fff0;display:flex;align-items:center;justify-content:center;margin-bottom:22px;">
     <span style="font-size:44px;">📶</span>
@@ -698,7 +705,10 @@ textarea.admin-ta{
     </div>
     <div class="search-bar" id="searchBarWrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-      <input type="search" id="searchInput" name="product-search" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" placeholder="Chèche Free Fire, PUBG, Netflix..." oninput="renderShop()">
+      <input type="search" id="searchInput" name="product-search" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" placeholder="Cliquez ici pour rechercher un produit" oninput="renderShop()">
+      <button type="button" class="search-mic-btn" id="searchMicBtn" onclick="startVoiceSearch()" title="Rechèch vokal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
+      </button>
     </div>
   </div>
 
@@ -732,10 +742,9 @@ textarea.admin-ta{
 </div>
 
 <!-- Support AI widget -->
-<div id="supportFabBubble" style="display:none;position:fixed;bottom:136px;right:16px;z-index:61;background:#fff;color:#111;font-size:12px;font-weight:600;padding:8px 12px;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,0.2);max-width:170px;">
-  Je suis là pour t'aider 🐶
-  <div style="position:absolute;bottom:-6px;right:20px;width:12px;height:12px;background:#fff;transform:rotate(45deg);"></div>
-</div>
+<div id="supportTooltip" style="display:none;position:fixed;bottom:88px;right:74px;z-index:59;background:#fff;color:#14181c;font-size:12px;font-weight:600;border-radius:16px 16px 4px 16px;box-shadow:0 8px 20px rgba(0,0,0,0.15);line-height:1.35;white-space:nowrap;overflow:hidden;max-width:0;padding:0;opacity:0;transition:max-width 1.4s cubic-bezier(0.22,0.9,0.28,1), padding 1.4s cubic-bezier(0.22,0.9,0.28,1), opacity 1s ease;">Je suis là pour t'aider ! 👋</div>
+<div style="position:fixed;bottom:78px;right:16px;z-index:59;width:52px;height:52px;border-radius:50%;background:#3fce7c;animation:supportFabPulse 2.2s ease-out infinite;pointer-events:none;"></div>
+<style>@keyframes supportFabPulse{0%{transform:scale(1);opacity:0.55;}100%{transform:scale(1.7);opacity:0;}}</style>
 <button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶<span id="supportFabBadge" style="display:none;position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 5px;background:#E23B57;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;font-family:sans-serif;"></span></button>
 <div id="supportChatBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:70;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)toggleSupportChat()">
   <div style="width:100%;max-width:480px;background:var(--panel);border-radius:22px 22px 0 0;height:65vh;max-height:560px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(20,40,30,0.18);">
@@ -1086,7 +1095,7 @@ async function fetchProductsFromServer(){
           id:p.id, name:p.name, category:p.category, icon:p.icon, image:p.image, heroImage:p.hero_image||null, description:p.description,
           type:p.type, popular:!!p.popular, active:p.active!==false, badge:p.badge||null, outOfStock:!!p.out_of_stock,
           redeemInstructions:p.redeem_instructions||'', redeemLink:p.redeem_link||'', descriptions:p.descriptions||[],
-          sortOrder:p.sort_order||0
+          sortOrder:p.sort_order||0, likesCount:p.likes_count||0, sharesCount:p.shares_count||0
         };
         if(p.type === 'calculator'){
           const mc = (configs||[]).find(c=>c.product_id===p.id);
@@ -1505,15 +1514,6 @@ async function testDailyReport(){
 }
 /* ---- Support AI (Groq via Supabase Edge Function) ---- */
 let supportChatOpen = false;
-function showSupportFabBubble(){
-  if(supportChatOpen) return;
-  const bubble = document.getElementById('supportFabBubble');
-  if(!bubble) return;
-  bubble.style.display = 'block';
-  setTimeout(() => { bubble.style.display = 'none'; }, 4000);
-}
-setTimeout(showSupportFabBubble, 6000);
-setInterval(showSupportFabBubble, 45000);
 let supportChatHistory = [];
 const SUPPORT_FN_URL = 'https://nzbnlecbtvbnulkknqbi.supabase.co/functions/v1/support-chat-';
 let supportMode = 'bot'; // 'bot' oswa 'human'
@@ -1760,8 +1760,8 @@ async function toggleSupportChat(){
   supportChatOpen = !supportChatOpen;
   document.getElementById('supportChatBg').style.display = supportChatOpen ? 'flex' : 'none';
   if(supportChatOpen){
-    const bubble = document.getElementById('supportFabBubble');
-    if(bubble) bubble.style.display = 'none';
+    const tip = document.getElementById('supportTooltip');
+    if(tip) tip.style.display = 'none';
     if(supportChatFirstOpen){
       supportChatFirstOpen = false;
       await getOrRestoreSupportConversation();
@@ -2830,8 +2830,14 @@ function relayOrderError(error, context){
     showToast('⚠️ ' + msg);
   }
 }
+function isGenericNetworkError(msg){
+  if(!msg) return false;
+  const m = String(msg).toLowerCase();
+  return m.includes('failed to fetch') || m.includes('networkerror') || m.includes('network request failed') || m.includes('load failed');
+}
 function showCustomerError(friendlyMsg, technicalDetail, context, translationKeyOverride){
   showToast(translationKeyOverride ? t(translationKeyOverride) : t('generic_error_msg'), 4000);
+  if(isGenericNetworkError(technicalDetail)) return;
   const u = currentUser();
   const clientName = u ? (u.name || 'Kliyan konekte') : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè');
   sendNtfyNotification('🚨 Erè teknik (paj kliyan)', '👤 Moun: ' + clientName + '\n📄 Kontèks: ' + (context||currentPage||'?') + '\n🛠️ Detay: ' + technicalDetail, 'urgent', 'rotating_light');
@@ -2841,7 +2847,7 @@ function showToast(msg, duration){
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.classList.remove('show'), duration || 3000);
-  if(msg && msg.indexOf('⚠️') !== -1){
+  if(msg && msg.indexOf('⚠️') !== -1 && !isGenericNetworkError(msg)){
     const u = currentUser();
     const clientName = u ? (u.name || 'Kliyan konekte') : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè');
     sendNtfyNotification('🚨 Erè sou sit la', '👤 Moun: ' + clientName + '\n📄 Paj: ' + (currentPage||'?') + '\n⚠️ Mesaj: ' + msg, 'urgent', 'rotating_light');
@@ -3576,6 +3582,17 @@ function routeFromURL(){
   if(page){ goPage(page, { skipHistory:true }); }
 }
 function enterShopFromWelcome(){
+  const btn = document.querySelector('.we-cta');
+  if(btn){
+    btn.classList.remove('dancing');
+    void btn.offsetWidth;
+    btn.classList.add('dancing');
+    setTimeout(() => {
+      document.getElementById('welcomeOverlay').style.display = 'none';
+      goPage('shop');
+    }, 400);
+    return;
+  }
   document.getElementById('welcomeOverlay').style.display = 'none';
   goPage('shop');
 }
@@ -3918,6 +3935,29 @@ function pageShop(){
   return `<div id="promoBannerBox"></div><div id="shopGrid"></div>`;
 }
 let shopHasRenderedOnce = false;
+function startVoiceSearch(){
+  const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SpeechRec){
+    showToast('Rechèch vokal pa disponib sou aparèy sa a');
+    return;
+  }
+  const micBtn = document.getElementById('searchMicBtn');
+  const input = document.getElementById('searchInput');
+  const recognition = new SpeechRec();
+  recognition.lang = 'fr-FR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  micBtn.classList.add('listening');
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    input.removeAttribute('readonly');
+    input.value = transcript;
+    renderShop();
+  };
+  recognition.onerror = () => { micBtn.classList.remove('listening'); };
+  recognition.onend = () => { micBtn.classList.remove('listening'); };
+  try{ recognition.start(); }catch(e){ micBtn.classList.remove('listening'); }
+}
 function renderShop(){
   if(currentPage !== 'shop') return;
   renderPromoBanner();
@@ -4111,7 +4151,10 @@ function renderApiTopupSheet(p){
     <div class="sheet-handle"></div>
     
     <h3>${p.image?'':escapeHtml(p.icon)+' '}${escapeHtml(p.name)}</h3>
-    <div class="sub">${p.description ? escapeHtml(p.description) : 'Rechaje kont ou rapid'}</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+      <div class="sub" style="flex:1;">${p.description ? escapeHtml(p.description) : 'Rechaje kont ou rapid'}</div>
+      ${renderLikeShareRow(p)}
+    </div>
     ${renderDescriptionBlocks(p, 'above')}
     <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;margin:6px 0 16px;">${minP} — ${maxP} <span style="font-size:12px;color:var(--muted);font-weight:600;">HTG</span></div>
     <div class="variant-grid" id="variantList" style="margin-bottom:16px;">
@@ -4468,7 +4511,10 @@ function renderFormSheet(p){
     <div class="sheet-handle"></div>
     
     <h3>${p.image?'':escapeHtml(p.icon)+' '}${escapeHtml(p.name)}</h3>
-    <div class="sub">${p.description ? escapeHtml(p.description) : 'Chwazi opsyon w vle achte a'}</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+      <div class="sub" style="flex:1;">${p.description ? escapeHtml(p.description) : 'Chwazi opsyon w vle achte a'}</div>
+      ${renderLikeShareRow(p)}
+    </div>
     ${renderDescriptionBlocks(p, 'above')}
     <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;margin:6px 0 16px;">${minP} — ${maxP} <span style="font-size:12px;color:var(--muted);font-weight:600;">HTG</span></div>
     <div class="variant-grid" id="variantList">
@@ -4566,7 +4612,10 @@ function renderVariantSheet(p){
     <div class="sheet-handle"></div>
     
     <h3>${p.image?'':escapeHtml(p.icon)+' '}${escapeHtml(p.name)}</h3>
-    <div class="sub">${p.description ? escapeHtml(p.description) : 'Chwazi opsyon w vle achte a'}</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+      <div class="sub" style="flex:1;">${p.description ? escapeHtml(p.description) : 'Chwazi opsyon w vle achte a'}</div>
+      ${renderLikeShareRow(p)}
+    </div>
     ${renderDescriptionBlocks(p, 'above')}
     <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;margin:6px 0 16px;">${minP} — ${maxP} <span style="font-size:12px;color:var(--muted);font-weight:600;">HTG</span></div>
     <div class="variant-grid" id="variantList">
@@ -4600,7 +4649,10 @@ function renderManualSheet(p){
     <div class="sheet-handle"></div>
     
     <h3>${p.image?'':escapeHtml(p.icon)+' '}${escapeHtml(p.name)}</h3>
-    <div class="sub">${p.description ? escapeHtml(p.description) : 'Ranpli enfòmasyon yo pou kontinye'}</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+      <div class="sub" style="flex:1;">${p.description ? escapeHtml(p.description) : 'Ranpli enfòmasyon yo pou kontinye'}</div>
+      ${renderLikeShareRow(p)}
+    </div>
     ${renderDescriptionBlocks(p, 'above')}
     <span class="pill ok" style="margin-bottom:14px;display:inline-block;">Taux : ${c.taux} G</span>
     ${(c.fields||[]).map(normalizeManualField).map((f,i) => `<div class="field-uid"><label>${escapeHtml(f.label)} *</label><input type="text" id="mField-${i}" placeholder="${escapeHtml(f.placeholder||'')}" required></div>`).join('')}
@@ -7154,10 +7206,24 @@ function loadHtml2Canvas(){
 }
 async function downloadOrderReceipt(orderId, userId){
   const uid_ = userId || state.currentUserId;
-  const orders = state.orders[uid_] || [];
-  const o = orders.find(x=>x.id===orderId);
-  if(!o) return;
   showToast('Génération du reçu...');
+  let o;
+  try{
+    const sb0 = await getSupabase();
+    const { data: freshOrder, error: freshErr } = await sb0.from('orders').select('*').eq('id', orderId).maybeSingle();
+    if(freshErr || !freshOrder){
+      showToast('⚠️ Kòmand pa jwenn');
+      return;
+    }
+    o = {
+      id:freshOrder.id, orderNo:freshOrder.order_no, type:freshOrder.type, status:freshOrder.status,
+      product:freshOrder.product, variant:freshOrder.variant, price:Number(freshOrder.price),
+      pin:freshOrder.pin_code, fields:freshOrder.fields, montantUSD:freshOrder.montant_usd, fraisUSD:freshOrder.frais_usd,
+      date:freshOrder.created_at, adminResponse:freshOrder.admin_response, playerId:freshOrder.player_id,
+      serverId:freshOrder.server_id, playerName:freshOrder.player_name,
+      marketEmail:freshOrder.market_email, marketPassword:freshOrder.market_password
+    };
+  }catch(e){ showToast('⚠️ Erè chajman kòmand lan'); return; }
   try{
     await loadHtml2Canvas();
     const sb = await getSupabase();
@@ -7498,6 +7564,79 @@ function copyReferralLink(){
   if(!d) return;
   const link = window.location.origin + '/?ref=' + d.code;
   navigator.clipboard.writeText(link).then(()=>showToast('Lyen kopye ✓'));
+}
+function formatCount(n){
+  n = Number(n)||0;
+  if(n >= 1000){
+    const k = n / 1000;
+    const rounded = Math.round(k * 10) / 10;
+    return (rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1).replace('.', ',')) + 'k';
+  }
+  return String(n);
+}
+const LIKE_COOLDOWN_MS = 72 * 60 * 60 * 1000; // 72 èdtan
+function renderLikeShareRow(p){
+  return `<div style="display:flex;gap:10px;flex-shrink:0;">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+      <button id="likeBtn-${p.id}" onclick="giveProductLike('${p.id}')" style="width:32px;height:32px;border-radius:9px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;color:${!canLikeProductNow(p.id)?'#E23B57':'#4b5259'};${!canLikeProductNow(p.id)?'background:#fff3f5;border-color:#f8d7dd;':''}">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="${!canLikeProductNow(p.id)?'#E23B57':'none'}" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.6z"/></svg>
+      </button>
+      <span id="likeCount-${p.id}" style="font-size:10px;font-weight:700;color:var(--muted);">${formatCount(p.likesCount||0)}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:3px;">
+      <button onclick="shareProduct('${p.id}')" style="width:32px;height:32px;border-radius:9px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4b5259;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+      </button>
+      <span id="shareCount-${p.id}" style="font-size:10px;font-weight:700;color:var(--muted);">${formatCount(p.sharesCount||0)}</span>
+    </div>
+  </div>`;
+}
+function canLikeProductNow(productId){
+  const last = localStorage.getItem('kt_last_liked_'+productId);
+  if(!last) return true;
+  return (Date.now() - Number(last)) >= LIKE_COOLDOWN_MS;
+}
+async function giveProductLike(productId){
+  if(!canLikeProductNow(productId)){
+    return;
+  }
+  try{
+    const sb = await getSupabase();
+    const { data: newCount, error } = await sb.rpc('increment_product_likes', { p_product_id: productId });
+    if(error){ return; }
+    localStorage.setItem('kt_last_liked_'+productId, String(Date.now()));
+    const p = state.products.find(x=>x.id===productId);
+    if(p) p.likesCount = newCount;
+    const countEl = document.getElementById('likeCount-'+productId);
+    const btnEl = document.getElementById('likeBtn-'+productId);
+    if(countEl) countEl.textContent = formatCount(newCount);
+    if(btnEl){
+      btnEl.style.color = '#E23B57';
+      btnEl.style.background = '#fff3f5';
+      btnEl.style.borderColor = '#f8d7dd';
+      const svg = btnEl.querySelector('svg');
+      if(svg) svg.setAttribute('fill', '#E23B57');
+    }
+  }catch(e){}
+}
+async function shareProduct(productId){
+  const p = state.products.find(x=>x.id===productId);
+  if(!p) return;
+  const link = window.location.origin + '/product/' + slugify(p.name);
+  const message = "🎮 " + p.name + " sou Kerry Topup Official!\n👇 Klike la pou w achte:\n🔗 " + link;
+  const inIframe = window.top !== window.self;
+  try{
+    const sb = await getSupabase();
+    const { data: newCount } = await sb.rpc('increment_product_shares', { p_product_id: productId });
+    if(newCount != null){
+      const countEl = document.getElementById('shareCount-'+productId);
+      if(countEl) countEl.textContent = formatCount(newCount);
+    }
+  }catch(e){}
+  if(navigator.share && !inIframe){
+    try{ await navigator.share({ title: p.name, text: message, url: link }); return; }catch(e){ if(e.name==='AbortError') return; }
+  }
+  try{ await navigator.clipboard.writeText(link); showToast('Lyen kopye ✓'); }catch(e){ showToast(link); }
 }
 async function shareReferralLink(){
   const d = state.referralData;
@@ -11701,6 +11840,28 @@ fetchTutorialsV2();
 fetchTutorialTriggersV2();
 fetchPaymentSettings();
 fetchFooterContent();
+if(!sessionStorage.getItem('kt_support_tip_shown')){
+  sessionStorage.setItem('kt_support_tip_shown', '1');
+  setTimeout(() => {
+    const tip = document.getElementById('supportTooltip');
+    if(!tip) return;
+    tip.style.display = 'block';
+    void tip.offsetWidth; // fòse reflow pou transisyon an aktive kòrèkteman
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        tip.style.maxWidth = '210px';
+        tip.style.padding = '11px 15px';
+        tip.style.opacity = '1';
+      });
+    });
+    setTimeout(() => {
+      tip.style.maxWidth = '0';
+      tip.style.padding = '0';
+      tip.style.opacity = '0';
+      setTimeout(() => { tip.style.display = 'none'; }, 1500);
+    }, 5000);
+  }, 2000);
+}
 (async () => {
   await tryRestoreSupabaseSession();
   routeFromURL();
