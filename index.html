@@ -7592,7 +7592,8 @@ function renderLikeShareRow(p){
   </div>`;
 }
 function canLikeProductNow(productId){
-  const last = localStorage.getItem('kt_last_liked_'+productId);
+  const uid = state.currentUserId || 'vizitè';
+  const last = localStorage.getItem('kt_last_liked_'+uid+'_'+productId);
   if(!last) return true;
   return (Date.now() - Number(last)) >= LIKE_COOLDOWN_MS;
 }
@@ -7604,7 +7605,8 @@ async function giveProductLike(productId){
     const sb = await getSupabase();
     const { data: newCount, error } = await sb.rpc('increment_product_likes', { p_product_id: productId });
     if(error){ return; }
-    localStorage.setItem('kt_last_liked_'+productId, String(Date.now()));
+    const uid = state.currentUserId || 'vizitè';
+    localStorage.setItem('kt_last_liked_'+uid+'_'+productId, String(Date.now()));
     const p = state.products.find(x=>x.id===productId);
     if(p) p.likesCount = newCount;
     const countEl = document.getElementById('likeCount-'+productId);
