@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.kerrytopup.twa",
+        "sha256_cert_fingerprints": ["7C:C0:D1:DD:AD:53:3C:F0:3D:05:E6:70:14:DE:7D:2D:2F:97:1E:58:09:05:1D:38:36:37:FC:DF:90:FB:45:33"]
+      }
+    }]
