@@ -791,7 +791,7 @@ textarea.admin-ta{
     <div class="search-bar" id="searchBarWrap">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
       <input type="search" id="searchInput" name="product-search" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')" placeholder="Cliquez ici pour rechercher un produit" data-i18n-ph="search_placeholder" oninput="renderShop()">
-      <button type="button" class="search-mic-btn" id="searchMicBtn" onclick="startVoiceSearch()" title="Rechèch vokal">
+      <button type="button" class="search-mic-btn" id="searchMicBtn" onclick="startVoiceSearch()" title="Rechèch vokal" data-i18n-title="voice_search_title">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8"/></svg>
       </button>
     </div>
@@ -851,7 +851,7 @@ textarea.admin-ta{
     <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid #eef1ef;background:#fff;flex-shrink:0;">
       <label style="width:40px;height:40px;border-radius:50%;background:#f4f7f5;display:flex;align-items:center;justify-content:center;color:#4b5259;flex-shrink:0;cursor:pointer;font-size:17px;">📷<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
       <input type="text" id="supportChatInput" placeholder="Ekri kesyon ou..." style="flex:1;border:1px solid #e2e6e3;border-radius:24px;padding:11px 16px;font-size:14px;color:var(--text);background:#f7f9f8;" onkeydown="if(event.key==='Enter')sendSupportMessage()">
-      <button onclick="sendSupportMessage()" style="border:none;border-radius:24px;padding:11px 22px;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 6px 14px rgba(10,158,61,0.28);flex-shrink:0;">Voye</button>
+      <button onclick="sendSupportMessage()" style="border:none;border-radius:24px;padding:11px 22px;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 6px 14px rgba(10,158,61,0.28);flex-shrink:0;" data-i18n="btn_chat_send">Voye</button>
     </div>
   </div>
 </div>
@@ -1129,6 +1129,42 @@ const TRANSLATIONS = {
     auth_create_account:'Kreye Kont', auth_register_banner:'Byenveni lakay nou ! Kreye yon kont pou jwenn bonis eksklizif, pwofite Wallet sekirize nou an ak yon acha ki pi rapid.',
     pw_req_6chars:'Omwen 6 karaktè', pw_req_upper:'Yon lèt majiskil', pw_req_lower:'Yon lèt minisikil',
     pw_req_number:'Yon chif', pw_req_special:'Yon karaktè espesyal (@#$...)',
+    btn_chat_send:'Voye', btn_enable:'Aktive', push_enable_title:'Aktive notifikasyon yo', push_enable_sub:'Resevwa yon alèt kou yon kòmand pare.', btn_regen_now:'🔒 Rejenere kounye a', btn_remove_item:'Retire',
+    creating_account_btn:'Ap kreye kont...', verifying_photo_btn:'Ap verifye foto a...', verifying_in_progress:'Ap verifye...', processing_in_progress:'Ap trete...', logging_in_progress:'Ap konekte...',
+    voice_search_title:'Rechèch vokal', reset_password_title:'Nouvo Modpas', reset_password_sub:'Antre nouvo modpas ou vle itilize a.', label_new_password:'Nouvo modpas', label_confirm_password:'Konfime modpas ou', btn_save_new_password:'Sovgade nouvo modpas la',
+    regen_page_title:'Rejenere idantifyan API yo', regen_warning_title:'⚠️ Avètisman enpòtan', regen_warning_desc:'Rejenere idantifyan ou yo ap ranplase kle API ak sekrè ou imedyatman. Nenpòt entegrasyon ki egziste ap sispann fonksyone jiskaske w mete ajou nouvo idantifyan yo.', regen_step_confirm:'Konfime aksyon an', regen_type_help:'Pou rezon sekirite, tape mo ki anba a pou konfime ou vle rejenere idantifyan ou yo.', regen_type_placeholder:'Tape REGENERER isit la',
+    status_already_regen:'Deja rejenere', status_not_regen_yet:'Poko rejenere', badge_active:'Aktif ✓', transfer_page_title:'Transfè balans', my_requests_title:'Demand Rechaj Ou', suspended_title:'Robo Cherif la detekte<br>ou ap eseye triche',
+    suspended_terms_notice:'Ou pa respekte kondisyon sit nou an', order_summary_title:'Rezime kòmand lan', withdrawal_earnings_title:'Retire lajan mwen genyen', field_account_info:'Enfo Kont', field_enter_player_id_sub:'Antre ID jwè ou pou kontinye achte a.', label_player_id:'ID Jwè',
+    ph_enter_player_id:'Antre ID jwè ou', ph_enter_server_id:'Antre Server ID ou', toast_account_found:'Kont jwenn avèk siksè !', label_player_name:'Non jwè a', badge_account_verified:'✓ Kont valide', toast_player_not_found:'❌ Player ID sa a pa egziste',
+    label_amount_deposited:'Montan depoze (HTG)', label_receipt_natcash:'Resi NatCash', btn_choose_file:'Chwazi yon fichye', label_no_file_chosen:'Okenn fichye chwazi', ref_valid_for:'Referans valab pou', label_recipient_email:'Imèl destinatè a',
+    label_amount_htg:'Montan (HTG)', btn_send_transfer:'Voye transfè a', toast_recharge_approved:'Demand rechaj ou apwouve ✅', toast_copy_success:'Kopye avèk siksè ✅', toast_copy_fail:'Pa ka kopye — kopye manyèlman', toast_copy_simple:'Kopye ✓',
+    toast_code_copied:'Kòd kopye ✓', toast_link_copied:'Lyen kopye ✓', toast_link_copied_share:'🔗 Lyen kopye — kole l kote w vle pataje l', txn_already_used_box:'TXN ID sa a deja itilize.', toast_txn_already_used:'TXN ID deja itilize', receipt_already_used_box:'Resi sa a deja itilize pou yon lòt demand.',
+    toast_receipt_already_used:'Resi deja itilize', dup_used_box:'TXN ID, referans, oswa resi sa a deja itilize pou yon lòt demand.', toast_already_used:'Deja itilize', recharge_pending_admin_box:'Rechaj la ap tann validasyon Admin', toast_admin_verifying_order:'Admin ap verifye kòmand ou', toast_fill_all_correctly:'Ranpli tout chan yo kòrèkteman',
+    toast_no_user_with_email:'Pa gen itilizatè ak imèl sa a', order_became:'vin', toast_cart_insufficient_balance:'Balans ou pa ase pou tout panye a — rechaje Wallet la', label_admin_response:'Repons Admin', label_method:'Metòd', label_account_number_id:'Nimewo / Idantifyan',
+    ph_account_number:'Nimewo kont lan', btn_request_withdrawal:'Mande retrè a', empty_no_listings:'Pa gen okenn anons pou kounye a.', status_wait_verif:'An verifikasyon', status_recharge_approved:'Apwouve', status_recharge_rejected:'Rejte',
+    toast_choose_rating:'Chwazi yon nòt (1 a 5 zetwal)', toast_cannot_buy_own:'Ou pa ka achte pwòp kont ou', toast_already_in_cart:'Deja nan panye a', toast_insufficient_balance_recharge:'Balans ou pa ase — rechaje Wallet la', toast_enter_valid_number:'Antre yon nimewo valid', toast_number_changed:'✅ Nimewo chanje — mèsi !',
+    toast_number_confirmed:'✅ Nimewo konfime — mèsi !', toast_voice_not_available:'Rechèch vokal pa disponib sou aparèy sa a', toast_fill_all_fields:'Ranpli tout chan yo', toast_password_rules:'⚠️ Modpas la dwe respekte tout règ yo (anwo chan an)', toast_email_already_used:'Imèl sa deja itilize', toast_account_created_verify:'Kont kreye — verifye imèl ou pou konfime l anvan w konekte',
+    toast_welcome_prefix:'Byenveni', toast_server_connect_fail_prefix:'Pa ka konekte ak sèvè a', toast_confirm_email_first:'Konfime imèl ou anvan — gade nan bwat resepsyon ou', toast_wrong_credentials:'Imèl oswa modpas pa bon', toast_enter_email_first:'Antre imèl ou nan chan anwo a dabò', toast_reset_email_sent_prefix:'Yon imèl voye bay',
+    toast_reset_email_sent_suffix:'pou chanje modpas ou', toast_reset_email_fail_prefix:'Pa ka voye imèl la kounye a', toast_passwords_not_matching:'Modpas yo pa idantik — tanpri verifye', toast_password_changed:'Modpas chanje ak siksè ✓', toast_password_change_fail:'Pa ka chanje modpas la kounye a — eseye ankò', toast_select_option:'Chwazi yon opsyon',
+    toast_no_option_contact_admin:'⚠️ Pa gen opsyon disponib pou pwodwi sa a — kontakte Admin', toast_enter_server_id:'Antre Server ID ou anvan', toast_session_expired:'⚠️ Ou dekonekte — tanpri konekte ankò', toast_fill_field_prefix:'Ranpli chan', toast_enter_ff_id_prefix:'Antre ID Free Fire ou nan chan', name_confirmed_label:'Non konfime',
+    toast_fill_all_required:'Ranpli tout chan yo — yo obligatwa', toast_amount_between_prefix:'Kantite a dwe ant', toast_amount_between_mid:'ak', manual_max_error_prefix:'Ou pa ka kòmande plis pase', toast_enter_valid_amount:'Antre yon montan valid', toast_enter_txn_id:'Antre TXN ID la',
+    toast_txn_incomplete:'TXN ID enkonplè — manke', digits_suffix:'chif', toast_add_receipt_photo:'Ajoute yon foto rezi tranzaksyon an',
+    login_required_api_title:'Konekte pou wè aksè API ou', required_label:'Obligatwa', api_key_label:'Kle API', api_secret_label:'Sekrè API', regen_status_label:'Estati idantifyan yo', regen_current_active:'Idantifyan aktyèl ou yo aktif.',
+    recharge_detail_title:'Detay Rechaj', system_reference_label:'Referans sistèm', proof_sent_label:'Prèv voye', loading_label:'Chajman...', no_photo_saved_tx:'Pa gen foto anrejistre pou tranzaksyon sa a.', photo_load_error:'Erè chajman foto a.',
+    toast_error_prefix:'Erè', toast_option_not_connected:'⚠️ Opsyon sa a pa konekte ak Founisè — kontakte Admin', toast_login_to_review:'Konekte pou kite yon avis',
+    btn_download_receipt:'Telechaje resi a',
+    how_to_claim_label:'Kijan pou reklame', label_amount_paid:'Montan peye', label_invited_clients:'Kliyan envite', label_withdrawals_count:'Retrè', wallet_reseller_label:'Wallet Revandè',
+    notif_order_received_title:'Kòmand #{n} an tou piti', notif_order_received_text:'Nou resevwa kòmand ou a epi nou ap trete l. Ou pral resevwa pwodwi ou byento!',
+    notif_order_complete_title:'Kòmand #{n} konplè!', notif_order_complete_text:'Kòmand ou a livre avèk siksè. Mèsi pou konfyans ou nan Kerry Topup!',
+    notif_admin_replied_title:'Admin reponn kòmand #{n}',
+    checkout_title:'Kòmande', reseller_tagline:'Platfòm konfyans ou pou revann rechaj jwèt yo — rapid, san tèt chaje, ak pi bon pri sou mache a.',
+    reseller_no_access_title:'Ou pa gen aksè API', reseller_no_access_desc:'Kontakte Admin Kerry Topup pou mande aksè founisè.', reseller_whatsapp_contact:'💬 Kontakte sou WhatsApp',
+    reseller_access_suffix:'— Accès API', reseller_connected_as_prefix:'Konekte kòm',
+    api_loading_key:'Ap chaje kle API ou...', api_access_heading:'🔑 Aksè API', api_test_connection_btn:'🛰️ Teste koneksyon an',
+    api_regen_cooldown_prefix:'🔄 Reyinisyalizasyon nan', api_regen_cta:'▶ Régénérer les idantifyan yo',
+    api_recent_orders_heading:'📦 Kòmand resan yo', api_no_orders_yet:'Pa gen kòmand atravè API a poko.',
+    table_col_product:'Pwodwi', table_col_total:'Total', table_col_status:'Estati', table_col_date:'Dat',
+    status_completed:'Konplete', status_pending:'An atant', status_failed:'Echwe',
   },
   fr: {
     nav_shop:'Boutique', nav_wallet:'Portefeuille', nav_commandes:'Commandes', nav_historique:'Historique', nav_redeem:'Redeem Free Fire',
@@ -1294,6 +1330,42 @@ const TRANSLATIONS = {
     auth_create_account:'Créer un compte', auth_register_banner:"Bienvenue chez nous ! Créez un compte pour obtenir des bonus exclusifs, profiter de notre Wallet sécurisé et d'un achat plus rapide.",
     pw_req_6chars:'Au moins 6 caractères', pw_req_upper:'Une lettre majuscule', pw_req_lower:'Une lettre minuscule',
     pw_req_number:'Un chiffre', pw_req_special:'Un caractère spécial (@#$...)',
+    btn_chat_send:'Envoyer', btn_enable:'Activer', push_enable_title:'Activer les notifications', push_enable_sub:'Soyez alerté dès qu\'une commande est prête.', btn_regen_now:'🔒 Régénérer maintenant', btn_remove_item:'Retirer',
+    creating_account_btn:'Création du compte...', verifying_photo_btn:'Vérification de la photo...', verifying_in_progress:'Vérification en cours...', processing_in_progress:'Traitement en cours...', logging_in_progress:'Connexion en cours...',
+    voice_search_title:'Recherche vocale', reset_password_title:'Nouveau mot de passe', reset_password_sub:'Entrez le nouveau mot de passe que vous souhaitez utiliser.', label_new_password:'Nouveau mot de passe', label_confirm_password:'Confirmez votre mot de passe', btn_save_new_password:'Enregistrer le nouveau mot de passe',
+    regen_page_title:'Régénérer les identifiants API', regen_warning_title:'⚠️ Attention importante', regen_warning_desc:'Régénérer vos identifiants remplacera immédiatement votre clé API et votre secret. Toute intégration existante cessera de fonctionner jusqu\'à ce que vous mettiez à jour les nouveaux identifiants.', regen_step_confirm:'Confirmer l\'action', regen_type_help:'Pour des raisons de sécurité, tapez le mot ci-dessous pour confirmer que vous souhaitez régénérer vos identifiants.', regen_type_placeholder:'Tapez REGENERER ici',
+    status_already_regen:'Déjà régénéré', status_not_regen_yet:'Non encore régénéré', badge_active:'Actif ✓', transfer_page_title:'Transfert de solde', my_requests_title:'Vos demandes de recharge', suspended_title:'Le Shérif Robot a détecté<br>que tu es en train de tricher',
+    suspended_terms_notice:'Vous ne respectez pas les conditions de notre site', order_summary_title:'Résumé de la commande', withdrawal_earnings_title:'Retrait de mes gains', field_account_info:'Infos du compte', field_enter_player_id_sub:'Entrez votre ID joueur pour poursuivre l\'achat.', label_player_id:'ID Joueur',
+    ph_enter_player_id:'Entrez votre ID joueur', ph_enter_server_id:'Entrez votre Server ID', toast_account_found:'Compte trouvé avec succès !', label_player_name:'Nom du joueur', badge_account_verified:'✓ Compte validé', toast_player_not_found:'❌ Cet ID joueur n\'existe pas',
+    label_amount_deposited:'Montant déposé (HTG)', label_receipt_natcash:'Reçu NatCash', btn_choose_file:'Choisir un fichier', label_no_file_chosen:'Aucun fichier choisi', ref_valid_for:'Référence valable pour', label_recipient_email:'Email du destinataire',
+    label_amount_htg:'Montant (HTG)', btn_send_transfer:'Envoyer le transfert', toast_recharge_approved:'Votre demande de recharge est approuvée ✅', toast_copy_success:'Copié avec succès ✅', toast_copy_fail:'Impossible de copier — copiez manuellement', toast_copy_simple:'Copié ✓',
+    toast_code_copied:'Code copié ✓', toast_link_copied:'Lien copié ✓', toast_link_copied_share:'🔗 Lien copié — collez-le où vous voulez le partager', txn_already_used_box:'Ce TXN ID a déjà été utilisé.', toast_txn_already_used:'TXN ID déjà utilisé', receipt_already_used_box:'Ce reçu a déjà été utilisé pour une autre demande.',
+    toast_receipt_already_used:'Reçu déjà utilisé', dup_used_box:'Ce TXN ID, cette référence ou ce reçu a déjà été utilisé pour une autre demande.', toast_already_used:'Déjà utilisé', recharge_pending_admin_box:'La recharge est en cours de validation par l\'administrateur', toast_admin_verifying_order:'L\'administrateur vérifie votre commande', toast_fill_all_correctly:'Remplissez tous les champs correctement',
+    toast_no_user_with_email:'Aucun utilisateur avec cet email', order_became:'est devenue :', toast_cart_insufficient_balance:'Solde insuffisant pour tout le panier — rechargez votre Wallet', label_admin_response:'Réponse de l\'administrateur', label_method:'Méthode', label_account_number_id:'Numéro / Identifiant',
+    ph_account_number:'Numéro du compte', btn_request_withdrawal:'Demander le retrait', empty_no_listings:'Aucune annonce pour le moment.', status_wait_verif:'À vérifier', status_recharge_approved:'Approuvée', status_recharge_rejected:'Rejetée',
+    toast_choose_rating:'Choisissez une note (1 à 5 étoiles)', toast_cannot_buy_own:'Vous ne pouvez pas acheter votre propre compte', toast_already_in_cart:'Déjà dans le panier', toast_insufficient_balance_recharge:'Solde insuffisant — rechargez votre Wallet', toast_enter_valid_number:'Entrez un numéro valide', toast_number_changed:'✅ Numéro modifié — merci !',
+    toast_number_confirmed:'✅ Numéro confirmé — merci !', toast_voice_not_available:'La recherche vocale n\'est pas disponible sur cet appareil', toast_fill_all_fields:'Remplissez tous les champs', toast_password_rules:'⚠️ Le mot de passe doit respecter toutes les règles (ci-dessus)', toast_email_already_used:'Cet email est déjà utilisé', toast_account_created_verify:'Compte créé — vérifiez votre email pour le confirmer avant de vous connecter',
+    toast_welcome_prefix:'Bienvenue', toast_server_connect_fail_prefix:'Impossible de se connecter au serveur', toast_confirm_email_first:'Confirmez votre email d\'abord — vérifiez votre boîte de réception', toast_wrong_credentials:'Email ou mot de passe incorrect', toast_enter_email_first:'Entrez d\'abord votre email dans le champ ci-dessus', toast_reset_email_sent_prefix:'Un email a été envoyé à',
+    toast_reset_email_sent_suffix:'pour changer votre mot de passe', toast_reset_email_fail_prefix:'Impossible d\'envoyer l\'email pour le moment', toast_passwords_not_matching:'Les mots de passe ne correspondent pas — veuillez vérifier', toast_password_changed:'Mot de passe changé avec succès ✓', toast_password_change_fail:'Impossible de changer le mot de passe pour le moment — réessayez', toast_select_option:'Choisissez une option',
+    toast_no_option_contact_admin:'⚠️ Aucune option disponible pour ce produit — contactez l\'Admin', toast_enter_server_id:'Entrez d\'abord votre Server ID', toast_session_expired:'⚠️ Vous êtes déconnecté — veuillez vous reconnecter', toast_fill_field_prefix:'Remplissez le champ', toast_enter_ff_id_prefix:'Entrez votre ID Free Fire dans le champ', name_confirmed_label:'Nom confirmé',
+    toast_fill_all_required:'Remplissez tous les champs — ils sont obligatoires', toast_amount_between_prefix:'Le montant doit être entre', toast_amount_between_mid:'et', manual_max_error_prefix:'Vous ne pouvez pas commander plus de', toast_enter_valid_amount:'Entrez un montant valide', toast_enter_txn_id:'Entrez le numéro TXN ID',
+    toast_txn_incomplete:'TXN ID incomplet — il manque', digits_suffix:'chiffre(s)', toast_add_receipt_photo:'Ajoutez une photo du reçu de la transaction',
+    login_required_api_title:'Connectez-vous pour voir votre accès API', required_label:'Obligatoire', api_key_label:'Clé API', api_secret_label:'Secret API', regen_status_label:'Statut des identifiants', regen_current_active:'Vos identifiants actuels sont actifs.',
+    recharge_detail_title:'Détail de la recharge', system_reference_label:'Référence système', proof_sent_label:'Preuve envoyée', loading_label:'Chargement...', no_photo_saved_tx:'Aucune photo enregistrée pour cette transaction.', photo_load_error:'Erreur lors du chargement de la photo.',
+    toast_error_prefix:'Erreur', toast_option_not_connected:'⚠️ Cette option n\'est pas connectée au Fournisseur — contactez l\'Admin', toast_login_to_review:'Connectez-vous pour laisser un avis',
+    btn_download_receipt:'Télécharger le reçu',
+    how_to_claim_label:'Comment réclamer', label_amount_paid:'Montant payé', label_invited_clients:'Clients invités', label_withdrawals_count:'Retraits', wallet_reseller_label:'Wallet Revendeur',
+    notif_order_received_title:'Commande #{n} reçue', notif_order_received_text:'Nous avons reçu votre commande et nous la traitons. Vous recevrez votre produit bientôt !',
+    notif_order_complete_title:'Commande #{n} terminée !', notif_order_complete_text:'Votre commande a été livrée avec succès. Merci pour votre confiance envers Kerry Topup !',
+    notif_admin_replied_title:'L\'admin a répondu à la commande #{n}',
+    checkout_title:'Commander', reseller_tagline:'Votre plateforme de confiance pour revendre des recharges de jeux — rapide, sans tracas, aux meilleurs prix du marché.',
+    reseller_no_access_title:'Vous n\'avez pas accès à l\'API', reseller_no_access_desc:'Contactez l\'Admin Kerry Topup pour demander un accès fournisseur.', reseller_whatsapp_contact:'💬 Contacter sur WhatsApp',
+    reseller_access_suffix:'— Accès API', reseller_connected_as_prefix:'Connecté en tant que',
+    api_loading_key:'Chargement de votre clé API...', api_access_heading:'🔑 Accès API', api_test_connection_btn:'🛰️ Tester la connexion',
+    api_regen_cooldown_prefix:'🔄 Réinitialisation dans', api_regen_cta:'▶ Régénérer les identifiants',
+    api_recent_orders_heading:'📦 Commandes récentes', api_no_orders_yet:'Pas encore de commande via l\'API.',
+    table_col_product:'Produit', table_col_total:'Total', table_col_status:'Statut', table_col_date:'Date',
+    status_completed:'Terminée', status_pending:'En attente', status_failed:'Échouée',
   },
   en: {
     nav_shop:'Shop', nav_wallet:'Wallet', nav_commandes:'Orders', nav_historique:'History', nav_redeem:'Redeem Free Fire',
@@ -1459,6 +1531,42 @@ const TRANSLATIONS = {
     auth_create_account:'Create Account', auth_register_banner:'Welcome! Create an account to get exclusive bonuses, enjoy our secure Wallet and faster checkout.',
     pw_req_6chars:'At least 6 characters', pw_req_upper:'One uppercase letter', pw_req_lower:'One lowercase letter',
     pw_req_number:'One number', pw_req_special:'One special character (@#$...)',
+    btn_chat_send:'Send', btn_enable:'Enable', push_enable_title:'Enable notifications', push_enable_sub:'Get notified as soon as an order is ready.', btn_regen_now:'🔒 Regenerate now', btn_remove_item:'Remove',
+    creating_account_btn:'Creating account...', verifying_photo_btn:'Verifying photo...', verifying_in_progress:'Verifying...', processing_in_progress:'Processing...', logging_in_progress:'Logging in...',
+    voice_search_title:'Voice search', reset_password_title:'New Password', reset_password_sub:'Enter the new password you want to use.', label_new_password:'New password', label_confirm_password:'Confirm your password', btn_save_new_password:'Save new password',
+    regen_page_title:'Regenerate API credentials', regen_warning_title:'⚠️ Important warning', regen_warning_desc:'Regenerating your credentials will immediately replace your API key and secret. Any existing integration will stop working until you update the new credentials.', regen_step_confirm:'Confirm the action', regen_type_help:'For security reasons, type the word below to confirm you want to regenerate your credentials.', regen_type_placeholder:'Type REGENERER here',
+    status_already_regen:'Already regenerated', status_not_regen_yet:'Not yet regenerated', badge_active:'Active ✓', transfer_page_title:'Balance transfer', my_requests_title:'Your recharge requests', suspended_title:'Sheriff Robot detected<br>that you are cheating',
+    suspended_terms_notice:'You are not complying with our site\'s terms', order_summary_title:'Order summary', withdrawal_earnings_title:'Withdraw my earnings', field_account_info:'Account info', field_enter_player_id_sub:'Enter your player ID to continue the purchase.', label_player_id:'Player ID',
+    ph_enter_player_id:'Enter your player ID', ph_enter_server_id:'Enter your Server ID', toast_account_found:'Account found successfully!', label_player_name:'Player name', badge_account_verified:'✓ Account verified', toast_player_not_found:'❌ This Player ID doesn\'t exist',
+    label_amount_deposited:'Amount deposited (HTG)', label_receipt_natcash:'NatCash receipt', btn_choose_file:'Choose a file', label_no_file_chosen:'No file chosen', ref_valid_for:'Reference valid for', label_recipient_email:'Recipient\'s email',
+    label_amount_htg:'Amount (HTG)', btn_send_transfer:'Send transfer', toast_recharge_approved:'Your recharge request has been approved ✅', toast_copy_success:'Copied successfully ✅', toast_copy_fail:'Unable to copy — copy manually', toast_copy_simple:'Copied ✓',
+    toast_code_copied:'Code copied ✓', toast_link_copied:'Link copied ✓', toast_link_copied_share:'🔗 Link copied — paste it wherever you want to share it', txn_already_used_box:'This TXN ID has already been used.', toast_txn_already_used:'TXN ID already used', receipt_already_used_box:'This receipt has already been used for another request.',
+    toast_receipt_already_used:'Receipt already used', dup_used_box:'This TXN ID, reference, or receipt has already been used for another request.', toast_already_used:'Already used', recharge_pending_admin_box:'The recharge is being reviewed by the admin', toast_admin_verifying_order:'The admin is reviewing your order', toast_fill_all_correctly:'Fill in all fields correctly',
+    toast_no_user_with_email:'No user with that email', order_became:'is now', toast_cart_insufficient_balance:'Insufficient balance for the whole cart — recharge your Wallet', label_admin_response:'Admin\'s response', label_method:'Method', label_account_number_id:'Number / ID',
+    ph_account_number:'Account number', btn_request_withdrawal:'Request withdrawal', empty_no_listings:'No listings yet.', status_wait_verif:'Pending review', status_recharge_approved:'Approved', status_recharge_rejected:'Rejected',
+    toast_choose_rating:'Choose a rating (1 to 5 stars)', toast_cannot_buy_own:'You can\'t buy your own account', toast_already_in_cart:'Already in cart', toast_insufficient_balance_recharge:'Insufficient balance — recharge your Wallet', toast_enter_valid_number:'Enter a valid number', toast_number_changed:'✅ Number changed — thank you!',
+    toast_number_confirmed:'✅ Number confirmed — thank you!', toast_voice_not_available:'Voice search is not available on this device', toast_fill_all_fields:'Fill in all the fields', toast_password_rules:'⚠️ The password must meet all the requirements (above)', toast_email_already_used:'This email is already used', toast_account_created_verify:'Account created — check your email to confirm it before logging in',
+    toast_welcome_prefix:'Welcome', toast_server_connect_fail_prefix:'Unable to connect to the server', toast_confirm_email_first:'Confirm your email first — check your inbox', toast_wrong_credentials:'Incorrect email or password', toast_enter_email_first:'Enter your email in the field above first', toast_reset_email_sent_prefix:'An email was sent to',
+    toast_reset_email_sent_suffix:'to change your password', toast_reset_email_fail_prefix:'Unable to send the email right now', toast_passwords_not_matching:'Passwords don\'t match — please check', toast_password_changed:'Password changed successfully ✓', toast_password_change_fail:'Unable to change the password right now — try again', toast_select_option:'Choose an option',
+    toast_no_option_contact_admin:'⚠️ No option available for this product — contact Admin', toast_enter_server_id:'Enter your Server ID first', toast_session_expired:'⚠️ You\'re logged out — please log in again', toast_fill_field_prefix:'Fill in the field', toast_enter_ff_id_prefix:'Enter your Free Fire ID in the field', name_confirmed_label:'Confirmed name',
+    toast_fill_all_required:'Fill in all fields — they are required', toast_amount_between_prefix:'The amount must be between', toast_amount_between_mid:'and', manual_max_error_prefix:'You cannot order more than', toast_enter_valid_amount:'Enter a valid amount', toast_enter_txn_id:'Enter the TXN ID',
+    toast_txn_incomplete:'Incomplete TXN ID — missing', digits_suffix:'digit(s)', toast_add_receipt_photo:'Add a photo of the transaction receipt',
+    login_required_api_title:'Log in to see your API access', required_label:'Required', api_key_label:'API Key', api_secret_label:'API Secret', regen_status_label:'Credentials status', regen_current_active:'Your current credentials are active.',
+    recharge_detail_title:'Recharge details', system_reference_label:'System reference', proof_sent_label:'Proof sent', loading_label:'Loading...', no_photo_saved_tx:'No photo saved for this transaction.', photo_load_error:'Error loading the photo.',
+    toast_error_prefix:'Error', toast_option_not_connected:'⚠️ This option is not connected to the Supplier — contact Admin', toast_login_to_review:'Log in to leave a review',
+    btn_download_receipt:'Download receipt',
+    how_to_claim_label:'How to claim', label_amount_paid:'Amount paid', label_invited_clients:'Invited clients', label_withdrawals_count:'Withdrawals', wallet_reseller_label:'Reseller Wallet',
+    notif_order_received_title:'Order #{n} received', notif_order_received_text:'We received your order and are processing it. You\'ll receive your product soon!',
+    notif_order_complete_title:'Order #{n} complete!', notif_order_complete_text:'Your order was delivered successfully. Thank you for trusting Kerry Topup!',
+    notif_admin_replied_title:'Admin replied to order #{n}',
+    checkout_title:'Checkout', reseller_tagline:'Your trusted platform for reselling game top-ups — fast, hassle-free, at the best market prices.',
+    reseller_no_access_title:'You don\'t have API access', reseller_no_access_desc:'Contact Kerry Topup Admin to request supplier access.', reseller_whatsapp_contact:'💬 Contact on WhatsApp',
+    reseller_access_suffix:'— API Access', reseller_connected_as_prefix:'Logged in as',
+    api_loading_key:'Loading your API key...', api_access_heading:'🔑 API Access', api_test_connection_btn:'🛰️ Test connection',
+    api_regen_cooldown_prefix:'🔄 Reset in', api_regen_cta:'▶ Regenerate credentials',
+    api_recent_orders_heading:'📦 Recent orders', api_no_orders_yet:'No orders via the API yet.',
+    table_col_product:'Product', table_col_total:'Total', table_col_status:'Status', table_col_date:'Date',
+    status_completed:'Completed', status_pending:'Pending', status_failed:'Failed',
   },
   es: {
     nav_shop:'Tienda', nav_wallet:'Billetera', nav_commandes:'Pedidos', nav_historique:'Historial', nav_redeem:'Redeem Free Fire',
@@ -1624,6 +1732,42 @@ const TRANSLATIONS = {
     auth_create_account:'Crear Cuenta', auth_register_banner:'¡Bienvenido! Crea una cuenta para obtener bonos exclusivos, disfrutar de nuestra Billetera segura y una compra más rápida.',
     pw_req_6chars:'Al menos 6 caracteres', pw_req_upper:'Una letra mayúscula', pw_req_lower:'Una letra minúscula',
     pw_req_number:'Un número', pw_req_special:'Un carácter especial (@#$...)',
+    btn_chat_send:'Enviar', btn_enable:'Activar', push_enable_title:'Activar notificaciones', push_enable_sub:'Recibe una alerta en cuanto un pedido esté listo.', btn_regen_now:'🔒 Regenerar ahora', btn_remove_item:'Quitar',
+    creating_account_btn:'Creando cuenta...', verifying_photo_btn:'Verificando foto...', verifying_in_progress:'Verificando...', processing_in_progress:'Procesando...', logging_in_progress:'Iniciando sesión...',
+    voice_search_title:'Búsqueda por voz', reset_password_title:'Nueva contraseña', reset_password_sub:'Ingresa la nueva contraseña que deseas usar.', label_new_password:'Nueva contraseña', label_confirm_password:'Confirma tu contraseña', btn_save_new_password:'Guardar nueva contraseña',
+    regen_page_title:'Regenerar credenciales API', regen_warning_title:'⚠️ Advertencia importante', regen_warning_desc:'Regenerar tus credenciales reemplazará inmediatamente tu clave API y tu secreto. Cualquier integración existente dejará de funcionar hasta que actualices las nuevas credenciales.', regen_step_confirm:'Confirmar la acción', regen_type_help:'Por razones de seguridad, escribe la palabra de abajo para confirmar que deseas regenerar tus credenciales.', regen_type_placeholder:'Escribe REGENERER aquí',
+    status_already_regen:'Ya regenerado', status_not_regen_yet:'Aún no regenerado', badge_active:'Activo ✓', transfer_page_title:'Transferencia de saldo', my_requests_title:'Tus solicitudes de recarga', suspended_title:'El Sheriff Robot detectó<br>que estás haciendo trampa',
+    suspended_terms_notice:'No estás cumpliendo con los términos de nuestro sitio', order_summary_title:'Resumen del pedido', withdrawal_earnings_title:'Retiro de mis ganancias', field_account_info:'Info de la cuenta', field_enter_player_id_sub:'Ingresa tu ID de jugador para continuar la compra.', label_player_id:'ID de jugador',
+    ph_enter_player_id:'Ingresa tu ID de jugador', ph_enter_server_id:'Ingresa tu Server ID', toast_account_found:'¡Cuenta encontrada con éxito!', label_player_name:'Nombre del jugador', badge_account_verified:'✓ Cuenta verificada', toast_player_not_found:'❌ Este ID de jugador no existe',
+    label_amount_deposited:'Monto depositado (HTG)', label_receipt_natcash:'Recibo NatCash', btn_choose_file:'Elegir un archivo', label_no_file_chosen:'Ningún archivo elegido', ref_valid_for:'Referencia válida por', label_recipient_email:'Correo del destinatario',
+    label_amount_htg:'Monto (HTG)', btn_send_transfer:'Enviar transferencia', toast_recharge_approved:'Tu solicitud de recarga fue aprobada ✅', toast_copy_success:'Copiado con éxito ✅', toast_copy_fail:'No se pudo copiar — copia manualmente', toast_copy_simple:'Copiado ✓',
+    toast_code_copied:'Código copiado ✓', toast_link_copied:'Enlace copiado ✓', toast_link_copied_share:'🔗 Enlace copiado — pégalo donde quieras compartirlo', txn_already_used_box:'Este TXN ID ya fue utilizado.', toast_txn_already_used:'TXN ID ya utilizado', receipt_already_used_box:'Este recibo ya fue utilizado para otra solicitud.',
+    toast_receipt_already_used:'Recibo ya utilizado', dup_used_box:'Este TXN ID, referencia o recibo ya fue utilizado para otra solicitud.', toast_already_used:'Ya utilizado', recharge_pending_admin_box:'La recarga está siendo revisada por el administrador', toast_admin_verifying_order:'El administrador está revisando tu pedido', toast_fill_all_correctly:'Completa todos los campos correctamente',
+    toast_no_user_with_email:'No hay ningún usuario con ese correo', order_became:'ahora está', toast_cart_insufficient_balance:'Saldo insuficiente para todo el carrito — recarga tu Wallet', label_admin_response:'Respuesta del administrador', label_method:'Método', label_account_number_id:'Número / Identificador',
+    ph_account_number:'Número de cuenta', btn_request_withdrawal:'Solicitar el retiro', empty_no_listings:'Aún no hay anuncios.', status_wait_verif:'En verificación', status_recharge_approved:'Aprobada', status_recharge_rejected:'Rechazada',
+    toast_choose_rating:'Elige una calificación (1 a 5 estrellas)', toast_cannot_buy_own:'No puedes comprar tu propia cuenta', toast_already_in_cart:'Ya está en el carrito', toast_insufficient_balance_recharge:'Saldo insuficiente — recarga tu Wallet', toast_enter_valid_number:'Ingresa un número válido', toast_number_changed:'✅ Número cambiado — ¡gracias!',
+    toast_number_confirmed:'✅ Número confirmado — ¡gracias!', toast_voice_not_available:'La búsqueda por voz no está disponible en este dispositivo', toast_fill_all_fields:'Completa todos los campos', toast_password_rules:'⚠️ La contraseña debe cumplir con todos los requisitos (arriba)', toast_email_already_used:'Este correo ya está en uso', toast_account_created_verify:'Cuenta creada — revisa tu correo para confirmarla antes de iniciar sesión',
+    toast_welcome_prefix:'Bienvenido/a', toast_server_connect_fail_prefix:'No se pudo conectar al servidor', toast_confirm_email_first:'Confirma tu correo primero — revisa tu bandeja de entrada', toast_wrong_credentials:'Correo o contraseña incorrectos', toast_enter_email_first:'Ingresa primero tu correo en el campo de arriba', toast_reset_email_sent_prefix:'Se envió un correo a',
+    toast_reset_email_sent_suffix:'para cambiar tu contraseña', toast_reset_email_fail_prefix:'No se pudo enviar el correo en este momento', toast_passwords_not_matching:'Las contraseñas no coinciden — verifica de nuevo', toast_password_changed:'Contraseña cambiada con éxito ✓', toast_password_change_fail:'No se pudo cambiar la contraseña ahora — intenta de nuevo', toast_select_option:'Elige una opción',
+    toast_no_option_contact_admin:'⚠️ No hay opción disponible para este producto — contacta al Admin', toast_enter_server_id:'Ingresa primero tu Server ID', toast_session_expired:'⚠️ Has cerrado sesión — vuelve a iniciar sesión', toast_fill_field_prefix:'Completa el campo', toast_enter_ff_id_prefix:'Ingresa tu ID de Free Fire en el campo', name_confirmed_label:'Nombre confirmado',
+    toast_fill_all_required:'Completa todos los campos — son obligatorios', toast_amount_between_prefix:'El monto debe estar entre', toast_amount_between_mid:'y', manual_max_error_prefix:'No puedes pedir más de', toast_enter_valid_amount:'Ingresa un monto válido', toast_enter_txn_id:'Ingresa el TXN ID',
+    toast_txn_incomplete:'TXN ID incompleto — faltan', digits_suffix:'dígito(s)', toast_add_receipt_photo:'Agrega una foto del recibo de la transacción',
+    login_required_api_title:'Inicia sesión para ver tu acceso API', required_label:'Obligatorio', api_key_label:'Clave API', api_secret_label:'Secreto API', regen_status_label:'Estado de las credenciales', regen_current_active:'Tus credenciales actuales están activas.',
+    recharge_detail_title:'Detalle de la recarga', system_reference_label:'Referencia del sistema', proof_sent_label:'Comprobante enviado', loading_label:'Cargando...', no_photo_saved_tx:'No hay foto guardada para esta transacción.', photo_load_error:'Error al cargar la foto.',
+    toast_error_prefix:'Error', toast_option_not_connected:'⚠️ Esta opción no está conectada al Proveedor — contacta al Admin', toast_login_to_review:'Inicia sesión para dejar una reseña',
+    btn_download_receipt:'Descargar el recibo',
+    how_to_claim_label:'Cómo reclamar', label_amount_paid:'Monto pagado', label_invited_clients:'Clientes invitados', label_withdrawals_count:'Retiros', wallet_reseller_label:'Wallet del Revendedor',
+    notif_order_received_title:'Pedido #{n} recibido', notif_order_received_text:'Recibimos tu pedido y lo estamos procesando. ¡Recibirás tu producto pronto!',
+    notif_order_complete_title:'¡Pedido #{n} completado!', notif_order_complete_text:'Tu pedido fue entregado con éxito. ¡Gracias por confiar en Kerry Topup!',
+    notif_admin_replied_title:'El admin respondió al pedido #{n}',
+    checkout_title:'Finalizar compra', reseller_tagline:'Tu plataforma de confianza para revender recargas de juegos — rápido, sin complicaciones, a los mejores precios del mercado.',
+    reseller_no_access_title:'No tienes acceso a la API', reseller_no_access_desc:'Contacta al Admin de Kerry Topup para solicitar acceso de proveedor.', reseller_whatsapp_contact:'💬 Contactar por WhatsApp',
+    reseller_access_suffix:'— Acceso API', reseller_connected_as_prefix:'Conectado como',
+    api_loading_key:'Cargando tu clave API...', api_access_heading:'🔑 Acceso API', api_test_connection_btn:'🛰️ Probar conexión',
+    api_regen_cooldown_prefix:'🔄 Reinicio en', api_regen_cta:'▶ Regenerar credenciales',
+    api_recent_orders_heading:'📦 Pedidos recientes', api_no_orders_yet:'Aún no hay pedidos vía la API.',
+    table_col_product:'Producto', table_col_total:'Total', table_col_status:'Estado', table_col_date:'Fecha',
+    status_completed:'Completado', status_pending:'Pendiente', status_failed:'Fallido',
   }
 };
 function t(key){
@@ -2285,10 +2429,10 @@ async function checkAndRenderPushPrompt(){
     <div style="background:var(--green-dim);border:1px solid var(--green);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;">
       <span style="font-size:24px;">🔔</span>
       <div style="flex:1;">
-        <div style="font-weight:700;font-size:13px;">Activer les notifications</div>
-        <div style="color:var(--muted);font-size:11.5px;">Soyez alerté dès qu'une commande est prête.</div>
+        <div style="font-weight:700;font-size:13px;">${t('push_enable_title')}</div>
+        <div style="color:var(--muted);font-size:11.5px;">${t('push_enable_sub')}</div>
       </div>
-      <button onclick="enablePushNotifications().then(checkAndRenderPushPrompt)" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-weight:700;font-size:12px;flex-shrink:0;">Activer</button>
+      <button onclick="enablePushNotifications().then(checkAndRenderPushPrompt)" style="background:var(--green);color:#fff;border:none;border-radius:10px;padding:9px 14px;font-weight:700;font-size:12px;flex-shrink:0;">${t('btn_enable')}</button>
     </div>
   `;
 }
@@ -2504,9 +2648,9 @@ function formatChatText(text){
       <div style="background:var(--panel-2);border-radius:14px;padding:14px;margin-top:10px;">
         <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;">✍️ Ekri kantite ou vle a pou wè konbyen w ap peye ak frè yo :</div>
         <input type="number" id="${uid_}-input" placeholder="Ex: 20" oninput="updateChatCalculator('${uid_}','${pid}')" style="width:100%;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;color:var(--text);margin-bottom:10px;">
-        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;"><span style="color:var(--muted);">Montant</span><span id="${uid_}-amt">0 USD</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;"><span style="color:var(--muted);">Frais</span><span id="${uid_}-frais">+0 USD</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;padding:6px 0;border-top:1px solid var(--line);margin-top:4px;"><span>Total</span><span id="${uid_}-total" style="color:var(--green);">0 HTG</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;"><span style="color:var(--muted);">${t('field_amount')}</span><span id="${uid_}-amt">0 USD</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;padding:4px 0;"><span style="color:var(--muted);">${t('field_fees')}</span><span id="${uid_}-frais">+0 USD</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;padding:6px 0;border-top:1px solid var(--line);margin-top:4px;"><span>${t('field_total')}</span><span id="${uid_}-total" style="color:var(--green);">0 HTG</span></div>
         <a href="${window.location.origin}/product/${slugify(p.name)}" style="display:block;text-align:center;margin-top:10px;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;font-size:12.5px;padding:10px 20px;border-radius:20px;">🛒 Voir le produit</a>
       </div>
     `;
@@ -3523,12 +3667,14 @@ function showCustomerError(friendlyMsg, technicalDetail, context, translationKey
   const clientName = u ? (u.name || 'Kliyan konekte') : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè');
   sendNtfyNotification('🚨 Erè teknik (paj kliyan)', '👤 Moun: ' + clientName + '\n📄 Kontèks: ' + (context||currentPage||'?') + '\n🛠️ Detay: ' + technicalDetail, 'urgent', 'rotating_light');
 }
-function showToast(msg, duration){
+function showToast(msg, duration, skipNtfy){
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.classList.remove('show'), duration || 3000);
-  if(msg && msg.indexOf('⚠️') !== -1 && !isGenericNetworkError(msg)){
+  // skipNtfy: pou senp validasyon nòmal (kliyan ki tape yon modpas ki pa respekte règ yo, elatriye) —
+  // sa se yon bagay kliyan an ka korije limenm, pa bezwen deranje Kerry ak yon notifikasyon ijans.
+  if(msg && msg.indexOf('⚠️') !== -1 && !isGenericNetworkError(msg) && !skipNtfy){
     const u = currentUser();
     const clientName = u ? (u.name || 'Kliyan konekte') : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè');
     sendNtfyNotification('🚨 Erè sou sit la', '👤 Moun: ' + clientName + '\n📄 Paj: ' + (currentPage||'?') + '\n⚠️ Mesaj: ' + msg, 'urgent', 'rotating_light');
@@ -3967,23 +4113,23 @@ async function doRegister(){
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim().toLowerCase();
   const pass = document.getElementById('regPass').value;
-  if(!name || !email || !pass){ showToast('Ranpli tout chan yo'); return; }
+  if(!name || !email || !pass){ showToast(t('toast_fill_all_fields')); return; }
   if(pass.length < 6 || !/[A-Z]/.test(pass) || !/[a-z]/.test(pass) || !/[0-9]/.test(pass) || !/[^A-Za-z0-9]/.test(pass)){
-    showToast('⚠️ Modpas la dwe respekte tout règ yo (anwo chan an)');
+    showToast(t('toast_password_rules'), 3000, true);
     return;
   }
   const btn = document.getElementById('regSubmitBtn');
-  if(btn){ btn.disabled = true; btn.textContent = 'Ap kreye kont...'; }
+  if(btn){ btn.disabled = true; btn.textContent = t('creating_account_btn'); }
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.auth.signUp({ email, password: pass });
     if(error){
-      if(error.message.includes('already')){ showToast('Imèl sa deja itilize'); }
+      if(error.message.includes('already')){ showToast(t('toast_email_already_used')); }
       else { showCustomerError('⚠️ Nou pa t kapab kreye kont ou — eseye ankò.', error.message, 'Enskripsyon'); }
       return;
     }
     if(!data.session){
-      showToast('Kont kreye — verifye imèl ou pou konfime l anvan w konekte');
+      showToast(t('toast_account_created_verify'));
       closeAuthModal();
       return;
     }
@@ -3992,11 +4138,11 @@ async function doRegister(){
     }catch(e){ /* profile/wallet sync best-effort */ }
     await saveState();
     closeAuthModal();
-    showToast('Byenveni ' + name + ' 👋');
+    showToast(t('toast_welcome_prefix') + ' ' + name + ' 👋');
     afterAuthSuccess();
   }catch(e){
     console.error('Erè enskripsyon:', e);
-    showToast('Pa ka konekte ak sèvè a: ' + (e && e.message ? e.message : 'erè enkoni'));
+    showToast(t('toast_server_connect_fail_prefix') + ': ' + (e && e.message ? e.message : 'erè enkoni'));
   }finally{
     if(btn){ btn.disabled = false; btn.textContent = t('auth_create_account'); }
   }
@@ -4004,30 +4150,30 @@ async function doRegister(){
 async function doLogin(){
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const pass = document.getElementById('loginPass').value;
-  if(!email || !pass){ showToast('Ranpli tout chan yo'); return; }
+  if(!email || !pass){ showToast(t('toast_fill_all_fields')); return; }
   if(document.activeElement && typeof document.activeElement.blur === 'function') document.activeElement.blur();
   const btn = document.getElementById('loginSubmitBtn');
   if(btn){
     btn.disabled = true;
     btn.style.opacity = '0.6';
     btn.style.cursor = 'not-allowed';
-    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;vertical-align:-2px;margin-right:6px;"><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>Connexion en cours...';
+    btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;vertical-align:-2px;margin-right:6px;"><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>' + escapeHtml(t('logging_in_progress'));
   }
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if(error){
-      showToast(error.message.toLowerCase().includes('confirm') ? 'Konfime imèl ou anvan — gade nan bwat resepsyon ou' : 'Imèl oswa modpas pa bon');
+      showToast(error.message.toLowerCase().includes('confirm') ? t('toast_confirm_email_first') : t('toast_wrong_credentials'));
       return;
     }
     await syncLocalUserFromAuth(data.user);
     await saveState();
     closeAuthModal();
-    showToast('Byenveni ' + currentUser().name);
+    showToast(t('toast_welcome_prefix') + ' ' + currentUser().name);
     afterAuthSuccess();
   }catch(e){
     console.error('Erè koneksyon:', e);
-    showToast('Pa ka konekte ak sèvè a: ' + (e && e.message ? e.message : 'erè enkoni'));
+    showToast(t('toast_server_connect_fail_prefix') + ': ' + (e && e.message ? e.message : 'erè enkoni'));
   }finally{
     if(btn){ btn.disabled = false; btn.style.opacity = ''; btn.style.cursor = ''; btn.textContent = t('auth_login_tab'); }
   }
@@ -4050,20 +4196,20 @@ async function tryRestoreSupabaseSession(){
 }
 async function sendPasswordReset(){
   const email = (document.getElementById('loginEmail')?.value || '').trim().toLowerCase();
-  if(!email){ showToast('Antre imèl ou nan chan anwo a dabò'); return; }
+  if(!email){ showToast(t('toast_enter_email_first')); return; }
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.href.split('#')[0] });
     console.warn('resetPasswordForEmail result:', { data, error, errorMessage: error?.message, errorStatus: error?.status, errorCode: error?.code, errorName: error?.name, full: JSON.stringify(error) });
     if(error){
       const detail = error.message || error.error_description || error.code || error.name || JSON.stringify(error) || 'erè enkoni';
-      showToast('Erè (' + (error.status||'?') + '): ' + detail);
+      showToast(t('toast_error_prefix') + ' (' + (error.status||'?') + '): ' + detail);
       return;
     }
-    showToast('Yon imèl voye bay ' + email + ' pou chanje modpas ou');
+    showToast(t('toast_reset_email_sent_prefix') + ' ' + email + ' ' + t('toast_reset_email_sent_suffix'));
   }catch(e){
     console.warn('resetPasswordForEmail exception:', e, JSON.stringify(e));
-    showToast('Pa ka voye imèl la kounye a: ' + (e?.message || JSON.stringify(e)));
+    showToast(t('toast_reset_email_fail_prefix') + ': ' + (e?.message || JSON.stringify(e)));
   }
 }
 function showPasswordResetForm(){
@@ -4074,10 +4220,10 @@ function showPasswordResetForm(){
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
       </div>
     </div>
-    <h2 style="text-align:center;">Nouvo Modpas</h2>
-    <div class="sub" style="text-align:center;">Antre nouvo modpas ou vle itilize a.</div>
+    <h2 style="text-align:center;">${t('reset_password_title')}</h2>
+    <div class="sub" style="text-align:center;">${t('reset_password_sub')}</div>
     <div class="field">
-      <label style="font-size:10.5px;letter-spacing:1.1px;font-weight:800;color:#8a9096;text-transform:uppercase;">Nouveau mot de passe</label>
+      <label style="font-size:10.5px;letter-spacing:1.1px;font-weight:800;color:#8a9096;text-transform:uppercase;">${t('label_new_password')}</label>
       <div style="display:flex;align-items:center;justify-content:space-between;border:1.5px solid #e6e9e7;border-radius:13px;padding:13px 15px;background:#fbfcfb;margin-top:9px;">
         <input type="password" id="newPassInput" oninput="checkResetPasswordStrength()" placeholder="••••••••" style="border:none;outline:none;background:transparent;flex:1;font-size:15px;color:#14181c;">
         <button type="button" onclick="toggleFieldVisibility('newPassInput', this)" style="background:none;border:none;color:#9aa39d;flex-shrink:0;">
@@ -4093,7 +4239,7 @@ function showPasswordResetForm(){
       </div>
     </div>
     <div class="field">
-      <label style="font-size:10.5px;letter-spacing:1.1px;font-weight:800;color:#8a9096;text-transform:uppercase;">Confirmez votre mot de passe</label>
+      <label style="font-size:10.5px;letter-spacing:1.1px;font-weight:800;color:#8a9096;text-transform:uppercase;">${t('label_confirm_password')}</label>
       <div style="display:flex;align-items:center;justify-content:space-between;border:1.5px solid #e6e9e7;border-radius:13px;padding:13px 15px;background:#fbfcfb;margin-top:9px;">
         <input type="password" id="confirmPassInput" placeholder="••••••••" style="border:none;outline:none;background:transparent;flex:1;font-size:15px;color:#14181c;">
         <button type="button" onclick="toggleFieldVisibility('confirmPassInput', this)" style="background:none;border:none;color:#9aa39d;flex-shrink:0;">
@@ -4103,7 +4249,7 @@ function showPasswordResetForm(){
     </div>
     <button onclick="submitNewPassword()" style="width:100%;border:none;border-radius:14px;padding:15px;background:linear-gradient(145deg, #262d35, #0a0d11);color:#fff;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 14px 28px rgba(10,13,17,0.28), inset 0 1px 0 rgba(255,255,255,0.08);margin-top:6px;display:flex;align-items:center;justify-content:center;gap:9px;">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
-      Enregistrer le nouveau mot de passe
+      ${t('btn_save_new_password')}
     </button>
   `;
 }
@@ -4125,19 +4271,19 @@ async function submitNewPassword(){
   const pass = document.getElementById('newPassInput').value;
   const confirmPass = document.getElementById('confirmPassInput').value;
   if(!pass || pass.length < 6 || !/[A-Z]/.test(pass) || !/[a-z]/.test(pass) || !/[0-9]/.test(pass) || !/[^A-Za-z0-9]/.test(pass)){
-    showToast('⚠️ Modpas la dwe respekte tout règ yo (anwo chan an)');
+    showToast(t('toast_password_rules'), 3000, true);
     return;
   }
-  if(pass !== confirmPass){ showToast('Modpas yo pa idantik — tanpri verifye'); return; }
+  if(pass !== confirmPass){ showToast(t('toast_passwords_not_matching')); return; }
   try{
     const sb = await getSupabase();
     const { error } = await sb.auth.updateUser({ password: pass });
     if(error){ showCustomerError('⚠️ Nou pa t kapab chanje modpas ou — eseye ankò.', error.message, 'Chanjman modpas'); return; }
-    showToast('Modpas chanje ak siksè ✓');
+    showToast(t('toast_password_changed'));
     closeAuthModal();
     history.replaceState(null, '', window.location.pathname);
   }catch(e){
-    showToast('Pa ka chanje modpas la kounye a — eseye ankò');
+    showToast(t('toast_password_change_fail'));
   }
 }
 function afterAuthSuccess(){
@@ -4433,22 +4579,22 @@ function getNotifItems(){
   orders.forEach(o => {
     items.push({
       id:'recv-'+o.id, status:'processing',
-      title:'Kòmand #'+(o.orderNo||'')+' an tou piti',
-      text:'Nou resevwa kòmand ou a epi nou ap trete l. Ou pral resevwa pwodwi ou byento!',
+      title:t('notif_order_received_title').replace('{n}', o.orderNo||''),
+      text:t('notif_order_received_text'),
       date:o.date
     });
     if(o.status === 'terminee'){
       items.push({
         id:'done-'+o.id, status:'complete',
-        title:'Kòmand #'+(o.orderNo||'')+' konplè!',
-        text:'Kòmand ou a livre avèk siksè. Mèsi pou konfyans ou nan Kerry Topup!',
+        title:t('notif_order_complete_title').replace('{n}', o.orderNo||''),
+        text:t('notif_order_complete_text'),
         date:o.date
       });
     }
     if(o.adminResponse){
       items.push({
         id:'resp-'+o.id, status:'response',
-        title:'Admin reponn kòmand #'+(o.orderNo||''),
+        title:t('notif_admin_replied_title').replace('{n}', o.orderNo||''),
         text:o.adminResponse,
         date:o.date
       });
@@ -4634,7 +4780,7 @@ let shopHasRenderedOnce = false;
 function startVoiceSearch(){
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
   if(!SpeechRec){
-    showToast('Rechèch vokal pa disponib sou aparèy sa a');
+    showToast(t('toast_voice_not_available'));
     return;
   }
   const micBtn = document.getElementById('searchMicBtn');
@@ -4867,24 +5013,24 @@ function renderApiTopupSheet(p){
     <div style="border:1.5px solid #C4B5FD;border-radius:16px;padding:18px;margin-bottom:16px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
         <span style="font-size:20px;">🎮</span>
-        <span style="font-weight:800;font-size:16px;color:var(--text);">Info Compte</span>
-        <span style="background:#FEE2E2;color:#DC2626;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;">* Obligatoire</span>
+        <span style="font-weight:800;font-size:16px;color:var(--text);">${t('field_account_info')}</span>
+        <span style="background:#FEE2E2;color:#DC2626;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;">* ${t('required_label')}</span>
       </div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Entrez votre ID joueur pour poursuivre l'achat.</div>
-      <label style="font-size:13px;font-weight:700;color:var(--text);">ID Joueur <span style="color:#DC2626;">*</span></label>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">${t('field_enter_player_id_sub')}</div>
+      <label style="font-size:13px;font-weight:700;color:var(--text);">${t('label_player_id')} <span style="color:#DC2626;">*</span></label>
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--panel-2);border:1.5px solid #C4B5FD;border-radius:12px;padding:6px 6px 6px 12px;margin:8px 0 12px;">
         <span style="font-weight:900;font-style:italic;color:#7C3AED;font-size:16px;">F</span>
-        <input type="text" inputmode="numeric" pattern="[0-9]*" id="apiPlayerId-${p.id}" placeholder="Entrez votre ID joueur" oninput="clearVerifiedPlayer('${p.id}')" style="flex:1;min-width:0;background:none;border:none;outline:none;font-size:14px;color:var(--text);padding:8px 0;">
+        <input type="text" inputmode="numeric" pattern="[0-9]*" id="apiPlayerId-${p.id}" placeholder="${t('ph_enter_player_id')}" oninput="clearVerifiedPlayer('${p.id}')" style="flex:1;min-width:0;background:none;border:none;outline:none;font-size:14px;color:var(--text);padding:8px 0;">
         <button onclick="verifyPlayerId('${p.id}')" style="display:flex;align-items:center;gap:6px;background:rgba(15,166,84,0.12);color:var(--green);border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:700;white-space:nowrap;flex-shrink:0;">🛡️ Vérifier</button>
       </div>
-      ${selected && selected.requiresServerId && !selected.fixedServerId ? `<label style="font-size:13px;font-weight:700;color:var(--text);">Server ID <span style="color:#DC2626;">*</span></label><input type="text" id="apiServerId-${p.id}" placeholder="Entrez votre Server ID" style="width:100%;margin:8px 0 12px;background:var(--panel-2);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;color:var(--text);">` : ''}
+      ${selected && selected.requiresServerId && !selected.fixedServerId ? `<label style="font-size:13px;font-weight:700;color:var(--text);">Server ID <span style="color:#DC2626;">*</span></label><input type="text" id="apiServerId-${p.id}" placeholder="${t('ph_enter_server_id')}" style="width:100%;margin:8px 0 12px;background:var(--panel-2);border:1.5px solid var(--line);border-radius:12px;padding:11px 13px;font-size:14px;color:var(--text);">` : ''}
       <div id="verifyResult-${p.id}"></div>
     </div>
     `}
 
     <div style="display:flex;gap:10px;margin-bottom:16px;">
-      <button class="btn btn-ghost" style="flex:1;${p.outOfStock?'opacity:0.5;pointer-events:none;':''}" onclick="addApiTopupToCart('${p.id}')" ${p.outOfStock?'disabled':''}>Ajouter au panier</button>
-      <button id="apiBuyBtn-${p.id}" class="btn btn-green" style="flex:1;${p.outOfStock?'opacity:0.5;pointer-events:none;':''}" onclick="confirmApiTopupPurchase('${p.id}')" ${p.outOfStock?'disabled':''}>${p.outOfStock?'Rupture de stock':'Acheter maintenant'}</button>
+      <button class="btn btn-ghost" style="flex:1;${p.outOfStock?'opacity:0.5;pointer-events:none;':''}" onclick="addApiTopupToCart('${p.id}')" ${p.outOfStock?'disabled':''}>${t('btn_add_cart')}</button>
+      <button id="apiBuyBtn-${p.id}" class="btn btn-green" style="flex:1;${p.outOfStock?'opacity:0.5;pointer-events:none;':''}" onclick="confirmApiTopupPurchase('${p.id}')" ${p.outOfStock?'disabled':''}>${p.outOfStock?t('out_of_stock'):t('btn_buy_now')}</button>
     </div>
 
     <div style="background:rgba(15,166,84,0.08);border-radius:12px;padding:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;color:var(--green);font-weight:600;">
@@ -4905,13 +5051,13 @@ function clearVerifiedPlayer(productId){
 function addApiTopupToCart(productId){
   const p = state.products.find(x=>x.id===productId);
   const v = p.variants.find(x=>x.id===selectedVariantId);
-  if(!v){ showToast('Chwazi yon opsyon'); return; }
+  if(!v){ showToast(t('toast_select_option')); return; }
   const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = document.getElementById('apiServerId-'+productId);
   const serverId = v.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast(t('verify_player_id_toast')); return; }
-  if(v.requiresServerId && !v.fixedServerId && !serverId){ showToast('Antre Server ID ou anvan'); return; }
+  if(v.requiresServerId && !v.fixedServerId && !serverId){ showToast(t('toast_enter_server_id')); return; }
   const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
   state.cart.push({
     id: uid(), productId: p.id, productName: p.name, type:'api_topup',
@@ -4921,19 +5067,19 @@ function addApiTopupToCart(productId){
   saveState();
   saveCartToServer();
   renderTopIcons();
-  showToast('Ajoute nan panye ✓');
+  showToast(t('added_to_cart_toast'));
   goPage('shop');
 }
 function buyNowApiTopup(productId){
   const p = state.products.find(x=>x.id===productId);
   const v = p.variants.find(x=>x.id===selectedVariantId);
-  if(!v){ showToast('Chwazi yon opsyon'); return; }
+  if(!v){ showToast(t('toast_select_option')); return; }
   const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = document.getElementById('apiServerId-'+productId);
   const serverId = v.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast(t('verify_player_id_toast')); return; }
-  if(v.requiresServerId && !v.fixedServerId && !serverId){ showToast('Antre Server ID ou anvan'); return; }
+  if(v.requiresServerId && !v.fixedServerId && !serverId){ showToast(t('toast_enter_server_id')); return; }
   const qty = 1;
   state.cart.push({
     id: uid(), productId: p.id, productName: p.name, type:'api_topup',
@@ -4949,15 +5095,15 @@ async function verifyPlayerId(productId){
   const p = state.products.find(x=>x.id===productId);
   let variant = p.variants.find(v=>v.id===selectedVariantId);
   if(!variant && p.variants.length > 0){ variant = sortedVariants(p)[0]; selectedVariantId = variant.id; }
-  if(!variant){ showToast('⚠️ Pa gen opsyon disponib pou pwodwi sa a — kontakte Admin'); return; }
+  if(!variant){ showToast(t('toast_no_option_contact_admin')); return; }
   const playerId = document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = document.getElementById('apiServerId-'+productId);
   const serverId = variant.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   const resultBox = document.getElementById('verifyResult-'+productId);
-  resultBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:8px;"><span class="verif-spinner"></span>Vérification en cours...</div>';
+  resultBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:8px;"><span class="verif-spinner"></span>' + escapeHtml(t('verifying_in_progress')) + '</div>';
   const partnerIdForVerify = variant.partnerProductId != null ? String(variant.partnerProductId) : null;
-  if(!partnerIdForVerify){ showToast('⚠️ Opsyon sa a pa konekte ak Founisè — kontakte Admin'); resultBox.innerHTML=''; return; }
+  if(!partnerIdForVerify){ showToast(t('toast_option_not_connected')); resultBox.innerHTML=''; return; }
   try{
     const sb = await getSupabase();
     let { data, error } = await sb.functions.invoke('partner-verify', {
@@ -4996,14 +5142,14 @@ async function verifyPlayerId(productId){
         <div style="display:flex;align-items:center;gap:14px;background:rgba(15,166,84,0.06);border:1px dashed var(--green);border-radius:14px;padding:14px;margin-top:12px;">
           <div style="width:52px;height:52px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:10px;box-sizing:border-box;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAMAAAD6TlWYAAAC/VBMVEVHcEz/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugAnYVeNAAAA/3RSTlMA+P+kiaL+/Zr8+/kM+gUHCfH16g7lYSaj9C/p4ylZYrvo7sqW7RE2uIBQI+cLKr7m4LScLoTDjpINZ8EfGYpCY7Ms1qVrK7yHTm3Jp+JqQ6qhe9JWdS1fhXBMsjA15I0lVVSgZlFexFgot4y/GkR8j8BSYFxpSzu6V3F6glNsZD6eJ4h5T5SYi4Y/r61HrtCDSm+p37m1SYHMwp1/pjHZHs+9xcdoOk2rRSLL2Kg5bjiVzZmTQZATrHJdl3M9dDw33FrsyN0zNBB9FbEhIH7XZTK2JOFb3kaweNvrxhIIG+/y8NTaHHefHUDz084PGBYGBPbRFEgKAwL3kdUXmwHybCriAAAN0ElEQVR42u3dA5RjSfvH8V9+M5Ns0tbYtu21bdv27uv3Xdu2be/Ytm22MZ30IH/ee+6ZdHq6Kj03naquzzH6+J5T/dTzrcAwXGMYhmEYhmEYhmEYhmEYhmEYhmEYhmEYhmEYhmEYhmEYhhGaO7re2VMqPIopefNdJIJwixMWJFFJn69H7Rvy4nIvFbV6A2rdtsZJVNYDyaht77/qpbIuG4Xa1vFzqivjfNS2UBc/lZU0qxi1bUIzKst7RDJqW9ExVNfiAtS6TmuorLwWqH2zqKylu1D7yltTVRsnIwG0yKGiPNuDSAAtA1ST74dyJIKfqag5s5EIZk6lmqY2QkKYMYVKypuBxPCJlwryPXAeEkOoARXUfUAhEkRBLlUTWP7DpUEkil27Kcm/sc/R+2rLljc6D17WLYjEsZ1S/Fv7nd9pXsH+2lI4Mw0JpWglJfhyX5wXAgzHvOUUt2nvcBzMONFDYb0bFiGCcQKF9b4LkYwevShqdytUYhzXnaL2pqIS4x4/BW35EpUZ7SnIOxaVGR3bUdCkbogirBC4oVNbCtoRwsGyL/1n/R3H1FPFMQ2GZuPwO5aCfK1wkJ0XDmvro1I8I3HYBY+hoKymgCN5Ya6PyjkVh92IoyloYDYcwxt4qKB9OOxOb0JBg+C4sRdV1KEhDruzKCjlSsC283hzh2xJO5KCmjeCLf3fVJGvfTkOu259KKhzOmzXlVBFFxfi8Ls2iYJeh62gHVXUrhFcMJKCSvbANjpABS2fABckD6OgrTthSe9LBXU4B244rw0F/Z4KS88cqqfijxDccL6fgsbCtsxP5fh+XQ9X/ERBm8bB9gPV8/tvcMVvP1JQaSEsHU+mctZ2gzu+3UhBV4dhubQDVbN6IlzyHQV5r4HtXi8Vk9UVLin+hoKmLIIl1JiKyTwpDJds+JqCPp4JS8EWqsU/Mg1uWZFJQYNh+2U31XLKTLhmPgUFWsK2imoZNhyuWb+YgnJawFI0h0pZMB3uWbKUgo4vh2Xucqqk+31w0VUpFHRBxCaXKnYPhZsGUZDnM9hOoEICA1LhouzrKWjavIhNLkWcmQ03Nc2ioJVFsPTsTnUcvwGuGu2joFURm1xqyO0PV4XfoqDdv8DWnsrIWQF3zf6AgrYURGxyqSCjIVw2IYOC6gUjNrkUkDK/GC77g6JOg+1YKsJ7IBkuS/2cgtp2itjkUsBNBXDbzq0U9NU6WEbsoxryesJ1r5VQ0BjYRjWhAuL0EMrrFOT/E7aHqYSNy+C+9FcoqPtRsKRdTBV4VgXhvv80p6A7k2H58mUqIE4PoTwYoKD6sD3ioQLi9BDKXgpKuha2h7RfYhOXv5aC+nSDJfkWJr6tnyIuzsuioL5p4lFi7VtwOuLjX00o6HbY/vQzwflfWYQ46dmbYjJvg20ME5tv9fYyxEvq3gCFLNgAy7qvmMD8a4aduySM+Jl596C9lV3vZYRvimGZ2Jax8mWtbXxH/Zq7fG90v9ZfdcMlQxBH4uXmdzUfZQV+3H5Jdhh1wnUeHmzzpzUeZS0dX4A6Im30ZYyQVyYbJUbw9uqEumL/r00Y6UBYMkqM4D1jG+qK6a19jOQ01vgrY3HkCNQRqZMnsbKsppJRYoSzW6CO+O2EDEZxfXaNRlmZLVFHHHWkn9EMgq1rEuU9VY46IXjX0YzKaaxRn/IqrkWdkD+/LaM7tREsyXdSXul+1AWNPk9hFZzG+qg2lHd1GPoLvfAcq9QFtuv8lHcW9Jd8bharVPIabI8xBsdCe3MbJAk11uveYAzGQ3PhUe28PITfi2H5fiNjMAZ6S/9Hb9HG+iTGIq8QOtv2U4VoYx18h7FIagWN3T/QK9xY33o0Y7Kvv8ajv1NZnR1hWG5rwtisnQg97d/bRKaxPouxOvVvlwwJhh36jv4qW7MIlrS+jJm32UdnNGhsu/pAnPR7/Ft3R38CPs6HpVsfqmfaDLjkt4cyJBvra5OooPluj/7EG+uRVNF2uOLTLdKNdfIwKqi0Edywf6B8Y31eG6rnsi/gij8D8o31+T4K0j/0CveLobH+iaL0D73KPpBvrJ33tWhCr0Ud5BtrZ5SlDPd+8XrEGbmlUbQ5VGP9HR0m9Covi2LdnjVVN9bBb+gwoVd0/btX3VhvWECHCb2iWrKSkeqFYPkikw4TekUR2vPBoRrrWVSKr315IlxsOo31+leplDmFiK9u9ZJYWbt1sER5X8uEXo7QMz9WcyF5VxIVsnwC4qrH2GbVNdY3UyEdrkyQvYTux8Ey5E2qwnmtPE7CX3zlZXS3JMPSvxkV4bxWHic9/tJGoLG+20dl/P4b4mje1R5WJakrLOEjqIy1XyJ+wqef7BVprBUaZa2eiPjpcWF3scb6281URFZXxM/wf3sEG+vvqAjntXL3hX+Z6hVsrIu/oRqc18rdV35Sb+HGesPXVMMpHREv779VwWo4jfWKTCph2HDESfjJtV5W50XVRlkLpiNO0o/NYbU2fwvL+sVUQZv7ECc7D1Swenllao2ydg9FnIz7yEsBTmP99xQmPpdfK3ek33sZRfgaqjXKapCNuNg/poRCmjWFZchAJr7jtyEuks/0UozzO9ZNmzHh5TZFfCzzUNAg2Br6mOhcf61c/n8yp7EOH9B+iU3ctq8p6NQrYCnL036JTZz4/2Sd18Py6WYmNm+/ZMTLLIrqAtuFTHB9RyBuzi3xVFTm8TOS8zvWxS8xoXlfnYv4yd+1p7JnVqzaxAhOY73tPSayzDEjUPu2rWYEp7F+poSJK3Dy5PWofUXjPYwwFra3magCbRaPLkQCmD2oCSNkTIBl/U2Ul3LTmQ1q6MwDRxzaz7c/eFw6EkHTzj5GchrrK06lPOc+VH/Bq75mZU5jfVUK5Tn3odrLf3sjK/MuhO1yxuAs1BVXvJTCKJzfsc4eSHlNTkfdEP4ij1E5jXXTLMo7+lbUCeXftWF0g2Fr5aO8Y4KoCzYcUcHoAi0jo0Q5/0Bd8O0wL6uQ0yIySpTSdiL0V3R+H1bJaazvz6C8r9ZBe2Ujdws11n9hDMZAe0f19bNqnotgKT6D8vx/QnPBrkcLNtbyoyxntV9f2Wd1EG2s95RQXq8e0NqX76Tw0LbD1oUxOAE6C4/6itVwGuv0zpTnOREaSz+2N6vjNNaNmlPe8rnQ163tS1gtp7E+J4Xy5hRBW5fe4mP1ToPtDsZgO3SVumw5BbS9FJbs6ylv9y5oat0TmyiiXUdYLsmivNwC6KnnHD+FtIftnz7KaxCClmY8J/2PWPgtyvN+Ai1lL6Yg53esZz9HeR1mQEsXlVCQ01hPyKC8qTOhpZspqj5sfzAGP0NL4i8eOI116ueUF2gJLfVvJr9TsHMr5eW0gJYa+uR3CmIaZbUuh1bk18Rvh+11xmAAtCS+Ju401umvUF7FfdCS+Jr4gltrNMqaNBxaupCiTimu0Sjr2VRoRf5u7TvYfmUMxkNL4ndrG7+FJf8jytv0L2jJOZCIN9bvrqG80kJoqQsdoo31Qi/l7QhBR87dmnhjHd5Bed6F0JJzIBFvrAtLKW/Nu9CScyARb6zHZVDe2nxo6Q7KN9ZjGYNfoSXxA0nKVbCkPk15KedAS+IHkuZXwPL+aspr3ghaWuiVb6xfqKC8zunQUWhHDI313xiDLtCS+IHEaazLH6BD/s/1In4gcRrr/1xGeVu3QUtjKer3VFgeDFDeGcXQivyB5A/Y9jIGF0JL4geSjHGw5K+lvM33Q0viB5LS2bAsWkN5eWXQ0vMUtaNmo6x+YeiovLX8LCq0g/J8raClG3MoaM2i2EdZziRMOy0D8rOocZsob+AQaOlnihoM23jG4HJoaeZUCgrcAEvqs5SX9HdoaUYHCsq5EZb3J1He0iXQ0ide+bWqmEZZi9dDR6EGFHVB5MlRzixoqSCXgiouijw5Ssn8AlratZsOwcb6xhzK+3oDtLSKDtHG+oYA5Z0ShI6KVsZQCA5mDE6CluYuly8EZ35MeRu/h5ZO9MgXgtOnUN4bv0FLJ1DUT2FYhnop7ydoqUcvCmryGiyhMynPdx20dFxvCuqbDMv+symvzVHQ0j1+iumwArYnN1HencnQUnuK8V0QhO1cxqA+tNSxHcW8tA41G2V1hZY6taUI39MbYMPwSZT38pfQ0mkU0WRwIRwXVVDexWnQUbAeqxdod0MaHBjAGPwVWtq5hdXwTWk9dL/8JWikJqOgpYs2sUrepKyzL7651aIeOFiLHMrbNwJaepxR+Tev/vCnPz47b3aq0CWogHpBaOkNRvBmNp/6ztstO21IF78EFeA9DXpqE/HFXn7NqCX5IfFLUFEdOkFPK/m//Bu3/v8XW4TqxTTKatcRemq0Y8H/frETt5WH5S9BJbSHror254fcugR1+JfBsOzPpbzePWE4l6DyPuwBw7K9RisJRtFTlNdmOgzLvGmU168YhuUzD6UtXQTD9gSleb6DYevxIWX5fiiHYeuZQ0mBt9bBsGFZgHI2P58Pw/EopaS8+VkxDEfHkynOt+amu8tgOIT2+a3RYu6Rg1pdUg7jYPd6WQ3/5km9Dow/sX+00aIRakxHlMuAk0/pMvn7qkeLRkHuIb7YoadfkR+EITjKcq7v/u+LLSxC9YzJvogv9vXJ3+8U/2KN6b1J0lvRrPT/r++CMKQET2pW8d7KAS1nFKTBMAzDMAzDMAzDMAzDMAzDMAzDMAzDMAzDMAzDMAzDMAzDMAyjJv4bvws2IiPSZAEAAAAASUVORK5CYII=" style="width:100%;height:100%;object-fit:contain;"></div>
           <div>
-            <div style="color:var(--green);font-weight:700;font-size:14px;">Compte trouvé avec succès !</div>
-            <div style="color:var(--text);font-size:13px;margin:2px 0 6px;">Nom du joueur : <b>${escapeHtml(data.name || '')}</b></div>
-            <span style="background:#ECFDF5;color:#059669;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;">✓ Compte validé</span>
+            <div style="color:var(--green);font-weight:700;font-size:14px;">${t('toast_account_found')}</div>
+            <div style="color:var(--text);font-size:13px;margin:2px 0 6px;">${t('label_player_name')} : <b>${escapeHtml(data.name || '')}</b></div>
+            <span style="background:#ECFDF5;color:#059669;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;">${t('badge_account_verified')}</span>
           </div>
         </div>
       `;
     } else {
-      resultBox.innerHTML = '<div style="background:rgba(214,69,69,0.08);border-radius:10px;padding:11px 13px;color:var(--red);font-weight:600;font-size:13px;margin-top:12px;">❌ Player ID sa a pa egziste</div>';
+      resultBox.innerHTML = '<div style="background:rgba(214,69,69,0.08);border-radius:10px;padding:11px 13px;color:var(--red);font-weight:600;font-size:13px;margin-top:12px;">' + escapeHtml(t('toast_player_not_found')) + '</div>';
       if(data.debug_sent || data.debug_received){
         resultBox.innerHTML += `
           <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px;margin-top:10px;font-size:10.5px;font-family:monospace;color:#111;word-break:break-all;">
@@ -5027,7 +5173,7 @@ async function verifyFormFieldPlayer(productId, fieldIndex){
   const playerId = document.getElementById('formField-'+fieldIndex).value.trim();
   if(!playerId){ showToast(t('toast_enter_player_id')); return; }
   const resultBox = document.getElementById('formFieldVerifyResult-'+fieldIndex);
-  resultBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:8px;"><span class="verif-spinner"></span>Vérification en cours...</div>';
+  resultBox.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:8px;"><span class="verif-spinner"></span>' + escapeHtml(t('verifying_in_progress')) + '</div>';
   try{
     const sb = await getSupabase();
     // Referans jenerik — verifikasyon sèlman, pa gen acha/livrezon ki fèt atravè li
@@ -5035,7 +5181,7 @@ async function verifyFormFieldPlayer(productId, fieldIndex){
       body: { partner_product_id: '33770', player_id: playerId }
     });
     if(error || !data || data.error || !data.valid){
-      resultBox.innerHTML = '<div style="background:rgba(214,69,69,0.08);border-radius:10px;padding:11px 13px;color:var(--red);font-weight:600;font-size:13px;margin-top:10px;">❌ Player ID sa a pa egziste</div>';
+      resultBox.innerHTML = '<div style="background:rgba(214,69,69,0.08);border-radius:10px;padding:11px 13px;color:var(--red);font-weight:600;font-size:13px;margin-top:10px;">' + escapeHtml(t('toast_player_not_found')) + '</div>';
       return;
     }
     if(!window.verifiedFormPlayerNames) window.verifiedFormPlayerNames = {};
@@ -5044,9 +5190,9 @@ async function verifyFormFieldPlayer(productId, fieldIndex){
       <div style="display:flex;align-items:center;gap:14px;background:rgba(15,166,84,0.06);border:1px dashed var(--green);border-radius:14px;padding:14px;margin-top:12px;">
         <div style="width:52px;height:52px;border-radius:50%;background:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:10px;box-sizing:border-box;"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUAAAAFACAMAAAD6TlWYAAAC/VBMVEVHcEz/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugD/ugAnYVeNAAAA/3RSTlMA+P+kiaL+/Zr8+/kM+gUHCfH16g7lYSaj9C/p4ylZYrvo7sqW7RE2uIBQI+cLKr7m4LScLoTDjpINZ8EfGYpCY7Ms1qVrK7yHTm3Jp+JqQ6qh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" style="width:100%;height:100%;object-fit:contain;"></div>
         <div>
-          <div style="color:var(--green);font-weight:700;font-size:14px;">Compte trouvé avec succès !</div>
-          <div style="color:var(--text);font-size:13px;margin:2px 0 6px;">Nom du joueur : <b>${escapeHtml(data.name || '')}</b></div>
-          <span style="background:#ECFDF5;color:#059669;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;">✓ Compte validé</span>
+          <div style="color:var(--green);font-weight:700;font-size:14px;">${t('toast_account_found')}</div>
+          <div style="color:var(--text);font-size:13px;margin:2px 0 6px;">${t('label_player_name')} : <b>${escapeHtml(data.name || '')}</b></div>
+          <span style="background:#ECFDF5;color:#059669;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;">${t('badge_account_verified')}</span>
         </div>
       </div>
     `;
@@ -5061,18 +5207,18 @@ async function confirmApiTopupPurchase(productId){
   if(p0 && p0.outOfStock){ showToast('⚠️ ' + t('toast_out_of_stock')); return; }
   const buyBtn = document.getElementById('apiBuyBtn-'+productId);
   if(buyBtn && buyBtn.disabled) return; // deja ap trete — anpeche doub-klik
-  if(buyBtn){ buyBtn.disabled = true; buyBtn.style.opacity = '0.6'; buyBtn.style.cursor = 'not-allowed'; buyBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;vertical-align:-2px;margin-right:6px;"><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>En cours de traitement...'; }
+  if(buyBtn){ buyBtn.disabled = true; buyBtn.style.opacity = '0.6'; buyBtn.style.cursor = 'not-allowed'; buyBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;vertical-align:-2px;margin-right:6px;"><path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/></svg>' + escapeHtml(t('processing_in_progress')); }
   const p = state.products.find(x=>x.id===productId);
   let variant = p.variants.find(v=>v.id===selectedVariantId);
   if(!variant && p.variants.length > 0){ variant = sortedVariants(p)[0]; selectedVariantId = variant.id; }
-  if(!variant){ showToast('⚠️ Pa gen opsyon disponib pou pwodwi sa a — kontakte Admin'); if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.textContent='⚡ Acheter maintenant';} return; }
+  if(!variant){ showToast(t('toast_no_option_contact_admin')); if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.textContent='⚡ '+t('btn_buy_now');} return; }
   const isGiftCard = variant.orderMode === 'api_pin';
   const playerId = isGiftCard ? '' : document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = isGiftCard ? null : document.getElementById('apiServerId-'+productId);
   const serverId = variant.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
   const totalPrice = variant.price * qty;
-  const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.style.cursor='';buyBtn.textContent='⚡ Acheter maintenant';} };
+  const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.style.cursor='';buyBtn.textContent='⚡ '+t('btn_buy_now');} };
   const finishPurchaseSuccess = () => {
     showToast(t('toast_purchase_success')); goPage('commandes');
   };
@@ -5091,13 +5237,13 @@ async function confirmApiTopupPurchase(productId){
       sessionData = refreshed;
     }
     if(!sessionData?.session){
-      showToast('⚠️ Ou dekonekte — tanpri konekte ankò');
+      showToast(t('toast_session_expired'));
       resetBtn();
       openAuthModal('login');
       return;
     }
   }catch(sessionErr){
-    showToast('⚠️ Ou dekonekte — tanpri konekte ankò');
+    showToast(t('toast_session_expired'));
     resetBtn();
     openAuthModal('login');
     return;
@@ -5230,14 +5376,14 @@ function renderFormSheet(p){
           <div style="border:1.5px solid #C4B5FD;border-radius:16px;padding:18px;margin-bottom:16px;">
             <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
               <span style="font-size:20px;">🎮</span>
-              <span style="font-weight:800;font-size:16px;color:var(--text);">Info Compte</span>
-              ${f.required ? '<span style="background:#FEE2E2;color:#DC2626;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;">* Obligatoire</span>' : ''}
+              <span style="font-weight:800;font-size:16px;color:var(--text);">${t('field_account_info')}</span>
+              ${f.required ? '<span style="background:#FEE2E2;color:#DC2626;font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;">* '+(t('required_label'))+'</span>' : ''}
             </div>
-            <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">Entrez votre ID joueur pour poursuivre l'achat.</div>
+            <div style="font-size:13px;color:var(--muted);margin-bottom:14px;">${t('field_enter_player_id_sub')}</div>
             <label style="font-size:13px;font-weight:700;color:var(--text);">${escapeHtml(f.label)}${f.required?' <span style="color:#DC2626;">*</span>':''}</label>
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--panel-2);border:1.5px solid #C4B5FD;border-radius:12px;padding:6px 6px 6px 12px;margin:8px 0 12px;">
               <span style="font-weight:900;font-style:italic;color:#7C3AED;font-size:16px;">F</span>
-              <input type="text" inputmode="numeric" pattern="[0-9]*" id="formField-${i}" placeholder="Entrez votre ID joueur" oninput="clearVerifiedFormPlayer('${p.id}',${i})" style="flex:1;min-width:0;background:none;border:none;outline:none;font-size:14px;color:var(--text);padding:8px 0;">
+              <input type="text" inputmode="numeric" pattern="[0-9]*" id="formField-${i}" placeholder="${t('ph_enter_player_id')}" oninput="clearVerifiedFormPlayer('${p.id}',${i})" style="flex:1;min-width:0;background:none;border:none;outline:none;font-size:14px;color:var(--text);padding:8px 0;">
               <button onclick="verifyFormFieldPlayer('${p.id}',${i})" style="display:flex;align-items:center;gap:6px;background:rgba(15,166,84,0.12);color:var(--green);border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:700;white-space:nowrap;flex-shrink:0;">🛡️ Vérifier</button>
             </div>
             <div id="formFieldVerifyResult-${i}"></div>
@@ -5247,8 +5393,8 @@ function renderFormSheet(p){
       return `<div class="field-uid"><label>${escapeHtml(f.label)}${f.required?' *':''}</label><input type="${f.type==='number'?'number':(f.type==='email'?'email':(f.type==='tel'?'tel':'text'))}" id="formField-${i}"></div>`;
     }).join('')}
     <div style="display:flex;gap:10px;">
-      <button class="btn btn-ghost" style="flex:1;${p.outOfStock?'opacity:0.5;pointer-events:none;':''}" onclick="addFormToCart('${p.id}')" ${p.outOfStock?'disabled':''}>Ajouter au panier</button>
-      <button class="btn btn-green" style="flex:1;${p.outOfStock?'opacity:0.5;pointer-events:none;':''}" onclick="confirmFormOrder('${p.id}')" ${p.outOfStock?'disabled':''}>${p.outOfStock?'Rupture de stock':'Acheter maintenant'}</button>
+      <button class="btn btn-ghost" style="flex:1;${p.outOfStock?'opacity:0.5;pointer-events:none;':''}" onclick="addFormToCart('${p.id}')" ${p.outOfStock?'disabled':''}>${t('btn_add_cart')}</button>
+      <button class="btn btn-green" style="flex:1;${p.outOfStock?'opacity:0.5;pointer-events:none;':''}" onclick="confirmFormOrder('${p.id}')" ${p.outOfStock?'disabled':''}>${p.outOfStock?t('out_of_stock'):t('btn_buy_now')}</button>
     </div>
   `;
 }
@@ -5264,7 +5410,7 @@ async function confirmFormOrder(productId){
   }
   const p = state.products.find(x=>x.id===productId);
   const v = p.variants.find(x=>x.id===selectedVariantId);
-  if(!v){ showToast('Chwazi yon opsyon'); return; }
+  if(!v){ showToast(t('toast_select_option')); return; }
   const fields = p.formFields || [];
   const collected = {};
   for(let i=0;i<fields.length;i++){
@@ -5396,7 +5542,7 @@ function updateManualTotal(productId){
   if(errBox && btnBox){
     if(amt > max){
       errBox.style.display = 'block';
-      errBox.textContent = 'Ou pa ka kòmande plis pase ' + max + ' $';
+      errBox.textContent = t('manual_max_error_prefix') + ' ' + max + ' $';
       btnBox.style.display = 'none';
     } else {
       errBox.style.display = 'none';
@@ -5415,7 +5561,7 @@ function addManualToCart(productId){
   const u = currentUser();
   const amt = parseFloat(document.getElementById('manualAmount').value) || 0;
   if(amt < (c.min||0) || amt > (c.max||999999)){
-    showToast('Kantite a dwe ant ' + c.min + ' ak ' + c.max + ' $'); return;
+    showToast(t('toast_amount_between_prefix') + ' ' + c.min + ' ' + t('toast_amount_between_mid') + ' ' + c.max + ' $'); return;
   }
   const customFields = {};
   let missingField = false;
@@ -5424,13 +5570,13 @@ function addManualToCart(productId){
     if(!val) missingField = true;
     customFields[f.label] = val;
   });
-  if(missingField){ showToast('Ranpli tout chan yo — yo obligatwa'); return; }
+  if(missingField){ showToast(t('toast_fill_all_required')); return; }
   const total = Math.round((amt + feeForAmount(c, amt)) * (c.taux||0));
   state.cart.push({ id:uid(), productId:p.id, productName:p.name, type:'calculator', variantId:null, variantLabel:amt+' $', price:total, fields:customFields, montantUSD:amt, fraisUSD:feeForAmount(c, amt) });
   saveState();
   saveCartToServer();
   renderTopIcons();
-  showToast('Ajoute nan panye ✓');
+  showToast(t('added_to_cart_toast'));
   goPage('shop');
 }
 async function confirmManualOrder(productId){
@@ -5443,7 +5589,7 @@ async function confirmManualOrder(productId){
   const c = p.manualConfig || {taux:145, frais:2, min:0, max:999999, fields:[]};
   const amt = parseFloat(document.getElementById('manualAmount').value) || 0;
   if(amt < (c.min||0) || amt > (c.max||999999)){
-    showToast('Kantite a dwe ant ' + c.min + ' ak ' + c.max + ' $'); return;
+    showToast(t('toast_amount_between_prefix') + ' ' + c.min + ' ' + t('toast_amount_between_mid') + ' ' + c.max + ' $'); return;
   }
   const customFields = {};
   let missingField = false;
@@ -5452,7 +5598,7 @@ async function confirmManualOrder(productId){
     if(!val) missingField = true;
     customFields[f.label] = val;
   });
-  if(missingField){ showToast('Ranpli tout chan yo — yo obligatwa'); return; }
+  if(missingField){ showToast(t('toast_fill_all_required')); return; }
 
   showToast(t('toast_transaction_processing'));
   try{
@@ -5511,7 +5657,7 @@ async function confirmPurchase(productId){
   const p = state.products.find(x=>x.id===productId);
   if(p && p.outOfStock){ showToast('⚠️ ' + t('toast_out_of_stock')); return; }
   const v = p.variants.find(x=>x.id===selectedVariantId);
-  if(!v){ showToast('Chwazi yon opsyon'); return; }
+  if(!v){ showToast(t('toast_select_option')); return; }
 
   showToast(t('toast_transaction_processing'));
   try{
@@ -5589,27 +5735,27 @@ async function openRechargeProof(txIndex){
   if(!t) return;
   document.getElementById('sheetContent').innerHTML = `
     <div class="sheet-handle"></div>
-    <h3>Detay Rechaj</h3>
+    <h3>${t('recharge_detail_title')}</h3>
     <div class="sub">${new Date(t.date).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</div>
     <div class="card" style="background:var(--panel-2);">
       <div class="tx-row"><span style="color:var(--muted);">TXN ID</span><span style="font-weight:700;">${escapeHtml(t.txnId||'—')}</span></div>
-      <div class="tx-row"><span style="color:var(--muted);">Référence système</span><span style="font-weight:700;">${escapeHtml(t.reference||'—')}</span></div>
-      <div class="tx-row"><span style="color:var(--muted);">Montant</span><span style="font-weight:700;color:var(--green);">+${money(t.amount)}</span></div>
+      <div class="tx-row"><span style="color:var(--muted);">${t('system_reference_label')}</span><span style="font-weight:700;">${escapeHtml(t.reference||'—')}</span></div>
+      <div class="tx-row"><span style="color:var(--muted);">${t('field_amount')}</span><span style="font-weight:700;color:var(--green);">+${money(t.amount)}</span></div>
     </div>
-    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:14px 0 8px;">Preuve envoyée</div>
-    <div id="proofImageBox" style="background:var(--panel-2);border-radius:12px;padding:14px;text-align:center;color:var(--muted);font-size:12.5px;">Chajman...</div>
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:14px 0 8px;">${t('proof_sent_label')}</div>
+    <div id="proofImageBox" style="background:var(--panel-2);border-radius:12px;padding:14px;text-align:center;color:var(--muted);font-size:12.5px;">${t('loading_label')}</div>
   `;
   document.getElementById('sheetBg').classList.add('show');
   if(!t.proofUrl){
-    document.getElementById('proofImageBox').textContent = 'Pa gen foto anrejistre pou tranzaksyon sa a.';
+    document.getElementById('proofImageBox').textContent = t('no_photo_saved_tx');
     return;
   }
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.storage.from('recharge-proofs').createSignedUrl(t.proofUrl, 300);
-    if(error || !data){ document.getElementById('proofImageBox').textContent = 'Erè chajman foto a.'; return; }
+    if(error || !data){ document.getElementById('proofImageBox').textContent = t('photo_load_error'); return; }
     document.getElementById('proofImageBox').innerHTML = `<img src="${data.signedUrl}" style="width:100%;border-radius:10px;">`;
-  }catch(e){ document.getElementById('proofImageBox').textContent = 'Erè chajman foto a.'; }
+  }catch(e){ document.getElementById('proofImageBox').textContent = t('photo_load_error'); }
 }
 function refreshHistoriqueView(){
   if(currentPage === 'wallet' && walletTab === 'historique'){
@@ -5994,18 +6140,18 @@ async function updateApiCatalogPrice(variantId, value){
 }
 function pageApiSupplier(){
   if(!state.currentUserId){
-    return `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">Konekte pou wè aksè API ou</div><button class="btn btn-green" style="margin-top:14px;" onclick="openAuthModal()">Konekte</button></div>`;
+    return `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">${t('login_required_api_title')}</div><button class="btn btn-green" style="margin-top:14px;" onclick="openAuthModal()">${t('btn_login_simple')}</button></div>`;
   }
   const c = state.apiClient;
   if(state.apiClientLoaded && !c){
-    return `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">Ou pa gen aksè API</div>Kontakte Admin Kerry Topup pou mande aksè founisè.<div style="margin-top:14px;"><a href="https://wa.me/${escapeHtml((state.paymentSettings.whatsapp||'').split(',')[0].trim())}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:13px;padding:12px 22px;border-radius:20px;">💬 Kontakte sou WhatsApp</a></div></div>`;
+    return `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">${t('reseller_no_access_title')}</div>${t('reseller_no_access_desc')}<div style="margin-top:14px;"><a href="https://wa.me/${escapeHtml((state.paymentSettings.whatsapp||'').split(',')[0].trim())}" style="display:inline-block;background:#25D366;color:#fff;text-decoration:none;font-weight:700;font-size:13px;padding:12px 22px;border-radius:20px;">${t('reseller_whatsapp_contact')}</a></div></div>`;
   }
   if(!state.apiClientLoaded){
-    return `<div class="empty"><div class="em-icon">⏳</div><div class="em-title">Chajman...</div></div>`;
+    return `<div class="empty"><div class="em-icon">⏳</div><div class="em-title">${t('loading_label')}</div></div>`;
   }
   const orders = state.apiOrders || [];
   const statusBadge = (s) => {
-    const map = { terminee:['completed','var(--green-dim)','var(--green)'], en_cours:['pending','var(--amber-dim)','var(--amber)'], annulee:['failed','var(--red-dim)','var(--red)'], remboursee:['failed','var(--red-dim)','var(--red)'] };
+    const map = { terminee:[t('status_completed'),'var(--green-dim)','var(--green)'], en_cours:[t('status_pending'),'var(--amber-dim)','var(--amber)'], annulee:[t('status_failed'),'var(--red-dim)','var(--red)'], remboursee:[t('status_failed'),'var(--red-dim)','var(--red)'] };
     const [label,bg,fg] = map[s] || [s,'var(--panel-2)','var(--muted)'];
     return `<span style="background:${bg};color:${fg};padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;">${label}</span>`;
   };
@@ -6015,8 +6161,8 @@ function pageApiSupplier(){
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
     <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:16px;">${escapeHtml(initials)}</div>
     <div>
-      <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">${escapeHtml(resellerName)} — Accès API</div>
-      <div style="color:var(--muted);font-size:11px;">Connecté en tant que ${escapeHtml(resellerName)}</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">${escapeHtml(resellerName)} ${t('reseller_access_suffix')}</div>
+      <div style="color:var(--muted);font-size:11px;">${t('reseller_connected_as_prefix')} ${escapeHtml(resellerName)}</div>
     </div>
   </div>
 
@@ -6025,55 +6171,55 @@ function pageApiSupplier(){
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
       <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.06em;">
         <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:15px;">💳</div>
-        Wallet Revandè
+        ${t('wallet_reseller_label')}
       </div>
-      <div style="font-size:10.5px;color:#fff;font-weight:700;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;margin-right:6px;box-shadow:0 0 0 3px rgba(255,255,255,0.25);"></span>Actif</div>
+      <div style="font-size:10.5px;color:#fff;font-weight:700;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;margin-right:6px;box-shadow:0 0 0 3px rgba(255,255,255,0.25);"></span>${t('badge_active')}</div>
     </div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">Solde disponible</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">${t('wallet_balance')}</div>
     <div style="font-size:34px;font-weight:900;letter-spacing:-0.5px;">${money(walletBalance())}</div>
   </div>
   </div>
 
-  ${!c ? `<div class="card"><div style="text-align:center;color:var(--muted);padding:20px;">Chajman kle API ou...</div></div>` : `
+  ${!c ? `<div class="card"><div style="text-align:center;color:var(--muted);padding:20px;">${t('api_loading_key')}</div></div>` : `
   <div class="card" style="margin-bottom:14px;">
-    <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px;">🔑 Accès API</div>
+    <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px;">${t('api_access_heading')}</div>
 
-    <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">Clé API</div>
+    <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">${t('api_key_label')}</div>
     <div style="display:flex;gap:8px;margin-bottom:14px;">
       <div id="apiField-key" data-shown="0" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-family:monospace;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">••••••••••••••••••••</div>
-      <button id="apiFieldBtn-key" class="mini-btn" onclick="toggleApiFieldVisibility('key')">👁 Afficher</button>
+      <button id="apiFieldBtn-key" class="mini-btn" onclick="toggleApiFieldVisibility('key')">${t('btn_show_pw')}</button>
       <button class="mini-btn" onclick="copyApiField('key')">📋</button>
     </div>
 
-    <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">Secret API</div>
+    <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:6px;">${t('api_secret_label')}</div>
     <div style="display:flex;gap:8px;margin-bottom:16px;">
       <div id="apiField-secret" data-shown="0" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-family:monospace;font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">••••••••••••••••••••••••••••••••</div>
-      <button id="apiFieldBtn-secret" class="mini-btn" onclick="toggleApiFieldVisibility('secret')">👁 Afficher</button>
+      <button id="apiFieldBtn-secret" class="mini-btn" onclick="toggleApiFieldVisibility('secret')">${t('btn_show_pw')}</button>
       <button class="mini-btn" onclick="copyApiField('secret')">📋</button>
     </div>
 
-    <button class="btn" style="width:100%;background:var(--ink);color:#fff;margin-bottom:14px;" onclick="testApiConnection()">🛰️ Tester la connexion</button>
+    <button class="btn" style="width:100%;background:var(--ink);color:#fff;margin-bottom:14px;" onclick="testApiConnection()">${t('api_test_connection_btn')}</button>
     <div id="apiTestResult" style="display:none;padding:12px;border-radius:10px;text-align:center;font-weight:700;font-size:13px;margin-bottom:14px;"></div>
     ${(() => {
       const lastRegen = c.regeneratedAt ? new Date(c.regeneratedAt) : null;
       const cooldownMs = lastRegen ? (24*60*60*1000) - (Date.now() - lastRegen.getTime()) : 0;
       if(cooldownMs > 0){
-        return `<div id="regenCooldownPill" data-until="${lastRegen.getTime() + 24*60*60*1000}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff9e8;border:1px solid #f0df9d;border-radius:10px;padding:11px 13px;font-size:13px;color:#79652c;font-weight:700;">🔄 Réinitialisation dans <b id="regenCooldownText" style="font-family:'Rajdhani',sans-serif;font-weight:800;color:#c93232;">--:--:--</b></div>`;
+        return `<div id="regenCooldownPill" data-until="${lastRegen.getTime() + 24*60*60*1000}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff9e8;border:1px solid #f0df9d;border-radius:10px;padding:11px 13px;font-size:13px;color:#79652c;font-weight:700;">${t('api_regen_cooldown_prefix')} <b id="regenCooldownText" style="font-family:'Rajdhani',sans-serif;font-weight:800;color:#c93232;">--:--:--</b></div>`;
       }
-      return `<div onclick="goPage('apiRegenerate')" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--text);font-weight:700;cursor:pointer;">▶ Régénérer les identifiants</div>`;
+      return `<div onclick="goPage('apiRegenerate')" style="display:flex;align-items:center;justify-content:center;gap:6px;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:13px;color:var(--text);font-weight:700;cursor:pointer;">${t('api_regen_cta')}</div>`;
     })()}
   </div>
 
   <div class="card">
-    <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px;">📦 Commandes récentes</div>
-    ${orders.length===0 ? `<div style="text-align:center;color:var(--muted);padding:16px 0;font-size:13px;">Pa gen kòmand atravè API a poko.</div>` : `
+    <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px;">${t('api_recent_orders_heading')}</div>
+    ${orders.length===0 ? `<div style="text-align:center;color:var(--muted);padding:16px 0;font-size:13px;">${t('api_no_orders_yet')}</div>` : `
     <div style="overflow-x:auto;">
     <table style="width:100%;border-collapse:collapse;font-size:12px;">
       <thead><tr>
-        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">Produit</th>
-        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">Total</th>
-        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">Statut</th>
-        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">Date</th>
+        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_product')}</th>
+        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_total')}</th>
+        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_status')}</th>
+        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_date')}</th>
       </tr></thead>
       <tbody>
         ${orders.map(o => `
@@ -6094,39 +6240,39 @@ function pageApiSupplier(){
 }
 function pageApiRegenerate(){
   const c = state.apiClient;
-  if(!c) return `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">Ou pa gen aksè API</div></div>`;
+  if(!c) return `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">${t('reseller_no_access_title')}</div></div>`;
   const lastRegen = c.regeneratedAt ? new Date(c.regeneratedAt) : null;
   const cooldownMs = lastRegen ? (24*60*60*1000) - (Date.now() - lastRegen.getTime()) : 0;
   const onCooldown = cooldownMs > 0;
   return `
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
     <button onclick="goPage('apiSupplier')" style="background:var(--panel-2);border:1px solid var(--line);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:16px;">←</button>
-    <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">Régénérer les identifiants API</div>
+    <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">${t('regen_page_title')}</div>
   </div>
 
   <div class="regen-danger">
-    <h3>⚠️ Attention importante</h3>
-    <p>Régénérer vos identifiants remplacera immédiatement votre clé API et votre secret. Toute intégration existante cessera de fonctionner jusqu'à ce que vous mettiez à jour les nouveaux identifiants.</p>
+    <h3>${t('regen_warning_title')}</h3>
+    <p>${t('regen_warning_desc')}</p>
   </div>
 
   <div class="regen-card">
-    <div class="regen-step"><span class="regen-num">1</span>Confirmer l'action</div>
+    <div class="regen-step"><span class="regen-num">1</span>${t('regen_step_confirm')}</div>
     ${onCooldown ? `
-      <div id="regenCooldownPill" data-until="${lastRegen.getTime() + 24*60*60*1000}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff9e8;border:1px solid #f0df9d;border-radius:10px;padding:14px;font-size:14px;color:#79652c;font-weight:700;">🔄 Réinitialisation dans <b id="regenCooldownText" style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:18px;color:#c93232;">--:--:--</b></div>
+      <div id="regenCooldownPill" data-until="${lastRegen.getTime() + 24*60*60*1000}" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff9e8;border:1px solid #f0df9d;border-radius:10px;padding:14px;font-size:14px;color:#79652c;font-weight:700;">${t('api_regen_cooldown_prefix')} <b id="regenCooldownText" style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:18px;color:#c93232;">--:--:--</b></div>
     ` : `
-      <p class="regen-help">Pour des raisons de sécurité, tapez le mot ci-dessous pour confirmer que vous souhaitez régénérer vos identifiants.</p>
+      <p class="regen-help">${t('regen_type_help')}</p>
       <div class="regen-word">REGENERER</div>
-      <input id="regenConfirmInput" class="regen-input" placeholder="Tapez REGENERER ici" autocomplete="off" oninput="document.getElementById('regenBtn').disabled = this.value.trim().toUpperCase() !== 'REGENERER'">
-      <button id="regenBtn" class="regen-btn" disabled onclick="regenerateApiCredentials()">🔒 Régénérer maintenant</button>
+      <input id="regenConfirmInput" class="regen-input" placeholder="${t('regen_type_placeholder')}" autocomplete="off" oninput="document.getElementById('regenBtn').disabled = this.value.trim().toUpperCase() !== 'REGENERER'">
+      <button id="regenBtn" class="regen-btn" disabled onclick="regenerateApiCredentials()">${t('btn_regen_now')}</button>
     `}
   </div>
 
   <div class="regen-card">
-    <div class="regen-step"><span class="regen-num">2</span>Statut des identifiants</div>
-    <div class="regen-status">⌛ &nbsp; <b>${c.regeneratedAt ? 'Déjà régénéré' : 'Non encore régénéré'}</b><br>Vos identifiants actuels sont actifs.</div>
+    <div class="regen-step"><span class="regen-num">2</span>${t('regen_status_label')}</div>
+    <div class="regen-status">⌛ &nbsp; <b>${c.regeneratedAt ? t('status_already_regen') : t('status_not_regen_yet')}</b><br>${t('regen_current_active')}</div>
     <div class="regen-rows">
-      <div class="regen-row"><span>🔑 &nbsp; Clé API</span><span class="regen-badge">Actif ✓</span></div>
-      <div class="regen-row"><span>🛡️ &nbsp; Secret API</span><span class="regen-badge">Actif ✓</span></div>
+      <div class="regen-row"><span>🔑 &nbsp; ${t('api_key_label')}</span><span class="regen-badge">${t('badge_active')}</span></div>
+      <div class="regen-row"><span>🛡️ &nbsp; ${t('api_secret_label')}</span><span class="regen-badge">${t('badge_active')}</span></div>
       <div class="regen-row"><span>📅 &nbsp; Dernière mise à jour</span><span>${c.regeneratedAt ? new Date(c.regeneratedAt).toLocaleString('fr-FR',{dateStyle:'long',timeStyle:'short'}) : '—'}</span></div>
     </div>
     <div class="regen-info"><b>ⓘ &nbsp; À savoir</b><ul><li>Les nouveaux identifiants seront générés immédiatement.</li><li>Copiez-les et mettez à jour votre intégration sans délai.</li><li>Les anciens identifiants ne fonctionneront plus après la régénération.</li></ul></div>
@@ -6264,14 +6410,14 @@ function renderWalletTab(){
           </div>
         </div>
         <div id="rcTimerBox" style="display:none;align-items:center;justify-content:space-between;background:#ECFDF5;border-radius:14px;padding:12px 16px;margin-bottom:12px;">
-          <span style="font-size:12px;color:var(--muted);">Referans valab pou</span>
+          <span style="font-size:12px;color:var(--muted);">${t('ref_valid_for')}</span>
           <span id="rcTimerDisplay" style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;color:#059669;">15:00</span>
         </div>
         <div style="display:flex;gap:12px;background:linear-gradient(135deg, #eef4ff, #e6f0fe);border:1px solid #d6e6fd;border-radius:16px;padding:16px 17px;font-size:13px;color:#3d4a5c;line-height:1.5;margin-bottom:22px;">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v5h1"/></svg>
           <div><b style="color:#14181c;">N.B :</b> la référence est obligatoire. Insérez-la dans le contenu du transfert NatCash.</div>
         </div>
-        <div class="field-uid"><label>Montant déposé (HTG)</label><input type="text" id="rcAmount" placeholder="Ex: 1000"></div>
+        <div class="field-uid"><label>${t('label_amount_deposited')}</label><input type="text" id="rcAmount" placeholder="Ex: 1000"></div>
         <div class="field-uid">
           <label>TXN ID</label>
           <div style="position:relative;">
@@ -6287,18 +6433,18 @@ function renderWalletTab(){
           </div>
         </div>
         <div class="field-uid">
-          <label>Reçu NatCash</label>
+          <label>${t('label_receipt_natcash')}</label>
           <label style="display:flex;align-items:center;gap:12px;border:1.5px dashed #cfd9d3;border-radius:14px;padding:15px 16px;background:#fafcfa;cursor:pointer;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa39d" stroke-width="2" style="flex-shrink:0;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
-            <span style="background:#14181c;color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:12.5px;font-weight:700;flex-shrink:0;">Choisir un fichier</span>
-            <span id="rcProofFileName" style="font-size:13px;color:#9aa39d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Aucun fichier choisi</span>
-            <input type="file" accept="image/*" id="rcProofImage" style="display:none;" onchange="document.getElementById('rcProofFileName').textContent = this.files[0] ? this.files[0].name : 'Aucun fichier choisi';">
+            <span style="background:#14181c;color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:12.5px;font-weight:700;flex-shrink:0;">${t('btn_choose_file')}</span>
+            <span id="rcProofFileName" style="font-size:13px;color:#9aa39d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t('label_no_file_chosen')}</span>
+            <input type="file" accept="image/*" id="rcProofImage" style="display:none;" onchange="document.getElementById('rcProofFileName').textContent = this.files[0] ? this.files[0].name : t('label_no_file_chosen');">
           </label>
         </div>
         <div id="rcSubmitArea">
           <button style="width:100%;border:none;border-radius:15px;padding:17px;background:linear-gradient(135deg, #1b2027, #0a0d11);color:#fff;font-weight:700;font-size:15.5px;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;margin:24px 0 16px;box-shadow:0 12px 26px rgba(10,13,17,0.28);" id="rcSubmitBtn" onclick="submitRecharge()">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-            Envoyer la demande
+            ${t('btn_send')}
           </button>
         </div>
         <div id="rcOcrResult" style="margin-top:12px;"></div>
@@ -6322,11 +6468,11 @@ function renderWalletTab(){
           <div style="width:40px;height:40px;border-radius:12px;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;box-shadow:0 6px 14px rgba(10,158,61,0.28);">
             <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M7 7h13l-3.5-3.5M17 17H4l3.5 3.5"/></svg>
           </div>
-          <h1 style="font-size:20px;font-weight:800;margin:0;">Transfert de solde</h1>
+          <h1 style="font-size:20px;font-weight:800;margin:0;">${t('transfer_page_title')}</h1>
         </div>
 
         <div style="margin-bottom:20px;">
-          <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">Email du destinataire</div>
+          <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">${t('label_recipient_email')}</div>
           <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #e6e9e7;border-radius:14px;padding:14px 16px;background:#fbfcfb;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa39d" stroke-width="2" style="flex-shrink:0;"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg>
             <input type="text" id="trEmail" placeholder="email@exemple.com" style="border:none;outline:none;background:transparent;font-size:15px;color:var(--text);width:100%;">
@@ -6334,7 +6480,7 @@ function renderWalletTab(){
         </div>
 
         <div style="margin-bottom:20px;">
-          <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">Montant (HTG)</div>
+          <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">${t('label_amount_htg')}</div>
           <div style="position:relative;display:flex;align-items:center;gap:10px;border:1.5px solid #e6e9e7;border-radius:14px;padding:14px 16px;background:#fbfcfb;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa39d" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5h4.5a1.5 1.5 0 0 1 0 3H10a1.5 1.5 0 0 0 0 3h5"/></svg>
             <input type="text" id="trAmount" placeholder="Ex: 500" style="border:none;outline:none;background:transparent;font-size:15px;color:var(--text);width:100%;">
@@ -6344,7 +6490,7 @@ function renderWalletTab(){
 
         <button onclick="submitTransfer()" style="width:100%;border:none;border-radius:14px;padding:16px;background:linear-gradient(135deg, #1b2027, #0a0d11);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 24px rgba(10,13,17,0.30);">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-          Envoyer le transfert
+          ${t('btn_send_transfer')}
         </button>
       </div>
     `;
@@ -6357,11 +6503,11 @@ function renderMyRequests(){
   if(!box) return;
   const mine = state.rechargeRequests.filter(r=>r.userId===state.currentUserId).slice(0,10);
   if(mine.length===0){ box.innerHTML=''; return; }
-  box.innerHTML = '<div class="card"><div class="section-title" style="margin:0 0 8px;"><h3>Demand Rechaj Ou</h3></div>' +
+  box.innerHTML = '<div class="card"><div class="section-title" style="margin:0 0 8px;"><h3>'+escapeHtml(t('my_requests_title'))+'</h3></div>' +
     mine.map(r => `
       <div class="tx-row">
         <div><div class="tx-title">${money(r.amount)}</div><div class="tx-date mono">TXN: ${escapeHtml(r.txnId)}</div></div>
-        <span class="pill ${r.status==='a_verifier'?'wait':(r.status==='approved'?'ok':'no')}">${r.status==='a_verifier'?"À vérifier":(r.status==='approved'?'Apwouve':'Rejte')}</span>
+        <span class="pill ${r.status==='a_verifier'?'wait':(r.status==='approved'?'ok':'no')}">${r.status==='a_verifier'?t('status_wait_verif'):(r.status==='approved'?t('status_recharge_approved'):t('status_recharge_rejected'))}</span>
       </div>
     `).join('') + '</div>';
 }
@@ -6388,7 +6534,7 @@ async function subscribeToMyRechargeRealtime(){
     if(myRechargeChannel){ sb.removeChannel(myRechargeChannel); }
     myRechargeChannel = sb.channel('my-recharge-rt-'+state.currentUserId)
       .on('postgres_changes', { event:'UPDATE', schema:'public', table:'recharge_requests', filter:'user_id=eq.'+state.currentUserId }, payload => {
-        if(payload.new.status === 'approved'){ showToast('Demand rechaj ou apwouve ✅'); }
+        if(payload.new.status === 'approved'){ showToast(t('toast_recharge_approved')); }
         fetchMyRechargeRequests();
         fetchWalletFromServer(state.currentUserId);
       })
@@ -6503,8 +6649,8 @@ function copyRechargeRef(){
   if(!rcTimerEndsAt || rcTimerExpired){ startRechargeTimer(); }
 }
 async function copyTextWithMessage(t){
-  try{ await navigator.clipboard.writeText(t); showToast('Kopye avèk siksè ✅'); }
-  catch(e){ showToast('Pa ka kopye — kopye manyèlman'); }
+  try{ await navigator.clipboard.writeText(t); showToast(TRANSLATIONS[currentLang].toast_copy_success||TRANSLATIONS.ht.toast_copy_success); }
+  catch(e){ showToast(TRANSLATIONS[currentLang].toast_copy_fail||TRANSLATIONS.ht.toast_copy_fail); }
 }
 function startRechargeTimer(){
   rcTimerEndsAt = Date.now() + 15*60*1000;
@@ -6582,7 +6728,7 @@ function resetRechargeFlow(){
   currentRechargeRef = genRechargeRef();
   saveRechargeTimerToServer();
   const area = document.getElementById('rcSubmitArea');
-  if(area) area.innerHTML = `<button class="btn btn-green" id="rcSubmitBtn" onclick="submitRecharge()">Envoyer la demande</button>`;
+  if(area) area.innerHTML = `<button class="btn btn-green" id="rcSubmitBtn" onclick="submitRecharge()">${t('btn_send')}</button>`;
   const box = document.getElementById('rcTimerBox');
   if(box){ box.style.display = 'none'; box.style.background='var(--green-dim)'; }
   const refDisplay = document.getElementById('rcRefDisplay');
@@ -6598,30 +6744,30 @@ async function submitRecharge(){
   const file = document.getElementById('rcProofImage').files[0];
   const resultBox = document.getElementById('rcOcrResult');
   const btn = document.getElementById('rcSubmitBtn');
-  if(!amount || amount<=0){ showToast('Antre yon montan valid'); return; }
-  if(!txn){ showToast('Antre TXN ID lan'); return; }
-  if(txn.length < 14){ showToast('TXN ID incomplet — il manque ' + (14 - txn.length) + ' chiffre(s)'); return; }
-  if(!file){ showToast('Ajoute yon foto rezi tranzaksyon an'); return; }
+  if(!amount || amount<=0){ showToast(t('toast_enter_valid_amount')); return; }
+  if(!txn){ showToast(t('toast_enter_txn_id')); return; }
+  if(txn.length < 14){ showToast(t('toast_txn_incomplete') + ' ' + (14 - txn.length) + ' ' + t('digits_suffix')); return; }
+  if(!file){ showToast(t('toast_add_receipt_photo')); return; }
   if(rcTimerExpired){ showToast(t('delay_expired_toast')); return; }
 
   const ref = currentRechargeRef;
 
   // fraud pre-checks (no OCR needed)
   if(state.usedTxnIds.includes(txn)){
-    resultBox.innerHTML = `<div class="card" style="border-color:var(--red);"><div style="color:var(--red);font-weight:700;">TXN ID sa a deja itilize.</div></div>`;
-    showToast('TXN ID deja itilize');
+    resultBox.innerHTML = `<div class="card" style="border-color:var(--red);"><div style="color:var(--red);font-weight:700;">${t('txn_already_used_box')}</div></div>`;
+    showToast(t('toast_txn_already_used'));
     trackFailedRechargeAttempt(state.currentUserId);
     return;
   }
 
-  if(btn){ btn.disabled = true; btn.textContent = 'Ap verifye foto a...'; }
+  if(btn){ btn.disabled = true; btn.textContent = t('verifying_photo_btn'); }
   resultBox.innerHTML = '<div style="font-size:12px;color:var(--muted);">⏳ Ap li foto a, tanpri tann...</div>';
 
   const receiptHash = await hashFile(file).catch(()=>null);
   if(receiptHash && state.usedReceiptHashes.includes(receiptHash)){
-    resultBox.innerHTML = `<div class="card" style="border-color:var(--red);"><div style="color:var(--red);font-weight:700;">Resi sa a deja itilize pou yon lòt demand.</div></div>`;
+    resultBox.innerHTML = `<div class="card" style="border-color:var(--red);"><div style="color:var(--red);font-weight:700;">${t('receipt_already_used_box')}</div></div>`;
     if(btn){ btn.disabled = false; btn.textContent = t('btn_send'); }
-    showToast('Resi deja itilize');
+    showToast(t('toast_receipt_already_used'));
     return;
   }
 
@@ -6666,7 +6812,7 @@ async function submitRecharge(){
   // constraints (on txn_id/ref/receipt_hash where status='approved') are the
   // real atomicity guarantee here — even two devices submitting at the exact
   // same moment can't both land on 'approved' for the same txn/ref/receipt.
-  let insertOk = false, wasDuplicate = false;
+  let insertOk = false, wasDuplicate = false, insertErrDetail = '';
   try{
     const sb = await getSupabase();
     const { error } = await sb.from('recharge_requests').insert({
@@ -6680,9 +6826,12 @@ async function submitRecharge(){
       insertOk = true;
     }
   }catch(e){
-    // Supabase unreachable — fall back to local-only bookkeeping so the app still works offline
-    console.warn('recharge_requests insert failed:', e?.message || e?.error_description || e?.code || JSON.stringify(e) || e);
-    showCustomerError('⚠️ Demand rechaj ou pa sove — eseye ankò nan kèk minit.', e?.message || 'erè enkoni', 'Demand Rechaj');
+    // Supabase unreachable OR rejected the write (RLS policy, missing column, bad data, etc.)
+    // — fall back to local-only bookkeeping so the app still works, and capture the exact
+    // reason so it reaches the admin notification below instead of staying only in the console.
+    insertErrDetail = (e && (e.message || e.error_description)) ? (e.message || e.error_description) : (e && e.code ? ('code ' + e.code) : (typeof e === 'string' ? e : 'erè enkoni'));
+    console.warn('recharge_requests insert failed:', insertErrDetail, e);
+    showCustomerError('⚠️ Demand rechaj ou pa sove — eseye ankò nan kèk minit.', insertErrDetail, 'Demand Rechaj');
     insertOk = 'local';
   }
 
@@ -6735,14 +6884,14 @@ async function submitRecharge(){
       setTimeout(() => goPage('checkout'), 1200);
     }
   } else if(wasDuplicate){
-    resultBox.innerHTML = `<div class="card" style="border-color:var(--red);"><div style="color:var(--red);font-weight:700;">TXN ID, referans, oswa resi sa a deja itilize pou yon lòt demand.</div></div>`;
-    showToast('Deja itilize');
+    resultBox.innerHTML = `<div class="card" style="border-color:var(--red);"><div style="color:var(--red);font-weight:700;">${t('dup_used_box')}</div></div>`;
+    showToast(t('toast_already_used'));
     if(btn){ btn.disabled = false; btn.textContent = t('btn_send'); }
   } else {
     resultBox.innerHTML = '';
     const area = document.getElementById('rcSubmitArea');
-    if(area) area.innerHTML = `<div style="text-align:center;background:var(--amber-dim);color:var(--amber);font-weight:700;font-size:13px;padding:14px;border-radius:12px;">Le recharge est en cours de validation par l'admin</div>`;
-    showToast('Admin ap verifye kòmand ou');
+    if(area) area.innerHTML = `<div style="text-align:center;background:var(--amber-dim);color:var(--amber);font-weight:700;font-size:13px;padding:14px;border-radius:12px;">${t('recharge_pending_admin_box')}</div>`;
+    showToast(t('toast_admin_verifying_order'));
     const u = currentUser();
     const clientName = u ? (u.name || 'Kliyan') : 'Kliyan';
     const clientPhone = (u && u.profile) ? (u.profile.whatsapp||'') : '';
@@ -6764,6 +6913,7 @@ async function submitRecharge(){
       ntfyDetail += '\n⚠️ Verifikasyon otomatik echwe — al gade nan Admin.';
     } else {
       ntfyDetail += '\n🛑 PA SOVE NAN ADMIN — baz done a refize l. Jere demand sa a MANYÈLMAN (kredite wallet kliyan an dirèkteman nan Admin → Kliyan si tout enfòmasyon yo bon).';
+      if(insertErrDetail) ntfyDetail += '\n🔎 Rezon (pou Kerry): ' + insertErrDetail;
     }
     let proofAttachUrl = null;
     if(proofPath){
@@ -6890,7 +7040,7 @@ function pageSuspended(){
       <div style="background:var(--red);color:#fff;font-weight:800;font-size:11px;padding:5px 14px;border-radius:20px;margin:16px 0 10px;letter-spacing:0.05em;">
         ⚠️ ${isPermanent ? 'COMPTE BLOQUÉ DÉFINITIVEMENT' : 'COMPTE SUSPENDU'}
       </div>
-      <h1 style="font-family:'Rajdhani',sans-serif;color:#fff;font-size:20px;margin:0 0 14px;line-height:1.3;">Le Shérif Robot a détecté<br>que tu es en train de tricher</h1>
+      <h1 style="font-family:'Rajdhani',sans-serif;color:#fff;font-size:20px;margin:0 0 14px;line-height:1.3;">${t('suspended_title')}</h1>
       <div style="background:rgba(226,59,87,0.12);border:1.5px solid rgba(226,59,87,0.4);border-radius:16px;padding:18px;margin-bottom:18px;max-width:340px;">
         <p style="color:#F5C9D1;font-size:13px;line-height:1.6;margin:0;">${escapeHtml(u.suspensionReason || (isPermanent?'Fraude confirmée.':'Des tentatives répétées et suspectes ont été détectées sur ton compte.'))}</p>
       </div>
@@ -6901,9 +7051,9 @@ function pageSuspended(){
             <div id="cherifTimerVal" style="font-family:'Rajdhani',sans-serif;color:#fff;font-weight:800;font-size:22px;letter-spacing:0.05em;">--</div>
           </div>`
       }
-      <div style="color:#F5C9D1;font-size:12.5px;font-weight:700;margin-bottom:14px;">⚠️ Vous ne respectez pas les <a href="#" onclick="event.preventDefault();goPage('conditions')" style="color:#fff;text-decoration:underline;">conditions</a> de notre site</div>
+      <div style="color:#F5C9D1;font-size:12.5px;font-weight:700;margin-bottom:14px;">⚠️ ${t('suspended_terms_notice')}</div>
       <a class="btn btn-green" style="width:100%;max-width:340px;display:block;text-decoration:none;box-sizing:border-box;margin-bottom:10px;" href="mailto:kerrytopup54@gmail.com">✉️ Contacter le support</a>
-      <button id="suspendedLogoutBtn" onclick="doLogout()" style="width:100%;max-width:340px;background:transparent;border:1px solid rgba(255,255,255,0.3);color:#F5C9D1;border-radius:12px;padding:12px;font-weight:600;font-size:12.5px;">Déconnexion</button>
+      <button id="suspendedLogoutBtn" onclick="doLogout()" style="width:100%;max-width:340px;background:transparent;border:1px solid rgba(255,255,255,0.3);color:#F5C9D1;border-radius:12px;padding:12px;font-weight:600;font-size:12.5px;">${t('drawer_logout')}</button>
     </div>
   `;
 }
@@ -6938,7 +7088,7 @@ function orderDetailsBlockHtml(order){
     `<tr><td style="width:40%;padding:8px 0;"><b>${k}</b></td><td style="width:60%;padding:8px 0;text-align:right;">${v}</td></tr>`
   ).join('') : '';
   return `
-    <h3>Résumé de la commande</h3>
+    <h3>${t('order_summary_title')}</h3>
     <table width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;">
       <tr><td style="width:40%;padding:8px 0;"><b>Commande</b></td><td style="width:60%;padding:8px 0;text-align:right;">#${order.orderNo||''}</td></tr>
       <tr><td style="width:40%;padding:8px 0;"><b>Date</b></td><td style="width:60%;padding:8px 0;text-align:right;">${fmtDate(order.date)}</td></tr>
@@ -7088,7 +7238,7 @@ async function submitTransfer(){
   if(blockIfSuspended()) return;
   const email = document.getElementById('trEmail').value.trim().toLowerCase();
   const amount = parseFloat(document.getElementById('trAmount').value);
-  if(!email || !amount || amount<=0){ showToast('Ranpli tout chan yo kòrèkteman'); return; }
+  if(!email || !amount || amount<=0){ showToast(t('toast_fill_all_correctly')); return; }
   if(checkWalletManipulation(state.currentUserId, amount)) return;
   if(walletBalance() < amount){ showToast(t('toast_insufficient_balance')); return; }
   const transferableAmount = walletBalance() - (state.walletBonus?.[state.currentUserId] || 0);
@@ -7098,7 +7248,7 @@ async function submitTransfer(){
     const sb = await getSupabase();
     const { data: recipientId, error: lookupErr } = await sb.rpc('find_user_id_by_email', { p_email: email });
     if(lookupErr) throw lookupErr;
-    if(!recipientId){ showToast('Pa gen itilizatè ak imèl sa a'); return; }
+    if(!recipientId){ showToast(t('toast_no_user_with_email')); return; }
     if(recipientId === state.currentUserId){ showToast(t('toast_cannot_transfer')); return; }
     const targetLocal = state.users.find(u=>u.id===recipientId);
     const recipientName = targetLocal ? targetLocal.name : email.split('@')[0];
@@ -7173,7 +7323,7 @@ async function subscribeToMyOrdersRealtime(){
     if(myOrdersChannel){ sb.removeChannel(myOrdersChannel); }
     myOrdersChannel = sb.channel('my-orders-rt-'+state.currentUserId)
       .on('postgres_changes', { event:'UPDATE', schema:'public', table:'orders', filter:'user_id=eq.'+state.currentUserId }, payload => {
-        showToast('Kòmand #'+payload.new.order_no+' vin '+(statusLabel(payload.new.status)||payload.new.status));
+        showToast(t('order_hash')+payload.new.order_no+' '+t('order_became')+' '+(statusLabel(payload.new.status)||payload.new.status));
         // notifyAdminNewSale retire — trigger SQL notify_order_terminee deja voye 'Vente confirmée' otomatikman, evite doub
         fetchMyOrders();
       })
@@ -7185,7 +7335,7 @@ async function subscribeToMyOrdersRealtime(){
 function addPinToCart(productId){
   const p = state.products.find(x=>x.id===productId);
   const v = p.variants.find(x=>x.id===selectedVariantId);
-  if(!v){ showToast('Chwazi yon opsyon'); return; }
+  if(!v){ showToast(t('toast_select_option')); return; }
   const existing = state.cart.find(i => i.type==='pin' && i.variantId===v.id);
   if(existing){
     existing.qty += 1;
@@ -7196,13 +7346,13 @@ function addPinToCart(productId){
   saveState();
   saveCartToServer();
   renderTopIcons();
-  showToast('Ajoute nan panye ✓');
+  showToast(t('added_to_cart_toast'));
   goPage('shop');
 }
 function addFormToCart(productId){
   const p = state.products.find(x=>x.id===productId);
   const v = p.variants.find(x=>x.id===selectedVariantId);
-  if(!v){ showToast('Chwazi yon opsyon'); return; }
+  if(!v){ showToast(t('toast_select_option')); return; }
   const fields = p.formFields || [];
   const collected = {};
   for(let i=0;i<fields.length;i++){
@@ -7221,7 +7371,7 @@ function addFormToCart(productId){
   saveState();
   saveCartToServer();
   renderTopIcons();
-  showToast('Ajoute nan panye ✓');
+  showToast(t('added_to_cart_toast'));
   goPage('shop');
 }
 function changeCartQty(itemId, delta){
@@ -7290,7 +7440,7 @@ function renderCartItemCard(item, editable){
         </div>
         <div style="text-align:right;flex-shrink:0;">
           <div style="font-weight:800;color:#0a9e3d;font-size:15.5px;">${money(item.price)}</div>
-          ${editable ? `<button class="mini-btn" style="color:var(--red);margin-top:8px;" onclick="removeFromCart('${item.id}')">Retire</button>` : ''}
+          ${editable ? `<button class="mini-btn" style="color:var(--red);margin-top:8px;" onclick="removeFromCart('${item.id}')">${t('btn_remove_item')}</button>` : ''}
         </div>
       </div>
     </div>
@@ -7328,13 +7478,13 @@ function pageCheckout(){
   const [defPrenom, defNom] = (u?.name || '').split(' ');
   if(items.length === 0){
     return `
-      <div class="page-header"><h2>Checkout</h2></div>
+      <div class="page-header"><h2>${t('checkout_title')}</h2></div>
       <div class="empty"><div class="em-icon">🛒</div><div class="em-title">${t('cart_empty_title')}</div>${t('cart_empty_sub')}</div>
       <button class="btn btn-green" style="width:100%;margin-top:10px;" onclick="goPage('shop')">${t('btn_go_shop')}</button>
     `;
   }
   return `
-    <div class="page-header"><h2>Checkout</h2><p>${t('checkout_sub')}</p></div>
+    <div class="page-header"><h2>${t('checkout_title')}</h2><p>${t('checkout_sub')}</p></div>
     <div style="font-size:11.5px;letter-spacing:1.2px;font-weight:800;color:#8a9096;text-transform:uppercase;margin:0 0 14px 4px;">${t('billing_details')}</div>
     <div class="card" style="border-radius:20px;padding:22px;">
       <div class="checkout-field-row">
@@ -7464,7 +7614,7 @@ async function checkoutCart(){
   if(blockIfSuspended()) return;
   const total = cartTotal();
   if(total <= 0){ return; }
-  if(walletBalance() < total){ showToast('Balans ou pa ase pou tout panye a — rechaje Wallet la'); return; }
+  if(walletBalance() < total){ showToast(t('toast_cart_insufficient_balance')); return; }
   const itemsToProcess = [...state.cart];
   const failed = [];
   const manualOrdersCreated = [];
@@ -7883,7 +8033,7 @@ function openOrderDetail(orderId){
     }
     if(o.adminResponse){
       bodyHtml += `
-        <div style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;color:var(--muted);text-transform:uppercase;margin:14px 0 8px;">Réponse de l'administrateur</div>
+        <div style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;color:var(--muted);text-transform:uppercase;margin:14px 0 8px;">${t('label_admin_response')}</div>
         <div style="background:rgba(15,166,84,0.08);border-left:3px solid var(--green);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--text);line-height:1.5;">${escapeHtml(o.adminResponse)}</div>
       `;
     } else {
@@ -7893,12 +8043,12 @@ function openOrderDetail(orderId){
 
   document.getElementById('sheetContent').innerHTML = `
     <div class="sheet-handle"></div>
-    <h3>Kòmand #${escapeHtml(o.orderNo||'')}</h3>
+    <h3>${t('order_hash')}${escapeHtml(o.orderNo||'')}</h3>
     <div class="sub">${dateStr}</div>
     ${bodyHtml}
     <button onclick="downloadOrderReceipt('${orderId}')" style="width:100%;border:none;border-radius:13px;padding:13px;background:#14181c;color:#fff;font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;cursor:pointer;">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg>
-      Télécharger le reçu
+      ${t('btn_download_receipt')}
     </button>
   `;
   document.getElementById('sheetBg').classList.add('show');
@@ -7981,13 +8131,13 @@ async function downloadOrderReceipt(orderId, userId){
             ${logoSrc ? `<div style="width:34px;height:34px;border-radius:10px;background:#0B0F0C;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:5px;box-sizing:border-box;box-shadow:0 0 0 1px rgba(63,206,124,0.3);flex-shrink:0;"><img src="${logoSrc}" style="width:100%;height:100%;object-fit:contain;"></div>` : ''}
             <div>
               <div style="font-weight:800;font-size:14px;">Kerry Topup Official</div>
-              <div style="font-size:9.5px;color:#8aa398;margin-top:1px;">Votre plateforme de confiance pour tous vos topups</div>
+              <div style="font-size:9.5px;color:#8aa398;margin-top:1px;">${t('footer_tagline')}</div>
             </div>
           </div>
           <div style="position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;background:rgba(63,206,124,0.15);border:1px solid rgba(63,206,124,0.35);color:#7fe0a8;font-weight:700;font-size:11.5px;padding:6px 13px;border-radius:20px;margin-bottom:16px;">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>${statusLabels[o.status]||o.status}
           </div>
-          <div style="position:relative;z-index:1;font-size:10.5px;letter-spacing:1.5px;color:#5fd996;font-weight:800;text-transform:uppercase;margin-bottom:4px;">Montant payé</div>
+          <div style="position:relative;z-index:1;font-size:10.5px;letter-spacing:1.5px;color:#5fd996;font-weight:800;text-transform:uppercase;margin-bottom:4px;">${t('label_amount_paid')}</div>
           <div style="position:relative;z-index:1;font-size:32px;font-weight:900;letter-spacing:-0.5px;">${money(o.price)}</div>
         </div>
 
@@ -8036,22 +8186,22 @@ function renderNonPinStatusMessage(status){
 function renderRedeemHelp(productName){
   if(!productName) return '';
   if(productName.toLowerCase().includes('free fire')){
-    return `<button class="btn btn-green" style="width:100%;margin-top:10px;background:var(--green);" onclick="closeSheet();goPage('redeem');">Réclamer 🎁</button>`;
+    return `<button class="btn btn-green" style="width:100%;margin-top:10px;background:var(--green);" onclick="closeSheet();goPage('redeem');">${t('btn_claim')} 🎁</button>`;
   }
   const p = state.products.find(x => x.name === productName);
   if(p && p.redeemInstructions){
     return `
-      <div style="font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:14px 0 6px;">Kijan pou reklame</div>
+      <div style="font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:14px 0 6px;">${t('how_to_claim_label')}</div>
       <div style="font-size:12.5px;color:var(--text);line-height:1.6;white-space:pre-wrap;">${escapeHtml(p.redeemInstructions)}</div>
-      ${p.redeemLink ? `<a href="${escapeHtml(p.redeemLink)}" target="_blank" style="text-decoration:none;"><button class="btn btn-green" style="width:100%;margin-top:10px;background:var(--green);">Réclamer 🎁</button></a>` : ''}
+      ${p.redeemLink ? `<a href="${escapeHtml(p.redeemLink)}" target="_blank" style="text-decoration:none;"><button class="btn btn-green" style="width:100%;margin-top:10px;background:var(--green);">${t('btn_claim')} 🎁</button></a>` : ''}
     `;
   }
   return '';
 }
 
 async function copyText(t){
-  try{ await navigator.clipboard.writeText(t); showToast('Kopye ✓'); }
-  catch(e){ showToast('Pa ka kopye — kopye manyèlman'); }
+  try{ await navigator.clipboard.writeText(t); showToast(TRANSLATIONS[currentLang].toast_copy_simple||TRANSLATIONS.ht.toast_copy_simple); }
+  catch(e){ showToast(TRANSLATIONS[currentLang].toast_copy_fail||TRANSLATIONS.ht.toast_copy_fail); }
 }
 
 /* ================= REDEEM PAGE ================= */
@@ -8165,31 +8315,31 @@ function pageReferral(){
     <div class="card" style="margin-bottom:16px;border-radius:20px;padding:22px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
         <div style="width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg></div>
-        <h2 style="font-size:16.5px;font-weight:800;margin:0;">Retrait de mes gains</h2>
+        <h2 style="font-size:16.5px;font-weight:800;margin:0;">${t('withdrawal_earnings_title')}</h2>
       </div>
-      <div style="font-size:12px;font-weight:700;color:#4b5259;margin-bottom:10px;">Montant</div>
+      <div style="font-size:12px;font-weight:700;color:#4b5259;margin-bottom:10px;">${t('field_amount')}</div>
       <div style="display:flex;align-items:center;justify-content:space-between;border:1.5px solid #e6e9e7;border-radius:12px;padding:13px 15px;background:#fbfcfb;margin-bottom:8px;">
         <input type="number" id="withdrawAmount" placeholder="Ex: 150" style="border:none;outline:none;background:transparent;font-size:14.5px;color:#14181c;width:100%;">
         <span style="font-weight:700;color:#9aa39d;font-size:13px;flex-shrink:0;">HTG</span>
       </div>
       <div style="font-size:12px;color:#9aa39d;margin-bottom:18px;">Minimum: ${money(d.minWithdrawal)}</div>
 
-      <div style="font-size:12px;font-weight:700;color:#4b5259;margin-bottom:10px;">Méthode</div>
+      <div style="font-size:12px;font-weight:700;color:#4b5259;margin-bottom:10px;">${t('label_method')}</div>
       <div id="methodButtons" style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;"></div>
 
       <div id="withdrawAccountRow">
-        <div style="font-size:12px;font-weight:700;color:#4b5259;margin-bottom:10px;">Numéro / Identifiant</div>
-        <input type="tel" inputmode="numeric" id="withdrawAccount" placeholder="Numéro du compte" style="width:100%;border:1.5px solid #e6e9e7;border-radius:12px;padding:13px 15px;font-size:14px;color:#14181c;background:#fbfcfb;margin-bottom:18px;">
+        <div style="font-size:12px;font-weight:700;color:#4b5259;margin-bottom:10px;">${t('label_account_number_id')}</div>
+        <input type="tel" inputmode="numeric" id="withdrawAccount" placeholder="${t('ph_account_number')}" style="width:100%;border:1.5px solid #e6e9e7;border-radius:12px;padding:13px 15px;font-size:14px;color:#14181c;background:#fbfcfb;margin-bottom:18px;">
       </div>
       <button onclick="submitReferralWithdrawal()" style="width:100%;border:none;border-radius:14px;padding:15px;background:#14181c;color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
-        Demander le retrait
+        ${t('btn_request_withdrawal')}
       </button>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-      <div class="card" style="padding:16px;border-radius:16px;"><div style="font-size:10.5px;letter-spacing:0.6px;font-weight:700;color:#9aa39d;text-transform:uppercase;margin-bottom:8px;">Clients invités</div><div style="font-size:17px;font-weight:800;">${d.invitedCount}</div></div>
-      <div class="card" style="padding:16px;border-radius:16px;"><div style="font-size:10.5px;letter-spacing:0.6px;font-weight:700;color:#9aa39d;text-transform:uppercase;margin-bottom:8px;">Retraits</div><div style="font-size:17px;font-weight:800;">${d.withdrawalsCount}</div></div>
+      <div class="card" style="padding:16px;border-radius:16px;"><div style="font-size:10.5px;letter-spacing:0.6px;font-weight:700;color:#9aa39d;text-transform:uppercase;margin-bottom:8px;">${t('label_invited_clients')}</div><div style="font-size:17px;font-weight:800;">${d.invitedCount}</div></div>
+      <div class="card" style="padding:16px;border-radius:16px;"><div style="font-size:10.5px;letter-spacing:0.6px;font-weight:700;color:#9aa39d;text-transform:uppercase;margin-bottom:8px;">${t('label_withdrawals_count')}</div><div style="font-size:17px;font-weight:800;">${d.withdrawalsCount}</div></div>
     </div>
   `;
 }
@@ -8260,13 +8410,13 @@ async function fetchReferralPageData(){
 function copyReferralCode(){
   const d = state.referralData;
   if(!d) return;
-  navigator.clipboard.writeText(d.code).then(()=>showToast('Kòd kopye ✓'));
+  navigator.clipboard.writeText(d.code).then(()=>showToast(t('toast_code_copied')));
 }
 function copyReferralLink(){
   const d = state.referralData;
   if(!d) return;
   const link = window.location.origin + '/?ref=' + d.code;
-  navigator.clipboard.writeText(link).then(()=>showToast('Lyen kopye ✓'));
+  navigator.clipboard.writeText(link).then(()=>showToast(t('toast_link_copied')));
 }
 function formatCount(n){
   n = Number(n)||0;
@@ -8343,7 +8493,7 @@ async function shareProduct(productId){
   if(navigator.share && !inIframe){
     try{ await navigator.share({ title: p.name, text: message, url: link }); return; }catch(e){ if(e.name==='AbortError') return; }
   }
-  try{ await navigator.clipboard.writeText(link); showToast('Lyen kopye ✓'); }catch(e){ showToast(link); }
+  try{ await navigator.clipboard.writeText(link); showToast(t('toast_link_copied')); }catch(e){ showToast(link); }
 }
 async function shareReferralLink(){
   const d = state.referralData;
@@ -8467,7 +8617,7 @@ function renderMyListings(){
   const list = state.myListings || [];
   const statusLabel = { pending_review:'⏳ En attente', active:'✅ Actif sur le marché', rejected:'❌ Rejeté', sold:'💰 Vendu' };
   const statusColor = { pending_review:'var(--amber)', active:'var(--green)', rejected:'var(--red)', sold:'var(--muted)' };
-  if(list.length === 0){ box.innerHTML = '<div style="color:var(--muted);font-size:12px;">Aucune annonce pour l\'instant.</div>'; return; }
+  if(list.length === 0){ box.innerHTML = '<div style="color:var(--muted);font-size:12px;">' + escapeHtml(t('empty_no_listings')) + '</div>'; return; }
   box.innerHTML = list.map(l => `
     <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);">
       <img src="${escapeHtml((l.photos&&l.photos[0])||'')}" style="width:44px;height:44px;border-radius:8px;object-fit:cover;background:var(--panel-2);">
@@ -8838,8 +8988,8 @@ function renderReviewStars(){
   }
 }
 async function submitListingReview(){
-  if(!state.currentUserId){ showToast('Konekte pou kite yon avis'); return; }
-  if(!selectedReviewRating){ showToast('Chwazi yon nòt (1 a 5 zetwal)'); return; }
+  if(!state.currentUserId){ showToast(t('toast_login_to_review')); return; }
+  if(!selectedReviewRating){ showToast(t('toast_choose_rating')); return; }
   const comment = document.getElementById('reviewCommentInput').value.trim();
   const l = currentListingDetail;
   if(!l) return;
@@ -8864,7 +9014,7 @@ async function shareListing(id){
     try{ await navigator.share({ title:'Kerry Topup — Compte Free Fire', text, url }); }
     catch(e){ /* moun nan anile pataj la, pa gen pwoblèm */ }
   } else {
-    try{ await navigator.clipboard.writeText(url); showToast('🔗 Lyen kopye — kole l kote w vle pataje l'); }
+    try{ await navigator.clipboard.writeText(url); showToast(t('toast_link_copied_share')); }
     catch(e){ showToast(url); }
   }
 }
@@ -8883,8 +9033,8 @@ function addListingToCart(id){
   if(!state.currentUserId){ openAuthModal('login'); return; }
   const l = currentListingDetail;
   if(!l || l.id !== id) return;
-  if(l.seller_id === state.currentUserId){ showToast('Ou pa ka achte pwòp kont ou'); return; }
-  if(state.cart.find(i => i.type==='market_listing' && i.listingId===id)){ showToast('Deja nan panye a'); return; }
+  if(l.seller_id === state.currentUserId){ showToast(t('toast_cannot_buy_own')); return; }
+  if(state.cart.find(i => i.type==='market_listing' && i.listingId===id)){ showToast(t('toast_already_in_cart')); return; }
   state.cart.push({
     id: uid(), type: 'market_listing', listingId: l.id,
     productName: l.listing_name || l.rank, variantLabel: l.rank + ' — Niveau ' + l.level,
@@ -8899,8 +9049,8 @@ async function buyListing(id){
   if(blockIfSuspended()) return;
   const l = currentListingDetail;
   if(!l || l.id !== id){ showToast('Erè — rechaje paj la'); return; }
-  if(l.seller_id === state.currentUserId){ showToast('Ou pa ka achte pwòp kont ou'); return; }
-  if(walletBalance() < l.price){ showToast('Balans ou pa ase — rechaje Wallet la'); return; }
+  if(l.seller_id === state.currentUserId){ showToast(t('toast_cannot_buy_own')); return; }
+  if(walletBalance() < l.price){ showToast(t('toast_insufficient_balance_recharge')); return; }
 
   openConfirm(t('confirm_purchase_title'), t('confirm_purchase_desc').replace('{amount}', Number(l.price).toLocaleString('fr-FR')), async () => {
     try{
@@ -9140,7 +9290,7 @@ function editWhatsappNumber(){
 }
 async function confirmWhatsappNumber(){
   const val = document.getElementById('paramsWhatsapp').value.trim();
-  if(!val || val.length < 8){ showToast('Antre yon nimewo valid'); return; }
+  if(!val || val.length < 8){ showToast(t('toast_enter_valid_number')); return; }
   const u = currentUser();
   if(!u) return;
   const oldNumber = u.savedWhatsapp || '';
@@ -9157,7 +9307,7 @@ async function confirmWhatsappNumber(){
     let msg = '👤 ' + (u.name||'') + (label ? ' (' + label + ')' : '') + '\n📧 ' + (u.email||'');
     msg += isChange ? '\n📱 Ansyen: ' + oldNumber + '\n📱 Nouvo: ' + val : '\n📱 WhatsApp: ' + val;
     sendNtfyNotification(title, msg, 'default', 'iphone');
-    showToast('✅ Nimewo ' + (isChange?'chanje':'konfime') + ' — mèsi !');
+    showToast(isChange ? t('toast_number_changed') : t('toast_number_confirmed'));
     editWhatsappNumber();
     render();
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
@@ -9472,14 +9622,25 @@ async function saveOrderResponse(orderId, text){
     showToast('Repons sove ✓');
   }catch(e){ showToast('⚠️ Erè: ' + (e?.message||'enkoni')); }
 }
+function ktInitials(name){
+  const parts = (name||'?').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return '?';
+  return (parts[0][0] + (parts.length>1 ? parts[parts.length-1][0] : '')).toUpperCase();
+}
 function renderAdminOrderCard(o, userId){
   const u = state.users.find(x=>x.id===userId);
+  const clientName = u ? u.name : 'Kliyan enkoni';
   return `<div class="card">
-    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-      <div><div style="font-weight:700;font-size:13px;">${escapeHtml(o.product)} — ${escapeHtml(o.variant)}</div><div style="color:var(--muted);font-size:11px;">#${escapeHtml(o.orderNo||'')} · ${u?escapeHtml(u.name):'?'} · ${new Date(o.date).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</div></div>
-      <div style="font-weight:700;color:var(--green);font-size:13px;">${money(o.price)}</div>
+    <div style="display:flex;gap:10px;align-items:flex-start;">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--green-dim);color:var(--green-2);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12.5px;flex-shrink:0;">${escapeHtml(ktInitials(clientName))}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:800;font-size:14px;color:var(--text);">${escapeHtml(clientName)}</div>
+        <div style="font-weight:600;font-size:12.5px;color:var(--text);margin-top:2px;">${escapeHtml(o.product)} — ${escapeHtml(o.variant)}</div>
+        <div style="color:var(--muted);font-size:10.5px;margin-top:2px;">#${escapeHtml(o.orderNo||'')} · ${new Date(o.date).toLocaleString('fr-FR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'numeric',minute:'2-digit',hour12:true})}</div>
+      </div>
+      <div style="font-weight:800;color:var(--green);font-size:14px;white-space:nowrap;">${money(o.price)}</div>
     </div>
-    ${o.fields ? Object.entries(o.fields).map(([k,v]) => `<div style="font-size:11.5px;color:var(--muted);">${escapeHtml(k)}: <span style="color:var(--text);">${escapeHtml(v)}</span></div>`).join('') : ''}
+    ${o.fields ? Object.entries(o.fields).map(([k,v]) => `<div style="font-size:11.5px;color:var(--muted);margin-top:6px;">${escapeHtml(k)}: <span style="color:var(--text);">${escapeHtml(v)}</span></div>`).join('') : ''}
     <div style="margin-top:8px;">
       <textarea id="resp-${o.id}" placeholder="Ekri yon repons pou kliyan an wè..." rows="2" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;resize:vertical;">${escapeHtml(o.adminResponse||'')}</textarea>
       <button class="mini-btn" style="margin-top:5px;" onclick="saveOrderResponse('${o.id}', document.getElementById('resp-${o.id}').value)">Sove repons</button>
