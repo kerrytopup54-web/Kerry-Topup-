@@ -832,76 +832,26 @@ textarea.admin-ta{
 <div style="position:fixed;bottom:78px;right:16px;z-index:59;width:52px;height:52px;border-radius:50%;background:#3fce7c;animation:supportFabPulse 2.2s ease-out infinite;pointer-events:none;"></div>
 <style>@keyframes supportFabPulse{0%{transform:scale(1);opacity:0.55;}100%{transform:scale(1.7);opacity:0;}}</style>
 <button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶<span id="supportFabBadge" style="display:none;position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 5px;background:#E23B57;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;font-family:sans-serif;"></span></button>
-<div id="supportChatBg" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg, #071a10 0%, #0a1710 40%, #050b08 100%);z-index:70;flex-direction:column;overflow:hidden;">
-  <style>
-    .ktc-glow{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle, rgba(63,206,124,0.18) 0%, transparent 70%);}
-    .ktc-particle{position:absolute;border-radius:50%;background:#3fce7c;opacity:0.35;pointer-events:none;animation:ktcFloat 7s ease-in-out infinite;}
-    .ktc-emoji{position:absolute;font-size:15px;opacity:0.32;pointer-events:none;animation:ktcFloat2 9s ease-in-out infinite;}
-    @keyframes ktcFloat{0%,100%{transform:translateY(0) scale(1);opacity:0.22;}50%{transform:translateY(-22px) scale(1.25);opacity:0.5;}}
-    @keyframes ktcFloat2{0%,100%{transform:translateY(0) rotate(0deg);opacity:0.16;}50%{transform:translateY(-30px) rotate(12deg);opacity:0.38;}}
-  </style>
-  <div class="ktc-glow" style="width:260px;height:260px;top:-90px;left:-60px;"></div>
-  <div class="ktc-glow" style="width:220px;height:220px;top:220px;right:-80px;"></div>
-  <div class="ktc-glow" style="width:240px;height:240px;bottom:120px;left:-90px;"></div>
-  <span class="ktc-particle" style="width:5px;height:5px;top:12%;left:22%;animation-delay:0s;"></span>
-  <span class="ktc-particle" style="width:4px;height:4px;top:30%;right:14%;animation-delay:1.4s;"></span>
-  <span class="ktc-particle" style="width:6px;height:6px;top:55%;left:8%;animation-delay:2.6s;"></span>
-  <span class="ktc-particle" style="width:3px;height:3px;top:70%;right:22%;animation-delay:0.8s;"></span>
-  <span class="ktc-particle" style="width:5px;height:5px;top:85%;left:30%;animation-delay:2s;"></span>
-  <span class="ktc-emoji" style="top:18%;left:12%;animation-delay:0.3s;">💵</span>
-  <span class="ktc-emoji" style="top:38%;right:10%;animation-delay:2.1s;">💎</span>
-  <span class="ktc-emoji" style="top:60%;left:20%;animation-delay:1.1s;">✨</span>
-  <span class="ktc-emoji" style="top:75%;right:16%;animation-delay:3s;">💵</span>
-  <span class="ktc-emoji" style="top:48%;left:40%;animation-delay:1.7s;">💎</span>
-  <div style="position:relative;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:14px 16px 16px;background:linear-gradient(135deg, #17a854, #0a7c3d);color:#fff;">
-    <button onclick="toggleSupportChat()" aria-label="Retounen" data-i18n-title="btn_back" title="Retounen" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.16);border:none;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5m6-7-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-    <div style="position:relative;width:40px;height:40px;flex-shrink:0;">
-      <div style="width:100%;height:100%;border-radius:50%;background:#fff;padding:4px;box-sizing:border-box;overflow:hidden;"><img id="supportChatHeaderLogo" src="" alt="Kerry Topup" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>
-      <span style="position:absolute;bottom:-2px;right:-2px;width:11px;height:11px;background:#3fce7c;border:2px solid #0a7c3d;border-radius:50%;"></span>
-    </div>
-    <script>document.getElementById('supportChatHeaderLogo').src=window.KT_LOGO_SRC;</script>
-    <div style="flex:1;min-width:0;">
-      <div style="font-weight:800;font-size:15.5px;">Touski Bot <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:4px;">👤 Kerry Cadet en ligne</span></div>
-      <div style="font-size:11.5px;display:flex;align-items:center;gap:5px;margin-top:1px;opacity:0.92;"><span style="width:6px;height:6px;border-radius:50%;background:#B6FFCF;"></span><span data-i18n="chat_status_online">An liy</span></div>
-    </div>
-  </div>
-  <div id="supportChatMessages" style="position:relative;flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:10px;"></div>
-  <div id="supportRecordingBar" style="position:relative;display:none;align-items:center;gap:10px;padding:12px 16px;background:rgba(7,26,16,0.75);backdrop-filter:blur(10px);border-top:1px solid rgba(63,206,124,0.18);color:#ff8fa3;flex-shrink:0;">
-    <span style="width:9px;height:9px;border-radius:50%;background:#E23B57;animation:pillPulse 1s ease-in-out infinite;flex-shrink:0;"></span>
-    <span id="supportRecordingTimer" style="font-weight:700;font-size:13px;">0:00</span>
-    <span data-i18n="chat_recording_label" style="flex:1;font-size:13px;font-weight:600;">Ap anrejistre mesaj vokal...</span>
-    <button onclick="cancelSupportRecording()" data-i18n="btn_cancel" style="border:none;background:none;color:#93b1a1;font-size:12.5px;font-weight:700;cursor:pointer;">Anile</button>
-  </div>
-  <div id="supportEmojiPanel" style="position:relative;display:none;flex-wrap:wrap;gap:4px;padding:10px 14px;background:rgba(7,26,16,0.85);backdrop-filter:blur(10px);border-top:1px solid rgba(63,206,124,0.18);max-height:150px;overflow-y:auto;flex-shrink:0;"></div>
-  <div style="position:relative;flex-shrink:0;display:flex;align-items:center;gap:8px;padding:14px 16px;border-top:1px solid rgba(63,206,124,0.18);background:rgba(7,26,16,0.75);backdrop-filter:blur(10px);">
-    <label style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#e8f5ec;flex-shrink:0;cursor:pointer;font-size:16px;">🔗<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
-    <button onclick="toggleSupportEmojiPanel()" aria-label="Emoji" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;color:#e8f5ec;flex-shrink:0;cursor:pointer;font-size:17px;">😊</button>
-    <input type="text" id="supportChatInput" data-i18n-ph="chat_input_placeholder" placeholder="Ekri kesyon ou..." style="flex:1;min-width:0;border:1px solid rgba(63,206,124,0.2);border-radius:24px;padding:11px 16px;font-size:14px;color:#e8f5ec;background:rgba(255,255,255,0.06);" oninput="updateSupportSendBtn()" onkeydown="if(event.key==='Enter')sendSupportMessage()">
-    <button id="supportMicBtn" onclick="onSupportMicSendClick()" aria-label="Voye mesaj vokal" style="width:40px;height:40px;border-radius:50%;background:#0FA654;border:none;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;">
-      <svg id="supportMicIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke-linecap="round"/></svg>
-      <svg id="supportSendIcon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M2.5 21.5 22 12 2.5 2.5 2.5 10 16 12 2.5 14z"/></svg>
-    </button>
-  </div>
-</div>
-
-<!-- Popup tutoriel byenveni (parèt yon sèl fwa, pa fòse) -->
-<div id="tutoWelcomeBg" style="display:none;position:fixed;inset:0;background:rgba(10,20,15,0.55);z-index:65;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeTutoWelcomePopup()">
-  <div style="width:100%;max-width:340px;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 24px 60px rgba(10,20,15,0.35);">
-    <div style="position:relative;background:linear-gradient(160deg,#17C267,#0A7C3D);padding:28px 24px 42px;text-align:center;color:#fff;">
-      <button onclick="closeTutoWelcomePopup()" aria-label="Fèmen" style="position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.18);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg>
-      </button>
-      <div style="width:52px;height:52px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 8px 18px rgba(0,0,0,0.15);">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0FA654" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+<div id="supportChatBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:70;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)toggleSupportChat()">
+  <div style="width:100%;max-width:480px;background:var(--panel);border-radius:22px 22px 0 0;height:65vh;max-height:560px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(20,40,30,0.18);">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:linear-gradient(135deg, #12241a, #0a1710);color:#fff;flex-shrink:0;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="position:relative;width:38px;height:38px;flex-shrink:0;">
+          <div style="width:100%;height:100%;border-radius:12px;background:linear-gradient(145deg, #17a854, #0a7c3d);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 6px 14px rgba(10,124,61,0.3);">🐶</div>
+          <span style="position:absolute;bottom:-2px;right:-2px;width:11px;height:11px;background:#3fce7c;border:2px solid #12241a;border-radius:50%;"></span>
+        </div>
+        <div>
+          <div style="font-weight:800;font-size:15.5px;">Touski Bot <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:4px;">👤 Kerry Cadet en ligne</span></div>
+          <div style="font-size:11.5px;color:#6fcf97;display:flex;align-items:center;gap:5px;margin-top:1px;"><span style="width:6px;height:6px;border-radius:50%;background:#3fce7c;"></span>An liy</div>
+        </div>
       </div>
-      <div style="font-weight:800;font-size:18px;" data-i18n="tuto_popup_title">Tutoriel Kerry Topup</div>
-      <div style="font-size:12.5px;margin-top:6px;line-height:1.4;opacity:0.94;padding:0 6px;" data-i18n="tuto_popup_sub">Men tutoriel enpòtan pou itilize Kerry Topup byen</div>
+      <button onclick="toggleSupportChat()" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;display:flex;align-items:center;justify-content:center;color:#cfd6d2;cursor:pointer;font-size:15px;">✕</button>
     </div>
-    <div id="tutoWelcomeCards" style="margin-top:-22px;padding:0 18px;display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;"></div>
-    <div style="padding:18px 20px 22px;text-align:center;">
-      <button onclick="closeTutoWelcomePopup()" data-i18n="btn_later" style="background:none;border:none;color:#6B7A6E;font-size:13px;font-weight:700;cursor:pointer;">Pita</button>
+    <div id="supportChatMessages" style="flex:1;overflow-y:auto;padding:20px;background:#f7f9f8;display:flex;flex-direction:column;gap:10px;"></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid #eef1ef;background:#fff;flex-shrink:0;">
+      <label style="width:40px;height:40px;border-radius:50%;background:#f4f7f5;display:flex;align-items:center;justify-content:center;color:#4b5259;flex-shrink:0;cursor:pointer;font-size:17px;">📷<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
+      <input type="text" id="supportChatInput" placeholder="Ekri kesyon ou..." style="flex:1;border:1px solid #e2e6e3;border-radius:24px;padding:11px 16px;font-size:14px;color:var(--text);background:#f7f9f8;" onkeydown="if(event.key==='Enter')sendSupportMessage()">
+      <button onclick="sendSupportMessage()" style="border:none;border-radius:24px;padding:11px 22px;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 6px 14px rgba(10,158,61,0.28);flex-shrink:0;" data-i18n="btn_chat_send">Voye</button>
     </div>
   </div>
 </div>
@@ -1215,12 +1165,6 @@ const TRANSLATIONS = {
     api_recent_orders_heading:'📦 Kòmand resan yo', api_no_orders_yet:'Pa gen kòmand atravè API a poko.',
     table_col_product:'Pwodwi', table_col_total:'Total', table_col_status:'Estati', table_col_date:'Dat',
     status_completed:'Konplete', status_pending:'An atant', status_failed:'Echwe',
-    chat_header_title:'Sipò Kerry Topup', chat_status_online:'An liy', chat_input_placeholder:'Ekri kesyon ou...',
-    chat_greeting_open:"Bonjou ! Se mwen menm Touski Bot 🐶. Kijan m ka ede w jodi a ? (Rechaj, acha, PIN, elatriye)",
-    chat_greeting_closed:"Bonjou e mèsi paske w kontakte nou 👋\n\nSèvis nou an fèmen kounye a. Nou disponib chak jou soti 8h00AM pou rive 8h30PM.\n\nOu ka kite mesaj ou ak imèl ou : n ap reponn ou de w nou louvri ankò.\n\nMèsi pou konfyans ou e a byento !",
-    chat_recording_label:'Ap anrejistre mesaj vokal...', btn_back:'Retounen', toast_mic_denied:'Nou pa ka jwenn aksè mikwo a — verifye pèmisyon telefòn ou',
-    toast_sending_voice:'Ap voye mesaj vokal la...', toast_voice_sent:'Mesaj vokal voye ✓',
-    tuto_popup_title:'Tutoriel Kerry Topup', tuto_popup_sub:'Men tutoriel enpòtan pou itilize Kerry Topup byen', btn_later:'Pita',
   },
   fr: {
     nav_shop:'Boutique', nav_wallet:'Portefeuille', nav_commandes:'Commandes', nav_historique:'Historique', nav_redeem:'Redeem Free Fire',
@@ -1422,12 +1366,6 @@ const TRANSLATIONS = {
     api_recent_orders_heading:'📦 Commandes récentes', api_no_orders_yet:'Pas encore de commande via l\'API.',
     table_col_product:'Produit', table_col_total:'Total', table_col_status:'Statut', table_col_date:'Date',
     status_completed:'Terminée', status_pending:'En attente', status_failed:'Échouée',
-    chat_header_title:'Support Kerry Topup', chat_status_online:'En ligne', chat_input_placeholder:'Écrivez votre question...',
-    chat_greeting_open:"Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)",
-    chat_greeting_closed:"Bonjour et merci de nous avoir contactés 👋\n\nNotre service est actuellement fermé. Nous sommes disponibles tous les jours de 8h00AM à 8h30PM.\n\nN'hésitez pas à nous laisser votre message et votre email : nous y répondrons dès la réouverture.\n\nMerci de votre confiance et à très bientôt !",
-    chat_recording_label:'Enregistrement du message vocal...', btn_back:'Retour', toast_mic_denied:'Impossible d\'accéder au micro — vérifiez les autorisations de votre téléphone',
-    toast_sending_voice:'Envoi du message vocal...', toast_voice_sent:'Message vocal envoyé ✓',
-    tuto_popup_title:'Tutoriel Kerry Topup', tuto_popup_sub:'Voici les tutoriels indispensables pour bien utiliser Kerry Topup', btn_later:'Plus tard',
   },
   en: {
     nav_shop:'Shop', nav_wallet:'Wallet', nav_commandes:'Orders', nav_historique:'History', nav_redeem:'Redeem Free Fire',
@@ -1629,12 +1567,6 @@ const TRANSLATIONS = {
     api_recent_orders_heading:'📦 Recent orders', api_no_orders_yet:'No orders via the API yet.',
     table_col_product:'Product', table_col_total:'Total', table_col_status:'Status', table_col_date:'Date',
     status_completed:'Completed', status_pending:'Pending', status_failed:'Failed',
-    chat_header_title:'Kerry Topup Support', chat_status_online:'Online', chat_input_placeholder:'Type your question...',
-    chat_greeting_open:"Hello! I'm Touski Bot 🐶. How can I help you today? (Recharge, purchase, PIN, etc.)",
-    chat_greeting_closed:"Hello and thanks for contacting us 👋\n\nOur service is currently closed. We're available every day from 8:00AM to 8:30PM.\n\nFeel free to leave us your message and email: we'll reply as soon as we reopen.\n\nThank you for your trust, see you soon!",
-    chat_recording_label:'Recording voice message...', btn_back:'Back', toast_mic_denied:'Can\'t access the microphone — check your phone permissions',
-    toast_sending_voice:'Sending voice message...', toast_voice_sent:'Voice message sent ✓',
-    tuto_popup_title:'Kerry Topup Tutorial', tuto_popup_sub:'Here are the essential tutorials to use Kerry Topup well', btn_later:'Later',
   },
   es: {
     nav_shop:'Tienda', nav_wallet:'Billetera', nav_commandes:'Pedidos', nav_historique:'Historial', nav_redeem:'Redeem Free Fire',
@@ -1836,12 +1768,6 @@ const TRANSLATIONS = {
     api_recent_orders_heading:'📦 Pedidos recientes', api_no_orders_yet:'Aún no hay pedidos vía la API.',
     table_col_product:'Producto', table_col_total:'Total', table_col_status:'Estado', table_col_date:'Fecha',
     status_completed:'Completado', status_pending:'Pendiente', status_failed:'Fallido',
-    chat_header_title:'Soporte Kerry Topup', chat_status_online:'En línea', chat_input_placeholder:'Escribe tu pregunta...',
-    chat_greeting_open:"¡Hola! Soy Touski Bot 🐶. ¿Cómo puedo ayudarte hoy? (Recarga, compra, PIN, etc.)",
-    chat_greeting_closed:"Hola y gracias por contactarnos 👋\n\nNuestro servicio está cerrado en este momento. Estamos disponibles todos los días de 8:00AM a 8:30PM.\n\nNo dudes en dejarnos tu mensaje y tu correo: te responderemos en cuanto reabramos.\n\n¡Gracias por tu confianza, hasta pronto!",
-    chat_recording_label:'Grabando mensaje de voz...', btn_back:'Volver', toast_mic_denied:'No podemos acceder al micrófono — revisa los permisos de tu teléfono',
-    toast_sending_voice:'Enviando mensaje de voz...', toast_voice_sent:'Mensaje de voz enviado ✓',
-    tuto_popup_title:'Tutorial de Kerry Topup', tuto_popup_sub:'Aquí están los tutoriales esenciales para usar bien Kerry Topup', btn_later:'Más tarde',
   }
 };
 function t(key){
@@ -2000,7 +1926,7 @@ async function fetchProductsFromServer(){
           const mc = (configs||[]).find(c=>c.product_id===p.id);
           obj.manualConfig = mc ? { taux:Number(mc.taux), frais:Number(mc.frais||0), min:Number(mc.min_amount), max:Number(mc.max_amount), fields:mc.fields||[], feeTiers:mc.fee_tiers||[] } : {taux:145,frais:0,min:5,max:500,fields:[],feeTiers:[]};
         } else {
-          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), costPrice:v.cost_price!=null?Number(v.cost_price):null, partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, fixedServerId:v.fixed_server_id||null, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null, equivalenceGroup:v.equivalence_group||null}));
+          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, fixedServerId:v.fixed_server_id||null, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null, equivalenceGroup:v.equivalence_group||null}));
           if(p.type === 'form'){ obj.formFields = p.form_fields || []; }
         }
         return obj;
@@ -2130,36 +2056,8 @@ async function fetchTutorialVideos(){
     if(data){
       state.tutorialVideos = data.map(v => ({ id:v.id, title:v.title, videoUrl:v.video_url, contextType:v.context_type, productId:v.product_id }));
       if(currentPage === 'tutoriel') render();
-      maybeShowTutoWelcomePopup();
     }
   }catch(e){ console.warn('fetchTutorialVideos failed:', e?.message || e); }
-}
-/* ---- Popup tutoriel byenveni — yon sèl fwa, san deranje moun ---- */
-function maybeShowTutoWelcomePopup(){
-  try{
-    if(localStorage.getItem('kt_tuto_popup_seen')) return;
-    if(!state.tutorialVideos || state.tutorialVideos.length === 0) return;
-    setTimeout(() => {
-      // Pa parèt si yon lòt modal/chat deja louvri — evite deranje moun nan mitan yon aksyon
-      if(supportChatOpen || document.getElementById('authModal')?.classList.contains('show')) return;
-      const cardsBox = document.getElementById('tutoWelcomeCards');
-      if(cardsBox){
-        cardsBox.innerHTML = state.tutorialVideos.slice(0, 6).map(v => `
-          <div onclick="closeTutoWelcomePopup();playTutorialVideoById('${v.id}');" style="flex:0 0 118px;background:#fff;border:1px solid var(--line);border-radius:16px;height:140px;box-shadow:0 6px 16px rgba(17,21,26,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
-            <div style="width:40px;height:40px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--green-2)"><path d="M8 5v14l11-7z"/></svg>
-            </div>
-            <div style="font-size:10.5px;font-weight:700;color:var(--text);text-align:center;padding:0 8px;line-height:1.3;">${escapeHtml(v.title)}</div>
-          </div>
-        `).join('');
-      }
-      document.getElementById('tutoWelcomeBg').style.display = 'flex';
-    }, 1800);
-  }catch(e){ /* pa bloke chaj sit la si sa echwe */ }
-}
-function closeTutoWelcomePopup(){
-  document.getElementById('tutoWelcomeBg').style.display = 'none';
-  try{ localStorage.setItem('kt_tuto_popup_seen', '1'); }catch(e){}
 }
 async function fetchVideoDismissals(userId){
   if(!userId) return;
@@ -2697,9 +2595,9 @@ async function toggleSupportChat(){
   }
   if(supportChatOpen && supportChatHistory.length === 0){
     if(isWithinBusinessHours()){
-      addSupportMessage('assistant', t('chat_greeting_open'));
+      addSupportMessage('assistant', "Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)");
     } else {
-      addSupportMessage('assistant', t('chat_greeting_closed'));
+      addSupportMessage('assistant', "Bonjour et merci de nous avoir contactés 👋\n\nNotre service est actuellement fermé. Nous sommes disponibles tous les jours de 8h00AM à 8h30PM.\n\nN'hésitez pas à nous laisser votre message et votre email : nous y répondrons dès la réouverture.\n\nMerci de votre confiance et à très bientôt !");
     }
   }
 }
@@ -2711,9 +2609,6 @@ function formatChatText(text){
   });
   escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:mp4|webm|mov|m4v)(?:\?[^\s<]*)?)/gi, (url) => {
     return `<div style="margin-top:8px;"><video src="${url}" controls style="width:100%;border-radius:10px;background:#000;max-height:220px;display:block;"></video></div>`;
-  });
-  escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:weba|ogg|mp3|wav|m4a)(?:\?[^\s<]*)?)/gi, (url) => {
-    return `<audio src="${url}" controls style="width:220px;max-width:100%;display:block;margin-top:4px;"></audio>`;
   });
   escaped = escaped.replace(/(https?:\/\/[^\s<]*(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))[a-zA-Z0-9_-]{11}[^\s<]*)/gi, (url) => {
     const embed = youtubeEmbedUrl(url);
@@ -2783,11 +2678,11 @@ function addSupportMessage(role, text, skipHistory){
   const row = document.createElement('div');
   const isBot = role === 'assistant';
   row.style.cssText = 'display:flex;gap:10px;margin-bottom:4px;' + (role==='user' ? 'flex-direction:row-reverse;' : '');
-  const avatarHtml = isBot ? `<div style="width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid rgba(63,206,124,0.3);overflow:hidden;flex-shrink:0;padding:2px;box-sizing:border-box;"><img src="${window.KT_LOGO_SRC}" alt="Kerry Topup" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>` : '';
+  const avatarHtml = isBot ? '<div style="width:30px;height:30px;border-radius:10px;background:linear-gradient(145deg, #17a854, #0a7c3d);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🐶</div>' : '';
   const styles = {
-    user: 'background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border-radius:16px 4px 16px 16px;box-shadow:0 4px 14px rgba(10,158,61,0.35);',
-    admin: 'background:#1565D8;color:#fff;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.2);',
-    assistant: 'background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);backdrop-filter:blur(6px);color:#e8f5ec;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.15);'
+    user: 'background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border-radius:16px 4px 16px 16px;box-shadow:0 4px 10px rgba(15,166,84,0.2);',
+    admin: 'background:#1565D8;color:#fff;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);',
+    assistant: 'background:#fff;border:1px solid #eef1ef;color:#14181c;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.03);'
   };
   const bubbleStyle = (styles[role] || styles.assistant) + 'padding:14px 16px;max-width:82%;font-size:14.5px;white-space:pre-wrap;line-height:1.55;';
   row.innerHTML = avatarHtml + '<div style="' + bubbleStyle + '">' + formatChatText(text) + '</div>';
@@ -2838,126 +2733,11 @@ async function sendSupportImage(input){
     showToast('Foto voye ✓');
   }
 }
-/* ---- Mesaj vokal nan chat sipò a ---- */
-let supportMediaRecorder = null;
-let supportRecordedChunks = [];
-let supportRecordingTimerInterval = null;
-let supportRecordingStartedAt = 0;
-let supportRecordingCancelled = false;
-const SUPPORT_EMOJI_LIST = ['😀','😁','😂','🤣','😊','😍','😘','😉','😎','🤩','🥳','😅','😇','🙂','😢','😭','😡','😱','🤔','👍','👎','🙏','💪','👏','🙌','🤝','✌️','👋','❤️','💚','💛','💙','💜','🔥','⭐','✨','💯','🎉','🎊','💰','💵','💎','🎮','📱','✅','❌','⚠️','⏰','📦'];
-function toggleSupportEmojiPanel(){
-  const panel = document.getElementById('supportEmojiPanel');
-  if(!panel) return;
-  const showing = panel.style.display === 'flex';
-  if(showing){ panel.style.display = 'none'; return; }
-  if(!panel.dataset.filled){
-    panel.innerHTML = SUPPORT_EMOJI_LIST.map(e => `<button onclick="insertSupportEmoji('${e}')" style="width:36px;height:36px;border:none;background:none;font-size:20px;cursor:pointer;border-radius:8px;">${e}</button>`).join('');
-    panel.dataset.filled = '1';
-  }
-  panel.style.display = 'flex';
-  const rec = document.getElementById('supportRecordingBar');
-  if(rec) rec.style.display = 'none';
-}
-function insertSupportEmoji(emoji){
-  const input = document.getElementById('supportChatInput');
-  if(!input) return;
-  input.value += emoji;
-  input.focus();
-  updateSupportSendBtn();
-}
-function updateSupportSendBtn(){
-  const input = document.getElementById('supportChatInput');
-  const micIcon = document.getElementById('supportMicIcon');
-  const sendIcon = document.getElementById('supportSendIcon');
-  if(!input || !micIcon || !sendIcon) return;
-  const hasText = input.value.trim().length > 0;
-  micIcon.style.display = hasText ? 'none' : 'block';
-  sendIcon.style.display = hasText ? 'block' : 'none';
-}
-function onSupportMicSendClick(){
-  const input = document.getElementById('supportChatInput');
-  if(input && input.value.trim().length > 0){
-    sendSupportMessage();
-    updateSupportSendBtn();
-  } else {
-    toggleSupportRecording();
-  }
-}
-async function toggleSupportRecording(){
-  if(supportMediaRecorder && supportMediaRecorder.state === 'recording'){
-    stopSupportRecording(false);
-    return;
-  }
-  try{
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    supportRecordedChunks = [];
-    supportRecordingCancelled = false;
-    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
-    supportMediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
-    supportMediaRecorder.ondataavailable = (e) => { if(e.data && e.data.size > 0) supportRecordedChunks.push(e.data); };
-    supportMediaRecorder.onstop = async () => {
-      stream.getTracks().forEach(tr => tr.stop());
-      clearInterval(supportRecordingTimerInterval);
-      document.getElementById('supportRecordingBar').style.display = 'none';
-      const micBtn = document.getElementById('supportMicBtn');
-      if(micBtn){ micBtn.style.background = '#0FA654'; }
-      if(supportRecordingCancelled || supportRecordedChunks.length === 0) return;
-      const blob = new Blob(supportRecordedChunks, { type: supportMediaRecorder.mimeType || 'audio/webm' });
-      await sendSupportVoiceMessage(blob);
-    };
-    supportMediaRecorder.start();
-    supportRecordingStartedAt = Date.now();
-    const bar = document.getElementById('supportRecordingBar');
-    if(bar) bar.style.display = 'flex';
-    const micBtn = document.getElementById('supportMicBtn');
-    if(micBtn){ micBtn.style.background = '#E23B57'; }
-    supportRecordingTimerInterval = setInterval(() => {
-      const secs = Math.floor((Date.now() - supportRecordingStartedAt) / 1000);
-      const m = Math.floor(secs / 60), s = secs % 60;
-      const el = document.getElementById('supportRecordingTimer');
-      if(el) el.textContent = m + ':' + String(s).padStart(2,'0');
-    }, 500);
-  }catch(e){
-    showToast(t('toast_mic_denied'));
-  }
-}
-function cancelSupportRecording(){
-  supportRecordingCancelled = true;
-  stopSupportRecording(true);
-}
-function stopSupportRecording(){
-  if(supportMediaRecorder && supportMediaRecorder.state === 'recording'){
-    supportMediaRecorder.stop();
-  }
-}
-async function sendSupportVoiceMessage(blob){
-  showToast(t('toast_sending_voice'));
-  const file = new File([blob], uid() + '.weba', { type: blob.type || 'audio/webm' });
-  const url = await uploadImageToStorage(file);
-  if(!url) return;
-  addSupportMessage('user', url);
-  {
-    const u = currentUser();
-    const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
-    const email = state.currentUserId ? ((u&&u.email)||'') : '';
-    sendNtfyNotification('🎤 Nouvo mesaj vokal kliyan (Touski Bot)', '👤 ' + name + '\n📧 ' + email + '\n▶️ Peze notifikasyon an pou tande mesaj la', 'default', 'microphone', url);
-  }
-  if(supportConversationId){
-    try{
-      const sb = await getSupabase();
-      await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:url });
-      await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
-    }catch(e){ showToast('⚠️ Pa ka voye mesaj vokal — eseye ankò'); }
-  } else {
-    showToast(t('toast_voice_sent'));
-  }
-}
 async function sendSupportMessage(){
   const input = document.getElementById('supportChatInput');
   const text = input.value.trim();
   if(!text) return;
   input.value = '';
-  updateSupportSendBtn();
   addSupportMessage('user', text);
 
   // Si sit la fèmen, kòmanse tracking imedyatman (pa tann 5 mesaj) e pa eseye reponn ak AI
@@ -2965,20 +2745,16 @@ async function sendSupportMessage(){
     await requestHumanAgent();
   }
 
-  // Chak mesaj kliyan voye (menm si li poko eskalade bay yon moun) — voye ntfy ak non/imèl kliyan an
-  {
-    const u = currentUser();
-    const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
-    const email = state.currentUserId ? ((u&&u.email)||'') : '';
-    sendNtfyNotification('💬 Nouvo mesaj kliyan (Touski Bot)', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'default', 'speech_balloon');
-  }
-
-  // Si tracking kòmanse (konvèsasyon eskalade), sove mesaj la nan Admin tou
+  // Si tracking kòmanse (konvèsasyon kreye), sove mesaj la e voye ntfy — kèlkeswa si bot la ap reponn tou
   if(supportConversationId){
     try{
       const sb = await getSupabase();
       await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text });
       await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
+      const u = currentUser();
+      const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
+      const email = state.currentUserId ? ((u&&u.email)||'') : '';
+      sendNtfyNotification('💬 Nouvo mesaj kliyan', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'default', 'speech_balloon');
     }catch(e){ /* pa bloke chat la si tracking echwe */ }
   }
 
@@ -5442,7 +5218,6 @@ async function confirmApiTopupPurchase(productId){
   const serverId = variant.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
   const totalPrice = variant.price * qty;
-  const totalCost = variant.costPrice != null ? variant.costPrice * qty : null;
   const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.style.cursor='';buyBtn.textContent='⚡ '+t('btn_buy_now');} };
   const finishPurchaseSuccess = () => {
     showToast(t('toast_purchase_success')); goPage('commandes');
@@ -5480,7 +5255,7 @@ async function confirmApiTopupPurchase(productId){
     const orderNo = 'KT-' + Math.random().toString(36).slice(2, 10).toUpperCase();
     const { data: inserted, error: insErr } = await sb.from('orders').insert({
       order_no: orderNo, user_id: state.currentUserId, type: isGiftCard ? 'pin' : 'api_topup', status: 'en_cours',
-      product: p.name, variant: variant.label + (qty>1?' × '+qty:''), price: totalPrice, cost_price: totalCost,
+      product: p.name, variant: variant.label + (qty>1?' × '+qty:''), price: totalPrice,
       player_id: playerId || null, server_id: serverId || null, player_name: verifiedName,
     }).select().single();
     if(insErr || !inserted){ showCustomerError('⚠️ Nou pa t kapab kreye kòmand ou — eseye ankò.', insErr?.message||'enkoni', 'Kreyasyon kòmand'); resetBtn(); return; }
@@ -7508,7 +7283,7 @@ async function insertOrderToServer(order, userId){
     const sb = await getSupabase();
     const { data, error } = await sb.from('orders').insert({
       order_no: order.orderNo, user_id: userId, type: order.type, status: order.status,
-      product: order.product, variant: order.variant, price: order.price, cost_price: order.costPrice || null, pin_code: order.pin || null,
+      product: order.product, variant: order.variant, price: order.price, pin_code: order.pin || null,
       fields: order.fields || null, montant_usd: order.montantUSD || null, frais_usd: order.fraisUSD || null
     }).select('id').single();
     if(error){
@@ -7928,11 +7703,9 @@ async function checkoutCart(){
       try{
         const sb = await getSupabase();
         const itemOrderNo = 'KT-' + Math.random().toString(36).slice(2, 10).toUpperCase();
-        const cvApi = state.products.flatMap(pr=>pr.variants||[]).find(v=>v.id===item.variantId);
-        const itemCostApi = cvApi && cvApi.costPrice != null ? cvApi.costPrice * (item.qty||1) : null;
         const { data: inserted, error: insErr } = await sb.from('orders').insert({
           order_no: itemOrderNo, user_id: state.currentUserId, type: 'api_topup', status: 'en_cours',
-          product: item.productName, variant: item.variantLabel, price: item.price, cost_price: itemCostApi,
+          product: item.productName, variant: item.variantLabel, price: item.price,
           player_id: item.playerId, server_id: item.serverId || null,
         }).select().single();
         if(insErr || !inserted){ console.warn('api_topup order insert erè:', insErr?.message); failed.push(item); continue; }
@@ -8006,11 +7779,9 @@ async function checkoutCart(){
         processedCount++;
       }catch(e){ console.warn('market_listing checkout exception:', e?.message||e); failed.push(item); }
     } else {
-      const cvPin = item.variantId ? state.products.flatMap(pr=>pr.variants||[]).find(v=>v.id===item.variantId) : null;
       const order = {
         id: uid(), orderNo: nextOrderNo(), type:item.type, status:'en_cours',
         product: item.productName, variant: item.variantLabel, price: item.price,
-        costPrice: cvPin && cvPin.costPrice != null ? cvPin.costPrice * (item.qty||1) : null,
         fields: item.fields, montantUSD: item.montantUSD || null, date: new Date().toISOString()
       };
       if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
@@ -11701,20 +11472,18 @@ function renderFormAdminConfig(p){
   if(!p.formFields) p.formFields = [];
   return `
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Opsyon ak Pri</div>
-    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th title="Sa founisè a fè w peye">Pri Founisè</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
+    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
       ${sortedVariants(p).map(v => `
         <tr id="vrow-${v.id}" data-vid="${v.id}">
         <td style="width:40px;padding:0;"><span onpointerdown="startVariantDrag(event,'${p.id}','${v.id}')" style="cursor:grab;touch-action:none;color:var(--text);font-size:22px;line-height:1;letter-spacing:-1px;user-select:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;">⣿</span></td>
         <td><input type="text" style="width:100%;min-width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;font-size:12px;" value="${escapeHtml(v.label)}" onchange="updateVariantLabel('${p.id}','${v.id}',this.value)"></td>
         <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.price}" onchange="updatePrice('${p.id}','${v.id}',this.value)"></td>
-        <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.costPrice??''}" placeholder="—" onchange="updateCostPrice('${p.id}','${v.id}',this.value)"></td>
         <td><button class="mini-btn" onclick="removeVariant('${p.id}','${v.id}')">✕</button></td></tr>
       `).join('')}
     </tbody></table>
     <div style="display:flex;gap:6px;margin-top:8px;margin-bottom:14px;">
       <input type="text" id="addVarName-${p.id}" placeholder="Non opsyon" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
-      <input type="text" id="addVarCost-${p.id}" placeholder="Pri Founisè" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <button class="mini-btn" onclick="addVariant('${p.id}')">+ Ajoute</button>
     </div>
     <div style="background:var(--panel-2);border-radius:11px;padding:12px;">
@@ -11753,8 +11522,7 @@ function renderApiTopupAdminConfig(p){
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
             <span onpointerdown="startVariantDrag(event,'${p.id}','${v.id}')" style="cursor:grab;touch-action:none;color:var(--text);font-size:20px;line-height:1;user-select:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex-shrink:0;">⣿</span>
             <input type="text" style="flex:1;min-width:80px;font-size:13px;font-weight:600;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;" value="${escapeHtml(v.label)}" onchange="updateVariantLabel('${p.id}','${v.id}',this.value)">
-            <input type="text" class="mono" style="width:55px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:12px;" value="${v.price}" placeholder="Pri" onchange="updatePrice('${p.id}','${v.id}',this.value)">
-            <input type="text" class="mono" style="width:65px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:12px;" value="${v.costPrice??''}" placeholder="Pri Founisè" title="Sa founisè a fè w peye" onchange="updateCostPrice('${p.id}','${v.id}',this.value)">
+            <input type="text" class="mono" style="width:55px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:12px;" value="${v.price}" onchange="updatePrice('${p.id}','${v.id}',this.value)">
             <button class="mini-btn" onclick="removeVariant('${p.id}','${v.id}')">✕</button>
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
@@ -11787,7 +11555,6 @@ function renderApiTopupAdminConfig(p){
     <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
       <input type="text" id="addVarName-${p.id}" placeholder="Non opsyon (ex: 100 Diamonds)" style="flex:1;min-width:120px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri HTG" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
-      <input type="text" id="addVarCost-${p.id}" placeholder="Pri Founisè" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPartnerId-${p.id}" placeholder="Founisè product_id (vid si Verif sèlman)" style="width:110px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <button class="mini-btn" onclick="addApiTopupVariant('${p.id}')">+ Ajoute</button>
     </div>
@@ -11796,17 +11563,15 @@ function renderApiTopupAdminConfig(p){
 async function addApiTopupVariant(productId){
   const label = document.getElementById('addVarName-'+productId).value.trim();
   const price = parseFloat(document.getElementById('addVarPrice-'+productId).value);
-  const costEl = document.getElementById('addVarCost-'+productId);
-  const costPrice = costEl && costEl.value !== '' ? (parseFloat(costEl.value) || 0) : null;
   const partnerId = document.getElementById('addVarPartnerId-'+productId).value.trim();
   if(!label || !price){ showToast('Ranpli omwen non ak pri'); return; }
   const p = state.products.find(x=>x.id===productId);
   const orderMode = partnerId ? 'api_order' : 'api_verif';
-  const newVariant = { id: uid(), label, price, costPrice, partnerProductId: partnerId?parseInt(partnerId):null, requiresServerId: false, orderMode };
+  const newVariant = { id: uid(), label, price, partnerProductId: partnerId?parseInt(partnerId):null, requiresServerId: false, orderMode };
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.from('variants').insert({
-      product_id: productId, label, price, cost_price: costPrice, partner_product_id: partnerId?parseInt(partnerId):null, requires_server_id: false, supports_id_verification: true, order_mode: orderMode
+      product_id: productId, label, price, partner_product_id: partnerId?parseInt(partnerId):null, requires_server_id: false, supports_id_verification: true, order_mode: orderMode
     }).select().single();
     if(error){ showToast('⚠️ Pa sove sou sèvè a: ' + error.message); return; }
     if(data) newVariant.id = data.id;
@@ -11832,13 +11597,12 @@ async function updateApiTopupVariantField(productId, variantId, field, value){
 function renderPinAdminConfig(p){
   const allVariants = getAllVariantsFlat();
   return `
-    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th title="Sa founisè a fè w peye">Pri Founisè</th><th>Stòk</th><th>🔗 Marye</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
+    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th>Stòk</th><th>🔗 Marye</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
       ${sortedVariants(p).map(v => `
         <tr id="vrow-${v.id}" data-vid="${v.id}">
         <td style="width:40px;padding:0;"><span onpointerdown="startVariantDrag(event,'${p.id}','${v.id}')" style="cursor:grab;touch-action:none;color:var(--text);font-size:22px;line-height:1;letter-spacing:-1px;user-select:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;">⣿</span></td>
         <td><input type="text" style="width:100%;min-width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;font-size:12px;" value="${escapeHtml(v.label)}" onchange="updateVariantLabel('${p.id}','${v.id}',this.value)"></td>
         <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.price}" onchange="updatePrice('${p.id}','${v.id}',this.value)"></td>
-        <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.costPrice??''}" placeholder="—" onchange="updateCostPrice('${p.id}','${v.id}',this.value)"></td>
         <td>${(state.inventory[v.id]||[]).filter(x=>x.status==='dispo').length}</td>
         <td style="min-width:130px;">
           ${(() => { const members = getEquivalenceGroupMembers(v.equivalenceGroup, v.id);
@@ -11855,7 +11619,6 @@ function renderPinAdminConfig(p){
     <div style="display:flex;gap:6px;margin-top:8px;">
       <input type="text" id="addVarName-${p.id}" placeholder="Non opsyon" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
-      <input type="text" id="addVarCost-${p.id}" placeholder="Pri Founisè" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <button class="mini-btn" onclick="addVariant('${p.id}')">+ Ajoute</button>
     </div>
   `;
@@ -12250,12 +12013,6 @@ async function updatePrice(pid, vid, val){
   try{ const sb = await getSupabase(); await sb.from('variants').update({ price:v.price }).eq('id', vid); }catch(e){}
   await saveState(); showToast('Pri mete ajou');
 }
-async function updateCostPrice(pid, vid, val){
-  const p = state.products.find(x=>x.id===pid); const v = p.variants.find(x=>x.id===vid);
-  v.costPrice = val === '' ? null : (parseFloat(val) || 0);
-  try{ const sb = await getSupabase(); await sb.from('variants').update({ cost_price:v.costPrice }).eq('id', vid); }catch(e){}
-  await saveState(); showToast('Pri founisè mete ajou');
-}
 async function updateVariantLabel(pid, vid, val){
   const label = val.trim();
   if(!label){ showToast('Non opsyon an pa ka vid'); renderAdminTab(); return; }
@@ -12274,13 +12031,11 @@ async function addVariant(pid){
   const p = state.products.find(x=>x.id===pid);
   const name = document.getElementById('addVarName-'+pid).value.trim();
   const price = parseFloat(document.getElementById('addVarPrice-'+pid).value);
-  const costEl = document.getElementById('addVarCost-'+pid);
-  const costPrice = costEl && costEl.value !== '' ? (parseFloat(costEl.value) || 0) : null;
   if(!name || !price){ showToast('Ranpli non ak pri'); return; }
-  const newVariant = {id:uid(), label:name, price, costPrice};
+  const newVariant = {id:uid(), label:name, price};
   try{
     const sb = await getSupabase();
-    const { data: vIns } = await sb.from('variants').insert({ product_id:pid, label:name, price, cost_price:costPrice }).select().single();
+    const { data: vIns } = await sb.from('variants').insert({ product_id:pid, label:name, price }).select().single();
     if(vIns) newVariant.id = vIns.id;
   }catch(e){}
   p.variants.push(newVariant);
