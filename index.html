@@ -462,6 +462,27 @@ html.dark .bottomnav-inner{background:rgba(22,27,34,0.92);}
   transition:opacity .25s cubic-bezier(0.4,0,0.2,1), transform .25s cubic-bezier(0.4,0,0.2,1); z-index:95;box-shadow:0 12px 32px rgba(0,0,0,0.28);max-width:85%;text-align:center;
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
+/* Toast pwofesyonèl: kat blan anwo ekran, ikòn koulè selon kalite mesaj */
+.toast{
+  bottom:calc(env(safe-area-inset-bottom,0px) + 92px);top:auto;left:50%;width:calc(100% - 28px);max-width:420px;
+  transform:translateX(-50%) translateY(18px);display:flex;align-items:center;gap:11px;text-align:left;
+  background:#fff;color:#14201a;border:1px solid rgba(15,30,22,0.08);border-radius:16px;padding:11px 16px 11px 12px;
+  font-size:13.5px;font-weight:600;line-height:1.4;box-shadow:0 14px 36px rgba(10,20,15,0.22),0 2px 6px rgba(10,20,15,0.08);
+  backdrop-filter:none;z-index:2147483600;
+}
+.toast.show{transform:translateX(-50%) translateY(0);}
+.toast{border-left:4px solid #0a9e3d;padding-left:14px;}
+.toast.err{border-left-color:#e5484d;}
+.toast.info{border-left-color:#3b82f6;}
+.toast .t-ic{flex:0 0 auto;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;line-height:1;background:rgba(10,158,61,0.12);}
+.toast.err .t-ic{background:rgba(229,72,77,0.13);}
+.toast.info .t-ic{background:#3b82f6;color:#fff;font-weight:800;font-style:italic;font-family:Georgia,serif;font-size:18px;}
+.toast.warn .t-ic{background:rgba(245,166,35,0.18);}
+.toast.ok{border-left:4px solid #0a9e3d;}
+.toast.err{border-left:4px solid #e5484d;}
+.toast.warn{border-left:4px solid #f5a623;}
+.toast .t-tx{flex:1;min-width:0;word-break:break-word;}
+@media (prefers-color-scheme:dark){ .toast{background:#18211c;color:#eaf5ee;border-color:rgba(255,255,255,0.08);} }
 
 .empty{text-align:center;padding:50px 20px;color:var(--muted);}
 .empty .em-icon{font-size:34px;margin-bottom:10px;}
@@ -2488,7 +2509,7 @@ async function getOrRestoreSupportConversation(){
       const { data: msgs } = await sb.from('support_messages').select('*').eq('conversation_id', convo.id).order('created_at',{ascending:true});
       supportChatHistory = [];
       document.getElementById('supportChatMessages').innerHTML = '';
-      (msgs||[]).forEach(m => addSupportMessage(m.sender==='customer'?'user':(m.sender==='admin'?'admin':'assistant'), m.content, true, { id:m.id, reactions:m.reactions, deleted:!!m.deleted }));
+      (msgs||[]).forEach(m => addSupportMessage(m.sender==='customer'?'user':(m.sender==='admin'?'admin':'assistant'), m.content, true, { id:m.id, reactions:m.reactions, deleted:!!m.deleted, edited:!!m.edited }));
       await sb.from('support_messages').update({ read_by_customer:true }).eq('conversation_id', convo.id).eq('sender','admin');
       updateSupportFabBadge();
       subscribeToSupportMessages(convo.id);
@@ -2635,6 +2656,7 @@ function updateAgentBadgeDisplay(){
 }
 
 function subscribeToSupportMessages(conversationId){
+  setupSupportTypingChannel(conversationId);
   getSupabase().then(sb => {
     if(supportRealtimeChannel){ sb.removeChannel(supportRealtimeChannel); }
     supportRealtimeChannel = sb.channel('support_messages_'+conversationId)
@@ -2889,8 +2911,76 @@ function updateChatCalculator(uid_, productId){
   if(elFrais) elFrais.textContent = '+' + frais + ' USD';
   if(elTotal) elTotal.textContent = money(Math.round(total));
 }
+
+/* ---- Chat: 3 boul k ap danse + modifye mesaj ---- */
+(function(){ if(document.getElementById('ktDotsCss')) return; const s = document.createElement('style'); s.id = 'ktDotsCss'; s.textContent = '@keyframes ktDot{0%,80%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-6px);opacity:1}} .kt-dots{display:inline-flex;gap:5px;align-items:center;height:14px}.kt-dots i{width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block;animation:ktDot 1.1s infinite ease-in-out}.kt-dots i:nth-child(2){animation-delay:.18s}.kt-dots i:nth-child(3){animation-delay:.36s}'; document.head.appendChild(s); })();
+function ktDotsHtml(){ return '<span class="kt-dots"><i></i><i></i><i></i></span>'; }
+function ktEditedLabel(){ return ({ht:' · modifye',fr:' · modifié',en:' · edited',es:' · editado'})[currentLang] || ' · edited'; }
+function ktIsMediaUrl(s){ return /^https?:\/\/\S+\.(jpg|jpeg|png|webp|gif|mp4|webm|mov|m4v|weba|ogg|mp3|wav|m4a)(\?\S*)?$/i.test(String(s||'').trim()); }
+let supportTypingTimer = null;
+function showSupportTyping(){
+  const box = document.getElementById('supportChatMessages'); if(!box) return;
+  let row = document.getElementById('supportTypingRow');
+  if(!row){
+    row = document.createElement('div');
+    row.id = 'supportTypingRow';
+    row.style.cssText = 'display:flex;gap:10px;margin-bottom:4px;';
+    row.innerHTML = `<div style="width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid rgba(63,206,124,0.3);overflow:hidden;flex-shrink:0;padding:2px;box-sizing:border-box;"><img src="${window.KT_LOGO_SRC}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div><div style="background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);color:#3fce7c;border-radius:4px 16px 16px 16px;padding:14px 16px;">${ktDotsHtml()}</div>`;
+  }
+  box.appendChild(row); box.scrollTop = box.scrollHeight;
+  clearTimeout(supportTypingTimer);
+  supportTypingTimer = setTimeout(hideSupportTyping, 3500);
+}
+function hideSupportTyping(){ const r = document.getElementById('supportTypingRow'); if(r) r.remove(); clearTimeout(supportTypingTimer); }
+let supportTypingChannel = null, supportTypingLastSent = 0;
+async function setupSupportTypingChannel(conversationId){
+  try{
+    const sb = await getSupabase();
+    if(supportTypingChannel){ sb.removeChannel(supportTypingChannel); }
+    supportTypingChannel = sb.channel('typing_' + conversationId, { config:{ broadcast:{ self:false } } })
+      .on('broadcast', { event:'typing' }, (msg) => { if(msg && msg.payload && msg.payload.who === 'admin') showSupportTyping(); })
+      .subscribe();
+  }catch(e){}
+}
+function sendSupportTyping(){
+  if(!supportTypingChannel || !supportConversationId) return;
+  const now = Date.now(); if(now - supportTypingLastSent < 2000) return;
+  supportTypingLastSent = now;
+  try{ supportTypingChannel.send({ type:'broadcast', event:'typing', payload:{ who:'customer' } }); }catch(e){}
+}
+function setSupportBubbleText(row, text, edited){
+  const b = row.querySelector('.kc-bubble'); if(!b) return;
+  b.innerHTML = formatChatText(text) + (edited ? '<span style="opacity:0.6;font-size:11px;">' + ktEditedLabel() + '</span>' : '');
+  row._text = text; row._edited = !!edited;
+  if(row._hist) row._hist.content = text;
+}
+function editSupportMessage(row){
+  const b = row.querySelector('.kc-bubble'); if(!b) return;
+  const original = row._text || '';
+  const L = ({ht:['Anrejistre','Anile'],fr:['Enregistrer','Annuler'],en:['Save','Cancel'],es:['Guardar','Cancelar']})[currentLang] || ['Save','Cancel'];
+  b.innerHTML = '<textarea id="kcEditArea" rows="2" style="width:100%;min-width:200px;box-sizing:border-box;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.35);border-radius:10px;color:#fff;padding:8px 10px;font-size:14px;font-family:inherit;resize:vertical;"></textarea><div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;"><button id="kcEditCancel" style="border:none;background:rgba(255,255,255,0.18);color:#fff;border-radius:14px;padding:6px 14px;font-weight:700;font-size:12.5px;cursor:pointer;">' + L[1] + '</button><button id="kcEditSave" style="border:none;background:#fff;color:#0a7c3d;border-radius:14px;padding:6px 14px;font-weight:800;font-size:12.5px;cursor:pointer;">' + L[0] + '</button></div>';
+  const ta = b.querySelector('#kcEditArea'); ta.value = original; ta.focus();
+  b.querySelector('#kcEditCancel').onclick = (e) => { e.stopPropagation(); setSupportBubbleText(row, original, row._edited); };
+  b.querySelector('#kcEditSave').onclick = async (e) => {
+    e.stopPropagation();
+    const nt = ta.value.trim();
+    if(!nt || nt === original){ setSupportBubbleText(row, original, row._edited); return; }
+    if(ktBlockBadText(nt)) return;
+    setSupportBubbleText(row, nt, true);
+    const id = row.dataset.dbid; if(!id) return;
+    try{
+      const sb = await getSupabase();
+      let { error } = await sb.from('support_messages').update({ content: nt, edited: true }).eq('id', id);
+      if(error && /edited/i.test(error.message || '')){ ({ error } = await sb.from('support_messages').update({ content: nt }).eq('id', id)); }
+      if(error) showToast('⚠️ ' + error.message);
+    }catch(err){}
+  };
+  b.onclick = (e) => e.stopPropagation();
+}
+
 function addSupportMessage(role, text, skipHistory, meta){
   meta = meta || {};
+  const _typingRow = document.getElementById('supportTypingRow');
   let entry = null;
   if(!skipHistory){ entry = { role, content: text }; supportChatHistory.push(entry); }
   const box = document.getElementById('supportChatMessages');
@@ -2911,8 +3001,9 @@ function addSupportMessage(role, text, skipHistory, meta){
   const bubbleStyle = (styles[role] || styles.assistant) + 'padding:14px 16px;max-width:100%;font-size:14.5px;white-space:pre-wrap;line-height:1.55;box-sizing:border-box;';
   row.innerHTML = avatarHtml + '<div style="display:flex;flex-direction:column;max-width:82%;min-width:0;align-items:' + (role==='user' ? 'flex-end' : 'flex-start') + ';"><div class="kc-bubble" style="' + bubbleStyle + '">' + formatChatText(text) + '</div><div class="kc-react" style="display:none;margin-top:-6px;"></div></div>';
   box.appendChild(row);
+  if(role === 'admin') hideSupportTyping();
   if(meta.deleted) applySupportDeleted(row);
-  else renderSupportReactions(row);
+  else { renderSupportReactions(row); if(meta.edited) setSupportBubbleText(row, text, true); }
   attachSupportMsgMenu(row);
   box.scrollTop = box.scrollHeight;
   return row;
@@ -2962,6 +3053,7 @@ function openSupportMsgMenu(row, rect){
   m.id = 'supportMsgMenu';
   m.style.cssText = 'position:fixed;z-index:80;background:#10241a;border:1px solid rgba(63,206,124,0.3);border-radius:18px;padding:8px;box-shadow:0 18px 44px rgba(0,0,0,0.55);min-width:200px;';
   m.innerHTML = '<div style="display:flex;gap:4px;justify-content:center;">' + SUPPORT_REACT_EMOJIS.map(e => `<button data-e="${e}" style="width:38px;height:38px;border:none;border-radius:50%;background:${myReact===e?'rgba(63,206,124,0.25)':'transparent'};font-size:21px;cursor:pointer;">${e}</button>`).join('') + '</div>' +
+    (mine && !ktIsMediaUrl(row._text) ? `<button data-edit="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#e8f5ec;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">✏️ ${({ht:'Modifye',fr:'Modifier',en:'Edit',es:'Editar'})[currentLang] || 'Edit'}</button>` : '') +
     (mine ? `<button data-del="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#ff8a8a;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">🗑️ ${T}</button>` : '');
   bg.appendChild(m);
   const mh = m.offsetHeight, mw = m.offsetWidth;
@@ -2972,6 +3064,7 @@ function openSupportMsgMenu(row, rect){
     const b = e.target.closest('button'); if(!b) return;
     e.stopPropagation();
     if(b.dataset.e){ reactToSupportMessage(row, b.dataset.e); }
+    else if(b.dataset.edit){ editSupportMessage(row); }
     else if(b.dataset.del){ deleteSupportMessage(row); }
     closeSupportMsgMenu();
   });
@@ -3008,6 +3101,7 @@ function applyRemoteSupportUpdate(m){
   const row = Array.from(box.children).find(r => r.dataset && r.dataset.dbid === String(m.id));
   if(!row) return;
   if(m.deleted){ applySupportDeleted(row); return; }
+  if(typeof m.content === 'string' && m.content !== '' && m.content !== row._text){ setSupportBubbleText(row, m.content, !!m.edited); }
   row._reactions = (m.reactions && typeof m.reactions === 'object') ? m.reactions : {};
   renderSupportReactions(row);
 }
@@ -3084,6 +3178,7 @@ function insertSupportEmoji(emoji){
   updateSupportSendBtn();
 }
 function updateSupportSendBtn(){
+  sendSupportTyping();
   const input = document.getElementById('supportChatInput');
   const micIcon = document.getElementById('supportMicIcon');
   const sendIcon = document.getElementById('supportSendIcon');
@@ -3171,10 +3266,42 @@ async function sendSupportVoiceMessage(blob){
     showToast(t('toast_voice_sent'));
   }
 }
+
+/* ===== Filtè mo/emoji entèdi (chat kliyan) — modifye lis la isit si ou vle ===== */
+const KT_BAD_EMOJI = ['🥵','💩','🍆','🍑'];
+const KT_BAD_WORDS = ['kaka','gyet manman','manje kaka','fout','foutre','merd','merde','med','bouzen','vole','volo','chen sal','sal chen','pute','putain','salope','connard','encule'];
+function ktNorm(t){
+  return String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/0/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5/g,'s').replace(/@/g,'a').replace(/\$/g,'s')
+    .replace(/(.)\1{2,}/g,'$1$1').replace(/[^a-z\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+function ktHasBadText(text){
+  const raw = String(text||'');
+  if(KT_BAD_EMOJI.some(e => raw.includes(e))) return true;
+  const n = ' ' + ktNorm(raw) + ' ';
+  const squeezed = ' ' + n.trim().replace(/(.)\1+/g,'$1') + ' ';
+  return KT_BAD_WORDS.some(w => {
+    const k = ' ' + w + ' ';
+    const k2 = ' ' + w.replace(/(.)\1+/g,'$1') + ' ';
+    return n.includes(k) || squeezed.includes(k2);
+  });
+}
+function ktBlockBadText(text){
+  if(!ktHasBadText(text)) return false;
+  const M = {
+    ht:"Enposib pou voye kalite mesaj sa a, li vyole règ nou yo 📏",
+    fr:"Impossible d'envoyer ce type de message, il enfreint nos règles 📏",
+    en:"Unable to send this type of message, it breaks our rules 📏",
+    es:"No se puede enviar este tipo de mensaje, infringe nuestras reglas 📏"
+  };
+  showToast(M[currentLang] || M.fr, 4000, true);
+  return true;
+}
 async function sendSupportMessage(){
   const input = document.getElementById('supportChatInput');
   const text = input.value.trim();
   if(!text) return;
+  if(ktBlockBadText(text)) return;
   input.value = '';
   updateSupportSendBtn();
   const _txtRow = addSupportMessage('user', text);
@@ -3207,8 +3334,8 @@ async function sendSupportMessage(){
 
   const thinking = document.createElement('div');
   thinking.id = 'supportThinking';
-  thinking.style.cssText = 'align-self:flex-start;background:var(--panel-2);border-radius:14px;padding:9px 13px;font-size:13px;color:var(--muted);';
-  thinking.textContent = '...';
+  thinking.style.cssText = 'align-self:flex-start;margin-left:40px;background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);border-radius:4px 16px 16px 16px;padding:14px 16px;color:#3fce7c;';
+  thinking.innerHTML = ktDotsHtml();
   document.getElementById('supportChatMessages').appendChild(thinking);
   document.getElementById('supportChatMessages').scrollTop = 999999;
   try{
@@ -4119,7 +4246,26 @@ function showCustomerError(friendlyMsg, technicalDetail, context, translationKey
 }
 function showToast(msg, duration, skipNtfy){
   const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
+  {
+    const raw = String(msg == null ? '' : msg);
+    const lead = (raw.match(/^\s*(⚠️|✅|❌)/) || [])[1];
+    const ERR = /\berr(eur|or|è)\b|échou|echwe|échec|failed|fail\b|pa kapab|pa ka |pa t kapab|impossible|rejte|rejet|refus|invalid|incorrect|pa bon|pa kòrèk|no se pudo|unable|denied|wrong|interdit|entèdi/i;
+    const WARN = /attention|atansyon|pridan|prudence|careful|cuidado|warning|avertissement|avètisman|suspen|bloke|blocked|limit|insuffisant|ensifizan|pa gen ase|insufficient|pa dwe|ne doit|must|doit|dwe |obligatoire|oblije|expir|bonus|règ|regle|rule|rules/i;
+    const OK = /succ[eè]s|success|byenveni|bienvenu|welcome|bienvenid|konplete|terminé|complet|copi|kopye|envoy|voye|anrejistre|enregistr|saved|sent|enviad|mèsi|merci|thank|gracias|réussi|reussi|siksè|aprouve|approuv|confirm[eé]|ajoute|ajouté|added|créé|kreye|created|dekonekte|déconnect/i;
+    let kind;
+    if(lead === '✅') kind = 'ok';
+    else if(lead === '❌' || ERR.test(raw)) kind = 'err';
+    else if(lead === '⚠️' && WARN.test(raw)) kind = 'warn';
+    else if(OK.test(raw)) kind = 'ok';
+    else if(WARN.test(raw)) kind = 'warn';
+    else kind = 'info';
+    const clean = raw.replace(/^\s*(⚠️|✅|❌|🚫|🚨|ℹ️)\s*/,'');
+    t.className = 'toast ' + kind;
+    t.innerHTML = '<span class="t-ic">' + (kind==='ok' ? '✅' : (kind==='err' ? '❌' : (kind==='warn' ? '⚠️' : 'i'))) + '</span><span class="t-tx"></span>';
+    t.querySelector('.t-tx').textContent = clean;
+    void t.offsetWidth;
+    t.classList.add('show');
+  }
   clearTimeout(toastTimer);
   toastTimer = setTimeout(()=>t.classList.remove('show'), duration || 3000);
   // skipNtfy: pou senp validasyon nòmal (kliyan ki tape yon modpas ki pa respekte règ yo, elatriye) —
@@ -4570,10 +4716,8 @@ async function doRegister(){
   if(btn){ btn.disabled = true; btn.textContent = t('creating_account_btn'); }
   try{
     const sb = await getSupabase();
-    if(window.ktPin) ktPin.unlocked = true;
     const { data, error } = await sb.auth.signUp({ email, password: pass });
     if(error){
-      if(window.ktPin) ktPin.unlocked = false;
       if(error.message.includes('already')){ showToast(t('toast_email_already_used')); }
       else { showCustomerError('⚠️ Nou pa t kapab kreye kont ou — eseye ankò.', error.message, 'Enskripsyon'); }
       return;
@@ -4611,10 +4755,8 @@ async function doLogin(){
   }
   try{
     const sb = await getSupabase();
-    if(window.ktPin) ktPin.unlocked = true; // modpas la fèk antre — pa bezwen PIN imedyatman
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if(error){
-      if(window.ktPin) ktPin.unlocked = false;
       showToast(error.message.toLowerCase().includes('confirm') ? t('toast_confirm_email_first') : t('toast_wrong_credentials'));
       return;
     }
@@ -4741,7 +4883,7 @@ async function submitNewPassword(){
   }
 }
 function afterAuthSuccess(){
-  if(window.ktPin){ ktPin.unlocked = true; ktPinGate(); }
+  if(window.ktPin){ ktPin.unlocked = false; ktPinGate(); } // chak koneksyon: PIN lan mande (kreye si poko genyen)
   fetchProductsFromServer();
   fetchApiClient();
   render();
@@ -4809,7 +4951,7 @@ function goPagePart2(page, opts){
   if(page === 'referral'){ fetchReferralPageData(); }
   else if(['shop','panye','checkout','commandes','redeem'].includes(page)){ maybeShowTutorialV2(page, null); }
   if(page === 'tutoriel'){ fetchTutorialVideos(); }
-  if(page === 'notifications'){ checkAndRenderPushPrompt(); }
+  if(page === 'notifications'){ checkAndRenderPushPrompt(); if(typeof fetchMyRechargeRequests === 'function') fetchMyRechargeRequests(); }
   if(page === 'marche'){
     setTimeout(renderListingPhotosGrid, 0);
     Promise.all([fetchActiveListings(), marcheTab === 'vendre' ? fetchMyListings() : Promise.resolve()])
@@ -5048,13 +5190,24 @@ function getNotifItems(){
   const cname = (state.users.find(x => x.id === uid) || {}).name || '';
   orders.forEach(o => {
     const f = o.fields || {};
-    const pid = o.playerId || f['Player ID'] || f['ID'] || f['Id'] || '';
-    const pname = o.playerName || f['Non kont'] || f['Nom du compte'] || f['Pseudo'] || '';
+    let pid = o.playerId || '';
+    let pname = o.playerName || '';
+    const extraLines = [];
+    Object.entries(f).forEach(([k,v]) => {
+      if(typeof v !== 'string' || !v) return;
+      const mm = v.match(/^(.*) \(Non konfime: (.*)\)$/);
+      if(mm){ if(!pid) pid = mm[1]; if(!pname) pname = mm[2]; }
+      else if(/^(player ?id|id|id joueur|id jwè)$/i.test(k.trim())){ if(!pid) pid = v; }
+      else if(/^(non kont|nom du compte|pseudo|nickname|nom)$/i.test(k.trim())){ if(!pname) pname = v; }
+      else extraLines.push('▫️ ' + k + ' : ' + v);
+    });
     let txt = `${ORD.head(cname)}\n\n${ORD.det}\n\n📦 ${ORD.prod} : ${o.product || ''}\n`;
     if(o.variant) txt += `🎯 ${ORD.opt} : ${o.variant}\n`;
     txt += `💰 ${ORD.amt} : HTG ${Number(o.price||0).toLocaleString('fr-FR')}\n`;
     if(pid) txt += `🎮 ${ORD.pid} : ${pid}\n`;
     if(pname) txt += `✅ ${ORD.acc} : ${pname}\n`;
+    if(o.serverId) txt += `🌐 Server ID : ${o.serverId}\n`;
+    extraLines.forEach(l => { txt += l + '\n'; });
     txt += `📊 ${ORD.st} : ${ORD.S[o.status] || o.status || ''}\n`;
     txt += `🆔 ${ORD.cmd} : #${String(o.orderNo || '').replace(/^#/, '')}`;
     items.push({ id:'ord-'+o.id+'-'+o.status, cat:'order', status: o.status === 'terminee' ? 'complete' : 'processing', text:txt, date:o.date, multi:true });
@@ -5069,6 +5222,18 @@ function getNotifItems(){
     const amt = Number(tx.amount || 0).toLocaleString('fr-FR');
     const mt = String(tx.label || '').match(/^Transfè resevwa nan men (.+)$/);
     items.push({ id:'tx-'+tx.date+'-'+tx.amount, cat:'transaction', status:'transaction', text: mt ? M.tx(amt, mt[1]) : M.txg(amt, String(tx.label||'').replace(/^🎁\s*/,'')), date:tx.date });
+  });
+  // Demann rechaj: "resevwa / ap verifye" ak "rejte" (apwouve = deja kouvri pa kat Transaction lan)
+  const RC = ({
+    ht:{ wait:(a)=>`Nou resevwa demann rechaj ${a} HTG ou a. N ap verifye l.`, rej:(a)=>`Demann rechaj ${a} HTG ou a pa apwouve. Kontakte sipò si w gen kesyon.` },
+    fr:{ wait:(a)=>`Nous avons reçu votre demande de recharge de ${a} HTG. Vérification en cours.`, rej:(a)=>`Votre demande de recharge de ${a} HTG n'a pas été approuvée. Contactez le support si besoin.` },
+    en:{ wait:(a)=>`We received your ${a} HTG recharge request. We are verifying it.`, rej:(a)=>`Your ${a} HTG recharge request was not approved. Contact support if you have questions.` },
+    es:{ wait:(a)=>`Recibimos tu solicitud de recarga de ${a} HTG. La estamos verificando.`, rej:(a)=>`Tu solicitud de recarga de ${a} HTG no fue aprobada. Contacta al soporte si tienes dudas.` }
+  })[currentLang] || { wait:(a)=>`We received your ${a} HTG recharge request.`, rej:(a)=>`Your ${a} HTG recharge request was not approved.` };
+  (state.rechargeRequests || []).filter(r => r.userId === uid && r.date && new Date(r.date).getTime() >= cutoff).forEach(r => {
+    const amt = Number(r.amount || 0).toLocaleString('fr-FR');
+    if(r.status === 'a_verifier' || r.status === 'pending') items.push({ id:'rc-'+r.id+'-'+r.status, cat:'transaction', status:'transaction', text:RC.wait(amt), date:r.date });
+    else if(r.status === 'rejected') items.push({ id:'rc-'+r.id+'-'+r.status, cat:'transaction', status:'transaction', text:RC.rej(amt), date:r.date });
   });
   return items.filter(n => !dismissed.includes(n.id)).sort((a,b) => new Date(b.date) - new Date(a.date));
 }
@@ -6993,7 +7158,7 @@ function renderWalletTab(){
           </div>
         </div>
 
-        <button onclick="submitTransfer()" style="width:100%;border:none;border-radius:14px;padding:16px;background:linear-gradient(135deg, #1b2027, #0a0d11);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 24px rgba(10,13,17,0.30);">
+        <button id="trSubmitBtn" onclick="submitTransfer()" style="width:100%;border:none;border-radius:14px;padding:16px;background:linear-gradient(135deg, #1b2027, #0a0d11);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 24px rgba(10,13,17,0.30);">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
           ${t('btn_send_transfer')}
         </button>
@@ -7028,6 +7193,8 @@ async function fetchMyRechargeRequests(){
       }));
       state.rechargeRequests = state.rechargeRequests.filter(r=>r.userId!==state.currentUserId).concat(mine);
       renderMyRequests();
+      if(currentPage === 'notifications') render();
+      renderTopIcons();
     }
   }catch(e){}
 }
@@ -7749,6 +7916,15 @@ async function submitTransfer(){
   const transferableAmount = walletBalance() - (state.walletBonus?.[state.currentUserId] || 0);
   if(amount > transferableAmount){ showToast(t('cannot_transfer_bonus_toast'), 4000); return; }
   const senderName = currentUser().name;
+  let pinHash = '';
+  if(typeof ktPinAsk === 'function'){ pinHash = await ktPinAsk(({ht:'Pou rezon sekirite, pou voye lajan ou dwe konfime kòd PIN ou.',fr:"Pour des raisons de sécurité, pour envoyer de l'argent vous devez confirmer votre code PIN.",en:'For security reasons, to send money you must confirm your PIN code.',es:'Por razones de seguridad, para enviar dinero debes confirmar tu código PIN.'})[currentLang]); if(pinHash === null) return; }
+  const _trBtn = document.getElementById('trSubmitBtn');
+  const _trOld = _trBtn ? _trBtn.innerHTML : '';
+  if(_trBtn){
+    _trBtn.disabled = true; _trBtn.style.opacity = '0.6'; _trBtn.style.cursor = 'not-allowed';
+    const _trTxt = ({ht:'Voye ap fèt…',fr:'Envoi en cours…',en:'Sending…',es:'Enviando…'})[currentLang] || 'Envoi en cours…';
+    _trBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.2-8.55" stroke-linecap="round"/></svg> ' + _trTxt;
+  }
   try{
     const sb = await getSupabase();
     const { data: recipientId, error: lookupErr } = await sb.rpc('find_user_id_by_email', { p_email: email });
@@ -7757,12 +7933,21 @@ async function submitTransfer(){
     if(recipientId === state.currentUserId){ showToast(t('toast_cannot_transfer')); return; }
     const targetLocal = state.users.find(u=>u.id===recipientId);
     const recipientName = targetLocal ? targetLocal.name : email.split('@')[0];
-    const { error: transferErr } = await sb.rpc('transfer_wallet', {
-      recipient_id: recipientId, amount,
-      sender_label: 'Transfè bay '+recipientName,
-      recipient_label: 'Transfè resevwa nan men '+senderName+((currentUser() && currentUser().email) ? ' ('+currentUser().email+')' : '')
-    });
-    if(transferErr){ showToast('Erè: ' + transferErr.message); return; }
+    const _tArgs = { recipient_id: recipientId, amount, sender_label: 'Transfè bay '+recipientName, recipient_label: 'Transfè resevwa nan men '+senderName+((currentUser() && currentUser().email) ? ' ('+currentUser().email+')' : '') };
+    let transferErr = null;
+    if(pinHash){
+      // Vèsyon ki verifye PIN la sou sèvè a (si SQL la enstale); sinon retounen sou ansyen fonksyon an
+      const r1 = await sb.rpc('transfer_wallet_pin', Object.assign({}, _tArgs, { p_hash: pinHash }));
+      transferErr = r1.error;
+      if(transferErr && /could not find the function|PGRST202|does not exist/i.test((transferErr.message||'') + (transferErr.code||''))){
+        const r2 = await sb.rpc('transfer_wallet', _tArgs);
+        transferErr = r2.error;
+      }
+    } else {
+      const r3 = await sb.rpc('transfer_wallet', _tArgs);
+      transferErr = r3.error;
+    }
+    if(transferErr){ showToast(/PIN_INVALID/.test(transferErr.message||'') ? '⚠️ PIN pa bon' : 'Erè: ' + transferErr.message); return; }
     await fetchWalletFromServer(state.currentUserId);
     render();
     showToast(t('toast_transfer_success'));
@@ -7775,6 +7960,9 @@ async function submitTransfer(){
     setTimeout(() => sendTransferEmails(currentUser(), { name: recipientName, email: email }, amount), 2600);
   }catch(e){
     showToast('Pa ka konekte ak sèvè a — eseye ankò');
+  }finally{
+    const b2 = document.getElementById('trSubmitBtn');
+    if(b2){ b2.disabled = false; b2.style.opacity = ''; b2.style.cursor = 'pointer'; if(_trOld) b2.innerHTML = _trOld; }
   }
 }
 
@@ -7830,6 +8018,18 @@ async function fetchMyOrders(){
   }catch(e){ showToast('⚠️ Erè koneksyon lè chaje kòmand yo'); }
 }
 let myOrdersChannel = null;
+// Filè sekou: si realtime pa mache, rafrechi kòmand yo chak 25s (ak lè kliyan an retounen sou sit la) pou kloch la toujou ajou
+if(!window._ktOrdersPoll){
+  window._ktOrdersPoll = true;
+  const _ktRefreshOrders = () => {
+    if(document.hidden || !state.currentUserId) return;
+    const sig = () => JSON.stringify((state.orders[state.currentUserId] || []).map(o => o.id + ':' + o.status));
+    const before = sig();
+    Promise.resolve(fetchMyOrders()).then(() => { if(sig() === before) return; if(currentPage === 'notifications') render(); renderTopIcons(); }).catch(()=>{});
+  };
+  setInterval(_ktRefreshOrders, 25000);
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) _ktRefreshOrders(); });
+}
 async function subscribeToMyOrdersRealtime(){
   if(!state.currentUserId) return;
   try{
@@ -11736,11 +11936,34 @@ async function loadAdminChatConversation(id){
     renderAdminChatMessages(msgs||[]);
     await sb.from('support_messages').update({ read_by_admin:true }).eq('conversation_id', id).eq('sender','customer');
 
+    try{
+      if(window.adminTypingChannel){ sb.removeChannel(window.adminTypingChannel); }
+      window.adminTypingChannel = sb.channel('typing_' + id, { config:{ broadcast:{ self:false } } })
+        .on('broadcast', { event:'typing' }, (msg) => {
+          if(!(msg && msg.payload && msg.payload.who === 'customer')) return;
+          const bx = document.getElementById('adminChatMessages'); if(!bx) return;
+          let t = document.getElementById('adminTypingRow');
+          if(!t){ t = document.createElement('div'); t.id = 'adminTypingRow'; t.style.cssText = 'align-self:flex-end;background:var(--green);color:#fff;border-radius:14px 14px 2px 14px;padding:10px 14px;'; t.innerHTML = ktDotsHtml(); }
+          bx.appendChild(t); bx.scrollTop = bx.scrollHeight;
+          clearTimeout(window.adminTypingTimer);
+          window.adminTypingTimer = setTimeout(() => { const r = document.getElementById('adminTypingRow'); if(r) r.remove(); }, 3500);
+        }).subscribe();
+      const ai = document.getElementById('adminChatInput');
+      if(ai && !ai._typingBound){
+        ai._typingBound = true;
+        ai.addEventListener('input', () => {
+          const now = Date.now(); if(now - (window.adminTypingLast||0) < 2000 || !window.adminTypingChannel) return;
+          window.adminTypingLast = now;
+          try{ window.adminTypingChannel.send({ type:'broadcast', event:'typing', payload:{ who:'admin' } }); }catch(e){}
+        });
+      }
+    }catch(e){}
     if(adminChatRealtimeChannel){ sb.removeChannel(adminChatRealtimeChannel); }
     adminChatRealtimeChannel = sb.channel('admin_support_'+id)
       .on('postgres_changes', { event:'INSERT', schema:'public', table:'support_messages', filter:'conversation_id=eq.'+id }, async (payload) => {
         const box2 = document.getElementById('adminChatMessages');
         if(!box2) return;
+        { const tr = document.getElementById('adminTypingRow'); if(tr) tr.remove(); }
         appendAdminChatBubble(payload.new);
         if(payload.new.sender === 'customer'){ await sb.from('support_messages').update({ read_by_admin:true }).eq('id', payload.new.id); }
       })
@@ -11754,6 +11977,16 @@ function renderAdminChatMessages(msgs){
   box.innerHTML = '';
   msgs.forEach(m => appendAdminChatBubble(m));
 }
+function renderAdminBubbleContent(b){
+  const m = b._m || {};
+  const rx = (m.reactions && typeof m.reactions === 'object') ? [m.reactions.customer, m.reactions.admin].filter(Boolean) : [];
+  if(m.deleted){
+    b.innerHTML = '<span style="opacity:0.75;font-style:italic;">🚫 Mesaj siprime</span>';
+    b.style.background = 'var(--panel-2)'; b.style.color = 'var(--muted)';
+  } else {
+    b.innerHTML = formatChatText(m.content) + (m.edited ? '<span style="opacity:0.7;font-size:10.5px;"> · modifye</span>' : '') + (rx.length ? '<div style="margin-top:6px;font-size:15px;">' + rx.join(' ') + '</div>' : '');
+  }
+}
 function appendAdminChatBubble(m){
   const box = document.getElementById('adminChatMessages');
   if(!box) return;
@@ -11763,24 +11996,78 @@ function appendAdminChatBubble(m){
     bot: 'align-self:flex-start;background:var(--panel-2);color:var(--text);border-radius:14px 14px 14px 2px;'
   };
   const bubble = document.createElement('div');
-  bubble.style.cssText = (styleBySender[m.sender]||styleBySender.bot) + 'padding:9px 13px;max-width:80%;font-size:12.5px;white-space:pre-wrap;line-height:1.5;';
+  bubble.style.cssText = (styleBySender[m.sender]||styleBySender.bot) + 'padding:9px 13px;max-width:80%;font-size:12.5px;white-space:pre-wrap;line-height:1.5;cursor:pointer;';
   bubble.dataset.dbid = m.id || '';
-  const rx = (m.reactions && typeof m.reactions === 'object') ? [m.reactions.customer, m.reactions.admin].filter(Boolean) : [];
-  if(m.deleted){
-    bubble.innerHTML = '<span style="opacity:0.75;font-style:italic;">🚫 Mesaj siprime</span>';
-    bubble.style.background = 'var(--panel-2)'; bubble.style.color = 'var(--muted)';
-  } else {
-    bubble.innerHTML = formatChatText(m.content) + (rx.length ? '<div style="margin-top:6px;font-size:15px;">' + rx.join(' ') + '</div>' : '');
-  }
+  bubble._m = m;
+  renderAdminBubbleContent(bubble);
+  bubble.addEventListener('click', (e) => { if(e.target.closest('a,button,audio,video,iframe,input')) return; openAdminMsgMenu(bubble); });
   box.appendChild(bubble);
   box.scrollTop = box.scrollHeight;
 }
 function applyAdminChatUpdate(m){
   const box = document.getElementById('adminChatMessages'); if(!box) return;
   const b = Array.from(box.children).find(x => x.dataset && x.dataset.dbid === String(m.id)); if(!b) return;
-  const rx = (m.reactions && typeof m.reactions === 'object') ? [m.reactions.customer, m.reactions.admin].filter(Boolean) : [];
-  if(m.deleted){ b.innerHTML = '<span style="opacity:0.75;font-style:italic;">🚫 Mesaj siprime</span>'; b.style.background = 'var(--panel-2)'; b.style.color = 'var(--muted)'; }
-  else { b.innerHTML = formatChatText(m.content) + (rx.length ? '<div style="margin-top:6px;font-size:15px;">' + rx.join(' ') + '</div>' : ''); }
+  b._m = Object.assign({}, b._m || {}, m);
+  renderAdminBubbleContent(b);
+}
+function closeAdminMsgMenu(){ const x = document.getElementById('adminMsgMenu'); if(x) x.remove(); }
+function openAdminMsgMenu(b){
+  closeAdminMsgMenu();
+  const m = b._m || {};
+  if(m.deleted || !m.id) return;
+  const mine = m.sender === 'admin';
+  const mineReact = (m.reactions || {}).admin;
+  const menu = document.createElement('div');
+  menu.id = 'adminMsgMenu';
+  menu.style.cssText = 'position:fixed;z-index:9999;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 14px 36px rgba(0,0,0,0.3);';
+  menu.innerHTML = '<div style="display:flex;gap:4px;">' + ['👍','❤️','😂','😮','😢','🙏'].map(e => `<button data-e="${e}" style="width:36px;height:36px;border:none;border-radius:50%;background:${mineReact===e?'var(--green-dim)':'transparent'};font-size:20px;cursor:pointer;">${e}</button>`).join('') + '</div>' +
+    (mine && !ktIsMediaUrl(m.content) ? '<button data-edit="1" style="width:100%;margin-top:6px;padding:10px;border:none;border-top:1px solid var(--line);background:transparent;color:var(--text);font-weight:700;font-size:13px;text-align:left;cursor:pointer;">✏️ Modifye</button>' : '') +
+    (mine ? '<button data-del="1" style="width:100%;margin-top:6px;padding:10px;border:none;border-top:1px solid var(--line);background:transparent;color:var(--red);font-weight:700;font-size:13px;text-align:left;cursor:pointer;">🗑️ Siprime pou tout moun</button>' : '');
+  document.body.appendChild(menu);
+  const r = b.getBoundingClientRect(), mw = menu.offsetWidth, mh = menu.offsetHeight;
+  let top = r.top - mh - 6; if(top < 8) top = r.bottom + 6;
+  let left = Math.max(8, Math.min(r.left, window.innerWidth - mw - 8));
+  menu.style.top = top + 'px'; menu.style.left = left + 'px';
+  menu.addEventListener('click', (e) => {
+    const btn = e.target.closest('button'); if(!btn) return;
+    e.stopPropagation();
+    if(btn.dataset.e) adminReactToMessage(b, btn.dataset.e);
+    else if(btn.dataset.edit) adminEditChatMessage(b);
+    else if(btn.dataset.del) adminDeleteChatMessage(b);
+    closeAdminMsgMenu();
+  });
+  setTimeout(() => document.addEventListener('click', closeAdminMsgMenu, { once:true }), 0);
+}
+async function adminReactToMessage(b, emoji){
+  const m = b._m; const r = Object.assign({}, m.reactions || {});
+  if(r.admin === emoji) delete r.admin; else r.admin = emoji;
+  m.reactions = r; renderAdminBubbleContent(b);
+  try{ const sb = await getSupabase(); const { error } = await sb.from('support_messages').update({ reactions: r }).eq('id', m.id); if(error) showToast('⚠️ ' + error.message); }catch(e){}
+}
+function adminEditChatMessage(b){
+  const m = b._m; const original = m.content || '';
+  b.innerHTML = '<textarea rows="2" style="width:100%;min-width:200px;box-sizing:border-box;border:1px solid rgba(255,255,255,0.4);border-radius:8px;background:rgba(0,0,0,0.25);color:#fff;padding:7px 9px;font-size:12.5px;font-family:inherit;"></textarea><div style="display:flex;gap:6px;margin-top:6px;justify-content:flex-end;"><button class="e-c" style="border:none;border-radius:10px;padding:5px 12px;font-weight:700;font-size:12px;background:rgba(255,255,255,0.2);color:#fff;cursor:pointer;">Anile</button><button class="e-s" style="border:none;border-radius:10px;padding:5px 12px;font-weight:800;font-size:12px;background:#fff;color:#1565D8;cursor:pointer;">Anrejistre</button></div>';
+  const ta = b.querySelector('textarea'); ta.value = original; ta.focus();
+  b.onclick = null;
+  b.querySelector('.e-c').onclick = (e) => { e.stopPropagation(); renderAdminBubbleContent(b); };
+  b.querySelector('.e-s').onclick = async (e) => {
+    e.stopPropagation();
+    const nt = ta.value.trim();
+    if(!nt || nt === original){ renderAdminBubbleContent(b); return; }
+    m.content = nt; m.edited = true; renderAdminBubbleContent(b);
+    try{
+      const sb = await getSupabase();
+      let { error } = await sb.from('support_messages').update({ content: nt, edited: true }).eq('id', m.id);
+      if(error && /edited/i.test(error.message || '')){ ({ error } = await sb.from('support_messages').update({ content: nt }).eq('id', m.id)); }
+      if(error) showToast('⚠️ ' + error.message);
+    }catch(err){}
+  };
+}
+function adminDeleteChatMessage(b){
+  openConfirm('Siprime mesaj sa a?', 'Li ap disparèt pou kliyan an tou.', async () => {
+    const m = b._m; m.deleted = true; renderAdminBubbleContent(b);
+    try{ const sb = await getSupabase(); const { error } = await sb.from('support_messages').update({ deleted:true, content:'', reactions:{} }).eq('id', m.id); if(error) showToast('⚠️ ' + error.message); }catch(e){}
+  });
 }
 async function sendAdminChatImage(input){
   const file = input.files[0];
@@ -13343,7 +13630,7 @@ document.addEventListener('click', function(e){
 window.ktPin = { unlocked:false, user:null, mode:null, first:'', buf:'', hiddenAt:0, recovery:false, reset:false, busy:false, bioTried:false };
 const KT_PIN_I18N = {
   ht:{ create_title:'Kreye yon kòd PIN pou pwoteje kont Kerry Topup Official ou a 🌝🔐', create_sub:'Chwazi 4 chif ou ap sonje.', confirm_title:'Konfime PIN ou', confirm_sub:'Antre menm 4 chif la yon dezyèm fwa.',
-    unlock_title:'Antre PIN ou', unlock_sub:'Pou pwoteje kont ou, antre PIN ou pou kontinye.', newpin_title:'Nouvo PIN', newpin_sub:'Kreye yon nouvo PIN 4 chif pou kont ou.',
+    verify_title:'Konfime ak PIN ou', verify_sub:'Antre PIN ou pou konfime aksyon sa a.', unlock_title:'Antre PIN ou', unlock_sub:'Pou pwoteje kont ou, antre PIN ou pou kontinye.', newpin_title:'Nouvo PIN', newpin_sub:'Kreye yon nouvo PIN 4 chif pou kont ou.',
     next:'Suivant', confirm:'Konfime', back:'Retounen', forgot:'PIN bliye?', logout:'Dekonekte', cancel:'Anile',
     mismatch:'PIN yo pa menm. Eseye ankò.', weak:'PIN sa twò senp. Pa mete 4 menm chif.', wrong:'PIN la pa bon. Ou rete {n} esè.', toomany:'Twòp esè. Ou dekonekte pou sekirite.',
     saved:'PIN kreye ak siksè ✓', changed:'PIN chanje ak siksè ✓', savefail:'⚠️ Nou pa t kapab anrejistre PIN lan — eseye ankò.',
@@ -13352,7 +13639,7 @@ const KT_PIN_I18N = {
     reset_sent:'📧 Nou voye yon lyen sou {email}. Louvri l pou kreye yon nouvo PIN.', reset_fail:'⚠️ Nou pa t kapab voye imèl la — eseye ankò pita.', reset_wait:'⏳ Tanpri tann yon ti moman anvan w eseye ankò.',
     settings_pin:'PIN sekirite', settings_bio:'Anprent', pin_link:'Mwen vle chanje PIN mwen olye', nosession:'⚠️ Lyen an ekspire. Mande yon lòt.' },
   fr:{ create_title:'Créez un code PIN pour protéger votre compte Kerry Topup Official 🌝🔐', create_sub:'Choisissez 4 chiffres faciles à retenir.', confirm_title:'Confirmez votre PIN', confirm_sub:'Saisissez les mêmes 4 chiffres une seconde fois.',
-    unlock_title:'Entrez votre PIN', unlock_sub:'Pour protéger votre compte, entrez votre PIN pour continuer.', newpin_title:'Nouveau PIN', newpin_sub:'Créez un nouveau PIN à 4 chiffres pour votre compte.',
+    verify_title:'Confirmez avec votre PIN', verify_sub:'Entrez votre PIN pour confirmer cette action.', unlock_title:'Entrez votre PIN', unlock_sub:'Pour protéger votre compte, entrez votre PIN pour continuer.', newpin_title:'Nouveau PIN', newpin_sub:'Créez un nouveau PIN à 4 chiffres pour votre compte.',
     next:'Suivant', confirm:'Confirmer', back:'Retour', forgot:'PIN oublié ?', logout:'Se déconnecter', cancel:'Annuler',
     mismatch:'Les PIN ne correspondent pas. Réessayez.', weak:'PIN trop simple. Évitez 4 chiffres identiques.', wrong:'PIN incorrect. Il vous reste {n} essai(s).', toomany:'Trop d\'essais. Vous avez été déconnecté par sécurité.',
     saved:'PIN créé avec succès ✓', changed:'PIN modifié avec succès ✓', savefail:'⚠️ Impossible d\'enregistrer le PIN — réessayez.',
@@ -13361,7 +13648,7 @@ const KT_PIN_I18N = {
     reset_sent:'📧 Un lien a été envoyé à {email}. Ouvrez-le pour créer un nouveau PIN.', reset_fail:'⚠️ Impossible d\'envoyer l\'e-mail — réessayez plus tard.', reset_wait:'⏳ Patientez un instant avant de réessayer.',
     settings_pin:'PIN de sécurité', settings_bio:'Empreinte', pin_link:'Je veux plutôt changer mon PIN', nosession:'⚠️ Lien expiré. Demandez-en un autre.' },
   es:{ create_title:'Crea un código PIN para proteger tu cuenta de Kerry Topup Official 🌝🔐', create_sub:'Elige 4 dígitos fáciles de recordar.', confirm_title:'Confirma tu PIN', confirm_sub:'Ingresa los mismos 4 dígitos otra vez.',
-    unlock_title:'Ingresa tu PIN', unlock_sub:'Para proteger tu cuenta, ingresa tu PIN para continuar.', newpin_title:'Nuevo PIN', newpin_sub:'Crea un nuevo PIN de 4 dígitos para tu cuenta.',
+    verify_title:'Confirma con tu PIN', verify_sub:'Ingresa tu PIN para confirmar esta acción.', unlock_title:'Ingresa tu PIN', unlock_sub:'Para proteger tu cuenta, ingresa tu PIN para continuar.', newpin_title:'Nuevo PIN', newpin_sub:'Crea un nuevo PIN de 4 dígitos para tu cuenta.',
     next:'Siguiente', confirm:'Confirmar', back:'Volver', forgot:'¿Olvidaste el PIN?', logout:'Cerrar sesión', cancel:'Cancelar',
     mismatch:'Los PIN no coinciden. Inténtalo de nuevo.', weak:'PIN demasiado simple. Evita 4 dígitos iguales.', wrong:'PIN incorrecto. Te quedan {n} intento(s).', toomany:'Demasiados intentos. Cerramos tu sesión por seguridad.',
     saved:'PIN creado con éxito ✓', changed:'PIN cambiado con éxito ✓', savefail:'⚠️ No se pudo guardar el PIN — inténtalo de nuevo.',
@@ -13370,7 +13657,7 @@ const KT_PIN_I18N = {
     reset_sent:'📧 Enviamos un enlace a {email}. Ábrelo para crear un nuevo PIN.', reset_fail:'⚠️ No se pudo enviar el correo — inténtalo más tarde.', reset_wait:'⏳ Espera un momento antes de intentarlo de nuevo.',
     settings_pin:'PIN de seguridad', settings_bio:'Huella', pin_link:'Prefiero cambiar mi PIN', nosession:'⚠️ Enlace expirado. Solicita otro.' },
   en:{ create_title:'Create a PIN code to protect your Kerry Topup Official account 🌝🔐', create_sub:'Choose 4 digits you will remember.', confirm_title:'Confirm your PIN', confirm_sub:'Enter the same 4 digits a second time.',
-    unlock_title:'Enter your PIN', unlock_sub:'To protect your account, enter your PIN to continue.', newpin_title:'New PIN', newpin_sub:'Create a new 4-digit PIN for your account.',
+    verify_title:'Confirm with your PIN', verify_sub:'Enter your PIN to confirm this action.', unlock_title:'Enter your PIN', unlock_sub:'To protect your account, enter your PIN to continue.', newpin_title:'New PIN', newpin_sub:'Create a new 4-digit PIN for your account.',
     next:'Next', confirm:'Confirm', back:'Back', forgot:'Forgot PIN?', logout:'Log out', cancel:'Cancel',
     mismatch:'PINs do not match. Try again.', weak:'PIN is too simple. Avoid 4 identical digits.', wrong:'Wrong PIN. {n} attempt(s) left.', toomany:'Too many attempts. You were logged out for security.',
     saved:'PIN created successfully ✓', changed:'PIN changed successfully ✓', savefail:'⚠️ Could not save the PIN — try again.',
@@ -13411,6 +13698,22 @@ function ktPinCss(){
   #ktPinOverlay .kp-link.mut{color:#93b1a1;text-decoration:none;font-weight:500;}
   #ktPinOverlay .kp-spin{margin-top:40px;width:34px;height:34px;border-radius:50%;border:3px solid rgba(63,206,124,.25);border-top-color:#3fce7c;animation:kpspin .8s linear infinite;}
   #ktPinOverlay .kp-shake{animation:kpshake .35s;}
+  /* PIN an fòm popup (menm gwosè ak popup koneksyon an) */
+  #ktPinOverlay{justify-content:center;padding:14px;box-sizing:border-box;background:rgba(3,8,5,.86);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);}
+  #ktPinOverlay .kp-wrap{max-width:340px;min-height:0;margin:auto;padding:20px 18px 14px;border-radius:24px;background:linear-gradient(160deg,#0d2418,#08130d);border:1px solid rgba(63,206,124,.2);box-shadow:0 24px 60px rgba(0,0,0,.55);}
+  #ktPinOverlay .kp-logo{width:58px;height:58px;border-radius:16px;margin-top:0;}
+  #ktPinOverlay .kp-brand{font-size:16px;}
+  #ktPinOverlay .kp-ic{margin-top:12px;width:44px;height:44px;}
+  #ktPinOverlay .kp-ic svg{width:22px;height:22px;}
+  #ktPinOverlay h1{margin:10px 0 4px;font-size:18px;}
+  #ktPinOverlay p{font-size:12.5px;line-height:1.4;max-width:280px;}
+  #ktPinOverlay .kp-dots{margin:14px 0 4px;gap:16px;}
+  #ktPinOverlay .kp-msg{min-height:16px;margin-bottom:6px;font-size:12.5px;}
+  #ktPinOverlay .kp-pad{grid-template-columns:repeat(3,56px);gap:9px 18px;}
+  #ktPinOverlay .kp-key,#ktPinOverlay .kp-blank{width:56px;height:56px;font-size:23px;}
+  #ktPinOverlay .kp-btn{margin-top:12px;height:46px;border-radius:23px;font-size:15px;}
+  #ktPinOverlay .kp-link{min-height:38px;font-size:13.5px;}
+  #ktPinOverlay .kp-spin{margin:22px 0;}
   @keyframes kpspin{to{transform:rotate(360deg)}}
   @keyframes kpshake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}`;
   document.head.appendChild(s);
@@ -13428,7 +13731,7 @@ const KT_ICON_FP = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" 
 const KT_ICON_DEL = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="m13 9 4 6m0-6-4 6"/></svg>';
 
 /* ---- stockage / hash ---- */
-function ktPinUid(){ return (ktPin.user && ktPin.user.id) || (typeof state!=='undefined' && state.currentUserId) || ''; }
+function ktPinUid(){ return (ktPin.user && ktPin.user.id) || (typeof state!=='undefined' && state.currentUserId) || ktPin.bootUid || ''; }
 function ktPinMeta(){
   const uid = ktPinUid();
   const m = ktPin.user && ktPin.user.user_metadata && ktPin.user.user_metadata.kt_pin;
@@ -13514,7 +13817,7 @@ function ktPinRender(msg, ok){
       <button class="kp-btn ghost" onclick="ktPinHide()">${pt('bio_no')}</button></div>`;
     return;
   }
-  const tk = m==='create' ? (ktPin.reset ? 'newpin' : 'create') : (m==='confirm' ? 'confirm' : 'unlock');
+  const tk = m==='create' ? (ktPin.reset ? 'newpin' : 'create') : (m==='confirm' ? 'confirm' : (m==='verify' ? 'verify' : 'unlock'));
   const hasBio = (m==='unlock' && !!ktBioId()) || (m==='create' && !!ktPin.bioAvail);
   let keys = '';
   for(let i=1;i<=9;i++) keys += `<button class="kp-key" onclick="ktPinKey('${i}')">${i}</button>`;
@@ -13523,9 +13826,10 @@ function ktPinRender(msg, ok){
   let actions = '';
   if(m==='create') actions = `<button class="kp-btn" id="ktPinBtn" onclick="ktPinSubmit()" disabled>${pt('next')}</button>` + (ktPin.reset && ktPinMeta() ? `<button class="kp-link mut" onclick="ktPinCancelReset()">${pt('cancel')}</button>` : `<button class="kp-link mut" onclick="ktPinLogout()">${pt('logout')}</button>`);
   if(m==='confirm') actions = `<button class="kp-btn" id="ktPinBtn" onclick="ktPinSubmit()" disabled>${pt('confirm')}</button><button class="kp-link mut" onclick="ktPinBack()">${pt('back')}</button>`;
+  if(m==='verify') actions = `<button class="kp-link mut" onclick="ktPinCancelVerify()">${pt('cancel')}</button>`;
   if(m==='unlock') actions = `<div style="margin-top:auto;padding-top:18px;display:flex;flex-direction:column;align-items:center;"><button class="kp-link" onclick="ktPinForgot()">${pt('forgot')}</button><button class="kp-link mut" onclick="ktPinLogout()">${pt('logout')}</button></div>`;
   el.innerHTML = `<div class="kp-wrap">${ktPinLogo()}
-    <h1>${pt(tk + '_title')}</h1><p>${pt(tk + '_sub')}</p>
+    <h1>${pt(tk + '_title')}</h1><p>${(m==='verify' && ktPin.verifyReason) ? ktPin.verifyReason : pt(tk + '_sub')}</p>
     <div class="kp-dots" id="ktPinDots"><span class="kp-dot"></span><span class="kp-dot"></span><span class="kp-dot"></span><span class="kp-dot"></span></div>
     <div class="kp-msg${ok?' ok':''}" id="ktPinMsg">${msg||''}</div>
     <div class="kp-pad">${keys}</div>${actions}</div>`;
@@ -13541,7 +13845,7 @@ function ktPinShake(){ const e = document.getElementById('ktPinDots'); if(e){ e.
 function ktPinKey(d){
   if(ktPin.busy || ktPin.buf.length >= 4) return;
   ktPin.buf += d; ktPinMsg(''); ktPinDots();
-  if(ktPin.buf.length === 4 && ktPin.mode === 'unlock') ktPinSubmit();
+  if(ktPin.buf.length === 4 && (ktPin.mode === 'unlock' || ktPin.mode === 'verify')) ktPinSubmit();
 }
 function ktPinDel(){ if(ktPin.busy) return; ktPin.buf = ktPin.buf.slice(0,-1); ktPinDots(); }
 function ktPinBack(){ ktPin.first = ''; ktPinShow('create'); }
@@ -13586,15 +13890,16 @@ async function ktPinSubmit(){
     }finally{ ktPin.busy = false; }
     return;
   }
-  if(m === 'unlock'){
+  if(m === 'unlock' || m === 'verify'){
     const meta = ktPinMeta(); const uid = ktPinUid();
     if(!meta){ ktPinShow('create'); return; }
     ktPin.busy = true;
     try{
       const h = await ktPinHash(pin, meta.s, uid);
       if(h === meta.h){
-        ktPin.unlocked = true;
         try{ localStorage.removeItem('kt_pin_try_' + uid); }catch(e){}
+        if(m === 'verify'){ ktPin.verifyReason = ''; const cb = ktPin.verifyCb; ktPin.verifyCb = null; ktPinHide(); if(cb) cb(h); return; }
+        ktPin.unlocked = true;
         ktPinHide();
         return;
       }
@@ -13602,6 +13907,7 @@ async function ktPinSubmit(){
       ktPin.buf = ''; ktPinDots(); ktPinShake();
       if(n >= 5){
         try{ localStorage.removeItem('kt_pin_try_' + uid); }catch(e){}
+        try{ const _u = ktPin.user || {}; const _nm = (_u.user_metadata && (_u.user_metadata.name || _u.user_metadata.full_name)) || (typeof currentUser === 'function' && currentUser() ? currentUser().name : ''); sendNtfyNotification('🔐 Kont dekonekte apre 5 move PIN', '👤 ' + (_nm||'') + '\n📧 ' + (_u.email||'') + '\n⚠️ Si se pa li, kont lan ka an danje.', 'high', 'lock'); }catch(e){}
         await ktPinLogout(true);
         return;
       }
@@ -13641,6 +13947,7 @@ async function ktPinToggleBio(){
   if(typeof render === 'function') render();
 }
 async function ktPinLogout(tooMany){
+  if(ktPin.verifyCb){ const cb = ktPin.verifyCb; ktPin.verifyCb = null; try{ cb(null); }catch(e){} }
   ktPin.unlocked = false; ktPinHide();
   try{ await doLogoutConfirmed(); }catch(e){}
   if(tooMany === true) showToast(pt('toomany'), 4500, true);
@@ -13669,6 +13976,16 @@ async function ktPinSendReset(fromSettings){
     if(fromSettings === true) showToast(pt('reset_fail')); else ktPinMsg(pt('reset_fail'));
   }
 }
+// Mande PIN lan pou konfime yon aksyon sansib (transfè). Retounen hash la, '' si pa gen PIN, null si anile.
+function ktPinAsk(reason){
+  return new Promise(res => {
+    if(!ktPinMeta()){ res(''); return; }
+    ktPin.verifyCb = res;
+    ktPin.verifyReason = reason ? String(reason) : '';
+    ktPinShow('verify');
+  });
+}
+function ktPinCancelVerify(){ ktPin.verifyReason = ''; const cb = ktPin.verifyCb; ktPin.verifyCb = null; ktPinHide(); if(cb) cb(null); }
 function ktPinForgot(){ ktPinSendReset(false); }
 function ktPinResetPending(){
   try{ const f = JSON.parse(localStorage.getItem('kt_pin_reset') || 'null'); return !!(f && Date.now() - f.t < 2*3600*1000); }catch(e){ return false; }
@@ -13734,7 +14051,7 @@ async function ktPinGate(){
     sb.auth.getUser().then(r => { const u = r && r.data && r.data.user; const nm = u && u.user_metadata && u.user_metadata.kt_pin; if(nm && nm.h){ ktPin.user = u; ktPinCache(nm); } }).catch(()=>{});
   }catch(e){ console.warn('[pin] gate:', e && e.message); if(ktPin.mode === 'wait') ktPinHide(); }
 }
-function ktPinOnSignedOut(){ ktPin.unlocked = false; ktPin.user = null; ktPinClearCaches(); if(ktPin.mode) ktPinHide(); }
+function ktPinOnSignedOut(){ ktPin.unlocked = false; ktPin.user = null; ktPin.bootUid = ''; ktPinClearCaches(); if(ktPin.mode) ktPinHide(); }
 
 /* ---- kat PIN nan Paramèt ---- */
 function ktPinSettingsHtml(){
@@ -13754,9 +14071,10 @@ function ktPinSettingsHtml(){
 /* ---- demaraj: kouvri ekran an imedyatman si gen yon PIN konnen sou aparèy la ---- */
 (function(){
   try{
-    const has = Object.keys(localStorage).some(k => k.indexOf('kt_pinmeta_') === 0);
-    if(has && !window.location.hash.includes('type=recovery')){
-      const boot = function(){ if(!ktPin.mode){ ktPinShow('wait'); setTimeout(function(){ if(ktPin.mode === 'wait') ktPinHide(); }, 10000); } };
+    const bootKey = Object.keys(localStorage).find(k => k.indexOf('kt_pinmeta_') === 0);
+    if(bootKey && !window.location.hash.includes('type=recovery')){
+      ktPin.bootUid = bootKey.replace('kt_pinmeta_', '');
+      const boot = function(){ if(!ktPin.mode){ ktPinShow('unlock'); setTimeout(function(){ if(ktPin.mode === 'unlock' && !ktPin.user && !ktPin.unlocked){ ktPinGate(); } }, 8000); } };
       if(document.body) boot(); else document.addEventListener('DOMContentLoaded', boot);
     }
   }catch(e){}
