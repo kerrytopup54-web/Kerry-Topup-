@@ -613,8 +613,8 @@ textarea.admin-ta{
   .we-logo-wrap{position:relative;z-index:2;margin-bottom:18px;animation:weRiseIn 0.8s cubic-bezier(0.16,1,0.3,1) both;}
   .we-logo-ring{position:absolute;inset:-10px;border-radius:32px;border:1.5px solid rgba(63,206,124,0.35);animation:weRingPulse 2.5s ease-in-out infinite;}
   @keyframes weRingPulse{0%,100%{transform:scale(1);opacity:0.5;}50%{transform:scale(1.12);opacity:0;}}
-  .we-logo-box{width:80px;height:80px;border-radius:22px;background:#0B0F0C;display:flex;align-items:center;justify-content:center;padding:13px;box-shadow:0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(63,206,124,0.3), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 40px rgba(63,206,124,0.15);position:relative;box-sizing:border-box;}
-  .we-logo-box img{width:100%;height:100%;object-fit:contain;}
+  .we-logo-box{width:84px;height:84px;border-radius:22px;background:#fff;display:flex;align-items:center;justify-content:center;padding:0;overflow:hidden;box-shadow:0 20px 44px rgba(0,0,0,0.45), 0 0 40px rgba(63,206,124,0.18);position:relative;box-sizing:border-box;}
+  .we-logo-box img{width:100%;height:100%;object-fit:cover;}
   @keyframes weRiseIn{from{opacity:0;transform:translateY(24px) scale(0.92);}to{opacity:1;transform:translateY(0) scale(1);}}
   @keyframes weRiseIn2{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
   .we-eyebrow{font-size:10.5px;font-weight:800;letter-spacing:0.12em;color:#5fd996;margin-bottom:12px;position:relative;z-index:2;animation:weRiseIn2 0.7s 0.05s cubic-bezier(0.16,1,0.3,1) both;}
@@ -832,26 +832,94 @@ textarea.admin-ta{
 <div style="position:fixed;bottom:78px;right:16px;z-index:59;width:52px;height:52px;border-radius:50%;background:#3fce7c;animation:supportFabPulse 2.2s ease-out infinite;pointer-events:none;"></div>
 <style>@keyframes supportFabPulse{0%{transform:scale(1);opacity:0.55;}100%{transform:scale(1.7);opacity:0;}}</style>
 <button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶<span id="supportFabBadge" style="display:none;position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 5px;background:#E23B57;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;font-family:sans-serif;"></span></button>
-<div id="supportChatBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:70;align-items:flex-end;justify-content:center;" onclick="if(event.target===this)toggleSupportChat()">
-  <div style="width:100%;max-width:480px;background:var(--panel);border-radius:22px 22px 0 0;height:65vh;max-height:560px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 24px 60px rgba(20,40,30,0.18);">
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:linear-gradient(135deg, #12241a, #0a1710);color:#fff;flex-shrink:0;">
-      <div style="display:flex;align-items:center;gap:12px;">
-        <div style="position:relative;width:38px;height:38px;flex-shrink:0;">
-          <div style="width:100%;height:100%;border-radius:12px;background:linear-gradient(145deg, #17a854, #0a7c3d);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 6px 14px rgba(10,124,61,0.3);">🐶</div>
-          <span style="position:absolute;bottom:-2px;right:-2px;width:11px;height:11px;background:#3fce7c;border:2px solid #12241a;border-radius:50%;"></span>
-        </div>
-        <div>
-          <div style="font-weight:800;font-size:15.5px;">Touski Bot <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:4px;">👤 Kerry Cadet en ligne</span></div>
-          <div style="font-size:11.5px;color:#6fcf97;display:flex;align-items:center;gap:5px;margin-top:1px;"><span style="width:6px;height:6px;border-radius:50%;background:#3fce7c;"></span>An liy</div>
-        </div>
-      </div>
-      <button onclick="toggleSupportChat()" style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.08);border:none;display:flex;align-items:center;justify-content:center;color:#cfd6d2;cursor:pointer;font-size:15px;">✕</button>
+<div id="supportChatBg" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg, #071a10 0%, #0a1710 40%, #050b08 100%);z-index:70;flex-direction:column;overflow:hidden;">
+  <style>
+    .ktc-glow{position:absolute;border-radius:50%;pointer-events:none;background:radial-gradient(circle, rgba(63,206,124,0.18) 0%, transparent 70%);}
+    .ktc-particle{position:absolute;border-radius:50%;background:#3fce7c;opacity:0.35;pointer-events:none;animation:ktcFloat 7s ease-in-out infinite;}
+    .ktc-emoji{position:absolute;font-size:15px;opacity:0.32;pointer-events:none;animation:ktcFloat2 9s ease-in-out infinite;}
+    @keyframes ktcFloat{0%,100%{transform:translateY(0) scale(1);opacity:0.22;}50%{transform:translateY(-22px) scale(1.25);opacity:0.5;}}
+    @keyframes ktcFloat2{0%,100%{transform:translateY(0) rotate(0deg);opacity:0.16;}50%{transform:translateY(-30px) rotate(12deg);opacity:0.38;}}
+  </style>
+  <div class="ktc-glow" style="width:260px;height:260px;top:-90px;left:-60px;"></div>
+  <div class="ktc-glow" style="width:220px;height:220px;top:220px;right:-80px;"></div>
+  <div class="ktc-glow" style="width:240px;height:240px;bottom:120px;left:-90px;"></div>
+  <span class="ktc-particle" style="width:5px;height:5px;top:12%;left:22%;animation-delay:0s;"></span>
+  <span class="ktc-particle" style="width:4px;height:4px;top:30%;right:14%;animation-delay:1.4s;"></span>
+  <span class="ktc-particle" style="width:6px;height:6px;top:55%;left:8%;animation-delay:2.6s;"></span>
+  <span class="ktc-particle" style="width:3px;height:3px;top:70%;right:22%;animation-delay:0.8s;"></span>
+  <span class="ktc-particle" style="width:5px;height:5px;top:85%;left:30%;animation-delay:2s;"></span>
+  <span class="ktc-emoji" style="top:18%;left:12%;animation-delay:0.3s;">💵</span>
+  <span class="ktc-emoji" style="top:38%;right:10%;animation-delay:2.1s;">💎</span>
+  <span class="ktc-emoji" style="top:60%;left:20%;animation-delay:1.1s;">✨</span>
+  <span class="ktc-emoji" style="top:75%;right:16%;animation-delay:3s;">💵</span>
+  <span class="ktc-emoji" style="top:48%;left:40%;animation-delay:1.7s;">💎</span>
+  <div style="position:relative;flex-shrink:0;display:flex;align-items:center;gap:12px;padding:14px 16px 16px;background:linear-gradient(135deg, #17a854, #0a7c3d);color:#fff;">
+    <button onclick="toggleSupportChat()" aria-label="Retounen" data-i18n-title="btn_back" title="Retounen" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.16);border:none;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 12H5m6-7-7 7 7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div style="position:relative;width:40px;height:40px;flex-shrink:0;">
+      <div style="width:100%;height:100%;border-radius:50%;background:#fff;padding:4px;box-sizing:border-box;overflow:hidden;"><img id="supportChatHeaderLogo" src="" alt="Kerry Topup" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>
+      <span style="position:absolute;bottom:-2px;right:-2px;width:11px;height:11px;background:#3fce7c;border:2px solid #0a7c3d;border-radius:50%;"></span>
     </div>
-    <div id="supportChatMessages" style="flex:1;overflow-y:auto;padding:20px;background:#f7f9f8;display:flex;flex-direction:column;gap:10px;"></div>
-    <div style="display:flex;align-items:center;gap:10px;padding:14px 16px;border-top:1px solid #eef1ef;background:#fff;flex-shrink:0;">
-      <label style="width:40px;height:40px;border-radius:50%;background:#f4f7f5;display:flex;align-items:center;justify-content:center;color:#4b5259;flex-shrink:0;cursor:pointer;font-size:17px;">📷<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
-      <input type="text" id="supportChatInput" placeholder="Ekri kesyon ou..." style="flex:1;border:1px solid #e2e6e3;border-radius:24px;padding:11px 16px;font-size:14px;color:var(--text);background:#f7f9f8;" onkeydown="if(event.key==='Enter')sendSupportMessage()">
-      <button onclick="sendSupportMessage()" style="border:none;border-radius:24px;padding:11px 22px;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;font-weight:700;font-size:14px;cursor:pointer;box-shadow:0 6px 14px rgba(10,158,61,0.28);flex-shrink:0;" data-i18n="btn_chat_send">Voye</button>
+    <script>document.getElementById('supportChatHeaderLogo').src=window.KT_LOGO_SRC;</script>
+    <div style="flex:1;min-width:0;">
+      <div style="font-weight:800;font-size:15.5px;"><span id="supportBotName">Touski Bot</span> <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:4px;">👤 Kerry Cadet en ligne</span></div>
+      <div style="font-size:11.5px;display:flex;align-items:center;gap:5px;margin-top:1px;opacity:0.92;"><span style="width:6px;height:6px;border-radius:50%;background:#B6FFCF;"></span><span data-i18n="chat_status_online">An liy</span></div>
+    </div>
+  </div>
+  <div id="supportChatMessages" style="position:relative;flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:10px;"></div>
+  <div id="supportRecordingBar" style="position:relative;display:none;align-items:center;gap:10px;padding:12px 16px;background:rgba(7,26,16,0.75);backdrop-filter:blur(10px);border-top:1px solid rgba(63,206,124,0.18);color:#ff8fa3;flex-shrink:0;">
+    <span style="width:9px;height:9px;border-radius:50%;background:#E23B57;animation:pillPulse 1s ease-in-out infinite;flex-shrink:0;"></span>
+    <span id="supportRecordingTimer" style="font-weight:700;font-size:13px;">0:00</span>
+    <span data-i18n="chat_recording_label" style="flex:1;font-size:13px;font-weight:600;">Ap anrejistre mesaj vokal...</span>
+    <button onclick="cancelSupportRecording()" data-i18n="btn_cancel" style="border:none;background:none;color:#93b1a1;font-size:12.5px;font-weight:700;cursor:pointer;">Anile</button>
+  </div>
+  <div id="supportEmojiPanel" style="position:relative;display:none;flex-wrap:wrap;gap:4px;padding:10px 14px;background:rgba(7,26,16,0.85);backdrop-filter:blur(10px);border-top:1px solid rgba(63,206,124,0.18);max-height:150px;overflow-y:auto;flex-shrink:0;"></div>
+  <div style="position:relative;flex-shrink:0;padding:12px 14px 6px;background:rgba(7,26,16,0.75);backdrop-filter:blur(10px);border-top:1px solid rgba(63,206,124,0.18);">
+    <div id="supportModelMenu" style="display:none;position:absolute;left:18px;bottom:calc(100% - 6px);width:min(300px, calc(100% - 36px));background:#10241a;border:1px solid rgba(63,206,124,0.28);border-radius:18px;padding:8px;box-shadow:0 18px 44px rgba(0,0,0,0.55);z-index:5;">
+      <button onclick="pickSupportPersona('touski')" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:none;border-radius:12px;background:transparent;color:#e8f5ec;cursor:pointer;font-family:inherit;">
+        <span style="font-size:22px;">🐶</span>
+        <span style="flex:1;min-width:0;"><span style="display:block;font-weight:800;font-size:14px;">Touski <span style="color:#93b1a1;font-weight:600;">5.5</span></span><span id="personaDescTouski" style="display:block;font-size:11.5px;color:#93b1a1;margin-top:1px;"></span></span>
+        <span id="personaCheckTouski" style="color:#3fce7c;font-weight:900;"></span>
+      </button>
+      <button onclick="pickSupportPersona('foulon')" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:none;border-radius:12px;background:transparent;color:#e8f5ec;cursor:pointer;font-family:inherit;">
+        <span style="font-size:22px;">🐕</span>
+        <span style="flex:1;min-width:0;"><span style="display:block;font-weight:800;font-size:14px;">Foulon <span style="color:#93b1a1;font-weight:600;">7.5</span></span><span id="personaDescFoulon" style="display:block;font-size:11.5px;color:#93b1a1;margin-top:1px;"></span></span>
+        <span id="personaCheckFoulon" style="color:#3fce7c;font-weight:900;"></span>
+      </button>
+    </div>
+    <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(63,206,124,0.22);border-radius:26px;padding:10px 12px 10px 14px;">
+      <input type="text" id="supportChatInput" placeholder="Reponn Touski..." style="width:100%;box-sizing:border-box;border:none;outline:none;background:transparent;padding:6px 2px 12px;font-size:15px;color:#e8f5ec;" oninput="updateSupportSendBtn()" onkeydown="if(event.key==='Enter')sendSupportMessage()">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <label aria-label="Image" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#e8f5ec;flex-shrink:0;cursor:pointer;font-size:22px;line-height:1;font-weight:300;">+<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
+        <button id="supportModelChip" onclick="toggleSupportModelMenu(event)" style="display:flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:19px;border:none;background:rgba(255,255,255,0.08);color:#e8f5ec;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;"><span id="supportModelChipName">Touski 5.5</span><span id="supportModelChipEffort" style="color:#93b1a1;font-weight:600;">Moyen</span></button>
+        <span style="flex:1;"></span>
+        <button id="supportMicBtn" onclick="onSupportMicSendClick()" aria-label="Voye mesaj vokal" style="width:40px;height:40px;border-radius:50%;background:#0FA654;border:none;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;">
+          <svg id="supportMicIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke-linecap="round"/></svg>
+          <svg id="supportSendIcon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M2.5 21.5 22 12 2.5 2.5 2.5 10 16 12 2.5 14z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div style="position:relative;flex-shrink:0;text-align:center;padding:0 16px calc(10px + env(safe-area-inset-bottom, 0px));background:rgba(7,26,16,0.75);backdrop-filter:blur(10px);font-size:11px;color:#6f8f7d;letter-spacing:.2px;">Powered by <b style="color:#3fce7c;font-weight:800;">KC GLOBAL STUDIO</b></div>
+</div>
+
+<!-- Popup tutoriel byenveni (parèt yon sèl fwa, pa fòse) -->
+<div id="tutoWelcomeBg" style="display:none;position:fixed;inset:0;background:rgba(10,20,15,0.55);z-index:65;align-items:center;justify-content:center;padding:20px;" onclick="if(event.target===this)closeTutoWelcomePopup()">
+  <div style="width:100%;max-width:340px;background:#fff;border-radius:24px;overflow:hidden;box-shadow:0 24px 60px rgba(10,20,15,0.35);">
+    <div style="position:relative;background:linear-gradient(160deg,#17C267,#0A7C3D);padding:28px 24px 42px;text-align:center;color:#fff;">
+      <button onclick="closeTutoWelcomePopup()" aria-label="Fèmen" style="position:absolute;top:14px;right:14px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.18);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M18 6 6 18M6 6l12 12" stroke-linecap="round"/></svg>
+      </button>
+      <div style="width:52px;height:52px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;box-shadow:0 8px 18px rgba(0,0,0,0.15);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0FA654" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+      </div>
+      <div style="font-weight:800;font-size:18px;" data-i18n="tuto_popup_title">Tutoriel Kerry Topup</div>
+      <div style="font-size:12.5px;margin-top:6px;line-height:1.4;opacity:0.94;padding:0 6px;" data-i18n="tuto_popup_sub">Men tutoriel enpòtan pou itilize Kerry Topup byen</div>
+    </div>
+    <div id="tutoWelcomeCards" style="margin-top:-22px;padding:0 18px;display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;"></div>
+    <div style="padding:18px 20px 22px;text-align:center;">
+      <button onclick="closeTutoWelcomePopup()" data-i18n="btn_later" style="background:none;border:none;color:#6B7A6E;font-size:13px;font-weight:700;cursor:pointer;">Pita</button>
     </div>
   </div>
 </div>
@@ -1165,6 +1233,12 @@ const TRANSLATIONS = {
     api_recent_orders_heading:'📦 Kòmand resan yo', api_no_orders_yet:'Pa gen kòmand atravè API a poko.',
     table_col_product:'Pwodwi', table_col_total:'Total', table_col_status:'Estati', table_col_date:'Dat',
     status_completed:'Konplete', status_pending:'An atant', status_failed:'Echwe',
+    chat_header_title:'Sipò Kerry Topup', chat_status_online:'An liy', chat_input_placeholder:'Ekri kesyon ou...',
+    chat_greeting_open:"Bonjou ! Se mwen menm Touski Bot 🐶. Kijan m ka ede w jodi a ? (Rechaj, acha, PIN, elatriye)",
+    chat_greeting_closed:"Bonjou e mèsi paske w kontakte nou 👋\n\nSèvis nou an fèmen kounye a. Nou disponib chak jou soti 8h00AM pou rive 8h30PM.\n\nOu ka kite mesaj ou ak imèl ou : n ap reponn ou de w nou louvri ankò.\n\nMèsi pou konfyans ou e a byento !",
+    chat_recording_label:'Ap anrejistre mesaj vokal...', btn_back:'Retounen', toast_mic_denied:'Nou pa ka jwenn aksè mikwo a — verifye pèmisyon telefòn ou',
+    toast_sending_voice:'Ap voye mesaj vokal la...', toast_voice_sent:'Mesaj vokal voye ✓',
+    tuto_popup_title:'Tutoriel Kerry Topup', tuto_popup_sub:'Men tutoriel enpòtan pou itilize Kerry Topup byen', btn_later:'Pita',
   },
   fr: {
     nav_shop:'Boutique', nav_wallet:'Portefeuille', nav_commandes:'Commandes', nav_historique:'Historique', nav_redeem:'Redeem Free Fire',
@@ -1366,6 +1440,12 @@ const TRANSLATIONS = {
     api_recent_orders_heading:'📦 Commandes récentes', api_no_orders_yet:'Pas encore de commande via l\'API.',
     table_col_product:'Produit', table_col_total:'Total', table_col_status:'Statut', table_col_date:'Date',
     status_completed:'Terminée', status_pending:'En attente', status_failed:'Échouée',
+    chat_header_title:'Support Kerry Topup', chat_status_online:'En ligne', chat_input_placeholder:'Écrivez votre question...',
+    chat_greeting_open:"Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)",
+    chat_greeting_closed:"Bonjour et merci de nous avoir contactés 👋\n\nNotre service est actuellement fermé. Nous sommes disponibles tous les jours de 8h00AM à 8h30PM.\n\nN'hésitez pas à nous laisser votre message et votre email : nous y répondrons dès la réouverture.\n\nMerci de votre confiance et à très bientôt !",
+    chat_recording_label:'Enregistrement du message vocal...', btn_back:'Retour', toast_mic_denied:'Impossible d\'accéder au micro — vérifiez les autorisations de votre téléphone',
+    toast_sending_voice:'Envoi du message vocal...', toast_voice_sent:'Message vocal envoyé ✓',
+    tuto_popup_title:'Tutoriel Kerry Topup', tuto_popup_sub:'Voici les tutoriels indispensables pour bien utiliser Kerry Topup', btn_later:'Plus tard',
   },
   en: {
     nav_shop:'Shop', nav_wallet:'Wallet', nav_commandes:'Orders', nav_historique:'History', nav_redeem:'Redeem Free Fire',
@@ -1567,6 +1647,12 @@ const TRANSLATIONS = {
     api_recent_orders_heading:'📦 Recent orders', api_no_orders_yet:'No orders via the API yet.',
     table_col_product:'Product', table_col_total:'Total', table_col_status:'Status', table_col_date:'Date',
     status_completed:'Completed', status_pending:'Pending', status_failed:'Failed',
+    chat_header_title:'Kerry Topup Support', chat_status_online:'Online', chat_input_placeholder:'Type your question...',
+    chat_greeting_open:"Hello! I'm Touski Bot 🐶. How can I help you today? (Recharge, purchase, PIN, etc.)",
+    chat_greeting_closed:"Hello and thanks for contacting us 👋\n\nOur service is currently closed. We're available every day from 8:00AM to 8:30PM.\n\nFeel free to leave us your message and email: we'll reply as soon as we reopen.\n\nThank you for your trust, see you soon!",
+    chat_recording_label:'Recording voice message...', btn_back:'Back', toast_mic_denied:'Can\'t access the microphone — check your phone permissions',
+    toast_sending_voice:'Sending voice message...', toast_voice_sent:'Voice message sent ✓',
+    tuto_popup_title:'Kerry Topup Tutorial', tuto_popup_sub:'Here are the essential tutorials to use Kerry Topup well', btn_later:'Later',
   },
   es: {
     nav_shop:'Tienda', nav_wallet:'Billetera', nav_commandes:'Pedidos', nav_historique:'Historial', nav_redeem:'Redeem Free Fire',
@@ -1768,6 +1854,12 @@ const TRANSLATIONS = {
     api_recent_orders_heading:'📦 Pedidos recientes', api_no_orders_yet:'Aún no hay pedidos vía la API.',
     table_col_product:'Producto', table_col_total:'Total', table_col_status:'Estado', table_col_date:'Fecha',
     status_completed:'Completado', status_pending:'Pendiente', status_failed:'Fallido',
+    chat_header_title:'Soporte Kerry Topup', chat_status_online:'En línea', chat_input_placeholder:'Escribe tu pregunta...',
+    chat_greeting_open:"¡Hola! Soy Touski Bot 🐶. ¿Cómo puedo ayudarte hoy? (Recarga, compra, PIN, etc.)",
+    chat_greeting_closed:"Hola y gracias por contactarnos 👋\n\nNuestro servicio está cerrado en este momento. Estamos disponibles todos los días de 8:00AM a 8:30PM.\n\nNo dudes en dejarnos tu mensaje y tu correo: te responderemos en cuanto reabramos.\n\n¡Gracias por tu confianza, hasta pronto!",
+    chat_recording_label:'Grabando mensaje de voz...', btn_back:'Volver', toast_mic_denied:'No podemos acceder al micrófono — revisa los permisos de tu teléfono',
+    toast_sending_voice:'Enviando mensaje de voz...', toast_voice_sent:'Mensaje de voz enviado ✓',
+    tuto_popup_title:'Tutorial de Kerry Topup', tuto_popup_sub:'Aquí están los tutoriales esenciales para usar bien Kerry Topup', btn_later:'Más tarde',
   }
 };
 function t(key){
@@ -1778,6 +1870,7 @@ function setLang(lang){
   localStorage.setItem('kt_lang', lang);
   applyWelcomeTranslations();
   render();
+  if(typeof applySupportPersonaUI === 'function') applySupportPersonaUI();
 }
 function applyWelcomeTranslations(){
   const map = {
@@ -1790,6 +1883,7 @@ function applyWelcomeTranslations(){
     if(el) el.innerHTML = t(map[id]);
   }
   applyStaticTranslations();
+  if(typeof applySupportPersonaUI === 'function') applySupportPersonaUI();
 }
 function applyStaticTranslations(){
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1926,7 +2020,7 @@ async function fetchProductsFromServer(){
           const mc = (configs||[]).find(c=>c.product_id===p.id);
           obj.manualConfig = mc ? { taux:Number(mc.taux), frais:Number(mc.frais||0), min:Number(mc.min_amount), max:Number(mc.max_amount), fields:mc.fields||[], feeTiers:mc.fee_tiers||[] } : {taux:145,frais:0,min:5,max:500,fields:[],feeTiers:[]};
         } else {
-          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, fixedServerId:v.fixed_server_id||null, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null, equivalenceGroup:v.equivalence_group||null}));
+          obj.variants = (vars||[]).filter(v=>v.product_id===p.id).map(v=>({id:v.id, label:v.label, price:Number(v.price), costPrice:v.cost_price!=null?Number(v.cost_price):null, partnerProductId:v.partner_product_id||null, requiresServerId:!!v.requires_server_id, fixedServerId:v.fixed_server_id||null, sortOrder:v.sort_order||0, orderMode:v.order_mode||'api_order', apiPrice:v.api_price!=null?Number(v.api_price):null, availableViaApi:!!v.available_via_api, apiProductId:v.api_product_id||null, equivalenceGroup:v.equivalence_group||null}));
           if(p.type === 'form'){ obj.formFields = p.form_fields || []; }
         }
         return obj;
@@ -2056,8 +2150,36 @@ async function fetchTutorialVideos(){
     if(data){
       state.tutorialVideos = data.map(v => ({ id:v.id, title:v.title, videoUrl:v.video_url, contextType:v.context_type, productId:v.product_id }));
       if(currentPage === 'tutoriel') render();
+      maybeShowTutoWelcomePopup();
     }
   }catch(e){ console.warn('fetchTutorialVideos failed:', e?.message || e); }
+}
+/* ---- Popup tutoriel byenveni — yon sèl fwa, san deranje moun ---- */
+function maybeShowTutoWelcomePopup(){
+  try{
+    if(localStorage.getItem('kt_tuto_popup_seen')) return;
+    if(!state.tutorialVideos || state.tutorialVideos.length === 0) return;
+    setTimeout(() => {
+      // Pa parèt si yon lòt modal/chat deja louvri — evite deranje moun nan mitan yon aksyon
+      if(supportChatOpen || document.getElementById('authModal')?.classList.contains('show')) return;
+      const cardsBox = document.getElementById('tutoWelcomeCards');
+      if(cardsBox){
+        cardsBox.innerHTML = state.tutorialVideos.slice(0, 6).map(v => `
+          <div onclick="closeTutoWelcomePopup();playTutorialVideoById('${v.id}');" style="flex:0 0 118px;background:#fff;border:1px solid var(--line);border-radius:16px;height:140px;box-shadow:0 6px 16px rgba(17,21,26,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
+            <div style="width:40px;height:40px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="var(--green-2)"><path d="M8 5v14l11-7z"/></svg>
+            </div>
+            <div style="font-size:10.5px;font-weight:700;color:var(--text);text-align:center;padding:0 8px;line-height:1.3;">${escapeHtml(v.title)}</div>
+          </div>
+        `).join('');
+      }
+      document.getElementById('tutoWelcomeBg').style.display = 'flex';
+    }, 1800);
+  }catch(e){ /* pa bloke chaj sit la si sa echwe */ }
+}
+function closeTutoWelcomePopup(){
+  document.getElementById('tutoWelcomeBg').style.display = 'none';
+  try{ localStorage.setItem('kt_tuto_popup_seen', '1'); }catch(e){}
 }
 async function fetchVideoDismissals(userId){
   if(!userId) return;
@@ -2366,7 +2488,7 @@ async function getOrRestoreSupportConversation(){
       const { data: msgs } = await sb.from('support_messages').select('*').eq('conversation_id', convo.id).order('created_at',{ascending:true});
       supportChatHistory = [];
       document.getElementById('supportChatMessages').innerHTML = '';
-      (msgs||[]).forEach(m => addSupportMessage(m.sender==='customer'?'user':(m.sender==='admin'?'admin':'assistant'), m.content, true));
+      (msgs||[]).forEach(m => addSupportMessage(m.sender==='customer'?'user':(m.sender==='admin'?'admin':'assistant'), m.content, true, { id:m.id, reactions:m.reactions, deleted:!!m.deleted }));
       await sb.from('support_messages').update({ read_by_customer:true }).eq('conversation_id', convo.id).eq('sender','admin');
       updateSupportFabBadge();
       subscribeToSupportMessages(convo.id);
@@ -2519,11 +2641,12 @@ function subscribeToSupportMessages(conversationId){
       .on('postgres_changes', { event:'INSERT', schema:'public', table:'support_messages', filter:'conversation_id=eq.'+conversationId }, (payload) => {
         const m = payload.new;
         if(m.sender === 'admin'){
-          addSupportMessage('admin', m.content, true);
+          addSupportMessage('admin', m.content, true, { id:m.id, reactions:m.reactions, deleted:!!m.deleted });
           if(!supportChatOpen){ updateSupportFabBadge(); }
           else { sb.from('support_messages').update({ read_by_customer:true }).eq('id', m.id); }
         }
       })
+      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'support_messages', filter:'conversation_id=eq.'+conversationId }, (payload) => { applyRemoteSupportUpdate(payload.new); })
       .on('postgres_changes', { event:'UPDATE', schema:'public', table:'support_conversations', filter:'id=eq.'+conversationId }, (payload) => {
         state.supportAgentActive = payload.new.agent_active !== false;
         updateAgentBadgeDisplay();
@@ -2560,12 +2683,19 @@ async function requestHumanAgent(){
     if(!state.currentUserId) localStorage.setItem('kt_support_convo_id', convo.id);
 
     // Kopye TOUT istwa konvèsasyon an (Touski + kliyan) nan baz done a
-    const rows = supportChatHistory.map(m => ({
+    const _histForDb = supportChatHistory.filter(m => !m.deleted);
+    const rows = _histForDb.map(m => ({
       conversation_id: convo.id,
       sender: m.role === 'user' ? 'customer' : 'bot',
       content: m.content
     }));
-    if(rows.length) await sb.from('support_messages').insert(rows);
+    if(rows.length){
+      const { data: _bulk } = await sb.from('support_messages').insert(rows).select('id');
+      if(_bulk && _bulk.length === _histForDb.length){
+        const _box = document.getElementById('supportChatMessages');
+        Array.from(_box ? _box.children : []).forEach(r => { const i = r._hist ? _histForDb.indexOf(r._hist) : -1; if(i >= 0) r.dataset.dbid = _bulk[i].id; });
+      }
+    }
 
     state.supportAgentActive = false;
     subscribeToSupportMessages(convo.id);
@@ -2584,6 +2714,7 @@ function isWithinBusinessHours(){
 async function toggleSupportChat(){
   supportChatOpen = !supportChatOpen;
   document.getElementById('supportChatBg').style.display = supportChatOpen ? 'flex' : 'none';
+  if(supportChatOpen) applySupportPersonaUI();
   if(supportChatOpen){
     const tip = document.getElementById('supportTooltip');
     if(tip) tip.style.display = 'none';
@@ -2594,12 +2725,95 @@ async function toggleSupportChat(){
     if(supportConversationId) updateSupportFabBadge();
   }
   if(supportChatOpen && supportChatHistory.length === 0){
-    if(isWithinBusinessHours()){
-      addSupportMessage('assistant', "Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)");
-    } else {
-      addSupportMessage('assistant', "Bonjour et merci de nous avoir contactés 👋\n\nNotre service est actuellement fermé. Nous sommes disponibles tous les jours de 8h00AM à 8h30PM.\n\nN'hésitez pas à nous laisser votre message et votre email : nous y répondrons dès la réouverture.\n\nMerci de votre confiance et à très bientôt !");
-    }
+    if(!supportChatLangChosen){ showChatLangPicker(); }
+    else { sendChatGreeting(); }
   }
+}
+
+/* ===== Chat: chwa "modèl" (Touski 5.5 / Foulon 7.5) ===== */
+let supportPersona = 'touski';
+try{ const sp = localStorage.getItem('kt_chat_persona'); if(sp === 'foulon' || sp === 'touski') supportPersona = sp; }catch(e){}
+const PERSONA_TXT = {
+  ht:{ effort:'Mwayen', reply:'Reponn', touski:'Rapid, chalerè ak jwèt 🐶', foulon:'Kalm, detaye, etap pa etap', switched:(n)=>`— Kounya se ${n} k ap reponn ou —` },
+  fr:{ effort:'Moyen', reply:'Répondre à', touski:'Rapide, chaleureux et joueur 🐶', foulon:'Calme, détaillé, étape par étape', switched:(n)=>`— C'est maintenant ${n} qui vous répond —` },
+  en:{ effort:'Medium', reply:'Reply to', touski:'Quick, warm and playful 🐶', foulon:'Calm, detailed, step by step', switched:(n)=>`— ${n} is now answering you —` },
+  es:{ effort:'Medio', reply:'Responder a', touski:'Rápido, cálido y juguetón 🐶', foulon:'Calmado, detallado, paso a paso', switched:(n)=>`— Ahora te responde ${n} —` }
+};
+function personaName(p){ return p === 'foulon' ? 'Foulon' : 'Touski'; }
+function applySupportPersonaUI(){
+  const T = PERSONA_TXT[currentLang] || PERSONA_TXT.en;
+  const nm = personaName(supportPersona);
+  const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
+  set('supportModelChipName', nm + ' ' + (supportPersona === 'foulon' ? '7.5' : '5.5'));
+  set('supportModelChipEffort', T.effort);
+  const inp = document.getElementById('supportChatInput');
+  if(inp) inp.placeholder = (T.reply || 'Reply to') + ' ' + nm + '...';
+  set('supportBotName', supportPersona === 'foulon' ? 'Foulon' : 'Touski Bot');
+  set('personaDescTouski', T.touski);
+  set('personaDescFoulon', T.foulon);
+  set('personaCheckTouski', supportPersona === 'touski' ? '✓' : '');
+  set('personaCheckFoulon', supportPersona === 'foulon' ? '✓' : '');
+}
+function toggleSupportModelMenu(ev){
+  if(ev) ev.stopPropagation();
+  const m = document.getElementById('supportModelMenu'); if(!m) return;
+  applySupportPersonaUI();
+  m.style.display = m.style.display === 'block' ? 'none' : 'block';
+}
+function pickSupportPersona(p){
+  const m = document.getElementById('supportModelMenu'); if(m) m.style.display = 'none';
+  if(p === supportPersona) return;
+  supportPersona = p;
+  try{ localStorage.setItem('kt_chat_persona', p); }catch(e){}
+  applySupportPersonaUI();
+  const T = PERSONA_TXT[currentLang] || PERSONA_TXT.en;
+  const box = document.getElementById('supportChatMessages');
+  if(box){
+    const note = document.createElement('div');
+    note.style.cssText = 'align-self:center;font-size:11.5px;color:#93b1a1;padding:4px 10px;';
+    note.textContent = T.switched(personaName(p));
+    box.appendChild(note); box.scrollTop = 999999;
+  }
+}
+document.addEventListener('click', function(e){
+  const m = document.getElementById('supportModelMenu');
+  if(m && m.style.display === 'block' && !m.contains(e.target)) m.style.display = 'none';
+});
+function personaInstruction(){
+  if(supportPersona === 'foulon'){
+    return "PERSONALITE: Non ou se Foulon (modèl 7.5). Ou kalm, pwofesyonèl ak anpil pasyans. Reponn an detay, etap pa etap (1, 2, 3), ak yon ton respektye ak chalerè; kèk emoji sèlman. Verifye kliyan an konprann anvan ou fini.";
+  }
+  return "PERSONALITE: Non ou se Touski 🐶 (modèl 5.5). Ou rapid, chalerè, jwèt e dirèk. Reponn kout (2 a 4 fraz), ak emoji, san twòp pale.";
+}
+
+let supportChatLangChosen = true; // chwa lang nan chat la retire — bot la swiv lang kliyan an ekri
+function sendChatGreeting(){
+  const nm = supportPersona === 'foulon' ? 'Foulon' : 'Touski Bot';
+  if(isWithinBusinessHours()){
+    addSupportMessage('assistant', t('chat_greeting_open').replace(/Touski Bot/g, nm));
+  } else {
+    addSupportMessage('assistant', t('chat_greeting_closed'));
+  }
+}
+function showChatLangPicker(){
+  const box = document.getElementById('supportChatMessages');
+  if(!box || document.getElementById('supportLangPicker')) return;
+  const langs = [['ht','🇭🇹','Kreyòl Ayisyen'],['fr','🇫🇷','Français'],['en','🇺🇸','English'],['es','🇪🇸','Español']];
+  const el = document.createElement('div');
+  el.id = 'supportLangPicker';
+  el.style.cssText = 'align-self:stretch;background:rgba(255,255,255,0.06);border:1px solid rgba(63,206,124,0.22);border-radius:18px;padding:16px;';
+  el.innerHTML = `<div style="text-align:center;color:#e8f5ec;font-weight:800;font-size:14.5px;margin-bottom:4px;">🌍 Chwazi lang ou</div>
+    <div style="text-align:center;color:#93b1a1;font-size:11.5px;margin-bottom:12px;">Choisis ta langue · Choose your language · Elige tu idioma</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">` + langs.map(l => `<button onclick="pickChatLang('${l[0]}')" style="display:flex;align-items:center;justify-content:center;gap:8px;padding:12px 8px;border-radius:14px;border:1.5px solid ${currentLang===l[0]?'#3fce7c':'rgba(63,206,124,0.22)'};background:${currentLang===l[0]?'rgba(63,206,124,0.16)':'rgba(255,255,255,0.05)'};color:#e8f5ec;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit;"><span style="font-size:18px;">${l[1]}</span>${l[2]}</button>`).join('') + `</div>`;
+  box.appendChild(el);
+  box.scrollTop = 999999;
+}
+function pickChatLang(l){
+  const p = document.getElementById('supportLangPicker'); if(p) p.remove();
+  supportChatLangChosen = true;
+  if(l !== currentLang) setLang(l); else applyStaticTranslations();
+  applySupportPersonaUI();
+  sendChatGreeting();
 }
 function formatChatText(text){
   let escaped = escapeHtml(text);
@@ -2609,6 +2823,9 @@ function formatChatText(text){
   });
   escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:mp4|webm|mov|m4v)(?:\?[^\s<]*)?)/gi, (url) => {
     return `<div style="margin-top:8px;"><video src="${url}" controls style="width:100%;border-radius:10px;background:#000;max-height:220px;display:block;"></video></div>`;
+  });
+  escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:weba|ogg|mp3|wav|m4a)(?:\?[^\s<]*)?)/gi, (url) => {
+    return `<audio src="${url}" controls controlsList="nodownload noplaybackrate" oncontextmenu="return false" style="width:220px;max-width:100%;display:block;margin-top:4px;"></audio>`;
   });
   escaped = escaped.replace(/(https?:\/\/[^\s<]*(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))[a-zA-Z0-9_-]{11}[^\s<]*)/gi, (url) => {
     const embed = youtubeEmbedUrl(url);
@@ -2672,22 +2889,127 @@ function updateChatCalculator(uid_, productId){
   if(elFrais) elFrais.textContent = '+' + frais + ' USD';
   if(elTotal) elTotal.textContent = money(Math.round(total));
 }
-function addSupportMessage(role, text, skipHistory){
-  if(!skipHistory) supportChatHistory.push({ role, content: text });
+function addSupportMessage(role, text, skipHistory, meta){
+  meta = meta || {};
+  let entry = null;
+  if(!skipHistory){ entry = { role, content: text }; supportChatHistory.push(entry); }
   const box = document.getElementById('supportChatMessages');
   const row = document.createElement('div');
   const isBot = role === 'assistant';
   row.style.cssText = 'display:flex;gap:10px;margin-bottom:4px;' + (role==='user' ? 'flex-direction:row-reverse;' : '');
-  const avatarHtml = isBot ? '<div style="width:30px;height:30px;border-radius:10px;background:linear-gradient(145deg, #17a854, #0a7c3d);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;">🐶</div>' : '';
+  row.dataset.role = role;
+  row._hist = entry;
+  row._text = text;
+  if(meta.id) row.dataset.dbid = meta.id;
+  row._reactions = (meta.reactions && typeof meta.reactions === 'object') ? meta.reactions : {};
+  const avatarHtml = isBot ? `<div style="width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid rgba(63,206,124,0.3);overflow:hidden;flex-shrink:0;padding:2px;box-sizing:border-box;"><img src="${window.KT_LOGO_SRC}" alt="Kerry Topup" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>` : '';
   const styles = {
-    user: 'background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border-radius:16px 4px 16px 16px;box-shadow:0 4px 10px rgba(15,166,84,0.2);',
-    admin: 'background:#1565D8;color:#fff;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.08);',
-    assistant: 'background:#fff;border:1px solid #eef1ef;color:#14181c;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.03);'
+    user: 'background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border-radius:16px 4px 16px 16px;box-shadow:0 4px 14px rgba(10,158,61,0.35);',
+    admin: 'background:#1565D8;color:#fff;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.2);',
+    assistant: 'background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);backdrop-filter:blur(6px);color:#e8f5ec;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.15);'
   };
-  const bubbleStyle = (styles[role] || styles.assistant) + 'padding:14px 16px;max-width:82%;font-size:14.5px;white-space:pre-wrap;line-height:1.55;';
-  row.innerHTML = avatarHtml + '<div style="' + bubbleStyle + '">' + formatChatText(text) + '</div>';
+  const bubbleStyle = (styles[role] || styles.assistant) + 'padding:14px 16px;max-width:100%;font-size:14.5px;white-space:pre-wrap;line-height:1.55;box-sizing:border-box;';
+  row.innerHTML = avatarHtml + '<div style="display:flex;flex-direction:column;max-width:82%;min-width:0;align-items:' + (role==='user' ? 'flex-end' : 'flex-start') + ';"><div class="kc-bubble" style="' + bubbleStyle + '">' + formatChatText(text) + '</div><div class="kc-react" style="display:none;margin-top:-6px;"></div></div>';
   box.appendChild(row);
+  if(meta.deleted) applySupportDeleted(row);
+  else renderSupportReactions(row);
+  attachSupportMsgMenu(row);
   box.scrollTop = box.scrollHeight;
+  return row;
+}
+const SUPPORT_REACT_EMOJIS = ['👍','❤️','😂','😮','😢','🙏'];
+function renderSupportReactions(row){
+  const el = row.querySelector('.kc-react'); if(!el) return;
+  const r = row._reactions || {};
+  const list = [r.customer, r.admin].filter(Boolean);
+  if(!list.length || row._deleted){ el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'inline-flex';
+  el.style.cssText = 'display:inline-flex;gap:2px;margin-top:-6px;padding:2px 7px;border-radius:12px;background:#10241a;border:1px solid rgba(63,206,124,0.3);font-size:14px;position:relative;z-index:1;';
+  el.innerHTML = list.map(e => '<span>' + e + '</span>').join('');
+}
+function applySupportDeleted(row){
+  row._deleted = true;
+  if(row._hist) row._hist.deleted = true;
+  const b = row.querySelector('.kc-bubble');
+  if(b){
+    b.innerHTML = '<span style="opacity:0.7;font-style:italic;">🚫 ' + ({ht:'Mesaj siprime',fr:'Message supprimé',en:'Message deleted',es:'Mensaje eliminado'}[currentLang] || 'Message deleted') + '</span>';
+    b.style.background = 'rgba(255,255,255,0.06)'; b.style.boxShadow = 'none'; b.style.color = '#93b1a1'; b.style.border = '1px dashed rgba(255,255,255,0.18)';
+  }
+  renderSupportReactions(row);
+}
+function attachSupportMsgMenu(row){
+  const bubble = row.querySelector('.kc-bubble'); if(!bubble) return;
+  let timer = null, moved = false;
+  const open = (e) => {
+    if(row._deleted) return;
+    const r = bubble.getBoundingClientRect();
+    openSupportMsgMenu(row, r);
+  };
+  bubble.addEventListener('contextmenu', (e) => { if(e.target.closest('audio,video,a,button,input,iframe')) { if(e.target.closest('audio,video')) e.preventDefault(); return; } e.preventDefault(); open(e); });
+  bubble.addEventListener('touchstart', (e) => { moved = false; if(e.target.closest('audio,video,a,button,input,iframe')) return; timer = setTimeout(() => { if(!moved) open(e); }, 450); }, { passive:true });
+  bubble.addEventListener('touchmove', () => { moved = true; clearTimeout(timer); }, { passive:true });
+  bubble.addEventListener('touchend', () => clearTimeout(timer));
+  bubble.addEventListener('click', (e) => { if(e.target.closest('audio,video,a,button,input,iframe')) return; open(e); });
+}
+function closeSupportMsgMenu(){ const m = document.getElementById('supportMsgMenu'); if(m) m.remove(); }
+function openSupportMsgMenu(row, rect){
+  closeSupportMsgMenu();
+  const bg = document.getElementById('supportChatBg'); if(!bg) return;
+  const mine = row.dataset.role === 'user';
+  const myReact = (row._reactions || {}).customer;
+  const T = { ht:'Siprime pou tout moun', fr:'Supprimer pour tout le monde', en:'Delete for everyone', es:'Eliminar para todos' }[currentLang] || 'Delete for everyone';
+  const m = document.createElement('div');
+  m.id = 'supportMsgMenu';
+  m.style.cssText = 'position:fixed;z-index:80;background:#10241a;border:1px solid rgba(63,206,124,0.3);border-radius:18px;padding:8px;box-shadow:0 18px 44px rgba(0,0,0,0.55);min-width:200px;';
+  m.innerHTML = '<div style="display:flex;gap:4px;justify-content:center;">' + SUPPORT_REACT_EMOJIS.map(e => `<button data-e="${e}" style="width:38px;height:38px;border:none;border-radius:50%;background:${myReact===e?'rgba(63,206,124,0.25)':'transparent'};font-size:21px;cursor:pointer;">${e}</button>`).join('') + '</div>' +
+    (mine ? `<button data-del="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#ff8a8a;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">🗑️ ${T}</button>` : '');
+  bg.appendChild(m);
+  const mh = m.offsetHeight, mw = m.offsetWidth;
+  let top = rect.top - mh - 8; if(top < 70) top = Math.min(rect.bottom + 8, window.innerHeight - mh - 10);
+  let left = rect.left + (rect.width - mw)/2; left = Math.max(10, Math.min(left, window.innerWidth - mw - 10));
+  m.style.top = top + 'px'; m.style.left = left + 'px';
+  m.addEventListener('click', (e) => {
+    const b = e.target.closest('button'); if(!b) return;
+    e.stopPropagation();
+    if(b.dataset.e){ reactToSupportMessage(row, b.dataset.e); }
+    else if(b.dataset.del){ deleteSupportMessage(row); }
+    closeSupportMsgMenu();
+  });
+  setTimeout(() => { document.addEventListener('click', closeSupportMsgMenu, { once:true }); }, 0);
+}
+async function reactToSupportMessage(row, emoji){
+  const r = Object.assign({}, row._reactions || {});
+  if(r.customer === emoji) delete r.customer; else r.customer = emoji;
+  row._reactions = r;
+  renderSupportReactions(row);
+  const id = row.dataset.dbid;
+  if(!id) return;
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('support_messages').update({ reactions: r }).eq('id', id);
+    if(error) console.warn('reaction update:', error.message);
+  }catch(e){}
+}
+function deleteSupportMessage(row){
+  const msgs = { ht:['Siprime mesaj sa a?','Li ap disparèt pou tout moun nan konvèsasyon an.'], fr:['Supprimer ce message ?','Il disparaîtra pour tout le monde dans la conversation.'], en:['Delete this message?','It will disappear for everyone in the conversation.'], es:['¿Eliminar este mensaje?','Desaparecerá para todos en la conversación.'] }[currentLang] || ['Delete this message?',''];
+  openConfirm(msgs[0], msgs[1], async () => {
+    applySupportDeleted(row);
+    const id = row.dataset.dbid;
+    if(!id) return;
+    try{
+      const sb = await getSupabase();
+      const { error } = await sb.from('support_messages').update({ deleted:true, content:'', reactions:{} }).eq('id', id);
+      if(error){ console.warn('delete msg:', error.message); showToast('⚠️ ' + error.message); }
+    }catch(e){}
+  });
+}
+function applyRemoteSupportUpdate(m){
+  const box = document.getElementById('supportChatMessages'); if(!box) return;
+  const row = Array.from(box.children).find(r => r.dataset && r.dataset.dbid === String(m.id));
+  if(!row) return;
+  if(m.deleted){ applySupportDeleted(row); return; }
+  row._reactions = (m.reactions && typeof m.reactions === 'object') ? m.reactions : {};
+  renderSupportReactions(row);
 }
 async function fetchCustomerHistoryForChat(){
   if(!state.currentUserId) return null;
@@ -2720,11 +3042,12 @@ async function sendSupportImage(input){
   showToast('Ap voye foto a...');
   const url = await uploadImageToStorage(file);
   if(!url) return;
-  addSupportMessage('user', url);
+  const _imgRow = addSupportMessage('user', url);
   if(supportConversationId){
     try{
       const sb = await getSupabase();
-      await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:url });
+      const { data: _ins } = await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:url }).select('id').single();
+      if(_ins && _imgRow) _imgRow.dataset.dbid = _ins.id;
       await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
       const u = currentUser();
       sendNtfyNotification('📷 Nouvo foto kliyan', '👤 ' + (u?.name||'Kliyan') + '\n📧 ' + (u?.email||''), 'default', 'camera');
@@ -2733,28 +3056,149 @@ async function sendSupportImage(input){
     showToast('Foto voye ✓');
   }
 }
+/* ---- Mesaj vokal nan chat sipò a ---- */
+let supportMediaRecorder = null;
+let supportRecordedChunks = [];
+let supportRecordingTimerInterval = null;
+let supportRecordingStartedAt = 0;
+let supportRecordingCancelled = false;
+const SUPPORT_EMOJI_LIST = ['😀','😁','😂','🤣','😊','😍','😘','😉','😎','🤩','🥳','😅','😇','🙂','😢','😭','😡','😱','🤔','👍','👎','🙏','💪','👏','🙌','🤝','✌️','👋','❤️','💚','💛','💙','💜','🔥','⭐','✨','💯','🎉','🎊','💰','💵','💎','🎮','📱','✅','❌','⚠️','⏰','📦'];
+function toggleSupportEmojiPanel(){
+  const panel = document.getElementById('supportEmojiPanel');
+  if(!panel) return;
+  const showing = panel.style.display === 'flex';
+  if(showing){ panel.style.display = 'none'; return; }
+  if(!panel.dataset.filled){
+    panel.innerHTML = SUPPORT_EMOJI_LIST.map(e => `<button onclick="insertSupportEmoji('${e}')" style="width:36px;height:36px;border:none;background:none;font-size:20px;cursor:pointer;border-radius:8px;">${e}</button>`).join('');
+    panel.dataset.filled = '1';
+  }
+  panel.style.display = 'flex';
+  const rec = document.getElementById('supportRecordingBar');
+  if(rec) rec.style.display = 'none';
+}
+function insertSupportEmoji(emoji){
+  const input = document.getElementById('supportChatInput');
+  if(!input) return;
+  input.value += emoji;
+  input.focus();
+  updateSupportSendBtn();
+}
+function updateSupportSendBtn(){
+  const input = document.getElementById('supportChatInput');
+  const micIcon = document.getElementById('supportMicIcon');
+  const sendIcon = document.getElementById('supportSendIcon');
+  if(!input || !micIcon || !sendIcon) return;
+  const hasText = input.value.trim().length > 0;
+  micIcon.style.display = hasText ? 'none' : 'block';
+  sendIcon.style.display = hasText ? 'block' : 'none';
+}
+function onSupportMicSendClick(){
+  const input = document.getElementById('supportChatInput');
+  if(input && input.value.trim().length > 0){
+    sendSupportMessage();
+    updateSupportSendBtn();
+  } else {
+    toggleSupportRecording();
+  }
+}
+async function toggleSupportRecording(){
+  if(supportMediaRecorder && supportMediaRecorder.state === 'recording'){
+    stopSupportRecording(false);
+    return;
+  }
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    supportRecordedChunks = [];
+    supportRecordingCancelled = false;
+    const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+    supportMediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+    supportMediaRecorder.ondataavailable = (e) => { if(e.data && e.data.size > 0) supportRecordedChunks.push(e.data); };
+    supportMediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(tr => tr.stop());
+      clearInterval(supportRecordingTimerInterval);
+      document.getElementById('supportRecordingBar').style.display = 'none';
+      const micBtn = document.getElementById('supportMicBtn');
+      if(micBtn){ micBtn.style.background = '#0FA654'; }
+      if(supportRecordingCancelled || supportRecordedChunks.length === 0) return;
+      const blob = new Blob(supportRecordedChunks, { type: supportMediaRecorder.mimeType || 'audio/webm' });
+      await sendSupportVoiceMessage(blob);
+    };
+    supportMediaRecorder.start();
+    supportRecordingStartedAt = Date.now();
+    const bar = document.getElementById('supportRecordingBar');
+    if(bar) bar.style.display = 'flex';
+    const micBtn = document.getElementById('supportMicBtn');
+    if(micBtn){ micBtn.style.background = '#E23B57'; }
+    supportRecordingTimerInterval = setInterval(() => {
+      const secs = Math.floor((Date.now() - supportRecordingStartedAt) / 1000);
+      const m = Math.floor(secs / 60), s = secs % 60;
+      const el = document.getElementById('supportRecordingTimer');
+      if(el) el.textContent = m + ':' + String(s).padStart(2,'0');
+    }, 500);
+  }catch(e){
+    showToast(t('toast_mic_denied'));
+  }
+}
+function cancelSupportRecording(){
+  supportRecordingCancelled = true;
+  stopSupportRecording(true);
+}
+function stopSupportRecording(){
+  if(supportMediaRecorder && supportMediaRecorder.state === 'recording'){
+    supportMediaRecorder.stop();
+  }
+}
+async function sendSupportVoiceMessage(blob){
+  showToast(t('toast_sending_voice'));
+  const file = new File([blob], uid() + '.weba', { type: blob.type || 'audio/webm' });
+  const url = await uploadImageToStorage(file);
+  if(!url) return;
+  const _voiceRow = addSupportMessage('user', url);
+  {
+    const u = currentUser();
+    const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
+    const email = state.currentUserId ? ((u&&u.email)||'') : '';
+    sendNtfyNotification('🎤 Nouvo mesaj vokal kliyan (Touski Bot)', '👤 ' + name + '\n📧 ' + email + '\n▶️ Peze notifikasyon an pou tande mesaj la', 'default', 'microphone', url);
+  }
+  if(supportConversationId){
+    try{
+      const sb = await getSupabase();
+      const { data: _vins } = await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:url }).select('id').single();
+      if(_vins && _voiceRow) _voiceRow.dataset.dbid = _vins.id;
+      await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
+    }catch(e){ showToast('⚠️ Pa ka voye mesaj vokal — eseye ankò'); }
+  } else {
+    showToast(t('toast_voice_sent'));
+  }
+}
 async function sendSupportMessage(){
   const input = document.getElementById('supportChatInput');
   const text = input.value.trim();
   if(!text) return;
   input.value = '';
-  addSupportMessage('user', text);
+  updateSupportSendBtn();
+  const _txtRow = addSupportMessage('user', text);
 
   // Si sit la fèmen, kòmanse tracking imedyatman (pa tann 5 mesaj) e pa eseye reponn ak AI
   if(!isWithinBusinessHours() && !supportConversationId){
     await requestHumanAgent();
   }
 
-  // Si tracking kòmanse (konvèsasyon kreye), sove mesaj la e voye ntfy — kèlkeswa si bot la ap reponn tou
+  // Chak mesaj kliyan voye (menm si li poko eskalade bay yon moun) — voye ntfy ak non/imèl kliyan an
+  {
+    const u = currentUser();
+    const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
+    const email = state.currentUserId ? ((u&&u.email)||'') : '';
+    sendNtfyNotification('💬 Nouvo mesaj kliyan (Touski Bot)', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'default', 'speech_balloon');
+  }
+
+  // Si tracking kòmanse (konvèsasyon eskalade), sove mesaj la nan Admin tou
   if(supportConversationId){
     try{
       const sb = await getSupabase();
-      await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text });
+      const { data: _tins } = await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text }).select('id').single();
+      if(_tins && _txtRow) _txtRow.dataset.dbid = _tins.id;
       await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
-      const u = currentUser();
-      const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
-      const email = state.currentUserId ? ((u&&u.email)||'') : '';
-      sendNtfyNotification('💬 Nouvo mesaj kliyan', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'default', 'speech_balloon');
     }catch(e){ /* pa bloke chat la si tracking echwe */ }
   }
 
@@ -2784,6 +3228,10 @@ async function sendSupportMessage(){
       `• ${v.title}\n  Videyo: ${v.videoUrl}`
     ).join('\n') || 'Pa gen videyo espesifik kounye a — voye moun nan sou meni ☰ → Tutoriels.';
     const siteGuide = `
+${personaInstruction()}
+
+LANG RÈG: Reponn TOUJOU nan menm lang kliyan an ap ekri a (Kreyòl Ayisyen, Français, English, Español...). Si li poko ekri anyen oswa si mesaj la twò kout pou w konnen, itilize lang sit la: ${({ht:'Kreyòl Ayisyen',fr:'Français',en:'English',es:'Español'})[currentLang] || 'Kreyòl Ayisyen'}. Si li chanje lang pandan konvèsasyon an, swiv li.
+
 GID KONPLE SIT LA (pou reponn kesyon sou kijan sit la fonksyone):
 
 1. WALLET & RECHAJ — Ale nan meni ☰ → "Wallet". Antre montan an, peze "Rechaje", peye sou NatCash ak nimewo/non ki afiche a, telechaje foto resi a. Wallet ou kredite otomatikman apre verifikasyon; si sa pran plis tan, Admin ap konfime l pi vit posib.
@@ -2827,21 +3275,23 @@ RÈG STRIK KONFIDANSYALITE (SWIV TOUJOU, SAN EKSEPSYON):
       tutoriel: state.tutorielContent,
       products: catalogText,
       siteGuide: siteGuide,
+      language: currentLang,
+      persona: supportPersona,
       isLoggedIn: !!state.currentUserId,
       customerHistory: customerHistory
     };
     const res = await fetch(SUPPORT_FN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SUPABASE_KEY, 'apikey': SUPABASE_KEY },
-      body: JSON.stringify({ messages: supportChatHistory, businessInfo })
+      body: JSON.stringify({ messages: supportChatHistory.filter(m => !m.deleted).map(m => ({ role:m.role, content:m.content })), businessInfo })
     });
     const data = await res.json();
     document.getElementById('supportThinking')?.remove();
     const reply = data.reply || 'Mwen pa ka reponn kounye a — eseye ankò.';
     const fullReply = reply + '\n\n' + t('chat_closing') + '\n[LIEN_TUTORIELS]';
-    addSupportMessage('assistant', fullReply);
+    const _botRow = addSupportMessage('assistant', fullReply);
     if(supportConversationId){
-      try{ const sb = await getSupabase(); await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'bot', content: fullReply }); }catch(e){}
+      try{ const sb = await getSupabase(); const { data: _bins } = await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'bot', content: fullReply }).select('id').single(); if(_bins && _botRow) _botRow.dataset.dbid = _bins.id; }catch(e){}
     }
     if(!supportConversationId){
       const customerMsgCount = supportChatHistory.filter(m => m.role === 'user').length;
@@ -3741,9 +4191,7 @@ function renderAuthModal(mode){
   `;
   const avatar = `
     <div style="display:flex;justify-content:center;margin-bottom:16px;">
-      <div style="width:58px;height:58px;border-radius:17px;background:#0B0F0C;display:flex;align-items:center;justify-content:center;box-shadow:0 12px 24px rgba(10,13,17,0.28);padding:8px;box-sizing:border-box;">
-        <img src="${window.KT_LOGO_SRC}" alt="Kerry Topup Official" style="width:100%;height:100%;object-fit:contain;">
-      </div>
+      <img src="${window.KT_LOGO_SRC}" alt="Kerry Topup Official" style="width:72px;height:72px;border-radius:20px;object-fit:contain;background:#fff;box-shadow:0 10px 24px rgba(20,40,30,0.18);">
     </div>
   `;
   const tabs = `
@@ -4122,8 +4570,10 @@ async function doRegister(){
   if(btn){ btn.disabled = true; btn.textContent = t('creating_account_btn'); }
   try{
     const sb = await getSupabase();
+    if(window.ktPin) ktPin.unlocked = true;
     const { data, error } = await sb.auth.signUp({ email, password: pass });
     if(error){
+      if(window.ktPin) ktPin.unlocked = false;
       if(error.message.includes('already')){ showToast(t('toast_email_already_used')); }
       else { showCustomerError('⚠️ Nou pa t kapab kreye kont ou — eseye ankò.', error.message, 'Enskripsyon'); }
       return;
@@ -4161,8 +4611,10 @@ async function doLogin(){
   }
   try{
     const sb = await getSupabase();
+    if(window.ktPin) ktPin.unlocked = true; // modpas la fèk antre — pa bezwen PIN imedyatman
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if(error){
+      if(window.ktPin) ktPin.unlocked = false;
       showToast(error.message.toLowerCase().includes('confirm') ? t('toast_confirm_email_first') : t('toast_wrong_credentials'));
       return;
     }
@@ -4182,6 +4634,7 @@ async function tryRestoreSupabaseSession(){
   try{
     const sb = await getSupabase();
     if(window.location.hash.includes('type=recovery')){
+      if(typeof ktPinStartReset === 'function'){ await ktPinStartReset(true); return; }
       showPasswordResetForm();
       return;
     }
@@ -4251,6 +4704,7 @@ function showPasswordResetForm(){
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>
       ${t('btn_save_new_password')}
     </button>
+    <button type="button" onclick="ktPinSwitchFromPasswordForm()" style="width:100%;background:none;border:none;color:var(--green);font-weight:600;font-size:13px;padding:12px 0 0;cursor:pointer;text-decoration:underline;">${pt('pin_link')}</button>
   `;
 }
 function checkResetPasswordStrength(){
@@ -4287,6 +4741,7 @@ async function submitNewPassword(){
   }
 }
 function afterAuthSuccess(){
+  if(window.ktPin){ ktPin.unlocked = true; ktPinGate(); }
   fetchProductsFromServer();
   fetchApiClient();
   render();
@@ -4573,32 +5028,47 @@ function timeAgoText(dateStr){
   return days+' '+t('time_day');
 }
 function getNotifItems(){
-  const orders = state.orders[state.currentUserId] || [];
+  const uid = state.currentUserId;
+  const orders = state.orders[uid] || [];
   const dismissed = state.dismissedNotifIds || [];
+  const L = (({
+    ht:{ rec:(n,d)=>`Nou resevwa kòmand #${n} ou a (${d}). N ap trete l kounye a.`, done:(n,d)=>`Kòmand #${n} (${d}) valide ak siksè ✅`, tx:(a,w)=>`Ou resevwa ${a} HTG nan men ${w}`, txg:(a,l)=>`Ou resevwa ${a} HTG — ${l}` },
+    fr:{ rec:(n,d)=>`Nous avons reçu votre commande #${n} (${d}). Elle est en cours de traitement.`, done:(n,d)=>`La commande #${n} (${d}) a été validée avec succès ✅`, tx:(a,w)=>`Vous avez reçu ${a} HTG de ${w}`, txg:(a,l)=>`Vous avez reçu ${a} HTG — ${l}` },
+    en:{ rec:(n,d)=>`We received your order #${n} (${d}). It is being processed.`, done:(n,d)=>`Order #${n} (${d}) was validated successfully ✅`, tx:(a,w)=>`You received ${a} HTG from ${w}`, txg:(a,l)=>`You received ${a} HTG — ${l}` },
+    es:{ rec:(n,d)=>`Recibimos tu pedido #${n} (${d}). Se está procesando.`, done:(n,d)=>`El pedido #${n} (${d}) fue validado con éxito ✅`, tx:(a,w)=>`Recibiste ${a} HTG de ${w}`, txg:(a,l)=>`Recibiste ${a} HTG — ${l}` }
+  })[currentLang]) || null;
+  const M = L || ({ rec:(n,d)=>`We received your order #${n} (${d}).`, done:(n,d)=>`Order #${n} (${d}) was validated successfully ✅`, tx:(a,w)=>`You received ${a} HTG from ${w}`, txg:(a,l)=>`You received ${a} HTG — ${l}` });
   const items = [];
+  const ORD = (({
+    en:{ head:(n)=>`Hello 👋 ${n}, thank you for your order on Kerry Topup Official`, det:'Details', prod:'Product', opt:'Option', amt:'Amount', pid:'Player ID', acc:'Account name', st:'Status', cmd:'Order', S:{ terminee:'Completed ✅', en_cours:'Processing ⏳', remboursee:'Refunded 💸', annulee:'Canceled ❌' } },
+    es:{ head:(n)=>`Hola 👋 ${n}, gracias por tu pedido en Kerry Topup Official`, det:'Detalles', prod:'Producto', opt:'Opción', amt:'Monto', pid:'Player ID', acc:'Nombre de cuenta', st:'Estado', cmd:'Pedido', S:{ terminee:'Completado ✅', en_cours:'En proceso ⏳', remboursee:'Reembolsado 💸', annulee:'Cancelado ❌' } }
+  })[currentLang]) || { head:(n)=>`Bonjour 👋 client ${n} merci pour votre commande sur Kerry Topup Official`, det:'Détails', prod:'Produit', opt:'Opsyon', amt:'Montant', pid:'Player ID', acc:'Non kont', st:'Estati', cmd:'Commande', S:{ terminee:'Terminée ✅', en_cours:'En cours ⏳', remboursee:'Remboursée 💸', annulee:'Annulée ❌' } };
+  const ORD_HT_S = { terminee:'Konplete ✅', en_cours:'Ap trete ⏳', remboursee:'Ranbouse 💸', annulee:'Anile ❌' };
+  if(currentLang === 'ht') ORD.S = ORD_HT_S;
+  const cname = (state.users.find(x => x.id === uid) || {}).name || '';
   orders.forEach(o => {
-    items.push({
-      id:'recv-'+o.id, status:'processing',
-      title:t('notif_order_received_title').replace('{n}', o.orderNo||''),
-      text:t('notif_order_received_text'),
-      date:o.date
-    });
-    if(o.status === 'terminee'){
-      items.push({
-        id:'done-'+o.id, status:'complete',
-        title:t('notif_order_complete_title').replace('{n}', o.orderNo||''),
-        text:t('notif_order_complete_text'),
-        date:o.date
-      });
-    }
+    const f = o.fields || {};
+    const pid = o.playerId || f['Player ID'] || f['ID'] || f['Id'] || '';
+    const pname = o.playerName || f['Non kont'] || f['Nom du compte'] || f['Pseudo'] || '';
+    let txt = `${ORD.head(cname)}\n\n${ORD.det}\n\n📦 ${ORD.prod} : ${o.product || ''}\n`;
+    if(o.variant) txt += `🎯 ${ORD.opt} : ${o.variant}\n`;
+    txt += `💰 ${ORD.amt} : HTG ${Number(o.price||0).toLocaleString('fr-FR')}\n`;
+    if(pid) txt += `🎮 ${ORD.pid} : ${pid}\n`;
+    if(pname) txt += `✅ ${ORD.acc} : ${pname}\n`;
+    txt += `📊 ${ORD.st} : ${ORD.S[o.status] || o.status || ''}\n`;
+    txt += `🆔 ${ORD.cmd} : #${String(o.orderNo || '').replace(/^#/, '')}`;
+    items.push({ id:'ord-'+o.id+'-'+o.status, cat:'order', status: o.status === 'terminee' ? 'complete' : 'processing', text:txt, date:o.date, multi:true });
     if(o.adminResponse){
-      items.push({
-        id:'resp-'+o.id, status:'response',
-        title:t('notif_admin_replied_title').replace('{n}', o.orderNo||''),
-        text:o.adminResponse,
-        date:o.date
-      });
+      items.push({ id:'resp-'+o.id, cat:'admin', status:'response', text:o.adminResponse, date:o.date });
     }
+  });
+  // Tranzaksyon: lajan ki antre nan wallet la (transfè resevwa, rechaj, elatriye) — 3 dènye jou yo sèlman
+  const cutoff = Date.now() - 3*24*3600*1000;
+  (state.transactions[uid] || []).forEach(tx => {
+    if(tx.type !== 'in' || !tx.date || new Date(tx.date).getTime() < cutoff) return;
+    const amt = Number(tx.amount || 0).toLocaleString('fr-FR');
+    const mt = String(tx.label || '').match(/^Transfè resevwa nan men (.+)$/);
+    items.push({ id:'tx-'+tx.date+'-'+tx.amount, cat:'transaction', status:'transaction', text: mt ? M.tx(amt, mt[1]) : M.txg(amt, String(tx.label||'').replace(/^🎁\s*/,'')), date:tx.date });
   });
   return items.filter(n => !dismissed.includes(n.id)).sort((a,b) => new Date(b.date) - new Date(a.date));
 }
@@ -4610,41 +5080,71 @@ function pageNotifications(){
   const items = getNotifItems();
   if(!state.seenNotifIds) state.seenNotifIds = [];
   const unseenSnapshot = items.filter(n => !state.seenNotifIds.includes(n.id)).map(n=>n.id);
-  const STATUS_META = {
-    processing: { bar:'#3B82F6', icon:'⏳', badgeIcon:'🔵', badgeText:t('notif_processing'), badgeColor:'#3B82F6' },
-    complete: { bar:'#22C55E', icon:'check', badgeIcon:'✅', badgeText:t('notif_complete'), badgeColor:'#22C55E' },
-    response: { bar:'var(--green)', icon:'💬', badgeIcon:'💬', badgeText:t('notif_response'), badgeColor:'var(--green)' }
+  const NT = ({
+    ht:{today:'Jodi a', yesterday:'Yè', older:'Pi ansyen', admin:'Administration Kerry Topup Official', all_read:'Tout li', unread:'ki pa li'},
+    fr:{today:"Aujourd'hui", yesterday:'Hier', older:'Plus ancien', admin:'Administration Kerry Topup Official', all_read:'Tout lu', unread:'non lues'},
+    en:{today:'Today', yesterday:'Yesterday', older:'Earlier', admin:'Administration Kerry Topup Official', all_read:'All read', unread:'unread'},
+    es:{today:'Hoy', yesterday:'Ayer', older:'Anteriores', admin:'Administración Kerry Topup Official', all_read:'Todo leído', unread:'sin leer'}
+  })[currentLang] || {today:'Today', yesterday:'Yesterday', older:'Earlier', admin:'Administration Kerry Topup Official', all_read:'All read', unread:'unread'};
+  const CATS = ({
+    ht:{ order:'Kòmand', admin:'Admin', transaction:'Tranzaksyon' },
+    fr:{ order:'Commande', admin:'Admin', transaction:'Transaction' },
+    en:{ order:'Order', admin:'Admin', transaction:'Transaction' },
+    es:{ order:'Pedido', admin:'Admin', transaction:'Transacción' }
+  })[currentLang] || { order:'Order', admin:'Admin', transaction:'Transaction' };
+  const CAT_META = {
+    order: { color:'#3B82F6', soft:'rgba(59,130,246,0.12)', icon:'📦' },
+    admin: { color:'#0FA654', soft:'rgba(15,166,84,0.12)', icon:'✓' },
+    transaction: { color:'#D97706', soft:'rgba(245,158,11,0.15)', icon:'💰' }
+  };
+  const iconFor = (n) => {
+    if(n.cat === 'admin') return `<img src="${window.KT_LOGO_SRC}" alt="" style="width:46px;height:46px;border-radius:14px;object-fit:contain;background:#fff;flex-shrink:0;box-shadow:0 4px 12px rgba(20,40,30,0.15);">`;
+    if(n.cat === 'transaction') return `<div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#fbbf24,#d97706);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 14px rgba(217,119,6,0.28);font-size:22px;">💰</div>`;
+    if(n.status === 'complete') return `<div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#3fce7c,#0a9e3d);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 6px 14px rgba(10,158,61,0.28);"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`;
+    return `<div style="width:46px;height:46px;border-radius:14px;background:rgba(59,130,246,0.14);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>`;
   };
   const renderItem = (n) => {
-    const meta = STATUS_META[n.status] || STATUS_META.processing;
+    const cm = CAT_META[n.cat] || CAT_META.order;
     const isUnread = unseenSnapshot.includes(n.id);
-    const iconHtml = meta.icon === 'check'
-      ? `<div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`
-      : `<div style="width:44px;height:44px;border-radius:50%;background:#eef2fb;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">${meta.icon}</div>`;
-    const statusTagHtml = n.status === 'complete'
-      ? `<span style="display:inline-flex;align-items:center;gap:5px;font-weight:700;color:#0a9e3d;"><span style="width:15px;height:15px;border-radius:4px;background:#0a9e3d;display:inline-flex;align-items:center;justify-content:center;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="4"><path d="M20 6L9 17l-5-5"/></svg></span>${meta.badgeText}</span>`
-      : `<span style="display:inline-flex;align-items:center;gap:5px;font-weight:700;color:${meta.badgeColor};"><span style="width:8px;height:8px;border-radius:50%;background:${meta.badgeColor};"></span>${meta.badgeText}</span>`;
+    const isAdmin = n.cat === 'admin';
+    const tag = `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:${cm.color};background:${cm.soft};padding:4px 10px;border-radius:20px;">${CATS[n.cat] || ''}</span>`;
+    const body = isAdmin
+      ? `<div style="font-size:13.5px;line-height:1.5;color:var(--text);background:rgba(15,166,84,0.08);border-radius:4px 14px 14px 14px;padding:10px 12px;white-space:pre-wrap;word-break:break-word;">${escapeHtml(n.text)}</div>`
+      : `<div style="font-size:${n.multi?'13.5px':'14px'};font-weight:${n.multi?'500':'600'};line-height:1.55;color:var(--text);word-break:break-word;white-space:pre-wrap;">${escapeHtml(n.text)}</div>`;
     return `
-    <div style="position:relative;background:#fff;border-radius:16px;padding:16px 40px 16px 18px;margin-bottom:12px;box-shadow:0 4px 16px rgba(20,40,30,0.05);border-left:4px solid ${meta.bar};">
-      <div onclick="dismissNotif('${n.id}')" style="position:absolute;top:14px;right:14px;color:#c2c8c5;cursor:pointer;">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    <div style="position:relative;background:${isUnread ? 'linear-gradient(135deg, rgba(15,166,84,0.07), var(--panel) 55%)' : 'var(--panel)'};border:1px solid ${isUnread ? 'rgba(15,166,84,0.35)' : 'var(--line)'};border-radius:20px;padding:15px 40px 14px 15px;margin-bottom:12px;box-shadow:0 6px 18px rgba(20,40,30,0.06);">
+      <div onclick="dismissNotif('${n.id}')" aria-label="close" style="position:absolute;top:12px;right:12px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </div>
-      <div style="display:flex;gap:14px;">
-        ${iconHtml}
+      <div style="display:flex;gap:13px;">
+        ${iconFor(n)}
         <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-            ${isUnread ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;"></span>' : ''}
-            <div style="font-size:15px;font-weight:800;color:var(--text);padding-right:6px;">${escapeHtml(n.title)}</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            ${isUnread ? '<span style="width:9px;height:9px;border-radius:50%;background:#0FA654;flex-shrink:0;box-shadow:0 0 0 4px rgba(15,166,84,0.18);"></span>' : ''}
+            ${tag}
           </div>
-          <div style="font-size:13px;color:#7c8a83;line-height:1.45;margin-bottom:10px;">${escapeHtml(n.text)}</div>
-          <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#9aa39d;">
-            ${timeAgoText(n.date)} · ${statusTagHtml}
-            ${isUnread ? `<span style="margin-left:auto;color:var(--green);font-weight:800;font-size:10.5px;">${t('notif_new')}</span>` : ''}
+          ${body}
+          <div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--muted);">
+            <span>${timeAgoText(n.date)}</span>
+            ${isUnread ? `<span style="margin-left:auto;color:#fff;background:#0FA654;font-weight:800;font-size:10px;padding:3px 8px;border-radius:10px;letter-spacing:.4px;">${t('notif_new')}</span>` : ''}
           </div>
         </div>
       </div>
     </div>
   `;};
+  const dayBucket = (d) => {
+    const x = new Date(d), now = new Date();
+    const a = new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+    const b = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const diff = Math.round((b - a) / 86400000);
+    return diff <= 0 ? 'today' : (diff === 1 ? 'yesterday' : 'older');
+  };
+  const groupedHtml = ['today','yesterday','older'].map(k => {
+    const g = items.filter(n => dayBucket(n.date) === k);
+    if(!g.length) return '';
+    return `<div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin:6px 4px 10px;">${NT[k]}</div>` + g.map(renderItem).join('');
+  }).join('');
+  const unreadCount = unseenSnapshot.length;
   setTimeout(() => {
     items.forEach(n => { if(!state.seenNotifIds.includes(n.id)) state.seenNotifIds.push(n.id); });
     saveState();
@@ -4658,19 +5158,23 @@ function pageNotifications(){
       </button>
       <h1 style="font-size:21px;font-weight:800;margin:0;">${t('notif_title')}</h1>
     </div>
-    <p style="text-align:center;color:#8a9096;font-size:13px;margin:8px 0 18px;">${items.length} ${t('notif_title').toLowerCase()}</p>
+    <div style="text-align:center;margin:10px 0 18px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:${unreadCount ? '#0FA654' : 'var(--muted)'};background:${unreadCount ? 'rgba(15,166,84,0.12)' : 'var(--panel)'};border:1px solid var(--line);padding:6px 14px;border-radius:20px;">
+        ${unreadCount ? `<span style="width:7px;height:7px;border-radius:50%;background:#0FA654;"></span>${unreadCount} ${NT.unread}` : `✓ ${NT.all_read}`} · ${items.length} ${t('notif_title').toLowerCase()}
+      </span>
+    </div>
     <div id="pushPromptBanner"></div>
-    <div style="display:flex;gap:10px;margin-bottom:18px;">
-      <button onclick="markAllNotifRead()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--panel);border:1px solid #eef1ef;border-radius:14px;padding:13px;font-size:13.5px;font-weight:700;color:var(--text);">
+    <div style="display:flex;gap:10px;margin-bottom:20px;">
+      <button onclick="markAllNotifRead()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;font-size:13.5px;font-weight:700;color:var(--text);">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0a9e3d" stroke-width="3"><path d="M20 6L9 17l-5-5"/></svg>
         ${t('notif_mark_all_read')}
       </button>
-      <button onclick="clearAllNotifications()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--panel);border:1px solid #eef1ef;border-radius:14px;padding:13px;font-size:13.5px;font-weight:700;color:#e0304a;">
+      <button onclick="clearAllNotifications()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:13px;font-size:13.5px;font-weight:700;color:#e0304a;">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e0304a" stroke-width="2"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
         ${t('notif_clear_all')}
       </button>
     </div>
-    ${items.length===0 ? `<div class="empty"><div class="em-icon">🔔</div><div class="em-title">${t('notif_none')}</div></div>` : items.map(renderItem).join('')}
+    ${items.length===0 ? `<div class="empty"><div class="em-icon">🔔</div><div class="em-title">${t('notif_none')}</div></div>` : groupedHtml}
   `;
 }
 function syncNotifStateToServer(){
@@ -5218,6 +5722,7 @@ async function confirmApiTopupPurchase(productId){
   const serverId = variant.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
   const qty = 1; // Founisè sipòte sèlman 1 atik pa kòmand
   const totalPrice = variant.price * qty;
+  const totalCost = variant.costPrice != null ? variant.costPrice * qty : null;
   const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.style.cursor='';buyBtn.textContent='⚡ '+t('btn_buy_now');} };
   const finishPurchaseSuccess = () => {
     showToast(t('toast_purchase_success')); goPage('commandes');
@@ -5253,11 +5758,11 @@ async function confirmApiTopupPurchase(productId){
   try{
     const sb = await getSupabase();
     const orderNo = 'KT-' + Math.random().toString(36).slice(2, 10).toUpperCase();
-    const { data: inserted, error: insErr } = await sb.from('orders').insert({
+    const { data: inserted, error: insErr } = await insertOrderResilient(sb, {
       order_no: orderNo, user_id: state.currentUserId, type: isGiftCard ? 'pin' : 'api_topup', status: 'en_cours',
-      product: p.name, variant: variant.label + (qty>1?' × '+qty:''), price: totalPrice,
+      product: p.name, variant: variant.label + (qty>1?' × '+qty:''), price: totalPrice, cost_price: totalCost,
       player_id: playerId || null, server_id: serverId || null, player_name: verifiedName,
-    }).select().single();
+    });
     if(insErr || !inserted){ showCustomerError('⚠️ Nou pa t kapab kreye kòmand ou — eseye ankò.', insErr?.message||'enkoni', 'Kreyasyon kòmand'); resetBtn(); return; }
 
     if(isGiftCard){
@@ -7255,7 +7760,7 @@ async function submitTransfer(){
     const { error: transferErr } = await sb.rpc('transfer_wallet', {
       recipient_id: recipientId, amount,
       sender_label: 'Transfè bay '+recipientName,
-      recipient_label: 'Transfè resevwa nan men '+senderName
+      recipient_label: 'Transfè resevwa nan men '+senderName+((currentUser() && currentUser().email) ? ' ('+currentUser().email+')' : '')
     });
     if(transferErr){ showToast('Erè: ' + transferErr.message); return; }
     await fetchWalletFromServer(state.currentUserId);
@@ -7278,14 +7783,23 @@ let commandeFilter = 'tout';
 function statusLabel(s){ return { en_cours:t('status_en_cours'), terminee:t('status_terminee'), annulee:t('status_annulee'), remboursee:t('status_remboursee') }[s] || s; }
 const STATUS_PILL = { en_cours:'wait', terminee:'ok', annulee:'no', remboursee:'no' };
 
+// Si kolòn cost_price poko egziste nan baz done a, eseye ankò san li — kòmand kliyan pa dwe janm bloke pou rezon sa a
+async function insertOrderResilient(sb, payload, selectCols){
+  let res = await sb.from('orders').insert(payload).select(selectCols).single();
+  if(res.error && /cost_price/i.test(res.error.message || '') && 'cost_price' in payload){
+    const { cost_price, ...rest } = payload;
+    res = await sb.from('orders').insert(rest).select(selectCols).single();
+  }
+  return res;
+}
 async function insertOrderToServer(order, userId){
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('orders').insert({
+    const { data, error } = await insertOrderResilient(sb, {
       order_no: order.orderNo, user_id: userId, type: order.type, status: order.status,
-      product: order.product, variant: order.variant, price: order.price, pin_code: order.pin || null,
+      product: order.product, variant: order.variant, price: order.price, cost_price: order.costPrice || null, pin_code: order.pin || null,
       fields: order.fields || null, montant_usd: order.montantUSD || null, frais_usd: order.fraisUSD || null
-    }).select('id').single();
+    }, 'id');
     if(error){
       console.warn('insertOrderToServer failed:', error.message || error);
       showCustomerError('⚠️ Nou pa t kapab anrejistre kòmand la — eseye ankò.', error.message || error.code || 'erè enkoni', 'insertOrderToServer');
@@ -7325,7 +7839,7 @@ async function subscribeToMyOrdersRealtime(){
       .on('postgres_changes', { event:'UPDATE', schema:'public', table:'orders', filter:'user_id=eq.'+state.currentUserId }, payload => {
         showToast(t('order_hash')+payload.new.order_no+' '+t('order_became')+' '+(statusLabel(payload.new.status)||payload.new.status));
         // notifyAdminNewSale retire — trigger SQL notify_order_terminee deja voye 'Vente confirmée' otomatikman, evite doub
-        fetchMyOrders();
+        Promise.resolve(fetchMyOrders()).then(() => { if(currentPage === 'notifications') render(); renderTopIcons(); }).catch(()=>{});
       })
       .subscribe();
   }catch(e){}
@@ -7703,11 +8217,13 @@ async function checkoutCart(){
       try{
         const sb = await getSupabase();
         const itemOrderNo = 'KT-' + Math.random().toString(36).slice(2, 10).toUpperCase();
-        const { data: inserted, error: insErr } = await sb.from('orders').insert({
+        const cvApi = state.products.flatMap(pr=>pr.variants||[]).find(v=>v.id===item.variantId);
+        const itemCostApi = cvApi && cvApi.costPrice != null ? cvApi.costPrice * (item.qty||1) : null;
+        const { data: inserted, error: insErr } = await insertOrderResilient(sb, {
           order_no: itemOrderNo, user_id: state.currentUserId, type: 'api_topup', status: 'en_cours',
-          product: item.productName, variant: item.variantLabel, price: item.price,
+          product: item.productName, variant: item.variantLabel, price: item.price, cost_price: itemCostApi,
           player_id: item.playerId, server_id: item.serverId || null,
-        }).select().single();
+        });
         if(insErr || !inserted){ console.warn('api_topup order insert erè:', insErr?.message); failed.push(item); continue; }
 
         await applyWalletChange(state.currentUserId, -item.price, item.productName + ' — ' + item.variantLabel, 'out');
@@ -7779,9 +8295,11 @@ async function checkoutCart(){
         processedCount++;
       }catch(e){ console.warn('market_listing checkout exception:', e?.message||e); failed.push(item); }
     } else {
+      const cvPin = item.variantId ? state.products.flatMap(pr=>pr.variants||[]).find(v=>v.id===item.variantId) : null;
       const order = {
         id: uid(), orderNo: nextOrderNo(), type:item.type, status:'en_cours',
         product: item.productName, variant: item.variantLabel, price: item.price,
+        costPrice: cvPin && cvPin.costPrice != null ? cvPin.costPrice * (item.qty||1) : null,
         fields: item.fields, montantUSD: item.montantUSD || null, date: new Date().toISOString()
       };
       if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
@@ -9257,6 +9775,7 @@ function pageParametres(){
           <span style="font-size:14px;font-weight:600;letter-spacing:2px;">••••••••</span>
           <button onclick="requestPasswordChangeFromParams()" style="background:none;border:none;color:var(--green);font-size:17px;padding:4px 6px;cursor:pointer;" title="Changer le mot de passe">✏️</button>
         </div>
+        ${typeof ktPinSettingsHtml === 'function' ? ktPinSettingsHtml() : ''}
       </div>
     </div>
     ${state.isAdmin ? `<div class="card"><button class="btn btn-ghost" style="width:100%;" onclick="goPage('admin')">${t('drawer_admin')}</button></div>` : ''}
@@ -9363,18 +9882,33 @@ async function revokeAdminAccess(userId, email){
     await saveState(); renderAdminTab(); showToast('Aksè admin retire');
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
+function ktWaDigits(raw){
+  let d = String(raw || '').replace(/\D/g,'');
+  if(d.length === 8) d = '509' + d; // nimewo Ayiti san endikatif
+  return d;
+}
+function sendWhatsAppClient(userId){
+  const u = state.users.find(x=>x.id===userId);
+  const num = u && (u.savedWhatsapp || (u.profile && u.profile.whatsapp));
+  if(!u || !num){ showToast('Pa gen nimewo WhatsApp pou kliyan sa'); return; }
+  const msg = `Bonjou ${u.name || 'Kliyan'} 👋\n\nSe *Administration Kerry Topup Official* ki ap ekri w. 🌝\n\n`;
+  window.open('https://wa.me/' + ktWaDigits(num) + '?text=' + encodeURIComponent(msg), '_blank');
+}
 function sendWhatsAppOrder(userId, orderId){
   const list = state.orders[userId] || [];
   const o = list.find(x=>x.id===orderId);
   const u = state.users.find(x=>x.id===userId);
-  if(!o || !u || !u.profile){ showToast('Pa gen enfòmasyon WhatsApp pou kliyan sa'); return; }
-  const digits = u.profile.whatsapp.replace(/\D/g,'');
-  let msg = `Bonjou ${u.name || 'Kliyan'}, men detay kòmand #${o.orderNo} ou a sou Kerry Topup Official:\n\n`;
-  msg += `Pwodwi: ${o.product}\nMontan: ${o.variant}\nTotal: ${o.price.toLocaleString('fr-FR')} HTG\n`;
+  const waNum = u && (u.savedWhatsapp || (u.profile && u.profile.whatsapp));
+  if(!o || !u || !waNum){ showToast('Pa gen nimewo WhatsApp pou kliyan sa'); return; }
+  const digits = ktWaDigits(waNum);
+  const noteEl = document.getElementById('resp-' + orderId);
+  const note = ((noteEl && noteEl.value) || o.adminResponse || '').trim();
+  let msg = `*Administration Kerry Topup Official* 🌝\n\nBonjou ${u.name || 'Kliyan'} 👋\n\n`;
+  if(note) msg += `${note}\n\n`;
+  msg += `📦 Kòmand #${o.orderNo}\nPwodwi: ${o.product}${o.variant ? ' — ' + o.variant : ''}\nTotal: ${Number(o.price||0).toLocaleString('fr-FR')} HTG\n`;
   if(o.fields){ Object.entries(o.fields).forEach(([k,v]) => { msg += `${k}: ${v}\n`; }); }
-  msg += `\nN ap trete kòmand ou a kounye a. Mèsi pou konfyans ou!`;
-  const url = 'https://wa.me/' + digits + '?text=' + encodeURIComponent(msg);
-  window.open(url, '_blank');
+  msg += `\nMèsi pou konfyans ou! 💚`;
+  window.open('https://wa.me/' + digits + '?text=' + encodeURIComponent(msg), '_blank');
 }
 async function decrementRewardProgressForOrder(userId, productName, variantLabel){
   try{
@@ -10731,7 +11265,7 @@ function renderClientResultsList(){
       <div class="card" style="position:relative;">
         ${showRank ? `<div style="position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;box-shadow:0 2px 5px rgba(0,0,0,0.15);${rankStyles[i+1]||'background:var(--text);color:#fff;'}">${i+1}</div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div><div style="font-weight:700;font-size:13.5px;">${escapeHtml(u.name)}</div><div style="color:var(--muted);font-size:11px;">${escapeHtml(u.email||'')}</div>${u.savedWhatsapp?`<div style="color:var(--green);font-size:11px;">📱 ${escapeHtml(u.savedWhatsapp)}</div>`:''}</div>
+          <div><div style="font-weight:700;font-size:13.5px;">${escapeHtml(u.name)}</div><div style="color:var(--muted);font-size:11px;">${escapeHtml(u.email||'')}</div>${u.savedWhatsapp?`<div style="display:flex;align-items:center;gap:8px;margin-top:3px;"><span style="color:var(--green);font-size:11px;">📱 ${escapeHtml(u.savedWhatsapp)}</span><button class="mini-btn" style="background:#25D366;color:#fff;border:none;padding:3px 10px;" onclick="sendWhatsAppClient('${u.id}')">WhatsApp</button></div>`:''}</div>
           <div style="font-weight:700;color:var(--green);font-size:14px;">${money(state.wallets[u.id]||0)}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
@@ -11210,6 +11744,7 @@ async function loadAdminChatConversation(id){
         appendAdminChatBubble(payload.new);
         if(payload.new.sender === 'customer'){ await sb.from('support_messages').update({ read_by_admin:true }).eq('id', payload.new.id); }
       })
+      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'support_messages', filter:'conversation_id=eq.'+id }, (payload) => { applyAdminChatUpdate(payload.new); })
       .subscribe();
   }catch(e){ console.warn('loadAdminChatConversation failed:', e?.message||e); }
 }
@@ -11229,9 +11764,23 @@ function appendAdminChatBubble(m){
   };
   const bubble = document.createElement('div');
   bubble.style.cssText = (styleBySender[m.sender]||styleBySender.bot) + 'padding:9px 13px;max-width:80%;font-size:12.5px;white-space:pre-wrap;line-height:1.5;';
-  bubble.innerHTML = formatChatText(m.content);
+  bubble.dataset.dbid = m.id || '';
+  const rx = (m.reactions && typeof m.reactions === 'object') ? [m.reactions.customer, m.reactions.admin].filter(Boolean) : [];
+  if(m.deleted){
+    bubble.innerHTML = '<span style="opacity:0.75;font-style:italic;">🚫 Mesaj siprime</span>';
+    bubble.style.background = 'var(--panel-2)'; bubble.style.color = 'var(--muted)';
+  } else {
+    bubble.innerHTML = formatChatText(m.content) + (rx.length ? '<div style="margin-top:6px;font-size:15px;">' + rx.join(' ') + '</div>' : '');
+  }
   box.appendChild(bubble);
   box.scrollTop = box.scrollHeight;
+}
+function applyAdminChatUpdate(m){
+  const box = document.getElementById('adminChatMessages'); if(!box) return;
+  const b = Array.from(box.children).find(x => x.dataset && x.dataset.dbid === String(m.id)); if(!b) return;
+  const rx = (m.reactions && typeof m.reactions === 'object') ? [m.reactions.customer, m.reactions.admin].filter(Boolean) : [];
+  if(m.deleted){ b.innerHTML = '<span style="opacity:0.75;font-style:italic;">🚫 Mesaj siprime</span>'; b.style.background = 'var(--panel-2)'; b.style.color = 'var(--muted)'; }
+  else { b.innerHTML = formatChatText(m.content) + (rx.length ? '<div style="margin-top:6px;font-size:15px;">' + rx.join(' ') + '</div>' : ''); }
 }
 async function sendAdminChatImage(input){
   const file = input.files[0];
@@ -11472,18 +12021,20 @@ function renderFormAdminConfig(p){
   if(!p.formFields) p.formFields = [];
   return `
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Opsyon ak Pri</div>
-    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
+    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th title="Sa founisè a fè w peye">Pri Founisè</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
       ${sortedVariants(p).map(v => `
         <tr id="vrow-${v.id}" data-vid="${v.id}">
         <td style="width:40px;padding:0;"><span onpointerdown="startVariantDrag(event,'${p.id}','${v.id}')" style="cursor:grab;touch-action:none;color:var(--text);font-size:22px;line-height:1;letter-spacing:-1px;user-select:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;">⣿</span></td>
         <td><input type="text" style="width:100%;min-width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;font-size:12px;" value="${escapeHtml(v.label)}" onchange="updateVariantLabel('${p.id}','${v.id}',this.value)"></td>
         <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.price}" onchange="updatePrice('${p.id}','${v.id}',this.value)"></td>
+        <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.costPrice??''}" placeholder="—" onchange="updateCostPrice('${p.id}','${v.id}',this.value)"></td>
         <td><button class="mini-btn" onclick="removeVariant('${p.id}','${v.id}')">✕</button></td></tr>
       `).join('')}
     </tbody></table>
     <div style="display:flex;gap:6px;margin-top:8px;margin-bottom:14px;">
       <input type="text" id="addVarName-${p.id}" placeholder="Non opsyon" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
+      <input type="text" id="addVarCost-${p.id}" placeholder="Pri Founisè" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <button class="mini-btn" onclick="addVariant('${p.id}')">+ Ajoute</button>
     </div>
     <div style="background:var(--panel-2);border-radius:11px;padding:12px;">
@@ -11522,7 +12073,8 @@ function renderApiTopupAdminConfig(p){
           <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
             <span onpointerdown="startVariantDrag(event,'${p.id}','${v.id}')" style="cursor:grab;touch-action:none;color:var(--text);font-size:20px;line-height:1;user-select:none;display:flex;align-items:center;justify-content:center;width:32px;height:32px;flex-shrink:0;">⣿</span>
             <input type="text" style="flex:1;min-width:80px;font-size:13px;font-weight:600;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;" value="${escapeHtml(v.label)}" onchange="updateVariantLabel('${p.id}','${v.id}',this.value)">
-            <input type="text" class="mono" style="width:55px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:12px;" value="${v.price}" onchange="updatePrice('${p.id}','${v.id}',this.value)">
+            <input type="text" class="mono" style="width:55px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:12px;" value="${v.price}" placeholder="Pri" onchange="updatePrice('${p.id}','${v.id}',this.value)">
+            <input type="text" class="mono" style="width:65px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:12px;" value="${v.costPrice??''}" placeholder="Pri Founisè" title="Sa founisè a fè w peye" onchange="updateCostPrice('${p.id}','${v.id}',this.value)">
             <button class="mini-btn" onclick="removeVariant('${p.id}','${v.id}')">✕</button>
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
@@ -11555,6 +12107,7 @@ function renderApiTopupAdminConfig(p){
     <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
       <input type="text" id="addVarName-${p.id}" placeholder="Non opsyon (ex: 100 Diamonds)" style="flex:1;min-width:120px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri HTG" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
+      <input type="text" id="addVarCost-${p.id}" placeholder="Pri Founisè" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPartnerId-${p.id}" placeholder="Founisè product_id (vid si Verif sèlman)" style="width:110px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <button class="mini-btn" onclick="addApiTopupVariant('${p.id}')">+ Ajoute</button>
     </div>
@@ -11563,15 +12116,17 @@ function renderApiTopupAdminConfig(p){
 async function addApiTopupVariant(productId){
   const label = document.getElementById('addVarName-'+productId).value.trim();
   const price = parseFloat(document.getElementById('addVarPrice-'+productId).value);
+  const costEl = document.getElementById('addVarCost-'+productId);
+  const costPrice = costEl && costEl.value !== '' ? (parseFloat(costEl.value) || 0) : null;
   const partnerId = document.getElementById('addVarPartnerId-'+productId).value.trim();
   if(!label || !price){ showToast('Ranpli omwen non ak pri'); return; }
   const p = state.products.find(x=>x.id===productId);
   const orderMode = partnerId ? 'api_order' : 'api_verif';
-  const newVariant = { id: uid(), label, price, partnerProductId: partnerId?parseInt(partnerId):null, requiresServerId: false, orderMode };
+  const newVariant = { id: uid(), label, price, costPrice, partnerProductId: partnerId?parseInt(partnerId):null, requiresServerId: false, orderMode };
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.from('variants').insert({
-      product_id: productId, label, price, partner_product_id: partnerId?parseInt(partnerId):null, requires_server_id: false, supports_id_verification: true, order_mode: orderMode
+      product_id: productId, label, price, cost_price: costPrice, partner_product_id: partnerId?parseInt(partnerId):null, requires_server_id: false, supports_id_verification: true, order_mode: orderMode
     }).select().single();
     if(error){ showToast('⚠️ Pa sove sou sèvè a: ' + error.message); return; }
     if(data) newVariant.id = data.id;
@@ -11597,12 +12152,13 @@ async function updateApiTopupVariantField(productId, variantId, field, value){
 function renderPinAdminConfig(p){
   const allVariants = getAllVariantsFlat();
   return `
-    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th>Stòk</th><th>🔗 Marye</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
+    <table><thead><tr><th></th><th>Opsyon</th><th>Pri</th><th title="Sa founisè a fè w peye">Pri Founisè</th><th>Stòk</th><th>🔗 Marye</th><th></th></tr></thead><tbody id="vtbody-${p.id}">
       ${sortedVariants(p).map(v => `
         <tr id="vrow-${v.id}" data-vid="${v.id}">
         <td style="width:40px;padding:0;"><span onpointerdown="startVariantDrag(event,'${p.id}','${v.id}')" style="cursor:grab;touch-action:none;color:var(--text);font-size:22px;line-height:1;letter-spacing:-1px;user-select:none;display:flex;align-items:center;justify-content:center;width:40px;height:40px;">⣿</span></td>
         <td><input type="text" style="width:100%;min-width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;font-size:12px;" value="${escapeHtml(v.label)}" onchange="updateVariantLabel('${p.id}','${v.id}',this.value)"></td>
         <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.price}" onchange="updatePrice('${p.id}','${v.id}',this.value)"></td>
+        <td><input type="text" class="mono" style="width:60px;background:var(--panel-2);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:3px 5px;" value="${v.costPrice??''}" placeholder="—" onchange="updateCostPrice('${p.id}','${v.id}',this.value)"></td>
         <td>${(state.inventory[v.id]||[]).filter(x=>x.status==='dispo').length}</td>
         <td style="min-width:130px;">
           ${(() => { const members = getEquivalenceGroupMembers(v.equivalenceGroup, v.id);
@@ -11619,6 +12175,7 @@ function renderPinAdminConfig(p){
     <div style="display:flex;gap:6px;margin-top:8px;">
       <input type="text" id="addVarName-${p.id}" placeholder="Non opsyon" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
+      <input type="text" id="addVarCost-${p.id}" placeholder="Pri Founisè" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <button class="mini-btn" onclick="addVariant('${p.id}')">+ Ajoute</button>
     </div>
   `;
@@ -12013,6 +12570,12 @@ async function updatePrice(pid, vid, val){
   try{ const sb = await getSupabase(); await sb.from('variants').update({ price:v.price }).eq('id', vid); }catch(e){}
   await saveState(); showToast('Pri mete ajou');
 }
+async function updateCostPrice(pid, vid, val){
+  const p = state.products.find(x=>x.id===pid); const v = p.variants.find(x=>x.id===vid);
+  v.costPrice = val === '' ? null : (parseFloat(val) || 0);
+  try{ const sb = await getSupabase(); await sb.from('variants').update({ cost_price:v.costPrice }).eq('id', vid); }catch(e){}
+  await saveState(); showToast('Pri founisè mete ajou');
+}
 async function updateVariantLabel(pid, vid, val){
   const label = val.trim();
   if(!label){ showToast('Non opsyon an pa ka vid'); renderAdminTab(); return; }
@@ -12031,11 +12594,13 @@ async function addVariant(pid){
   const p = state.products.find(x=>x.id===pid);
   const name = document.getElementById('addVarName-'+pid).value.trim();
   const price = parseFloat(document.getElementById('addVarPrice-'+pid).value);
+  const costEl = document.getElementById('addVarCost-'+pid);
+  const costPrice = costEl && costEl.value !== '' ? (parseFloat(costEl.value) || 0) : null;
   if(!name || !price){ showToast('Ranpli non ak pri'); return; }
-  const newVariant = {id:uid(), label:name, price};
+  const newVariant = {id:uid(), label:name, price, costPrice};
   try{
     const sb = await getSupabase();
-    const { data: vIns } = await sb.from('variants').insert({ product_id:pid, label:name, price }).select().single();
+    const { data: vIns } = await sb.from('variants').insert({ product_id:pid, label:name, price, cost_price:costPrice }).select().single();
     if(vIns) newVariant.id = vIns.id;
   }catch(e){}
   p.variants.push(newVariant);
@@ -12738,14 +13303,18 @@ applyWelcomeTranslations();
 (async () => {
   await tryRestoreSupabaseSession();
   routeFromURL();
+  if(!ktPin.recovery) ktPinGate();
   try{
     const sb = await getSupabase();
     sb.auth.onAuthStateChange((event, session) => {
       console.log('[auth] eta chanje:', event, '| sesyon prezan:', !!session);
       if(event === 'SIGNED_OUT'){
+        ktPinOnSignedOut();
         state.currentUserId = null;
         state.isAdmin = false;
         state.isSuperAdmin = false;
+      } else if(event === 'SIGNED_IN' || event === 'INITIAL_SESSION'){
+        setTimeout(ktPinGate, 700);
       }
     });
   }catch(e){ console.warn('onAuthStateChange setup failed:', e?.message||e); }
@@ -12768,6 +13337,437 @@ document.addEventListener('click', function(e){
     sendNtfyNotification('🚫 Compte suspendu — tentative d\'action', '👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||''), 'default', 'no_entry', undefined, 'errors');
   }
 }, true);
+</script>
+<script>
+/* ===================== PIN SEKIRITE (4 chif) + ANPRENT ===================== */
+window.ktPin = { unlocked:false, user:null, mode:null, first:'', buf:'', hiddenAt:0, recovery:false, reset:false, busy:false, bioTried:false };
+const KT_PIN_I18N = {
+  ht:{ create_title:'Kreye yon kòd PIN pou pwoteje kont Kerry Topup Official ou a 🌝🔐', create_sub:'Chwazi 4 chif ou ap sonje.', confirm_title:'Konfime PIN ou', confirm_sub:'Antre menm 4 chif la yon dezyèm fwa.',
+    unlock_title:'Antre PIN ou', unlock_sub:'Pou pwoteje kont ou, antre PIN ou pou kontinye.', newpin_title:'Nouvo PIN', newpin_sub:'Kreye yon nouvo PIN 4 chif pou kont ou.',
+    next:'Suivant', confirm:'Konfime', back:'Retounen', forgot:'PIN bliye?', logout:'Dekonekte', cancel:'Anile',
+    mismatch:'PIN yo pa menm. Eseye ankò.', weak:'PIN sa twò senp. Pa mete 4 menm chif.', wrong:'PIN la pa bon. Ou rete {n} esè.', toomany:'Twòp esè. Ou dekonekte pou sekirite.',
+    saved:'PIN kreye ak siksè ✓', changed:'PIN chanje ak siksè ✓', savefail:'⚠️ Nou pa t kapab anrejistre PIN lan — eseye ankò.',
+    bio_title:'Aktive anprent?', bio_sub:'Ou ka louvri sit la ak anprent telefòn ou olye de PIN lan.', bio_yes:'Aktive anprent', bio_no:'Pita',
+    bio_on:'Anprent aktive ✓', bio_off:'Anprent dezaktive', bio_fail:'⚠️ Anprent pa mache sou aparèy sa a.',
+    reset_sent:'📧 Nou voye yon lyen sou {email}. Louvri l pou kreye yon nouvo PIN.', reset_fail:'⚠️ Nou pa t kapab voye imèl la — eseye ankò pita.', reset_wait:'⏳ Tanpri tann yon ti moman anvan w eseye ankò.',
+    settings_pin:'PIN sekirite', settings_bio:'Anprent', pin_link:'Mwen vle chanje PIN mwen olye', nosession:'⚠️ Lyen an ekspire. Mande yon lòt.' },
+  fr:{ create_title:'Créez un code PIN pour protéger votre compte Kerry Topup Official 🌝🔐', create_sub:'Choisissez 4 chiffres faciles à retenir.', confirm_title:'Confirmez votre PIN', confirm_sub:'Saisissez les mêmes 4 chiffres une seconde fois.',
+    unlock_title:'Entrez votre PIN', unlock_sub:'Pour protéger votre compte, entrez votre PIN pour continuer.', newpin_title:'Nouveau PIN', newpin_sub:'Créez un nouveau PIN à 4 chiffres pour votre compte.',
+    next:'Suivant', confirm:'Confirmer', back:'Retour', forgot:'PIN oublié ?', logout:'Se déconnecter', cancel:'Annuler',
+    mismatch:'Les PIN ne correspondent pas. Réessayez.', weak:'PIN trop simple. Évitez 4 chiffres identiques.', wrong:'PIN incorrect. Il vous reste {n} essai(s).', toomany:'Trop d\'essais. Vous avez été déconnecté par sécurité.',
+    saved:'PIN créé avec succès ✓', changed:'PIN modifié avec succès ✓', savefail:'⚠️ Impossible d\'enregistrer le PIN — réessayez.',
+    bio_title:'Activer l\'empreinte ?', bio_sub:'Vous pouvez ouvrir le site avec l\'empreinte de votre téléphone au lieu du PIN.', bio_yes:'Activer l\'empreinte', bio_no:'Plus tard',
+    bio_on:'Empreinte activée ✓', bio_off:'Empreinte désactivée', bio_fail:'⚠️ L\'empreinte ne fonctionne pas sur cet appareil.',
+    reset_sent:'📧 Un lien a été envoyé à {email}. Ouvrez-le pour créer un nouveau PIN.', reset_fail:'⚠️ Impossible d\'envoyer l\'e-mail — réessayez plus tard.', reset_wait:'⏳ Patientez un instant avant de réessayer.',
+    settings_pin:'PIN de sécurité', settings_bio:'Empreinte', pin_link:'Je veux plutôt changer mon PIN', nosession:'⚠️ Lien expiré. Demandez-en un autre.' },
+  es:{ create_title:'Crea un código PIN para proteger tu cuenta de Kerry Topup Official 🌝🔐', create_sub:'Elige 4 dígitos fáciles de recordar.', confirm_title:'Confirma tu PIN', confirm_sub:'Ingresa los mismos 4 dígitos otra vez.',
+    unlock_title:'Ingresa tu PIN', unlock_sub:'Para proteger tu cuenta, ingresa tu PIN para continuar.', newpin_title:'Nuevo PIN', newpin_sub:'Crea un nuevo PIN de 4 dígitos para tu cuenta.',
+    next:'Siguiente', confirm:'Confirmar', back:'Volver', forgot:'¿Olvidaste el PIN?', logout:'Cerrar sesión', cancel:'Cancelar',
+    mismatch:'Los PIN no coinciden. Inténtalo de nuevo.', weak:'PIN demasiado simple. Evita 4 dígitos iguales.', wrong:'PIN incorrecto. Te quedan {n} intento(s).', toomany:'Demasiados intentos. Cerramos tu sesión por seguridad.',
+    saved:'PIN creado con éxito ✓', changed:'PIN cambiado con éxito ✓', savefail:'⚠️ No se pudo guardar el PIN — inténtalo de nuevo.',
+    bio_title:'¿Activar huella?', bio_sub:'Puedes abrir el sitio con la huella de tu teléfono en lugar del PIN.', bio_yes:'Activar huella', bio_no:'Más tarde',
+    bio_on:'Huella activada ✓', bio_off:'Huella desactivada', bio_fail:'⚠️ La huella no funciona en este dispositivo.',
+    reset_sent:'📧 Enviamos un enlace a {email}. Ábrelo para crear un nuevo PIN.', reset_fail:'⚠️ No se pudo enviar el correo — inténtalo más tarde.', reset_wait:'⏳ Espera un momento antes de intentarlo de nuevo.',
+    settings_pin:'PIN de seguridad', settings_bio:'Huella', pin_link:'Prefiero cambiar mi PIN', nosession:'⚠️ Enlace expirado. Solicita otro.' },
+  en:{ create_title:'Create a PIN code to protect your Kerry Topup Official account 🌝🔐', create_sub:'Choose 4 digits you will remember.', confirm_title:'Confirm your PIN', confirm_sub:'Enter the same 4 digits a second time.',
+    unlock_title:'Enter your PIN', unlock_sub:'To protect your account, enter your PIN to continue.', newpin_title:'New PIN', newpin_sub:'Create a new 4-digit PIN for your account.',
+    next:'Next', confirm:'Confirm', back:'Back', forgot:'Forgot PIN?', logout:'Log out', cancel:'Cancel',
+    mismatch:'PINs do not match. Try again.', weak:'PIN is too simple. Avoid 4 identical digits.', wrong:'Wrong PIN. {n} attempt(s) left.', toomany:'Too many attempts. You were logged out for security.',
+    saved:'PIN created successfully ✓', changed:'PIN changed successfully ✓', savefail:'⚠️ Could not save the PIN — try again.',
+    bio_title:'Enable fingerprint?', bio_sub:'You can open the site with your phone\'s fingerprint instead of the PIN.', bio_yes:'Enable fingerprint', bio_no:'Later',
+    bio_on:'Fingerprint enabled ✓', bio_off:'Fingerprint disabled', bio_fail:'⚠️ Fingerprint does not work on this device.',
+    reset_sent:'📧 We sent a link to {email}. Open it to create a new PIN.', reset_fail:'⚠️ Could not send the email — try again later.', reset_wait:'⏳ Please wait a moment before trying again.',
+    settings_pin:'Security PIN', settings_bio:'Fingerprint', pin_link:'I want to change my PIN instead', nosession:'⚠️ Link expired. Request another one.' }
+};
+function pt(k){ const L = KT_PIN_I18N[(typeof currentLang!=='undefined'&&currentLang)] || KT_PIN_I18N.en; return (L[k] != null ? L[k] : (KT_PIN_I18N.en[k] != null ? KT_PIN_I18N.en[k] : k)); }
+
+function ktPinCss(){
+  if(document.getElementById('ktPinCss')) return;
+  const s = document.createElement('style'); s.id = 'ktPinCss';
+  s.textContent = `
+  #ktPinOverlay{position:fixed;inset:0;z-index:2147483000;display:none;flex-direction:column;align-items:center;overflow-y:auto;background:linear-gradient(160deg,#071a10 0%,#0a1710 40%,#050b08 100%);color:#e8f5ec;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-user-select:none;user-select:none;}
+  #ktPinOverlay .kp-wrap{width:100%;max-width:420px;box-sizing:border-box;padding:40px 24px 28px;display:flex;flex-direction:column;align-items:center;min-height:100%;margin:0 auto;}
+  /*logo*/
+  #ktPinOverlay .kp-logo{width:92px;height:92px;border-radius:24px;object-fit:contain;background:#fff;box-shadow:0 14px 34px rgba(0,0,0,.45),0 0 36px rgba(63,206,124,.18);margin-top:6px;}
+  #ktPinOverlay .kp-brand{font-weight:900;font-size:20px;letter-spacing:1px;color:#3fce7c;}
+  #ktPinOverlay .kp-ic{margin-top:26px;width:64px;height:64px;border-radius:50%;background:rgba(63,206,124,.14);display:flex;align-items:center;justify-content:center;color:#3fce7c;}
+  #ktPinOverlay h1{margin:16px 0 6px;font-size:22px;font-weight:800;text-align:center;}
+  #ktPinOverlay p{margin:0;font-size:13.5px;line-height:1.5;color:#93b1a1;text-align:center;max-width:300px;}
+  #ktPinOverlay .kp-dots{display:flex;gap:18px;margin:24px 0 8px;}
+  #ktPinOverlay .kp-dot{width:16px;height:16px;box-sizing:border-box;border-radius:50%;border:2px solid rgba(63,206,124,.4);transition:all .12s;}
+  #ktPinOverlay .kp-dot.on{background:#3fce7c;border-color:#3fce7c;box-shadow:0 0 12px rgba(63,206,124,.6);}
+  #ktPinOverlay .kp-msg{min-height:20px;margin-bottom:10px;font-size:13px;color:#ff8a8a;text-align:center;max-width:300px;}
+  #ktPinOverlay .kp-msg.ok{color:#3fce7c;}
+  #ktPinOverlay .kp-pad{display:grid;grid-template-columns:repeat(3,72px);gap:12px 22px;justify-content:center;}
+  #ktPinOverlay .kp-key{width:72px;height:72px;border-radius:50%;border:1px solid rgba(63,206,124,.2);background:rgba(255,255,255,.06);color:#e8f5ec;font-size:26px;font-weight:600;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;padding:0;-webkit-tap-highlight-color:transparent;}
+  #ktPinOverlay .kp-key:active{background:rgba(63,206,124,.25);}
+  #ktPinOverlay .kp-key.bio{border-color:rgba(63,206,124,.45);background:rgba(63,206,124,.12);color:#3fce7c;}
+  #ktPinOverlay .kp-key.del{border:none;background:transparent;color:#93b1a1;}
+  #ktPinOverlay .kp-blank{width:72px;height:72px;}
+  #ktPinOverlay .kp-btn{margin-top:22px;width:100%;max-width:320px;height:52px;border-radius:26px;border:none;background:linear-gradient(135deg,#17a854,#0a7c3d);color:#fff;font-size:16px;font-weight:700;box-shadow:0 8px 22px rgba(10,124,61,.4);cursor:pointer;font-family:inherit;}
+  #ktPinOverlay .kp-btn:disabled{background:rgba(255,255,255,.08);color:#6f8f7d;box-shadow:none;cursor:default;}
+  #ktPinOverlay .kp-btn.ghost{background:rgba(255,255,255,.08);box-shadow:none;color:#e8f5ec;margin-top:10px;}
+  #ktPinOverlay .kp-link{margin-top:6px;min-height:44px;padding:0 16px;border:none;background:transparent;color:#3fce7c;font-size:14.5px;font-weight:600;text-decoration:underline;text-underline-offset:4px;cursor:pointer;font-family:inherit;}
+  #ktPinOverlay .kp-link.mut{color:#93b1a1;text-decoration:none;font-weight:500;}
+  #ktPinOverlay .kp-spin{margin-top:40px;width:34px;height:34px;border-radius:50%;border:3px solid rgba(63,206,124,.25);border-top-color:#3fce7c;animation:kpspin .8s linear infinite;}
+  #ktPinOverlay .kp-shake{animation:kpshake .35s;}
+  @keyframes kpspin{to{transform:rotate(360deg)}}
+  @keyframes kpshake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}`;
+  document.head.appendChild(s);
+}
+function ktPinLogo(){ return '<img class="kp-logo" alt="Kerry Topup Official" src="' + (window.KT_LOGO_SRC || '') + '">'; }
+function ktPinEl(){
+  ktPinCss();
+  let el = document.getElementById('ktPinOverlay');
+  if(!el){ el = document.createElement('div'); el.id = 'ktPinOverlay'; document.body.appendChild(el); }
+  return el;
+}
+const KT_ICON_LOCK = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+const KT_ICON_SHIELD = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 4.5 3.2 8.2 8 9 4.8-.8 8-4.5 8-9V6l-8-3z"/><path d="m9 12 2.2 2.2L15.5 10"/></svg>';
+const KT_ICON_FP = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a2 2 0 0 0-2 2c0 2.5.5 4.5 1.5 6.5"/><path d="M14 13.5c0 2 .3 3.7 1 5.5"/><path d="M8 12.5a4 4 0 0 1 8 0"/><path d="M5.5 13A6.5 6.5 0 0 1 12 6a6.5 6.5 0 0 1 6.5 7c0 1.8-.2 3-.5 4.5"/><path d="M5 17c.3-1.2.5-2.4.5-4"/></svg>';
+const KT_ICON_DEL = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z"/><path d="m13 9 4 6m0-6-4 6"/></svg>';
+
+/* ---- stockage / hash ---- */
+function ktPinUid(){ return (ktPin.user && ktPin.user.id) || (typeof state!=='undefined' && state.currentUserId) || ''; }
+function ktPinMeta(){
+  const uid = ktPinUid();
+  const m = ktPin.user && ktPin.user.user_metadata && ktPin.user.user_metadata.kt_pin;
+  if(m && m.h) return m;
+  try{ const c = JSON.parse(localStorage.getItem('kt_pinmeta_' + uid) || 'null'); if(c && c.h) return c; }catch(e){}
+  return null;
+}
+function ktPinCache(meta){ try{ localStorage.setItem('kt_pinmeta_' + ktPinUid(), JSON.stringify(meta)); }catch(e){} }
+function ktPinClearCaches(){ try{ Object.keys(localStorage).forEach(k => { if(k.indexOf('kt_pinmeta_')===0 || k.indexOf('kt_pin_try_')===0) localStorage.removeItem(k); }); }catch(e){} }
+async function ktPinHash(pin, salt, uid){
+  const str = salt + ':' + uid + ':' + pin;
+  try{
+    if(window.crypto && crypto.subtle){
+      const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+    }
+  }catch(e){}
+  let h = 5381; for(let i=0;i<str.length;i++){ h = ((h<<5)+h+str.charCodeAt(i))|0; }
+  return 'x' + (h>>>0).toString(16);
+}
+function ktRandHex(n){ const a = new Uint8Array(n); (window.crypto||{getRandomValues:x=>x.forEach((_,i)=>x[i]=Math.floor(Math.random()*256))}).getRandomValues(a); return Array.from(a).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+/* ---- anprent (WebAuthn, platform authenticator) ---- */
+function ktBioSupported(){ return !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create && window.isSecureContext !== false); }
+async function ktBioAvailable(){ try{ return ktBioSupported() && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }catch(e){ return false; } }
+function ktBioId(){ try{ return localStorage.getItem('kt_bio_' + ktPinUid()); }catch(e){ return null; } }
+function ktB64(buf){ let s=''; new Uint8Array(buf).forEach(b=>s+=String.fromCharCode(b)); return btoa(s); }
+function ktUnB64(s){ const bin = atob(s); const a = new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) a[i]=bin.charCodeAt(i); return a; }
+async function ktBioRegister(){
+  try{
+    if(!(await ktBioAvailable())) return false;
+    const u = ktPin.user || {};
+    const cred = await navigator.credentials.create({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      rp: Object.assign({ name:'Kerry Topup' }, location.hostname ? { id: location.hostname } : {}),
+      user: { id: new TextEncoder().encode(String(ktPinUid())).slice(0,64), name: u.email || 'user', displayName: u.email || 'user' },
+      pubKeyCredParams: [{ type:'public-key', alg:-7 }, { type:'public-key', alg:-257 }],
+      authenticatorSelection: { authenticatorAttachment:'platform', userVerification:'required', residentKey:'discouraged' },
+      timeout: 60000, attestation:'none'
+    }});
+    if(!cred) return false;
+    localStorage.setItem('kt_bio_' + ktPinUid(), ktB64(cred.rawId));
+    return true;
+  }catch(e){ console.warn('[pin] bio register:', e); ktPin.bioErr = (e && e.name ? e.name : 'Error') + (e && e.message ? ': ' + String(e.message).slice(0,80) : ''); return false; }
+}
+async function ktBioVerify(){
+  try{
+    const id = ktBioId(); if(!id) return false;
+    const r = await navigator.credentials.get({ publicKey: {
+      challenge: crypto.getRandomValues(new Uint8Array(32)),
+      allowCredentials: [{ type:'public-key', id: ktUnB64(id), transports:['internal'] }],
+      userVerification: 'required', timeout: 60000
+    }});
+    return !!r;
+  }catch(e){ return false; }
+}
+
+/* ---- ekran ---- */
+function ktPinShow(mode){
+  const el = ktPinEl();
+  const was = ktPin.mode;
+  ktPin.mode = mode; ktPin.buf = ''; if(mode!=='confirm') ktPin.first = '';
+  el.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  ktPinRender();
+  if(mode==='create'){ ktBioAvailable().then(v => { if(v !== ktPin.bioAvail){ ktPin.bioAvail = v; if(ktPin.mode==='create') ktPinRender(); } }); }
+  if(mode==='unlock' && was!=='unlock'){ ktPin.bioTried = false; setTimeout(ktPinBioTry, 350); }
+}
+function ktPinHide(){
+  const el = document.getElementById('ktPinOverlay');
+  if(el){ el.style.display = 'none'; el.innerHTML = ''; }
+  ktPin.mode = null; ktPin.buf = ''; ktPin.first = '';
+  document.body.style.overflow = '';
+}
+function ktPinRender(msg, ok){
+  const el = ktPinEl(); const m = ktPin.mode;
+  if(m==='wait'){ el.innerHTML = '<div class="kp-wrap">' + ktPinLogo() + '<div class="kp-spin"></div></div>'; return; }
+  if(m==='bio'){
+    el.innerHTML = `<div class="kp-wrap">${ktPinLogo()}
+      <h1>${pt('bio_title')}</h1><p>${pt('bio_sub')}</p>
+      <div class="kp-msg" id="ktPinMsg"></div>
+      <button class="kp-btn" onclick="ktPinBioAccept()">${pt('bio_yes')}</button>
+      <button class="kp-btn ghost" onclick="ktPinHide()">${pt('bio_no')}</button></div>`;
+    return;
+  }
+  const tk = m==='create' ? (ktPin.reset ? 'newpin' : 'create') : (m==='confirm' ? 'confirm' : 'unlock');
+  const hasBio = (m==='unlock' && !!ktBioId()) || (m==='create' && !!ktPin.bioAvail);
+  let keys = '';
+  for(let i=1;i<=9;i++) keys += `<button class="kp-key" onclick="ktPinKey('${i}')">${i}</button>`;
+  keys += hasBio ? `<button class="kp-key bio" aria-label="fingerprint" onclick="${m==='create'?'ktPinBioSetup()':'ktPinBioTry(true)'}">${KT_ICON_FP}</button>` : '<span class="kp-blank"></span>';
+  keys += `<button class="kp-key" onclick="ktPinKey('0')">0</button><button class="kp-key del" aria-label="delete" onclick="ktPinDel()">${KT_ICON_DEL}</button>`;
+  let actions = '';
+  if(m==='create') actions = `<button class="kp-btn" id="ktPinBtn" onclick="ktPinSubmit()" disabled>${pt('next')}</button>` + (ktPin.reset && ktPinMeta() ? `<button class="kp-link mut" onclick="ktPinCancelReset()">${pt('cancel')}</button>` : `<button class="kp-link mut" onclick="ktPinLogout()">${pt('logout')}</button>`);
+  if(m==='confirm') actions = `<button class="kp-btn" id="ktPinBtn" onclick="ktPinSubmit()" disabled>${pt('confirm')}</button><button class="kp-link mut" onclick="ktPinBack()">${pt('back')}</button>`;
+  if(m==='unlock') actions = `<div style="margin-top:auto;padding-top:18px;display:flex;flex-direction:column;align-items:center;"><button class="kp-link" onclick="ktPinForgot()">${pt('forgot')}</button><button class="kp-link mut" onclick="ktPinLogout()">${pt('logout')}</button></div>`;
+  el.innerHTML = `<div class="kp-wrap">${ktPinLogo()}
+    <h1>${pt(tk + '_title')}</h1><p>${pt(tk + '_sub')}</p>
+    <div class="kp-dots" id="ktPinDots"><span class="kp-dot"></span><span class="kp-dot"></span><span class="kp-dot"></span><span class="kp-dot"></span></div>
+    <div class="kp-msg${ok?' ok':''}" id="ktPinMsg">${msg||''}</div>
+    <div class="kp-pad">${keys}</div>${actions}</div>`;
+  ktPinDots();
+}
+function ktPinMsg(msg, ok){ const e = document.getElementById('ktPinMsg'); if(e){ e.textContent = msg||''; e.classList.toggle('ok', !!ok); } }
+function ktPinDots(){
+  const d = document.querySelectorAll('#ktPinDots .kp-dot');
+  d.forEach((x,i) => x.classList.toggle('on', i < ktPin.buf.length));
+  const b = document.getElementById('ktPinBtn'); if(b) b.disabled = ktPin.buf.length !== 4;
+}
+function ktPinShake(){ const e = document.getElementById('ktPinDots'); if(e){ e.classList.remove('kp-shake'); void e.offsetWidth; e.classList.add('kp-shake'); } try{ navigator.vibrate && navigator.vibrate(120); }catch(_){} }
+function ktPinKey(d){
+  if(ktPin.busy || ktPin.buf.length >= 4) return;
+  ktPin.buf += d; ktPinMsg(''); ktPinDots();
+  if(ktPin.buf.length === 4 && ktPin.mode === 'unlock') ktPinSubmit();
+}
+function ktPinDel(){ if(ktPin.busy) return; ktPin.buf = ktPin.buf.slice(0,-1); ktPinDots(); }
+function ktPinBack(){ ktPin.first = ''; ktPinShow('create'); }
+document.addEventListener('keydown', function(e){
+  if(!ktPin.mode || ktPin.mode==='wait' || ktPin.mode==='bio') return;
+  if(/^[0-9]$/.test(e.key)) ktPinKey(e.key);
+  else if(e.key === 'Backspace') ktPinDel();
+  else if(e.key === 'Enter' && ktPin.mode !== 'unlock') ktPinSubmit();
+});
+
+async function ktPinSubmit(){
+  const m = ktPin.mode; const pin = ktPin.buf;
+  if(ktPin.busy || pin.length !== 4) return;
+  if(m === 'create'){
+    if(/^(\d)\1{3}$/.test(pin)){ ktPinMsg(pt('weak')); ktPinShake(); ktPin.buf=''; ktPinDots(); return; }
+    ktPin.first = pin; ktPinShow('confirm'); return;
+  }
+  if(m === 'confirm'){
+    if(pin !== ktPin.first){ ktPinMsg(pt('mismatch')); ktPinShake(); ktPin.buf=''; ktPinDots(); return; }
+    ktPin.busy = true;
+    try{
+      const sb = await getSupabase();
+      const uid = ktPinUid();
+      const salt = ktRandHex(16);
+      const h = await ktPinHash(pin, salt, uid);
+      const meta = { h, s:salt, v:1, t:Date.now() };
+      const { data, error } = await sb.auth.updateUser({ data: { kt_pin: meta, kt_pin_reset: null } });
+      if(error) throw error;
+      if(data && data.user) ktPin.user = data.user;
+      ktPinCache(meta);
+      ktPin.unlocked = true;
+      const wasReset = ktPin.reset;
+      ktPin.reset = false; ktPin.recovery = false;
+      try{ localStorage.removeItem('kt_pin_reset'); localStorage.removeItem('kt_pin_try_' + uid); }catch(e){}
+      if(wasReset){ try{ history.replaceState(null,'',window.location.pathname); }catch(e){} }
+      showToast(pt(wasReset ? 'changed' : 'saved'));
+      if(!ktBioId() && await ktBioAvailable()){ ktPin.busy = false; ktPinShow('bio'); return; }
+      ktPinHide();
+    }catch(e){
+      console.warn('[pin] save fail:', e);
+      ktPinMsg(pt('savefail')); ktPinShake(); ktPin.buf = ''; ktPinDots();
+    }finally{ ktPin.busy = false; }
+    return;
+  }
+  if(m === 'unlock'){
+    const meta = ktPinMeta(); const uid = ktPinUid();
+    if(!meta){ ktPinShow('create'); return; }
+    ktPin.busy = true;
+    try{
+      const h = await ktPinHash(pin, meta.s, uid);
+      if(h === meta.h){
+        ktPin.unlocked = true;
+        try{ localStorage.removeItem('kt_pin_try_' + uid); }catch(e){}
+        ktPinHide();
+        return;
+      }
+      let n = 0; try{ n = (parseInt(localStorage.getItem('kt_pin_try_' + uid) || '0', 10) || 0) + 1; localStorage.setItem('kt_pin_try_' + uid, String(n)); }catch(e){ n = 1; }
+      ktPin.buf = ''; ktPinDots(); ktPinShake();
+      if(n >= 5){
+        try{ localStorage.removeItem('kt_pin_try_' + uid); }catch(e){}
+        await ktPinLogout(true);
+        return;
+      }
+      ktPinMsg(pt('wrong').replace('{n}', String(5 - n)));
+    }finally{ ktPin.busy = false; }
+  }
+}
+async function ktPinBioTry(manual){
+  if(ktPin.mode !== 'unlock' || !ktBioId()) return;
+  if(!manual && ktPin.bioTried) return;
+  ktPin.bioTried = true;
+  const ok = await ktBioVerify();
+  if(ok && ktPin.mode === 'unlock'){
+    ktPin.unlocked = true;
+    try{ localStorage.removeItem('kt_pin_try_' + ktPinUid()); }catch(e){}
+    ktPinHide();
+  }
+}
+async function ktPinBioSetup(){
+  if(ktBioId()){ ktPinMsg(pt('bio_on'), true); return; }
+  const ok = await ktBioRegister();
+  if(ok) ktPinMsg(pt('bio_on'), true);
+  else if(ktPin.bioErr && !/^NotAllowedError/.test(ktPin.bioErr)) ktPinMsg(pt('bio_fail') + ' (' + ktPin.bioErr + ')'); // sinon: itilizatè a te peze anile → li kontinye ak PIN lan
+}
+async function ktPinBioAccept(){
+  const ok = await ktBioRegister();
+  if(ok){ showToast(pt('bio_on')); ktPinHide(); }
+  else if(ktPin.bioErr && /^NotAllowedError/.test(ktPin.bioErr)){ ktPinMsg(''); }
+  else { ktPinMsg(pt('bio_fail') + (ktPin.bioErr ? ' (' + ktPin.bioErr + ')' : '')); }
+}
+async function ktPinToggleBio(){
+  if(ktBioId()){ try{ localStorage.removeItem('kt_bio_' + ktPinUid()); }catch(e){} showToast(pt('bio_off')); }
+  else{
+    const ok = await ktBioRegister();
+    showToast(ok ? pt('bio_on') : pt('bio_fail'));
+  }
+  if(typeof render === 'function') render();
+}
+async function ktPinLogout(tooMany){
+  ktPin.unlocked = false; ktPinHide();
+  try{ await doLogoutConfirmed(); }catch(e){}
+  if(tooMany === true) showToast(pt('toomany'), 4500, true);
+}
+
+/* ---- PIN bliye / chanje PIN pa imèl (menm jan ak modpas) ---- */
+async function ktPinSendReset(fromSettings){
+  let email = (ktPin.user && ktPin.user.email) || '';
+  try{ if(!email && typeof currentUser === 'function' && currentUser()) email = currentUser().email; }catch(e){}
+  if(!email) return;
+  try{
+    const sb = await getSupabase();
+    try{ localStorage.setItem('kt_pin_reset', JSON.stringify({ uid: ktPinUid(), t: Date.now() })); }catch(e){}
+    try{ await sb.auth.updateUser({ data: { kt_pin_reset: Date.now() } }); }catch(e){} // make kont lan: mache menm si lyen an louvri sou lòt aparèy/navigatè
+    const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
+    if(error){
+      try{ localStorage.removeItem('kt_pin_reset'); }catch(e){}
+      const msg = /security purposes|after \d+ seconds/i.test(error.message || '') ? pt('reset_wait') : pt('reset_fail');
+      if(fromSettings === true) showToast(msg); else ktPinMsg(msg);
+      return;
+    }
+    const sent = pt('reset_sent').replace('{email}', email);
+    if(fromSettings === true) showToast(sent, 5000, true); else ktPinMsg(sent, true);
+  }catch(e){
+    try{ localStorage.removeItem('kt_pin_reset'); }catch(_){}
+    if(fromSettings === true) showToast(pt('reset_fail')); else ktPinMsg(pt('reset_fail'));
+  }
+}
+function ktPinForgot(){ ktPinSendReset(false); }
+function ktPinResetPending(){
+  try{ const f = JSON.parse(localStorage.getItem('kt_pin_reset') || 'null'); return !!(f && Date.now() - f.t < 2*3600*1000); }catch(e){ return false; }
+}
+function ktPinCancelReset(){
+  ktPin.reset = false; ktPin.recovery = false;
+  try{ localStorage.removeItem('kt_pin_reset'); history.replaceState(null,'',window.location.pathname); }catch(e){}
+  ktPinHide(); ktPinGate();
+}
+// Rele depi lyen imèl la louvri (type=recovery + demann PIN)
+async function ktPinStartReset(auto){
+  ktPin.recovery = true; ktPin.reset = true;
+  ktPinShow('wait');
+  try{
+    const sb = await getSupabase();
+    let user = null;
+    for(let i=0;i<6 && !user;i++){
+      const { data } = await sb.auth.getSession();
+      user = data && data.session && data.session.user;
+      if(!user) await new Promise(r => setTimeout(r, 500));
+    }
+    if(!user){ if(auto === true){ ktPin.recovery = false; ktPin.reset = false; ktPinHide(); showPasswordResetForm(); return; } showToast(pt('nosession')); ktPinCancelReset(); return; }
+    if(auto === true){
+      const mt = Number(user.user_metadata && user.user_metadata.kt_pin_reset) || 0;
+      if(!(ktPinResetPending() || (mt && Date.now() - mt < 2*3600*1000))){
+        ktPin.recovery = false; ktPin.reset = false; ktPinHide(); showPasswordResetForm(); return; // chanjman modpas nòmal
+      }
+    }
+    ktPin.user = user;
+    try{ await syncLocalUserFromAuth(user); await saveState(); fetchApiClient(); render(); }catch(e){}
+    ktPinShow('create');
+  }catch(e){ ktPinCancelReset(); }
+}
+// Si lyen an louvri nan fòm modpas la, bay opsyon pou chanje PIN olye
+function ktPinSwitchFromPasswordForm(){
+  try{ localStorage.setItem('kt_pin_reset', JSON.stringify({ uid:'', t: Date.now() })); }catch(e){}
+  closeAuthModal();
+  ktPinStartReset();
+}
+
+/* ---- pòtay prensipal ---- */
+async function ktPinGate(){
+  if(ktPin.recovery) return;
+  try{
+    const sb = await getSupabase();
+    const { data } = await sb.auth.getSession();
+    let user = data && data.session && data.session.user;
+    if(!user){ ktPin.user = null; ktPin.unlocked = false; if(ktPin.mode) ktPinHide(); return; }
+    ktPin.user = user;
+    let meta = ktPinMeta();
+    if(!meta){
+      // pa gen PIN nan sesyon lokal la — verifye ak sèvè a anvan nou fòse kreyasyon
+      try{
+        const r = await Promise.race([ sb.auth.getUser(), new Promise(res => setTimeout(() => res(null), 5000)) ]);
+        if(r && r.data && r.data.user){ ktPin.user = r.data.user; meta = ktPinMeta(); }
+      }catch(e){}
+    }
+    if(!meta){ if(['create','confirm','bio'].indexOf(ktPin.mode) < 0) ktPinShow('create'); return; }
+    ktPinCache(meta);
+    if(ktPin.unlocked){ if(ktPin.mode === 'wait') ktPinHide(); return; }
+    if(ktPin.mode !== 'unlock') ktPinShow('unlock');
+    // rafrechi an background si PIN lan te chanje sou yon lòt aparèy
+    sb.auth.getUser().then(r => { const u = r && r.data && r.data.user; const nm = u && u.user_metadata && u.user_metadata.kt_pin; if(nm && nm.h){ ktPin.user = u; ktPinCache(nm); } }).catch(()=>{});
+  }catch(e){ console.warn('[pin] gate:', e && e.message); if(ktPin.mode === 'wait') ktPinHide(); }
+}
+function ktPinOnSignedOut(){ ktPin.unlocked = false; ktPin.user = null; ktPinClearCaches(); if(ktPin.mode) ktPinHide(); }
+
+/* ---- kat PIN nan Paramèt ---- */
+function ktPinSettingsHtml(){
+  const bioOn = !!ktBioId();
+  const sup = ktBioSupported();
+  return `<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:14px 0 6px;">${pt('settings_pin')}</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span style="font-size:14px;font-weight:600;letter-spacing:4px;">••••</span>
+      <button onclick="ktPinSendReset(true)" style="background:none;border:none;color:var(--green);font-size:17px;padding:4px 6px;cursor:pointer;" title="PIN">✏️</button>
+    </div>
+    ${sup ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;">
+      <span style="font-size:14px;font-weight:600;">👆 ${pt('settings_bio')}</span>
+      <button onclick="ktPinToggleBio()" style="border:none;border-radius:20px;padding:6px 14px;font-weight:700;font-size:12.5px;cursor:pointer;background:${bioOn?'var(--green)':'#e6e9e7'};color:${bioOn?'#fff':'#5b625e'};">${bioOn?'ON':'OFF'}</button>
+    </div>` : ''}`;
+}
+
+/* ---- demaraj: kouvri ekran an imedyatman si gen yon PIN konnen sou aparèy la ---- */
+(function(){
+  try{
+    const has = Object.keys(localStorage).some(k => k.indexOf('kt_pinmeta_') === 0);
+    if(has && !window.location.hash.includes('type=recovery')){
+      const boot = function(){ if(!ktPin.mode){ ktPinShow('wait'); setTimeout(function(){ if(ktPin.mode === 'wait') ktPinHide(); }, 10000); } };
+      if(document.body) boot(); else document.addEventListener('DOMContentLoaded', boot);
+    }
+  }catch(e){}
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden){ ktPin.hiddenAt = Date.now(); return; }
+    if(ktPin.unlocked && ktPin.hiddenAt && Date.now() - ktPin.hiddenAt > 15000 && ktPinMeta()){
+      ktPin.unlocked = false; ktPinGate();
+    }
+  });
+})();
+
 </script>
 </body>
 </html>
