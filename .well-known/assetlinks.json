@@ -1,8 +1,15 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "com.kerrytopup.app",
-        "sha256_cert_fingerprints": ["4E:BB:C6:9F:26:0E:DE:D3:1C:50:4E:94:F5:C7:CE:C6:4C:A2:77:20:9E:36:59:F4:0F:05:41:73:95:58:8B:2C"]
-      }
-    }]
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kerrytopup.app",
+      "sha256_cert_fingerprints": [
+        "46:3F:BB:42:B6:75:C1:78:96:D1:11:C8:5C:A3:51:CD:93:8B:3F:9B:1F:80:0B:2C:1F:74:2F:94:8E:E9:60:25",
+        "61:8B:D6:07:F3:AD:0F:CA:C4:11:73:26:6E:3B:A9:9C:23:FA:DD:4F:35:FC:CF:D3:49:AC:72:FD:41:84:55:EC"
+      ]
+    }
+  }
+]
