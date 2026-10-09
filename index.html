@@ -670,6 +670,7 @@ textarea.admin-ta{
 <style>
   .we-dark{--panel:#fff;--panel-2:#e9efeb;--line:rgba(0,0,0,0.06);--text:#0b1a12;--muted:#5d6b63;--green:#0fa654;--ink:#0fa654;background:#f3f8f4;color:var(--text);padding:8px 18px 28px;min-height:100vh;}
   .we-screen{display:none !important;}
+  .hm-cta.dancing{animation:weCtaDance 0.55s cubic-bezier(0.36,0.07,0.19,0.97);}
   .hm-badge{z-index:3;width:84px !important;height:84px !important;top:112px !important;padding:0 !important;}
   .hm-ring{position:absolute;inset:0;animation:hmSpin 9s linear infinite;}
   .hm-ring text{font-size:10.5px;font-weight:800;fill:#0a8f45;letter-spacing:.6px;font-family:Inter,sans-serif;}
@@ -2500,6 +2501,59 @@ function pageCustomInfo(slug){
   `;
 }
 
+
+function promoGen(){ const a='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c='KT'; for(let i=0;i<6;i++) c += a[Math.floor(Math.random()*a.length)]; const e=document.getElementById('pmCode'); if(e) e.value=c; }
+async function fetchPromoCodes(){
+  const box = document.getElementById('promoList'); if(!box) return;
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('promo_codes').select('*').order('created_at',{ascending:false});
+    if(error){ box.innerHTML = '<div class="empty"><div class="em-title">⚠️ ' + escapeHtml(error.message) + '</div>Ou kouri SQL kòd promo a?</div>'; return; }
+    state.promoCodes = data || [];
+    if(!state.promoCodes.length){ box.innerHTML = '<div class="empty"><div class="em-icon">🏷️</div><div class="em-title">Poko gen kòd</div></div>'; return; }
+    box.innerHTML = state.promoCodes.map(c => {
+      const val = c.type === 'percent' ? c.value + '%' : 'HTG ' + Number(c.value).toLocaleString('fr-FR');
+      const exp = c.expires_at ? new Date(c.expires_at).toLocaleDateString('fr-FR') : '—';
+      return `<div class="card" style="${c.active?'':'opacity:.55;'}">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+          <div style="font-weight:900;font-size:16px;letter-spacing:1px;color:var(--green);">${escapeHtml(c.code)}</div>
+          <div style="font-weight:800;">-${escapeHtml(val)}</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin:6px 0 10px;line-height:1.6;">
+          👤 ${c.user_id ? escapeHtml(c.client_label || 'Yon kliyan presi') : 'Tout moun'}<br>
+          🔢 Itilize: <b>${c.used_count}</b>${c.max_uses != null ? ' / ' + c.max_uses : ' (san limit)'} · 🛒 Min: ${Number(c.min_amount||0).toLocaleString('fr-FR')} HTG · ⏳ ${exp}
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost" style="flex:1;" onclick="promoToggle('${c.id}', ${!c.active})">${c.active ? '⏸ Dezaktive' : '▶️ Aktive'}</button>
+          <button class="btn btn-ghost" style="flex:1;color:var(--red);" onclick="promoDelete('${c.id}')">🗑 Efase</button>
+        </div></div>`;
+    }).join('');
+  }catch(e){ box.innerHTML = '⚠️ ' + escapeHtml(e.message||'erè'); }
+}
+async function promoAdminCreate(){
+  const g = id => (document.getElementById(id)||{}).value || '';
+  const code = g('pmCode').trim().toUpperCase().replace(/\s+/g,'');
+  const type = g('pmType'), value = Number(g('pmValue'));
+  if(!code){ showToast('Ekri oswa jenere yon kòd'); return; }
+  if(!(value > 0) || (type === 'percent' && value > 100)){ showToast('Valè a pa bon'); return; }
+  const row = { code, type, value, max_uses: g('pmMax') ? parseInt(g('pmMax'),10) : null, min_amount: Number(g('pmMin')) || 0, expires_at: g('pmExp') ? new Date(g('pmExp') + 'T23:59:59').toISOString() : null, active: true };
+  try{
+    const sb = await getSupabase();
+    const email = g('pmEmail').trim();
+    if(email){
+      const { data: pr } = await sb.from('profiles').select('id,name,email').ilike('email', email).maybeSingle();
+      if(!pr){ showToast('⚠️ Pa jwenn kliyan sa a (imèl)'); return; }
+      row.user_id = pr.id; row.client_label = (pr.name || '') + ' (' + (pr.email || email) + ')';
+      if(row.max_uses == null) row.max_uses = 1;
+    }
+    const { error } = await sb.from('promo_codes').insert(row);
+    if(error){ showToast('⚠️ ' + (error.message.includes('duplicate') ? 'Kòd sa a egziste deja' : error.message)); return; }
+    showToast('✅ Kòd ' + code + ' kreye');
+    renderAdminTab();
+  }catch(e){ showToast('⚠️ ' + (e.message||'erè')); }
+}
+async function promoToggle(id, active){ try{ const sb = await getSupabase(); await sb.from('promo_codes').update({ active }).eq('id', id); }catch(e){} fetchPromoCodes(); }
+async function promoDelete(id){ if(!confirm('Efase kòd sa a?')) return; try{ const sb = await getSupabase(); await sb.from('promo_codes').delete().eq('id', id); }catch(e){} fetchPromoCodes(); }
 async function fetchBotFaq(){
   try{
     const sb = await getSupabase();
@@ -5286,8 +5340,8 @@ function selectWelcomeLang(code, flag, label){
   toggleWelcomeLangList();
   setLang(code);
 }
-function enterShopFromWelcome(){
-  const btn = document.querySelector('.we-cta');
+function enterShopFromWelcome(el){
+  const btn = (el && el.classList) ? el : document.querySelector('.we-cta');
   if(btn){
     btn.classList.remove('dancing');
     void btn.offsetWidth;
@@ -5800,7 +5854,7 @@ function renderWelcomeLong(){
     <div class="hm-hero" style="padding-top:52px;">
       <h1 class="hm-h1" style="font-size:26px;">${escapeHtml(T.h1)}</h1>
       <p class="hm-sub">${escapeHtml(T.sub)}</p>
-      <button class="hm-cta" onclick="enterShopFromWelcome()">${escapeHtml(T.cta)} <span style="font-size:17px;">→</span></button>
+      <button class="hm-cta" onclick="enterShopFromWelcome(this)">${escapeHtml(T.cta)} <span style="font-size:17px;">→</span></button>
       <div class="hm-collage">
         <div class="hm-c1" style="${bg(withImg[0])}"></div>
         <div class="hm-c2" style="${bg(withImg[1])}"></div>
@@ -5831,7 +5885,7 @@ function renderWelcomeLong(){
     <div class="hm-wave">${KT_WAVE}</div>
     <div class="hm-final">
       <div class="hm-title" style="margin-bottom:14px;">${escapeHtml(T.finalT)}</div>
-      <button class="hm-cta" onclick="enterShopFromWelcome()">${escapeHtml(T.finalCta)} <span style="font-size:17px;">→</span></button>
+      <button class="hm-cta" onclick="enterShopFromWelcome(this)">${escapeHtml(T.finalCta)} <span style="font-size:17px;">→</span></button>
     </div>` + renderFooter();
 }
 function renderShop(){
@@ -8474,6 +8528,57 @@ function removeFromCart(itemId){
 }
 function cartTotal(){ return state.cart.reduce((s,i)=>s+i.price,0); }
 
+/* ===== CODE PROMO ===== */
+window.ktPromo = null;
+const KT_PROMO_TXT = {
+  ht:{ label:'Kòd promo', ph:'Antre kòd promo ou', apply:'Aplike', remove:'Retire', applied:'Kòd aplike', disc:'Rabè',
+       invalid:'Kòd sa a pa valab', expired:'Kòd sa a ekspire', not_yours:'Kòd sa a pa pou kont ou', used_up:'Kòd sa a fini', already:'Ou deja itilize kòd sa a', min:'Minimòm achte pou kòd sa a:', login:'Konekte anvan', empty:'Antre yon kòd' },
+  fr:{ label:'Code promo', ph:'Entrez votre code promo', apply:'Appliquer', remove:'Retirer', applied:'Code appliqué', disc:'Réduction',
+       invalid:'Code invalide', expired:'Ce code a expiré', not_yours:"Ce code n'est pas pour votre compte", used_up:'Ce code est épuisé', already:'Vous avez déjà utilisé ce code', min:'Achat minimum pour ce code :', login:'Connectez-vous d\'abord', empty:'Entrez un code' },
+  en:{ label:'Promo code', ph:'Enter your promo code', apply:'Apply', remove:'Remove', applied:'Code applied', disc:'Discount',
+       invalid:'Invalid code', expired:'This code has expired', not_yours:'This code is not for your account', used_up:'This code is used up', already:'You already used this code', min:'Minimum purchase for this code:', login:'Please log in first', empty:'Enter a code' },
+  es:{ label:'Código promo', ph:'Ingresa tu código promo', apply:'Aplicar', remove:'Quitar', applied:'Código aplicado', disc:'Descuento',
+       invalid:'Código inválido', expired:'Este código expiró', not_yours:'Este código no es para tu cuenta', used_up:'Este código se agotó', already:'Ya usaste este código', min:'Compra mínima para este código:', login:'Inicia sesión primero', empty:'Ingresa un código' }
+};
+function ktPT(k){ const d = KT_PROMO_TXT[currentLang] || KT_PROMO_TXT.fr; return d[k] || KT_PROMO_TXT.fr[k] || k; }
+function ktPromoCalc(total){
+  const p = window.ktPromo; if(!p) return 0;
+  let d = p.type === 'percent' ? Math.round(total * Math.min(p.value,100) / 100) : Math.min(p.value, total);
+  return Math.max(0, Math.min(d, total));
+}
+function ktPromoBox(){
+  const total = cartTotal();
+  if(window.ktPromo){
+    return `<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--green-dim);border:1.5px dashed var(--green);border-radius:12px;padding:10px 12px;margin:10px 0;">
+      <div style="font-size:13px;"><div style="font-weight:800;color:var(--green);">🏷️ ${escapeHtml(window.ktPromo.code)} — ${escapeHtml(ktPT('applied'))}</div>
+      <div style="font-size:12px;color:var(--muted);">${escapeHtml(ktPT('disc'))}: <b>-${money(ktPromoCalc(total))}</b></div></div>
+      <button class="mini-btn" style="color:var(--red);" onclick="ktPromoRemove()">${escapeHtml(ktPT('remove'))}</button></div>`;
+  }
+  return `<div style="margin:10px 0;">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">🏷️ ${escapeHtml(ktPT('label'))}</div>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="ktPromoInput" autocomplete="off" autocapitalize="characters" placeholder="${escapeHtml(ktPT('ph'))}" style="flex:1 1 auto;width:100%;min-width:0;box-sizing:border-box;background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;font-size:14px;color:var(--text);text-transform:uppercase;font-weight:700;letter-spacing:1px;">
+      <button class="btn btn-green" style="flex:0 0 auto;width:auto;padding:12px 18px;white-space:nowrap;" onclick="ktPromoApply()">${escapeHtml(ktPT('apply'))}</button>
+    </div></div>`;
+}
+async function ktPromoApply(){
+  if(!isLoggedIn()){ showToast(ktPT('login')); openAuthModal('login'); return; }
+  const inp = document.getElementById('ktPromoInput');
+  const code = (inp && inp.value || '').trim().toUpperCase();
+  if(!code){ showToast(ktPT('empty')); return; }
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.rpc('promo_check', { p_code: code, p_total: cartTotal(), p_consume: false });
+    if(error || !data){ showToast('⚠️ ' + ktPT('invalid')); return; }
+    if(!data.ok){ showToast('⚠️ ' + ktPT(data.reason || 'invalid') + (data.reason === 'min' ? ' ' + money(data.min) : '')); return; }
+    window.ktPromo = { code, type: data.type, value: Number(data.value) };
+    showToast('✅ ' + ktPT('applied'));
+    render();
+  }catch(e){ showToast('⚠️ ' + ktPT('invalid')); }
+}
+function ktPromoRemove(){ window.ktPromo = null; render(); }
+
+
 function renderCartItemCard(item, editable){
   const p = state.products.find(x=>x.id===item.productId);
   const img = p && p.image ? `<img src="${p.image.replace(/"/g,'')}" alt="${escapeHtml(item.productName)}" style="width:52px;height:52px;border-radius:13px;object-fit:cover;flex-shrink:0;background:var(--panel-2);">` : `<div style="width:52px;height:52px;border-radius:13px;background:linear-gradient(160deg, #0a1428, #1e1030);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:20px;">${p?p.icon:'🛍️'}</div>`;
@@ -8544,7 +8649,8 @@ function pagePanye(){
       <button class="btn btn-ghost" style="width:100%;margin:6px 0 14px;" onclick="goPage('shop')">${t('btn_continue_shopping')}</button>
       <div class="card">
         <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span style="color:var(--muted);">${t('subtotal')}</span><span>${money(total)}</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span style="color:var(--muted);">${t('field_total')}</span><b>${money(total)}</b></div>
+        ${window.ktPromo ? `<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span style="color:var(--muted);">${escapeHtml(ktPT('disc'))}</span><span style="color:var(--green);font-weight:700;">-${money(ktPromoCalc(total))}</span></div>` : ''}
+        <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px;"><span style="color:var(--muted);">${t('field_total')}</span><b>${money(total - ktPromoCalc(total))}</b></div>
         <button class="btn btn-green" style="width:100%;" onclick="goPage('checkout')">${t('btn_order')}</button>
       </div>
     ` : ''}
@@ -8555,6 +8661,8 @@ let returnToCheckoutAfterRecharge = false;
 function pageCheckout(){
   const items = state.cart;
   const total = cartTotal();
+  const promoDisc = ktPromoCalc(total);
+  const totalPay = total - promoDisc;
   const bal = walletBalance();
   const u = currentUser();
   const prof = u?.profile || {};
@@ -8602,6 +8710,7 @@ function pageCheckout(){
     </div>
     <div style="font-size:11.5px;letter-spacing:1.2px;font-weight:800;color:#8a9096;text-transform:uppercase;margin:22px 0 14px 4px;">${t('order_summary')}</div>
     ${items.map(i => renderCartItemCard(i, false)).join('')}
+    ${ktPromoBox()}
     <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:16px 0 8px;">${t('payment_method')}</div>
     <div style="display:flex;align-items:center;gap:12px;background:var(--green-dim);border:1.5px solid var(--green);border-radius:14px;padding:14px 16px;margin-bottom:10px;">
       <div style="width:20px;height:20px;border-radius:50%;border:2px solid var(--green);flex-shrink:0;display:flex;align-items:center;justify-content:center;"><div style="width:10px;height:10px;border-radius:50%;background:var(--green);"></div></div>
@@ -8610,16 +8719,16 @@ function pageCheckout(){
     </div>
     <div class="card" style="background:linear-gradient(135deg, var(--green-dim), #d8f5e2);border:1px solid #b8ecc9;padding:16px 18px;">
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;"><span style="color:#4b6b57;">${t('my_balance')}</span><span style="font-weight:700;color:var(--text);">${money(bal)}</span></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;"><span style="color:#4b6b57;font-weight:800;">${t('total_to_pay')}</span><span style="font-weight:800;color:var(--green);">${money(total)}</span></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;"><span style="color:#4b6b57;">${t('remaining_after')}</span><span style="font-weight:700;color:var(--text);">${money(Math.max(0, bal-total))}</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:14px;"><span style="color:#4b6b57;font-weight:800;">${t('total_to_pay')}</span><span style="font-weight:800;color:var(--green);">${money(totalPay)}</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px;"><span style="color:#4b6b57;">${t('remaining_after')}</span><span style="font-weight:700;color:var(--text);">${money(Math.max(0, bal-totalPay))}</span></div>
     </div>
-    <div style="text-align:center;background:var(--green-dim);border-radius:12px;padding:12px;margin-top:12px;font-size:12.5px;color:var(--green);font-weight:600;">🎉 Vous économisez <b>0 HTG</b> avec votre solde actuel</div>
+    <div style="text-align:center;background:var(--green-dim);border-radius:12px;padding:12px;margin-top:12px;font-size:12.5px;color:var(--green);font-weight:600;">🎉 Vous économisez <b>${money(promoDisc)}</b> avec votre solde actuel</div>
     <div class="card" style="margin-top:16px;">
       <label id="acceptTermsLabel" style="display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text);margin-bottom:14px;cursor:pointer;line-height:1.5;">
         <input type="checkbox" id="acceptTermsCheckbox" style="margin-top:2px;flex-shrink:0;">
         <span>${t('accept_terms_text')} <span style="color:var(--green);text-decoration:underline;" onclick="event.preventDefault();goPage('conditions')">${t('terms_link')}</span></span>
       </label>
-      ${bal >= total ? `
+      ${bal >= totalPay ? `
         <button id="checkoutSubmitBtn" style="width:100%;border:none;border-radius:14px;padding:16px;background:#14181c;color:#fff;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;" onclick="submitCheckout()">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
           ${t('btn_confirm_order')}
@@ -8697,7 +8806,20 @@ async function checkoutCart(){
   if(blockIfSuspended()) return;
   const total = cartTotal();
   if(total <= 0){ return; }
-  if(walletBalance() < total){ showToast(t('toast_cart_insufficient_balance')); return; }
+  let promoDisc = 0, promoCodeUsed = null;
+  if(window.ktPromo){
+    if(walletBalance() < total - ktPromoCalc(total)){ showToast(t('toast_cart_insufficient_balance')); return; }
+    try{
+      const sbP = await getSupabase();
+      const { data: pr, error: pe } = await sbP.rpc('promo_check', { p_code: window.ktPromo.code, p_total: total, p_consume: true });
+      if(pe || !pr || !pr.ok){
+        showToast('⚠️ ' + ktPT((pr && pr.reason) || 'invalid'));
+        window.ktPromo = null; render(); return;
+      }
+      promoDisc = Number(pr.discount) || 0; promoCodeUsed = window.ktPromo.code;
+      if(promoDisc > 0) await applyWalletChange(state.currentUserId, promoDisc, 'Code promo ' + promoCodeUsed, 'in', true);
+    }catch(e){ showToast('⚠️ ' + ktPT('invalid')); window.ktPromo = null; render(); return; }
+  } else if(walletBalance() < total){ showToast(t('toast_cart_insufficient_balance')); return; }
   const itemsToProcess = [...state.cart];
   const failed = [];
   const manualOrdersCreated = [];
@@ -8884,12 +9006,20 @@ async function checkoutCart(){
       manualOrdersCreated.push(order);
     }
   }
+  if(promoDisc > 0 && processedCount === 0){
+    // tout achte yo echwe: anile rabè a epi remèt kòd la disponib
+    await applyWalletChange(state.currentUserId, -promoDisc, 'Anilasyon kòd promo ' + promoCodeUsed, 'out');
+    try{ const sbR = await getSupabase(); await sbR.rpc('promo_release', { p_code: promoCodeUsed }); }catch(e){}
+    promoDisc = 0;
+  }
   if(processedAmount > 0){
     await applyWalletChange(state.currentUserId, -processedAmount, 'Panye — ' + processedCount + ' atik', 'out');
   }
   await fetchWalletFromServer(state.currentUserId);
   await fetchRewardProgress(state.currentUserId);
   state.cart = failed; // keep unfulfilled units in cart so the customer can retry or remove them
+  if(promoCodeUsed && promoDisc > 0){ window.ktPromo = null; try{ sendNtfyNotification('🏷️ Code promo itilize', '👤 ' + ((currentUser()||{}).name||'Kliyan') + '\nKòd: ' + promoCodeUsed + '\nRabè: HTG ' + promoDisc.toLocaleString('fr-FR'), 'default', 'label'); }catch(e){} }
+  else if(promoCodeUsed){ window.ktPromo = null; }
   await saveState();
   await saveCartToServer();
   render();
@@ -10775,6 +10905,7 @@ const ADMIN_TABS = [
   {id:'paramsite', label:'Paramèt'},
   {id:'pub', label:'📢 Pub'},
   {id:'konesans', label:'🧠 Konesans bot'},
+  {id:'promo', label:'🏷️ Kòd promo'},
   {id:'kerryrewards', label:'💎 Free Fire Reward'},
   {id:'demanderekonpans', label:'🎁 Demande Rekonpans'},
   {id:'chatkliyan', label:'💬 Chat Kliyan'},
@@ -11456,6 +11587,32 @@ function renderAdminTab(){
       <div id="referralWithdrawalsList">Chajman...</div>
     `;
     fetchReferralAdminData();
+  }
+  else if(adminTab === 'promo'){
+    box.innerHTML = `
+      <div class="card">
+        <div class="section-title" style="margin:0 0 6px;"><h3>🏷️ Kreye yon kòd promo</h3></div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <input id="pmCode" placeholder="KÒD (ex: KERRY10)" style="flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px;color:var(--text);text-transform:uppercase;font-weight:700;">
+          <button class="btn btn-ghost" onclick="promoGen()">🎲</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <select id="pmType" style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px;color:var(--text);"><option value="percent">% Pousantaj</option><option value="fixed">HTG Montan fiks</option></select>
+          <input id="pmValue" type="number" inputmode="decimal" placeholder="Valè (ex: 10)" style="flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px;color:var(--text);">
+        </div>
+        <input id="pmEmail" placeholder="Imèl kliyan (si se pou yon sèl kliyan — kite vid pou tout moun)" style="width:100%;box-sizing:border-box;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px;color:var(--text);margin-bottom:8px;">
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <input id="pmMax" type="number" inputmode="numeric" placeholder="Max itilizasyon (vid = pa gen limit)" style="flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px;color:var(--text);">
+          <input id="pmMin" type="number" inputmode="decimal" placeholder="Achte minimòm HTG" style="flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px;color:var(--text);">
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin:2px 0 4px;">Dat ekspirasyon (opsyonèl)</div>
+        <input id="pmExp" type="date" style="width:100%;box-sizing:border-box;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:11px;color:var(--text);margin-bottom:10px;">
+        <button class="btn btn-green" style="width:100%;" onclick="promoAdminCreate()">💾 Kreye kòd la</button>
+        <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.5;">Chak kliyan ka itilize yon kòd yon sèl fwa. Rabè a antre nan wallet kliyan an kòm bonis epi li depanse sou acha a.</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:16px 0 8px;">Kòd yo</div>
+      <div id="promoList">Chajman...</div>`;
+    fetchPromoCodes();
   }
   else if(adminTab === 'konesans'){
     const L = state.botFaq || [];
@@ -14381,6 +14538,25 @@ function ktPinCss(){
   #ktPinOverlay .kp-btn{margin-top:12px;height:46px;border-radius:23px;font-size:15px;}
   #ktPinOverlay .kp-link{min-height:38px;font-size:13.5px;}
   #ktPinOverlay .kp-spin{margin:22px 0;}
+  /* PIN popup blan */
+  #ktPinOverlay .kp-wrap{background:#fff;border:1px solid rgba(0,0,0,.08);box-shadow:0 24px 60px rgba(0,0,0,.35);color:#0b1a12;}
+  #ktPinOverlay h1{color:#0b1a12;}
+  #ktPinOverlay p{color:#5d6b63;}
+  #ktPinOverlay .kp-brand{color:#0fa654;}
+  #ktPinOverlay .kp-logo{box-shadow:0 4px 14px rgba(0,0,0,.12);border:1px solid rgba(0,0,0,.06);}
+  #ktPinOverlay .kp-ic{background:rgba(15,166,84,.12);color:#0fa654;}
+  #ktPinOverlay .kp-dot{border-color:rgba(15,166,84,.45);}
+  #ktPinOverlay .kp-dot.on{background:#0fa654;border-color:#0fa654;box-shadow:0 0 8px rgba(15,166,84,.45);}
+  #ktPinOverlay .kp-key{background:#f1f5f2;border:1px solid rgba(0,0,0,.06);color:#0b1a12;}
+  #ktPinOverlay .kp-key:active{background:rgba(15,166,84,.22);}
+  #ktPinOverlay .kp-key.bio{background:rgba(15,166,84,.12);border-color:rgba(15,166,84,.4);color:#0fa654;}
+  #ktPinOverlay .kp-key.del{background:transparent;border:none;color:#5d6b63;}
+  #ktPinOverlay .kp-link{color:#0fa654;}
+  #ktPinOverlay .kp-link.mut{color:#5d6b63;}
+  #ktPinOverlay .kp-btn:disabled{background:#e9efeb;color:#8a978f;}
+  #ktPinOverlay .kp-btn.ghost{background:#eef3ef;color:#0b1a12;}
+  #ktPinOverlay .kp-msg{color:#d32f2f;} #ktPinOverlay .kp-msg.ok{color:#0fa654;}
+  #ktPinOverlay .kp-spin{border-color:rgba(15,166,84,.25);border-top-color:#0fa654;}
   @keyframes kpspin{to{transform:rotate(360deg)}}
   @keyframes kpshake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}`;
   document.head.appendChild(s);
@@ -14458,6 +14634,7 @@ async function ktBioVerify(){
 
 /* ---- ekran ---- */
 function ktPinShow(mode){
+  { const wo = document.getElementById('welcomeOverlay'); if(wo && wo.style.display === 'block' && ['unlock','wait','create'].indexOf(mode) >= 0) return; } // paj akey: pa PIN
   const el = ktPinEl();
   const was = ktPin.mode;
   ktPin.mode = mode; ktPin.buf = ''; if(mode!=='confirm') ktPin.first = '';
