@@ -184,7 +184,7 @@ input,textarea,select{font-family:'Inter',sans-serif;}
 }
 .cat-heading .line{flex:1;height:1px;background:linear-gradient(90deg, var(--line), transparent);}
 
-.prod-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(150px, 1fr));gap:14px;}
+.prod-grid{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:12px;}
 @media (min-width:640px){.prod-grid{grid-template-columns:repeat(auto-fill, minmax(170px, 1fr));gap:18px;}}
 @media (min-width:1024px){.prod-grid{grid-template-columns:repeat(auto-fill, minmax(190px, 1fr));gap:22px;}}
 .prod-card{
@@ -514,7 +514,8 @@ table{width:100%;border-collapse:collapse;display:block;overflow-x:auto;-webkit-
   .tut-media{max-width:340px;margin:0 auto;display:block;}
 }
 img{max-width:100%;height:auto;}
-html,body{overflow-x:hidden;}
+html{overflow-x:hidden;}
+body{overflow-x:clip;} /* clip (pa hidden) pou header sticky la rete fiks lè w scroll */
 th{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted);text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);}
 td{padding:8px 8px;font-size:12px;border-bottom:1px solid #171D14;}
 .mini-btn{padding:5px 9px;border-radius:7px;font-size:10.5px;font-weight:700;background:var(--panel-2);border:1px solid var(--line);}
@@ -613,14 +614,77 @@ textarea.admin-ta{
 .sk-levels{display:flex;gap:4px;width:74px}
 .sk-levels i{height:9px;flex:1;border-radius:6px;background:#7cff3a}
 .sk-labels{position:absolute;bottom:3px;left:0;right:0;display:flex;justify-content:space-around;font-size:7px;font-weight:bold}
+@keyframes ktSpin{to{transform:rotate(360deg)}}
+
+.ktv{display:flex;align-items:center;gap:10px;min-width:215px;}
+.ktv-play{width:46px;height:46px;border-radius:50%;border:none;background:#ff3b14;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;cursor:pointer;}
+.ktv-mid{flex:1;min-width:0;}
+.ktv-bar{height:7px;border-radius:4px;background:#e4e4e4;position:relative;cursor:pointer;}
+.ktv-bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:4px;background:#ff3b14;}
+.ktv-time{font-size:12.5px;color:#6b6b6b;margin-top:5px;line-height:1;}
+.ktv-mic{color:#e5532f;flex-shrink:0;}
+.ktv-ts{text-align:right;font-size:11px;color:#9a9a9a;margin-top:4px;line-height:1;}
+.ktv-mine .ktv-play{background:#fff;color:#0a9e3d;}
+.ktv-mine .ktv-bar{background:rgba(255,255,255,.38);}
+.ktv-mine .ktv-bar i{background:#fff;}
+.ktv-mine .ktv-time,.ktv-mine .ktv-ts{color:rgba(255,255,255,.88);}
+.ktv-mine .ktv-mic{color:rgba(255,255,255,.92);}
+
+.ktled{overflow:hidden;white-space:nowrap;position:relative;padding:9px 0;font-weight:800;font-size:14px;letter-spacing:.2px;display:block;text-decoration:none;}
+.ktled .track{display:inline-block;padding-left:100%;animation:ktledrun var(--dur,16s) linear infinite;}
+@keyframes ktledrun{to{transform:translateX(-100%);}}
+
+.hm-hero{text-align:center;padding:8px 4px 4px;}
+.hm-h1{font-family:'Rajdhani',sans-serif;font-weight:800;font-size:30px;line-height:1.1;margin:10px 0 10px;letter-spacing:-.2px;}
+.hm-sub{color:var(--muted);font-size:14px;line-height:1.6;margin:0 auto 18px;max-width:340px;}
+.hm-cta{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:999px;padding:14px 26px;font-weight:800;font-size:14.5px;color:#fff;background:linear-gradient(135deg,#17c267,#0a8f45);box-shadow:0 10px 24px rgba(10,143,69,.35);cursor:pointer;font-family:inherit;}
+.hm-collage{position:relative;height:300px;max-width:320px;margin:26px auto 8px;}
+.hm-c1,.hm-c2{position:absolute;border-radius:20px;overflow:hidden;background:var(--panel-2) center/cover no-repeat;box-shadow:0 14px 30px rgba(0,0,0,.18);}
+.hm-c1{left:0;top:0;width:58%;height:240px;}
+.hm-c2{right:0;top:40px;width:54%;height:240px;z-index:2;}
+.hm-badge{position:absolute;left:50%;top:118px;transform:translateX(-50%);width:76px;height:76px;border-radius:50%;background:#fff;color:#0a8f45;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;text-align:center;line-height:1.15;box-shadow:0 8px 20px rgba(0,0,0,.2);z-index:2;padding:6px;border:2px solid #17c267;}
+.hm-chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:18px 0 6px;}
+.hm-chip{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 20px;font-weight:800;font-size:13px;color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.hm-wave{display:flex;justify-content:center;margin:22px 0 6px;color:var(--green);}
+.hm-title{font-family:'Rajdhani',sans-serif;font-weight:800;font-size:26px;text-align:center;margin:6px 0 6px;}
+.hm-lead{text-align:center;color:var(--muted);font-size:13px;line-height:1.6;margin:0 auto 18px;max-width:340px;}
+.hm-step{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px 16px;text-align:center;margin:0 auto 14px;max-width:340px;box-shadow:0 4px 14px rgba(0,0,0,.05);}
+.hm-step .ic{font-size:34px;margin-bottom:8px;}
+.hm-step b{display:block;font-size:15px;margin-bottom:6px;}
+.hm-step span{display:block;color:var(--muted);font-size:12.5px;line-height:1.55;}
+.hm-faq{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:4px 16px;max-width:480px;margin:0 auto;box-shadow:0 4px 14px rgba(0,0,0,.05);}
+.hm-faq details{border-bottom:1px solid var(--line);padding:14px 0;}
+.hm-faq details:last-child{border-bottom:none;}
+.hm-faq summary{font-weight:700;font-size:13.5px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px;align-items:center;}
+.hm-faq summary::-webkit-details-marker{display:none;}
+.hm-faq summary::after{content:'⌄';font-size:16px;color:var(--muted);transition:transform .2s;}
+.hm-faq details[open] summary::after{transform:rotate(180deg);}
+.hm-faq p{margin:10px 0 0;color:var(--muted);font-size:12.5px;line-height:1.6;}
+.hm-final{text-align:center;padding:28px 12px 8px;}
 </style>
 <script>(function(){ try{ localStorage.removeItem('kt_dark'); document.documentElement.classList.remove('dark'); }catch(e){} })();</script>
 </head>
 <body>
 <div id="videoPopupBg" style="display:none;position:fixed;inset:0;background:rgba(4,6,5,0.75);z-index:9000;align-items:center;justify-content:center;padding:16px;"></div>
-<div id="welcomeOverlay" style="display:none;position:fixed;inset:0;z-index:99998;">
+<div id="welcomeOverlay" style="display:none;position:fixed;inset:0;z-index:99998;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#f3f8f4;">
 <style>
-  .we-screen{height:100%;width:100%;position:relative;overflow:hidden;background:linear-gradient(160deg, #071a10 0%, #0a1710 40%, #050b08 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 26px;color:#fff;box-sizing:border-box;}
+  .we-dark{--panel:#fff;--panel-2:#e9efeb;--line:rgba(0,0,0,0.06);--text:#0b1a12;--muted:#5d6b63;--green:#0fa654;--ink:#0fa654;background:#f3f8f4;color:var(--text);padding:8px 18px 28px;min-height:100vh;}
+  .we-screen{display:none !important;}
+  .hm-badge{z-index:3;width:84px !important;height:84px !important;top:112px !important;padding:0 !important;}
+  .hm-ring{position:absolute;inset:0;animation:hmSpin 9s linear infinite;}
+  .hm-ring text{font-size:10.5px;font-weight:800;fill:#0a8f45;letter-spacing:.6px;font-family:Inter,sans-serif;}
+  .hm-badge .mid{position:relative;width:38px;height:38px;border-radius:50%;overflow:hidden;display:block;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.15);} .hm-badge .mid img{width:100%;height:100%;object-fit:cover;display:block;}
+  @keyframes hmSpin{to{transform:rotate(360deg);}}
+  .we-dark .we-lang-dropdown{top:14px;right:14px;}
+  .we-dark .we-lang-btn{background:#fff;border:1px solid rgba(0,0,0,.08);color:#0b1a12;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+  .we-dark .we-lang-list{background:#fff;border:1px solid rgba(0,0,0,.08);box-shadow:0 12px 28px rgba(0,0,0,.15);}
+  .we-dark .we-lang-opt{color:#0b1a12;} .we-dark .we-lang-opt:hover{background:#eef6f1;}
+  .hm-c1{transform:rotate(-3deg);} .hm-c2{transform:rotate(3deg);border:5px solid #0b0b0b;border-radius:24px;}
+  .hm-trust{display:grid;grid-template-columns:1fr 1fr;gap:16px 10px;max-width:400px;margin:26px auto 0;}
+  .hm-tr{display:flex;gap:8px;align-items:flex-start;} .hm-tr i{font-style:normal;font-size:18px;line-height:1;} .hm-tr b{display:block;font-size:11.5px;} .hm-tr span{display:block;font-size:10px;color:var(--muted);line-height:1.35;}
+  .we-dark .hm-step,.we-dark .hm-faq,.we-dark .hm-chip{box-shadow:none;}
+  .we-dark .prod-card{background:var(--panel);}
+  .we-screen{min-height:100vh;min-height:100dvh;width:100%;position:relative;overflow:hidden;background:linear-gradient(160deg, #071a10 0%, #0a1710 40%, #050b08 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 26px;color:#fff;box-sizing:border-box;}
   .we-particle{position:absolute;border-radius:50%;background:#3fce7c;opacity:0.5;animation:weFloat 8s ease-in-out infinite;}
   .we-p1{width:5px;height:5px;top:15%;left:20%;animation-delay:0s;}
   .we-p2{width:3px;height:3px;top:25%;right:18%;animation-delay:1.2s;}
@@ -674,18 +738,6 @@ textarea.admin-ta{
   <div class="we-glow-ring"></div>
   <span class="we-particle we-p1"></span><span class="we-particle we-p2"></span><span class="we-particle we-p3"></span>
   <span class="we-particle we-p4"></span><span class="we-particle we-p5"></span><span class="we-particle we-p6"></span>
-  <div class="we-lang-dropdown">
-    <div class="we-lang-btn" id="weLangBtn" onclick="toggleWelcomeLangList()">
-      <span id="weLangFlag">🇭🇹</span><span id="weLangCode">HT</span>
-      <svg class="we-chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-    </div>
-    <div class="we-lang-list" id="weLangList">
-      <div class="we-lang-opt" onclick="selectWelcomeLang('ht','🇭🇹','HT')"><span>🇭🇹</span> Kreyòl</div>
-      <div class="we-lang-opt" onclick="selectWelcomeLang('fr','🇫🇷','FR')"><span>🇫🇷</span> Français</div>
-      <div class="we-lang-opt" onclick="selectWelcomeLang('en','🇺🇸','EN')"><span>🇺🇸</span> English</div>
-      <div class="we-lang-opt" onclick="selectWelcomeLang('es','🇪🇸','ES')"><span>🇪🇸</span> Español</div>
-    </div>
-  </div>
   <div class="we-logo-wrap">
     <div class="we-logo-ring"></div>
     <div class="we-logo-box"><img id="ktLogoWelcome" src="" alt="Kerry Topup Official"></div><script>document.getElementById('ktLogoWelcome').src=window.KT_LOGO_SRC;</script>
@@ -709,6 +761,20 @@ textarea.admin-ta{
   </div>
   <button class="we-cta" onclick="enterShopFromWelcome()"><span class="we-cta-sheen"></span><span class="we-cta-label" id="weCtaLabel">Découvrir la boutique →</span></button>
 </div>
+<div id="weLong" class="we-dark" style="position:relative;">
+  <div class="we-lang-dropdown">
+    <div class="we-lang-btn" id="weLangBtn" onclick="toggleWelcomeLangList()">
+      <span id="weLangFlag">🇭🇹</span><span id="weLangCode">HT</span>
+      <svg class="we-chev" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+    </div>
+    <div class="we-lang-list" id="weLangList">
+      <div class="we-lang-opt" onclick="selectWelcomeLang('ht','🇭🇹','HT')"><span>🇭🇹</span> Kreyòl</div>
+      <div class="we-lang-opt" onclick="selectWelcomeLang('fr','🇫🇷','FR')"><span>🇫🇷</span> Français</div>
+      <div class="we-lang-opt" onclick="selectWelcomeLang('en','🇺🇸','EN')"><span>🇺🇸</span> English</div>
+      <div class="we-lang-opt" onclick="selectWelcomeLang('es','🇪🇸','ES')"><span>🇪🇸</span> Español</div>
+    </div>
+  </div>
+<div id="weHero"></div><div id="weProd"></div><div id="weLower"></div></div>
 </div>
 <script>if(window.location.pathname === '/'){
   document.getElementById('welcomeOverlay').style.display = 'block';
@@ -731,22 +797,22 @@ textarea.admin-ta{
     @keyframes ubSheenSweep{0%{left:-60%;}35%{left:130%;}100%{left:130%;}}
   </style>
   <div class="ub-glow"></div>
-  <div style="display:flex;align-items:center;gap:12px;position:relative;z-index:1;">
+  <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;position:relative;z-index:1;">
     <div style="position:relative;flex-shrink:0;">
       <div class="ub-icon-ring"></div>
       <div class="ub-icon" style="width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#4fe08c,#0a9e3d);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(10,158,61,0.4);">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
       </div>
     </div>
-    <div style="flex:1;min-width:0;">
-      <div style="font-size:12.5px;font-weight:800;color:#fff;margin-bottom:2px;">✨ <span data-i18n="update_title">Nouvelle version</span></div>
-      <div style="font-size:10px;color:#8aa398;line-height:1.3;" data-i18n="update_sub">Améliorations disponibles</div>
+    <div style="width:100%;min-width:0;">
+      <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:3px;">✨ <span data-i18n="update_title">Nouvelle version</span></div>
+      <div style="font-size:12px;color:#8aa398;line-height:1.3;" data-i18n="update_sub">Améliorations disponibles</div>
     </div>
-    <button onclick="applyPendingUpdate()" style="flex-shrink:0;background:linear-gradient(135deg,#4fe08c,#0a9e3d);color:#06180d;border:none;border-radius:11px;padding:9px 13px;font-weight:800;font-size:11px;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 8px 18px rgba(10,158,61,0.35), inset 0 1px 0 rgba(255,255,255,0.25);white-space:nowrap;">
+    <button onclick="applyPendingUpdate()" style="width:100%;flex-shrink:0;background:linear-gradient(135deg,#4fe08c,#0a9e3d);color:#06180d;border:none;border-radius:12px;padding:12px 13px;font-weight:800;font-size:13px;cursor:pointer;position:relative;overflow:hidden;box-shadow:0 8px 18px rgba(10,158,61,0.35), inset 0 1px 0 rgba(255,255,255,0.25);white-space:nowrap;">
       <span class="ub-btn-sheen"></span><span data-i18n="update_btn">Mettre à jour</span>
     </button>
   </div>
-  <label for="autoUpdateCheck" style="display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,0.08);position:relative;z-index:1;cursor:pointer;">
+  <label for="autoUpdateCheck" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,0.08);position:relative;z-index:1;cursor:pointer;">
     <input type="checkbox" id="autoUpdateCheck" style="width:16px;height:16px;border-radius:5px;flex-shrink:0;accent-color:#3fce7c;cursor:pointer;">
     <span style="font-size:10px;color:#c3d6cc;user-select:none;" data-i18n="update_auto_label">Mettre à jour automatiquement à l'avenir</span>
   </label>
@@ -831,6 +897,8 @@ textarea.admin-ta{
     <button onclick="dismissInstallBanner()" style="background:none;border:none;color:#111827;font-size:18px;font-weight:700;padding:0 4px;flex-shrink:0;">✕</button>
   </div>
 
+  <div id="ledBannerBox"></div>
+
   <!-- ===== IMAJ PWODWI (deyò .content, san padding) ===== -->
   <div id="productHeroWrap"></div>
 
@@ -910,7 +978,8 @@ textarea.admin-ta{
       </button>
     </div>
     <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(63,206,124,0.22);border-radius:26px;padding:10px 12px 10px 14px;">
-      <input type="text" id="supportChatInput" placeholder="Reponn Touski..." style="width:100%;box-sizing:border-box;border:none;outline:none;background:transparent;padding:6px 2px 12px;font-size:15px;color:#e8f5ec;" oninput="updateSupportSendBtn()" onkeydown="if(event.key==='Enter')sendSupportMessage()">
+      <div id="supportImgPrev" style="display:none;padding:4px 2px 8px;"></div>
+      <textarea id="supportChatInput" rows="1" enterkeyhint="enter" placeholder="Reponn Touski..." style="width:100%;box-sizing:border-box;border:none;outline:none;background:transparent;padding:6px 2px 12px;font-size:15px;color:#e8f5ec;resize:none;overflow-y:auto;max-height:120px;line-height:1.4;font-family:inherit;display:block;" oninput="updateSupportSendBtn()" onkeydown="if(event.key==='Enter' && !event.shiftKey && !window.matchMedia('(pointer:coarse)').matches){event.preventDefault();sendSupportMessage();}"></textarea>
       <div style="display:flex;align-items:center;gap:8px;">
         <label aria-label="Image" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#e8f5ec;flex-shrink:0;cursor:pointer;font-size:22px;line-height:1;font-weight:300;">+<input type="file" accept="image/*" style="display:none;" onchange="sendSupportImage(this)"></label>
         <button id="supportModelChip" onclick="toggleSupportModelMenu(event)" style="display:flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:19px;border:none;background:rgba(255,255,255,0.08);color:#e8f5ec;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;"><span id="supportModelChipName">Touski 5.5</span><span id="supportModelChipEffort" style="color:#93b1a1;font-weight:600;">Moyen</span></button>
@@ -1944,6 +2013,7 @@ let state = {
   orders: {},           // userId -> [{id, orderNo, type, status, product, variant, price, pin, date}]
   rechargeRequests: [], // {id, userId, amount, txnId, status, date}
   siteBanners: [],
+  botFaq: [],
   products: [],         // {id, category, name, icon, type:'pin'|'calculator', variants / manualConfig}
   productsLoaded: false,
   inventory: {},         // variantId -> [{code, status:'dispo'|'vann'}]
@@ -2429,6 +2499,45 @@ function pageCustomInfo(slug){
     <div class="card" style="font-size:13.5px;color:var(--text);line-height:1.7;">${content}</div>
   `;
 }
+
+async function fetchBotFaq(){
+  try{
+    const sb = await getSupabase();
+    const { data } = await sb.from('site_content').select('*').eq('key','bot_knowledge').maybeSingle();
+    if(data && data.content){ const a = JSON.parse(data.content); if(Array.isArray(a)) state.botFaq = a; }
+  }catch(e){ console.warn('fetchBotFaq failed:', e?.message||e); }
+}
+async function botFaqSave(){
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('site_content').upsert({ key:'bot_knowledge', content: JSON.stringify(state.botFaq||[]), updated_at: new Date().toISOString() });
+    if(error){ showToast('⚠️ Erè: ' + error.message); return false; }
+    return true;
+  }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); return false; }
+}
+async function botFaqAdd(){
+  const q = document.getElementById('faqQ').value.trim();
+  const a = document.getElementById('faqA').value.trim();
+  if(!q || !a){ showToast('Ekri kesyon an ak repons lan'); return; }
+  const idxStr = document.getElementById('faqEditIdx').value;
+  if(!state.botFaq) state.botFaq = [];
+  if(idxStr !== '' && state.botFaq[+idxStr]) state.botFaq[+idxStr] = { q: q.slice(0,300), a: a.slice(0,1200) };
+  else state.botFaq.unshift({ q: q.slice(0,300), a: a.slice(0,1200) });
+  if(await botFaqSave()){ showToast('✅ Touski aprann sa'); }
+  renderAdminTab();
+}
+function botFaqEdit(i){
+  const x = (state.botFaq||[])[i]; if(!x) return;
+  document.getElementById('faqQ').value = x.q;
+  document.getElementById('faqA').value = x.a;
+  document.getElementById('faqEditIdx').value = String(i);
+  document.getElementById('faqQ').scrollIntoView({behavior:'smooth', block:'center'});
+}
+async function botFaqDel(i){
+  state.botFaq.splice(i, 1);
+  if(await botFaqSave()) showToast('Efase');
+  renderAdminTab();
+}
 async function fetchPaymentSettings(){
   try{
     const sb = await getSupabase();
@@ -2446,7 +2555,7 @@ async function savePaymentSettings(){
   const whatsapp = document.getElementById('paySetWhatsapp').value.trim();
   const ntfyTopic = document.getElementById('paySetNtfy').value.trim();
   if(!number || !name || !whatsapp){ showToast('Ranpli tout chan yo'); return; }
-  state.paymentSettings = { number, name, whatsapp, ntfyTopic };
+  state.paymentSettings = { ...state.paymentSettings, number, name, whatsapp, ntfyTopic };
   try{
     const sb = await getSupabase();
     await sb.from('site_content').upsert({ key:'payment_settings', content: JSON.stringify(state.paymentSettings), updated_at: new Date().toISOString() });
@@ -2837,17 +2946,101 @@ function pickChatLang(l){
   applySupportPersonaUI();
   sendChatGreeting();
 }
+
+const KT_V_PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M7 4.5v15l12-7.5z"/></svg>';
+const KT_V_PAUSE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4.2" height="15" rx="1.2"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.2"/></svg>';
+let _ktVoiceCur = null;
+function ktVFmt(sec){ sec = Math.max(0, Math.floor(sec||0)); return Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0'); }
+function ktVoiceClick(ev, el){
+  ev.stopPropagation();
+  const btn = el.querySelector('.ktv-play'), bar = el.querySelector('.ktv-bar'), fill = bar.firstElementChild, tm = el.querySelector('.ktv-time');
+  let a = el._a;
+  if(!a){
+    a = el._a = new Audio(el.dataset.src);
+    a.preload = 'auto';
+    const upd = () => {
+      const d = isFinite(a.duration) ? a.duration : 0;
+      fill.style.width = d ? Math.min(100, a.currentTime / d * 100) + '%' : '0%';
+      tm.textContent = a.paused && a.currentTime === 0 ? ktVFmt(d) : ktVFmt(a.currentTime);
+    };
+    a.addEventListener('timeupdate', upd);
+    a.addEventListener('loadedmetadata', () => {
+      if(!isFinite(a.duration)){ // weba MediaRecorder: duree pa konnen — fòse kalkil la
+        a.currentTime = 1e101;
+        a.addEventListener('timeupdate', function fix(){ a.removeEventListener('timeupdate', fix); a.currentTime = 0; upd(); });
+      } else upd();
+    });
+    a.addEventListener('play', () => { btn.innerHTML = KT_V_PAUSE; });
+    a.addEventListener('pause', () => { btn.innerHTML = KT_V_PLAY; upd(); });
+    a.addEventListener('ended', () => { a.currentTime = 0; btn.innerHTML = KT_V_PLAY; fill.style.width = '0%'; upd(); });
+    el._upd = upd;
+  }
+  if(ev.target.closest('.ktv-bar') && isFinite(a.duration) && a.duration > 0){
+    const r = bar.getBoundingClientRect();
+    a.currentTime = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)) * a.duration;
+    if(a.paused) a.play().catch(()=>{});
+    return;
+  }
+  if(a.paused){
+    if(_ktVoiceCur && _ktVoiceCur !== a) _ktVoiceCur.pause();
+    _ktVoiceCur = a;
+    a.play().catch(()=>{});
+  } else a.pause();
+}
+function ktIsVoiceText(t){ return /^\s*https?:\/\/\S+\.(?:weba|ogg|mp3|wav|m4a)(?:\?\S*)?\s*$/i.test(t||''); }
+
+function ktOpenImg(url){
+  const old = document.getElementById('ktImgLb'); if(old) old.remove();
+  const o = document.createElement('div');
+  o.id = 'ktImgLb';
+  o.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;padding:12px;';
+  o.onclick = () => o.remove();
+  o.innerHTML = '<img src="' + String(url).replace(/"/g,'') + '" alt="" style="max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;"><button type="button" aria-label="Close" style="position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:14px;width:40px;height:40px;border-radius:50%;border:none;background:rgba(255,255,255,.18);color:#fff;font-size:22px;line-height:1;cursor:pointer;">✕</button>';
+  document.body.appendChild(o);
+}
+function ktIsImageText(t){ return /^\s*https?:\/\/\S+\.(?:jpg|jpeg|png|webp|gif)(?:\?\S*)?\s*$/i.test(t||''); }
+function ktIsVideoText(t){ return /^\s*https?:\/\/\S+\.(?:mp4|webm|mov|m4v)(?:\?\S*)?\s*$/i.test(t||''); }
+function ktStyleVoiceBubble(b, mine, text, when){
+  if(b && (ktIsVideoText(text) || ktIsImageText(text))){
+    b.classList.toggle('ktv-mine', !!mine);
+    const _isImg = ktIsImageText(text); b.style.padding = '4px 4px 6px'; b.style.width = _isImg ? 'auto' : '270px'; b.style.maxWidth = '100%'; b.style.display = 'inline-block'; if(_isImg){ const _im = b.querySelector('.ktimg'); if(_im) _im.style.marginTop = '0'; }
+    const vd = b.querySelector('.ktvid'); if(vd) vd.style.marginTop = '0';
+    if(mine){ b.style.background = 'linear-gradient(135deg, #3fce7c, #0a9e3d)'; b.style.color = '#fff'; }
+    else { b.style.background = '#ffffff'; b.style.color = '#111'; b.style.border = 'none'; b.style.backdropFilter = 'none'; b.style.boxShadow = '0 2px 8px rgba(0,0,0,0.18)'; }
+    if(!b.querySelector('.ktv-ts')){
+      const d = when ? new Date(when) : new Date();
+      const ts = document.createElement('div'); ts.className = 'ktv-ts'; ts.style.padding = '0 6px';
+      ts.textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      b.appendChild(ts);
+    }
+    return;
+  }
+  if(!b || !ktIsVoiceText(text)) return;
+  b.classList.toggle('ktv-mine', !!mine);
+  b.style.padding = '9px 12px 8px';
+  if(mine){
+    b.style.background = 'linear-gradient(135deg, #3fce7c, #0a9e3d)'; b.style.color = '#fff';
+  } else {
+    b.style.background = '#ffffff'; b.style.color = '#111'; b.style.border = 'none'; b.style.backdropFilter = 'none'; b.style.boxShadow = '0 2px 8px rgba(0,0,0,0.18)';
+  }
+  if(!b.querySelector('.ktv-ts')){
+    const d = when ? new Date(when) : new Date();
+    const ts = document.createElement('div'); ts.className = 'ktv-ts';
+    ts.textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+    b.appendChild(ts);
+  }
+}
 function formatChatText(text){
   let escaped = escapeHtml(text);
   escaped = escaped.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
   escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:jpg|jpeg|png|webp|gif)(?:\?[^\s<]*)?)/gi, (url) => {
-    return `<a href="${url}" target="_blank"><img src="${url}" style="max-width:100%;border-radius:10px;display:block;margin-top:4px;"></a>`;
+    return `<img class="ktimg" src="${url}" alt="" loading="lazy" onclick="event.stopPropagation();ktOpenImg(this.src)" style="width:auto;height:auto;max-width:140px;max-height:250px;object-fit:contain;border-radius:10px;display:block;margin-top:4px;cursor:zoom-in;background:#0d2a1c;">`;
   });
   escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:mp4|webm|mov|m4v)(?:\?[^\s<]*)?)/gi, (url) => {
-    return `<div style="margin-top:8px;"><video src="${url}" controls style="width:100%;border-radius:10px;background:#000;max-height:220px;display:block;"></video></div>`;
+    return `<div class="ktvid" style="margin-top:8px;"><video src="${url}" controls playsinline preload="metadata" style="width:100%;border-radius:12px;background:#000;max-height:340px;display:block;"></video></div>`;
   });
   escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:weba|ogg|mp3|wav|m4a)(?:\?[^\s<]*)?)/gi, (url) => {
-    return `<audio src="${url}" controls controlsList="nodownload noplaybackrate" oncontextmenu="return false" style="width:220px;max-width:100%;display:block;margin-top:4px;"></audio>`;
+    return `<div class="ktv" data-src="${url}" onclick="ktVoiceClick(event,this)"><button type="button" class="ktv-play" aria-label="Play">${KT_V_PLAY}</button><div class="ktv-mid"><div class="ktv-bar"><i></i></div><div class="ktv-time">0:00</div></div><svg class="ktv-mic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></div>`;
   });
   escaped = escaped.replace(/(https?:\/\/[^\s<]*(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))[a-zA-Z0-9_-]{11}[^\s<]*)/gi, (url) => {
     const embed = youtubeEmbedUrl(url);
@@ -2986,21 +3179,31 @@ function addSupportMessage(role, text, skipHistory, meta){
   const box = document.getElementById('supportChatMessages');
   const row = document.createElement('div');
   const isBot = role === 'assistant';
-  row.style.cssText = 'display:flex;gap:10px;margin-bottom:4px;' + (role==='user' ? 'flex-direction:row-reverse;' : '');
+  row.style.cssText = 'display:flex;gap:8px;margin-bottom:6px;align-items:flex-end;' + (role==='user' ? 'flex-direction:row-reverse;' : '');
   row.dataset.role = role;
   row._hist = entry;
   row._text = text;
   if(meta.id) row.dataset.dbid = meta.id;
   row._reactions = (meta.reactions && typeof meta.reactions === 'object') ? meta.reactions : {};
-  const avatarHtml = isBot ? `<div style="width:30px;height:30px;border-radius:50%;background:#fff;border:1px solid rgba(63,206,124,0.3);overflow:hidden;flex-shrink:0;padding:2px;box-sizing:border-box;"><img src="${window.KT_LOGO_SRC}" alt="Kerry Topup" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>` : '';
+  const _logoAv = `<div class="kc-av" style="width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid rgba(63,206,124,0.3);overflow:hidden;flex-shrink:0;padding:2px;box-sizing:border-box;"><img src="${window.KT_LOGO_SRC}" alt="Kerry Topup" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>`;
+  let avatarHtml = _logoAv;
+  if(role === 'user'){
+    const _cu = (typeof currentUser === 'function') ? currentUser() : null;
+    const _ini = escapeHtml(((_cu && _cu.name) || (state.currentUserId ? 'K' : '?')).trim().charAt(0).toUpperCase() || '?');
+    avatarHtml = (_cu && _cu.googlePhoto)
+      ? `<div class="kc-av" style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1.5px solid rgba(63,206,124,0.6);"><img src="${escapeHtml(_cu.googlePhoto)}" alt="" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentNode.innerHTML='<span style=&quot;display:flex;width:100%;height:100%;align-items:center;justify-content:center;background:#1c4a33;color:#fff;font-weight:800;font-size:13px;&quot;>${_ini}</span>'"></div>`
+      : `<div class="kc-av" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3fce7c,#0a9e3d);color:#fff;font-weight:800;font-size:13px;border:1.5px solid rgba(255,255,255,0.35);">${_ini}</div>`;
+  }
   const styles = {
-    user: 'background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border-radius:16px 4px 16px 16px;box-shadow:0 4px 14px rgba(10,158,61,0.35);',
-    admin: 'background:#1565D8;color:#fff;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.2);',
-    assistant: 'background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);backdrop-filter:blur(6px);color:#e8f5ec;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.15);'
+    user: 'background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border-radius:16px 16px 4px 16px;box-shadow:0 4px 14px rgba(10,158,61,0.35);',
+    admin: 'background:#1565D8;color:#fff;border-radius:16px 16px 16px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.2);',
+    assistant: 'background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);backdrop-filter:blur(6px);color:#e8f5ec;border-radius:16px 16px 16px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);'
   };
   const bubbleStyle = (styles[role] || styles.assistant) + 'padding:14px 16px;max-width:100%;font-size:14.5px;white-space:pre-wrap;line-height:1.55;box-sizing:border-box;';
   row.innerHTML = avatarHtml + '<div style="display:flex;flex-direction:column;max-width:82%;min-width:0;align-items:' + (role==='user' ? 'flex-end' : 'flex-start') + ';"><div class="kc-bubble" style="' + bubbleStyle + '">' + formatChatText(text) + '</div><div class="kc-react" style="display:none;margin-top:-6px;"></div></div>';
+  { const _pr = box.lastElementChild; if(_pr && _pr.dataset && _pr.dataset.role === role){ const _pa = _pr.querySelector('.kc-av'); if(_pa) _pa.style.visibility = 'hidden'; } }
   box.appendChild(row);
+  ktStyleVoiceBubble(row.querySelector('.kc-bubble'), role === 'user', text, meta.created_at);
   if(role === 'admin') hideSupportTyping();
   if(meta.deleted) applySupportDeleted(row);
   else { renderSupportReactions(row); if(meta.edited) setSupportBubbleText(row, text, true); }
@@ -3129,13 +3332,51 @@ async function fetchCustomerHistoryForChat(){
     return text || 'Kliyan an konekte men li pa gen okenn kòmand/rechaj toujou.';
   }catch(e){ console.warn('fetchCustomerHistoryForChat failed:', e?.message||e); return null; }
 }
+window._ktPend = null;
+function ktRenderImgPrev(){
+  const box = document.getElementById('supportImgPrev'); if(!box) return;
+  const p = window._ktPend;
+  if(!p){ box.style.display = 'none'; box.innerHTML = ''; return; }
+  box.style.display = 'block';
+  box.innerHTML = `<div style="position:relative;width:76px;height:76px;border-radius:18px;overflow:hidden;background:#0d2a1c;">
+    <img src="${p.objUrl}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;${p.uploading?'filter:brightness(.6);':''}">
+    ${p.uploading ? '<svg width="34" height="34" viewBox="0 0 50 50" style="position:absolute;left:21px;top:21px;animation:ktSpin .9s linear infinite;"><circle cx="25" cy="25" r="20" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="5"/><path d="M25 5a20 20 0 0 1 20 20" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round"/></svg>' : ''}
+    <button type="button" aria-label="Retire" onclick="ktRemovePendingImage()" style="position:absolute;top:4px;right:4px;width:26px;height:26px;border-radius:50%;border:none;background:#fff;color:#111;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M5 5l14 14M19 5L5 19"/></svg>
+    </button>
+  </div>`;
+}
+function ktRemovePendingImage(){
+  const p = window._ktPend;
+  if(p){ p.cancelled = true; try{ URL.revokeObjectURL(p.objUrl); }catch(e){} }
+  window._ktPend = null;
+  ktRenderImgPrev();
+  updateSupportSendBtn();
+}
 async function sendSupportImage(input){
   const file = input.files[0];
   if(!file) return;
   input.value = '';
-  showToast('Ap voye foto a...');
-  const url = await uploadImageToStorage(file);
-  if(!url) return;
+  if(window._ktPend) ktRemovePendingImage();
+  const p = { file, objUrl: URL.createObjectURL(file), uploading:true, url:null, cancelled:false };
+  p.promise = (async()=>{
+    let url = null;
+    try{ url = await uploadImageToStorage(file); }catch(e){}
+    p.url = url; p.uploading = false;
+    if(window._ktPend === p) ktRenderImgPrev();
+    return url;
+  })();
+  window._ktPend = p;
+  ktRenderImgPrev();
+  updateSupportSendBtn();
+}
+async function ktFlushPendingImage(){
+  const p = window._ktPend;
+  if(!p) return true;
+  const url = await p.promise;
+  if(p.cancelled || window._ktPend !== p) return false;
+  if(!url){ ktRemovePendingImage(); showToast('⚠️ Pa ka voye foto — eseye ankò'); return false; }
+  window._ktPend = null; ktRenderImgPrev(); updateSupportSendBtn();
   const _imgRow = addSupportMessage('user', url);
   if(supportConversationId){
     try{
@@ -3146,9 +3387,8 @@ async function sendSupportImage(input){
       const u = currentUser();
       sendNtfyNotification('📷 Nouvo foto kliyan', '👤 ' + (u?.name||'Kliyan') + '\n📧 ' + (u?.email||''), 'default', 'camera');
     }catch(e){ showToast('⚠️ Pa ka voye foto — eseye ankò'); }
-  } else {
-    showToast('Foto voye ✓');
   }
+  return true;
 }
 /* ---- Mesaj vokal nan chat sipò a ---- */
 let supportMediaRecorder = null;
@@ -3183,13 +3423,14 @@ function updateSupportSendBtn(){
   const micIcon = document.getElementById('supportMicIcon');
   const sendIcon = document.getElementById('supportSendIcon');
   if(!input || !micIcon || !sendIcon) return;
-  const hasText = input.value.trim().length > 0;
+  input.style.height = 'auto'; input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  const hasText = input.value.trim().length > 0 || !!window._ktPend;
   micIcon.style.display = hasText ? 'none' : 'block';
   sendIcon.style.display = hasText ? 'block' : 'none';
 }
 function onSupportMicSendClick(){
   const input = document.getElementById('supportChatInput');
-  if(input && input.value.trim().length > 0){
+  if((input && input.value.trim().length > 0) || window._ktPend){
     sendSupportMessage();
     updateSupportSendBtn();
   } else {
@@ -3300,8 +3541,9 @@ function ktBlockBadText(text){
 async function sendSupportMessage(){
   const input = document.getElementById('supportChatInput');
   const text = input.value.trim();
-  if(!text) return;
-  if(ktBlockBadText(text)) return;
+  if(!text && !window._ktPend) return;
+  if(text && ktBlockBadText(text)) return;
+  if(window._ktPend){ const ok = await ktFlushPendingImage(); if(!ok) return; if(!text) return; }
   input.value = '';
   updateSupportSendBtn();
   const _txtRow = addSupportMessage('user', text);
@@ -3405,7 +3647,8 @@ RÈG STRIK KONFIDANSYALITE (SWIV TOUJOU, SAN EKSEPSYON):
       language: currentLang,
       persona: supportPersona,
       isLoggedIn: !!state.currentUserId,
-      customerHistory: customerHistory
+      customerHistory: customerHistory,
+      faq: (state.botFaq||[]).filter(x=>x&&x.q&&x.a).map(x => 'K: ' + x.q + '\nR: ' + x.a).join('\n\n').slice(0, 7000)
     };
     const res = await fetch(SUPPORT_FN_URL, {
       method: 'POST',
@@ -3712,14 +3955,36 @@ async function addRewardProgram(){
   const purchasesRequired = parseInt(document.getElementById('rwProgRequired').value);
   const rewardVariantId = document.getElementById('rwProgReward').value;
   if(!variantId || !rewardVariantId || !purchasesRequired || purchasesRequired<=0){ showToast('Ranpli tout chan yo'); return; }
+  const editId = window.rwEditId || null;
   try{
     const sb = await getSupabase();
-    await sb.from('reward_programs').insert({ variant_id:variantId, purchases_required:purchasesRequired, reward_variant_id:rewardVariantId, active:true });
+    if(editId){
+      const { error } = await sb.from('reward_programs').update({ variant_id:variantId, purchases_required:purchasesRequired, reward_variant_id:rewardVariantId }).eq('id', editId);
+      if(error){ showToast('⚠️ ' + error.message); return; }
+    } else {
+      await sb.from('reward_programs').insert({ variant_id:variantId, purchases_required:purchasesRequired, reward_variant_id:rewardVariantId, active:true });
+    }
   }catch(e){}
+  window.rwEditId = null;
   await fetchRewardPrograms();
   renderAdminTab();
-  showToast('Pwogram ajoute ✓');
+  showToast(editId ? '✅ Pwogram modifye (pwogrè kliyan yo rete)' : 'Pwogram ajoute ✓');
 }
+function editRewardProgram(id){
+  const p = state.rewardPrograms.find(x => x.id === id);
+  if(!p) return;
+  window.rwEditId = id;
+  renderAdminTab();
+  setTimeout(() => {
+    const a = document.getElementById('rwProgVariant'), b = document.getElementById('rwProgRequired'), c = document.getElementById('rwProgReward');
+    if(a) a.value = p.variantId;
+    if(b) b.value = p.purchasesRequired;
+    if(c) c.value = p.rewardVariantId;
+    const card = document.getElementById('rwProgCard');
+    if(card) card.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 50);
+}
+function cancelEditRewardProgram(){ window.rwEditId = null; renderAdminTab(); }
 async function toggleRewardProgram(id, active){
   try{ const sb = await getSupabase(); await sb.from('reward_programs').update({ active }).eq('id', id); }catch(e){}
   const p = state.rewardPrograms.find(x=>x.id===id);
@@ -3787,24 +4052,26 @@ function renderKerryRewardsAdminTab(){
       </label>
       <button class="btn btn-green" onclick="saveRewardSettings()">Sove Bonus</button>
     </div>
-    <div class="card">
-      <div style="font-weight:700;font-size:13px;margin-bottom:10px;">💎🛒 Ajoute Pwogram (Free Fire sèlman)</div>
+    <div class="card" id="rwProgCard"${window.rwEditId ? ' style="border:2px solid var(--green);"' : ''}>
+      <div style="font-weight:700;font-size:13px;margin-bottom:10px;">${window.rwEditId ? '✏️ Modifye Pwogram nan' : '💎🛒 Ajoute Pwogram (Free Fire sèlman)'}</div>
       <div class="field-uid"><label>Opsyon Free Fire konsène</label><select id="rwProgVariant" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;color:var(--text);padding:11px;">${variantOptions}</select></div>
       <div class="field-uid"><label>Kantite acha obligatwa</label><input type="text" id="rwProgRequired" placeholder="Ex: 25"></div>
       <div class="field-uid"><label>Rekonpans (opsyon Free Fire)</label><select id="rwProgReward" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:11px;color:var(--text);padding:11px;">${variantOptions}</select></div>
-      <button class="btn btn-green" onclick="addRewardProgram()">Ajoute Pwogram</button>
+      <button class="btn btn-green" onclick="addRewardProgram()">${window.rwEditId ? 'Sove chanjman' : 'Ajoute Pwogram'}</button>
+      ${window.rwEditId ? '<button class="btn btn-ghost" style="width:100%;margin-top:8px;" onclick="cancelEditRewardProgram()">Anile</button>' : ''}
     </div>
     ${state.rewardPrograms.map(p => {
       const v = ffVariants.find(x=>x.id===p.variantId);
       const r = ffVariants.find(x=>x.id===p.rewardVariantId);
       const isMarried = v && v.equivalenceGroup;
       return `<div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
           <div>
             <div style="font-weight:700;font-size:13px;">${v?escapeHtml(v.label):'?'} ${isMarried?'🔗':''} → ${p.purchasesRequired} acha → ${r?escapeHtml(r.label):'?'}</div>
           </div>
           <div style="display:flex;gap:8px;align-items:center;">
             <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><input type="checkbox" ${p.active?'checked':''} onchange="toggleRewardProgram('${p.id}', this.checked)"> Aktif</label>
+            <button class="mini-btn" onclick="editRewardProgram('${p.id}')">Modifye</button>
             <button class="mini-btn" style="color:var(--red);" onclick="deleteRewardProgram('${p.id}')">Efase</button>
           </div>
         </div>
@@ -4270,7 +4537,7 @@ function showToast(msg, duration, skipNtfy){
   toastTimer = setTimeout(()=>t.classList.remove('show'), duration || 3000);
   // skipNtfy: pou senp validasyon nòmal (kliyan ki tape yon modpas ki pa respekte règ yo, elatriye) —
   // sa se yon bagay kliyan an ka korije limenm, pa bezwen deranje Kerry ak yon notifikasyon ijans.
-  if(msg && msg.indexOf('⚠️') !== -1 && !isGenericNetworkError(msg) && !skipNtfy){
+  if(msg && msg.indexOf('⚠️') !== -1 && !isGenericNetworkError(msg) && !skipNtfy && !/déconnect|deconnect|dekonekte|reconnect|rekonekte|disconnected|signed out|desconect|sesyon|session|sesión|expir/i.test(msg)){
     const u = currentUser();
     const clientName = u ? (u.name || 'Kliyan konekte') : (state.currentUserId ? 'Kliyan konekte' : 'Vizitè');
     sendNtfyNotification('🚨 Erè sou sit la', '👤 Moun: ' + clientName + '\n📄 Paj: ' + (currentPage||'?') + '\n⚠️ Mesaj: ' + msg, 'urgent', 'rotating_light');
@@ -4914,7 +5181,7 @@ function slugify(name){
   return name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'');
 }
 const PAGE_PATHS = { shop:'/shop', wallet:'/wallet', commandes:'/commandes', redeem:'/redeem', historique:'/historique', parametres:'/parametres', panye:'/panier', admin:'/admin', tutoriel:'/tutoriel', checkout:'/checkout', kerryRewards:'/programme-fidelite', suspended:'/suspendu', aboutUs:'/a-propos', conditions:'/conditions', notifications:'/notifications', apiSupplier:'/api1', apiRegenerate:'/api1/regenerer', referral:'/parrainage', marche:'/marche' };
-const PATH_PAGES = { '/':'shop', '/wallet':'wallet', '/commandes':'commandes', '/redeem':'redeem', '/historique':'historique', '/parametres':'parametres', '/panier':'panye', '/admin':'admin', '/tutoriel':'tutoriel', '/checkout':'checkout', '/programme-fidelite':'kerryRewards', '/suspendu':'suspended', '/a-propos':'aboutUs', '/conditions':'conditions', '/notifications':'notifications', '/api1':'apiSupplier', '/marche':'marche' };
+const PATH_PAGES = { '/':'shop', '/shop':'shop', '/wallet':'wallet', '/commandes':'commandes', '/redeem':'redeem', '/historique':'historique', '/parametres':'parametres', '/panier':'panye', '/admin':'admin', '/tutoriel':'tutoriel', '/checkout':'checkout', '/programme-fidelite':'kerryRewards', '/suspendu':'suspended', '/a-propos':'aboutUs', '/conditions':'conditions', '/notifications':'notifications', '/api1':'apiSupplier', '/marche':'marche' };
 let pendingProductSlug = null;
 
 function goPage(page, opts){
@@ -4951,11 +5218,12 @@ function goPagePart2(page, opts){
   if(page === 'referral'){ fetchReferralPageData(); }
   else if(['shop','panye','checkout','commandes','redeem'].includes(page)){ maybeShowTutorialV2(page, null); }
   if(page === 'tutoriel'){ fetchTutorialVideos(); }
-  if(page === 'notifications'){ checkAndRenderPushPrompt(); if(typeof fetchMyRechargeRequests === 'function') fetchMyRechargeRequests(); }
+  if(page === 'notifications'){ checkAndRenderPushPrompt(); if(typeof fetchMyRechargeRequests === 'function') fetchMyRechargeRequests(); fetchSellerNotifs().then(c => { if(c && currentPage === 'notifications') render(); renderTopIcons(); }); }
   if(page === 'marche'){
     setTimeout(renderListingPhotosGrid, 0);
     Promise.all([fetchActiveListings(), marcheTab === 'vendre' ? fetchMyListings() : Promise.resolve()])
-      .then(() => { if(currentPage === 'marche'){ render(); renderListingPhotosGrid(); } });
+      .then(() => { if(currentPage === 'marche'){ render(); renderListingPhotosGrid(); if(marcheTab === 'vendre'){ if(state._myListingsErr){ const bx = document.getElementById('myListingsBox'); if(bx) bx.innerHTML = '<div style="color:var(--red);font-size:12px;">⚠️ ' + escapeHtml(state._myListingsErr) + '</div>'; } else if(state.myListings) renderMyListings(); } } })
+      .catch(() => { const bx = document.getElementById('myListingsBox'); if(bx) bx.innerHTML = '<div style="color:var(--muted);font-size:12px;">—</div>'; });
   }
   if(page === 'listingDetail' && currentListingDetail){
     loadListingReviews(currentListingDetail.id);
@@ -5027,11 +5295,13 @@ function enterShopFromWelcome(){
     setTimeout(() => {
       document.getElementById('welcomeOverlay').style.display = 'none';
       goPage('shop');
+      try{ if(window.ktPin) ktPinGate(); }catch(e){}
     }, 400);
     return;
   }
   document.getElementById('welcomeOverlay').style.display = 'none';
   goPage('shop');
+  try{ if(window.ktPin) ktPinGate(); }catch(e){}
 }
 window.addEventListener('popstate', () => {
   closeSheet();
@@ -5235,7 +5505,45 @@ function getNotifItems(){
     if(r.status === 'a_verifier' || r.status === 'pending') items.push({ id:'rc-'+r.id+'-'+r.status, cat:'transaction', status:'transaction', text:RC.wait(amt), date:r.date });
     else if(r.status === 'rejected') items.push({ id:'rc-'+r.id+'-'+r.status, cat:'transaction', status:'transaction', text:RC.rej(amt), date:r.date });
   });
+  // Vandè Marché a: kont li vann + nouvo avis sou kont li yo (7 dènye jou)
+  {
+    const SN = ({
+      ht:{ sold:(n,a)=>`Kont ou a (${n}) vann ✅ — ${a}`, rev:(n,st,c)=>`Nouvo avis sou kont ou a (${n}) : ${st}${c?' — « '+c+' »':''}` },
+      fr:{ sold:(n,a)=>`Votre compte (${n}) a été vendu ✅ — ${a}`, rev:(n,st,c)=>`Nouvel avis sur votre compte (${n}) : ${st}${c?' — « '+c+' »':''}` },
+      en:{ sold:(n,a)=>`Your account (${n}) was sold ✅ — ${a}`, rev:(n,st,c)=>`New review on your account (${n}): ${st}${c?' — "'+c+'"':''}` },
+      es:{ sold:(n,a)=>`Tu cuenta (${n}) fue vendida ✅ — ${a}`, rev:(n,st,c)=>`Nueva reseña en tu cuenta (${n}): ${st}${c?' — «'+c+'»':''}` }
+    })[currentLang] || { sold:(n,a)=>`Your account (${n}) was sold — ${a}`, rev:(n,st,c)=>`New review on your account (${n}): ${st}` };
+    const sc = Date.now() - 7*24*3600*1000;
+    const sn = state._sellerNotifs || { sold:[], reviews:[] };
+    sn.sold.filter(l => l.sold_at && new Date(l.sold_at).getTime() >= sc).forEach(l => {
+      items.push({ id:'msold-'+l.id, cat:'transaction', status:'transaction', text: SN.sold((l.listing_name || (l.rank + ' — Niv ' + l.level)), 'HTG ' + Number(l.price||0).toLocaleString('fr-FR')), date:l.sold_at });
+    });
+    sn.reviews.filter(r => r.created_at && new Date(r.created_at).getTime() >= sc).forEach(r => {
+      const n = r.listingName || '';
+      const st = '★'.repeat(Math.round(r.rating||0)) + '☆'.repeat(5 - Math.round(r.rating||0));
+      items.push({ id:'mrev-'+r.id, cat:'transaction', status:'transaction', text: SN.rev(n, st, r.comment || ''), date:r.created_at });
+    });
+  }
   return items.filter(n => !dismissed.includes(n.id)).sort((a,b) => new Date(b.date) - new Date(a.date));
+}
+async function fetchSellerNotifs(){
+  if(!state.currentUserId) return false;
+  try{
+    const sb = await getSupabase();
+    const { data: ls, error } = await sb.from('game_account_listings').select('id, listing_name, rank, level, price, status, sold_at').eq('seller_id', state.currentUserId);
+    if(error || !ls) return false;
+    const names = {}; ls.forEach(l => { names[l.id] = l.listing_name || (l.rank + ' — Niv ' + l.level); });
+    let reviews = [];
+    if(ls.length){
+      const { data: rv } = await sb.from('listing_reviews').select('id, listing_id, rating, comment, created_at, buyer_id').in('listing_id', ls.map(l => l.id)).order('created_at', {ascending:false}).limit(30);
+      reviews = (rv || []).filter(r => r.buyer_id !== state.currentUserId).map(r => ({ ...r, listingName: names[r.listing_id] || '' }));
+    }
+    const next = { sold: ls.filter(l => l.status === 'sold' || l.status === 'pending_delivery'), reviews };
+    const sig = JSON.stringify([next.sold.map(l => l.id), next.reviews.map(r => r.id)]);
+    const changed = sig !== state._sellerSig;
+    state._sellerNotifs = next; state._sellerSig = sig;
+    return changed;
+  }catch(e){ return false; }
 }
 function getUnseenNotifCount(){
   if(!state.seenNotifIds) state.seenNotifIds = [];
@@ -5445,6 +5753,7 @@ function renderBottomNav(){
 function pageShop(){
   return `<div id="promoBannerBox"></div><div id="shopGrid"></div>`;
 }
+
 let shopHasRenderedOnce = false;
 function startVoiceSearch(){
   const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -5469,7 +5778,64 @@ function startVoiceSearch(){
   recognition.onend = () => { micBtn.classList.remove('listening'); };
   try{ recognition.start(); }catch(e){ micBtn.classList.remove('listening'); }
 }
+
+const KT_HOME_TXT = {
+  ht:{ h1:'Jwenn kat ak kredi jwèt ou yo nan kèk klik!', sub:'Achte rechaj Free Fire, PUBG, kat kado ak plis ankò. Rapid, an sekirite epi pa gen reta.', cta:'Dekouvri boutik la', pay:'PAYE AK NATCASH', prodT:'Pwodwi nou yo', prodS:'Chwazi jwèt oswa sèvis ou bezwen an. Nou gen sa ou bezwen.', stepsT:'Kijan pou achte nan 3 etap', s1t:'Chwazi pwodwi a', s1d:'Chwazi nan katalòg nou an pwodwi dijital ki enterese w la.', s2t:'Ajoute l nan panye epi peye', s2d:'Peye ak wallet ou a an tout sekirite. Rechaje l ak NatCash si ou bezwen.', s3t:'Resevwa l imedyatman', s3d:'Kòd ou a oswa kredi ou a livre imedyatman apre peman an. Pwofite!', faqT:'Kesyon yo poze souvan', q1:'Konbyen tan livrezon an pran?', a1:'PIN yo livre otomatikman imedyatman apre peman an. Kòmand manyèl yo trete pa ekip nou, epi ou swiv estati a nan "Mes Commandes".', q2:'Ki mwayen peman nou aksepte?', a2:'Ou rechaje wallet ou a ak NatCash, epi ou itilize wallet la pou achte sou sit la.', q3:'Kisa pou m fè si m pa resevwa kòd mwen?', a3:'Louvri chat la (Touski) oswa kontakte nou sou WhatsApp. N ap verifye kòmand ou a rapidman.', q4:'Èske sit la an sekirite?', a4:'Wi. Kont ou pwoteje ak yon kòd PIN, epi tout kòmand yo gen yon istwa ou ka konsilte.', finalT:'Rechaje nan yon enstan!', finalCta:'Dekouvri boutik la' },
+  fr:{ h1:'Obtenez vos cartes et crédits de jeu en quelques clics !', sub:'Achetez vos recharges Free Fire, PUBG, cartes cadeaux et plus encore. Rapide, sécurisé et sans attente.', cta:'Découvrir la boutique', pay:'PAYER AVEC NATCASH', prodT:'Nos produits', prodS:'Choisissez le jeu ou le service dont vous avez besoin.', stepsT:'Comment acheter en 3 étapes', s1t:'Sélectionnez un produit', s1d:'Choisissez dans notre catalogue le produit numérique qui vous intéresse.', s2t:'Ajoutez au panier et payez', s2d:'Payez avec votre wallet en toute sécurité. Rechargez-le avec NatCash si besoin.', s3t:'Recevez instantanément', s3d:'Votre code ou crédit est livré dès le paiement. Profitez-en !', faqT:'FAQ', q1:'Combien de temps pour recevoir mon produit ?', a1:'Les PIN sont livrés automatiquement dès le paiement. Les commandes manuelles sont traitées par notre équipe ; suivez le statut dans « Mes Commandes ».', q2:'Quels modes de paiement acceptez-vous ?', a2:'Vous rechargez votre wallet avec NatCash, puis vous payez sur le site avec le wallet.', q3:'Que faire si je n\'ai pas reçu mon code ?', a3:'Ouvrez le chat (Touski) ou contactez-nous sur WhatsApp. Nous vérifions votre commande rapidement.', q4:'Le site est-il sécurisé ?', a4:'Oui. Votre compte est protégé par un code PIN et chaque commande est consultable dans votre historique.', finalT:'Rechargez en un instant !', finalCta:'Découvrir la boutique' },
+  en:{ h1:'Get your game cards and credits in a few clicks!', sub:'Buy Free Fire and PUBG top-ups, gift cards and more. Fast, secure and instant.', cta:'Discover the shop', pay:'PAY WITH NATCASH', prodT:'Our products', prodS:'Pick the game or service you need.', stepsT:'How to buy in 3 steps', s1t:'Choose a product', s1d:'Pick the digital product you want from our catalog.', s2t:'Add to cart and pay', s2d:'Pay securely with your wallet. Top it up with NatCash if needed.', s3t:'Get it instantly', s3d:'Your code or credit is delivered right after payment. Enjoy!', faqT:'FAQ', q1:'How long does delivery take?', a1:'PINs are delivered automatically right after payment. Manual orders are handled by our team; track the status in "My Orders".', q2:'Which payment methods do you accept?', a2:'You top up your wallet with NatCash, then pay on the site with your wallet.', q3:'What if I did not receive my code?', a3:'Open the chat (Touski) or contact us on WhatsApp. We will check your order quickly.', q4:'Is the site secure?', a4:'Yes. Your account is protected by a PIN code and every order is in your history.', finalT:'Top up in an instant!', finalCta:'Discover the shop' },
+  es:{ h1:'¡Consigue tus tarjetas y créditos de juego en pocos clics!', sub:'Compra recargas de Free Fire y PUBG, tarjetas de regalo y más. Rápido, seguro e instantáneo.', cta:'Descubrir la tienda', pay:'PAGA CON NATCASH', prodT:'Nuestros productos', prodS:'Elige el juego o servicio que necesitas.', stepsT:'Cómo comprar en 3 pasos', s1t:'Elige un producto', s1d:'Elige en nuestro catálogo el producto digital que te interesa.', s2t:'Añade al carrito y paga', s2d:'Paga con tu wallet de forma segura. Recárgalo con NatCash si hace falta.', s3t:'Recíbelo al instante', s3d:'Tu código o crédito se entrega justo después del pago. ¡Disfrútalo!', faqT:'Preguntas frecuentes', q1:'¿Cuánto tarda la entrega?', a1:'Los PIN se entregan automáticamente tras el pago. Los pedidos manuales los procesa nuestro equipo; sigue el estado en «Mis pedidos».', q2:'¿Qué métodos de pago aceptan?', a2:'Recargas tu wallet con NatCash y luego pagas en el sitio con el wallet.', q3:'¿Y si no recibí mi código?', a3:'Abre el chat (Touski) o escríbenos por WhatsApp. Revisaremos tu pedido rápido.', q4:'¿Es seguro el sitio?', a4:'Sí. Tu cuenta está protegida con un código PIN y cada pedido queda en tu historial.', finalT:'¡Recarga en un instante!', finalCta:'Descubrir la tienda' }
+};
+function ktHT(){ return KT_HOME_TXT[currentLang] || KT_HOME_TXT.fr; }
+function ktScrollShop(){ const g = document.getElementById('shopGrid'); if(g) g.scrollIntoView({behavior:'smooth', block:'start'}); }
+const KT_WAVE = '<svg width="52" height="22" viewBox="0 0 52 22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M2 14l8-8 8 10 8-12 8 12 8-10 8 8"/></svg>';
+function renderWelcomeLong(){
+  const ov = document.getElementById('welcomeOverlay');
+  const hero = document.getElementById('weHero'), prod = document.getElementById('weProd'), low = document.getElementById('weLower');
+  if(!ov || !hero || !prod || !low) return;
+  if(ov.style.display === 'none' || !ov.style.display) return;
+  const T = ktHT();
+  const withImg = state.products.filter(p => p.active !== false && p.image).slice(0, 2);
+  const bg = p => p ? "background-image:url('" + String(p.image).replace(/['"]/g,'') + "');" : '';
+  hero.innerHTML = `
+    <div class="hm-hero" style="padding-top:52px;">
+      <h1 class="hm-h1" style="font-size:26px;">${escapeHtml(T.h1)}</h1>
+      <p class="hm-sub">${escapeHtml(T.sub)}</p>
+      <button class="hm-cta" onclick="enterShopFromWelcome()">${escapeHtml(T.cta)} <span style="font-size:17px;">→</span></button>
+      <div class="hm-collage">
+        <div class="hm-c1" style="${bg(withImg[0])}"></div>
+        <div class="hm-c2" style="${bg(withImg[1])}"></div>
+        <div class="hm-badge"><svg class="hm-ring" viewBox="0 0 100 100"><defs><path id="hmCirc" d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"/></defs><text><textPath href="#hmCirc" startOffset="0" textLength="228" lengthAdjust="spacing">${escapeHtml(T.pay)} •</textPath></text></svg><span class="mid"><img src="${window.KT_NATCASH_ICON_SRC}" alt="NatCash"></span></div>
+      </div>
+      <div class="hm-chips"><div class="hm-chip">NatCash</div><div class="hm-chip">Wallet Kerry</div></div>
+    </div>`;
+  prod.innerHTML = '';
+  const TR = {
+    fr:[['⚡','Livraison instantanée','Vos produits en quelques secondes'],['🛡️','Paiement sécurisé','Transactions sécurisées'],['💬','Support 24/7','Notre équipe est là pour vous'],['✅','Produits officiels','100% authentiques']],
+    ht:[['⚡','Livrezon imedya','Pwodwi ou yo nan kèk segonn'],['🛡️','Peman an sekirite','Tranzaksyon sekirize'],['💬','Sipò 24/7','Ekip nou an la pou ou'],['✅','Pwodwi ofisyèl','100% otantik']],
+    en:[['⚡','Instant delivery','Your products in seconds'],['🛡️','Secure payment','Protected transactions'],['💬','24/7 support','Our team is here for you'],['✅','Official products','100% authentic']],
+    es:[['⚡','Entrega instantánea','Tus productos en segundos'],['🛡️','Pago seguro','Transacciones seguras'],['💬','Soporte 24/7','Nuestro equipo te ayuda'],['✅','Productos oficiales','100% auténticos']]
+  };
+  const trust = '<div class="hm-trust">' + (TR[currentLang] || TR.fr).map(x => '<div class="hm-tr"><i>'+x[0]+'</i><div><b>'+escapeHtml(x[1])+'</b><span>'+escapeHtml(x[2])+'</span></div></div>').join('') + '</div>';
+  low.innerHTML = trust + `
+    <div class="hm-wave">${KT_WAVE}</div>
+    <div class="hm-title">${escapeHtml(T.stepsT)}</div>
+    <div style="margin-top:14px;">
+      <div class="hm-step"><div class="ic">🛍️</div><b>${escapeHtml(T.s1t)}</b><span>${escapeHtml(T.s1d)}</span></div>
+      <div class="hm-step"><div class="ic">🛒</div><b>${escapeHtml(T.s2t)}</b><span>${escapeHtml(T.s2d)}</span></div>
+      <div class="hm-step"><div class="ic">⚡</div><b>${escapeHtml(T.s3t)}</b><span>${escapeHtml(T.s3d)}</span></div>
+    </div>
+    <div class="hm-title" style="margin-top:26px;">${escapeHtml(T.faqT)}</div>
+    <div class="hm-faq" style="margin-top:14px;">
+      ${[1,2,3,4].map(n => `<details><summary>${escapeHtml(T['q'+n])}</summary><p>${escapeHtml(T['a'+n])}</p></details>`).join('')}
+    </div>
+    <div class="hm-wave">${KT_WAVE}</div>
+    <div class="hm-final">
+      <div class="hm-title" style="margin-bottom:14px;">${escapeHtml(T.finalT)}</div>
+      <button class="hm-cta" onclick="enterShopFromWelcome()">${escapeHtml(T.finalCta)} <span style="font-size:17px;">→</span></button>
+    </div>` + renderFooter();
+}
 function renderShop(){
+  try{ renderWelcomeLong(); }catch(e){}
   if(currentPage !== 'shop') return;
   renderPromoBanner();
   const grid = document.getElementById('shopGrid');
@@ -8027,7 +8393,10 @@ if(!window._ktOrdersPoll){
     const before = sig();
     Promise.resolve(fetchMyOrders()).then(() => { if(sig() === before) return; if(currentPage === 'notifications') render(); renderTopIcons(); }).catch(()=>{});
   };
+  const _ktRefreshSeller = () => { if(document.hidden || !state.currentUserId) return; fetchSellerNotifs().then(c => { if(c){ if(currentPage === 'notifications') render(); renderTopIcons(); } }); };
   setInterval(_ktRefreshOrders, 25000);
+  setInterval(_ktRefreshSeller, 40000);
+  setTimeout(_ktRefreshSeller, 5000);
   document.addEventListener('visibilitychange', () => { if(!document.hidden) _ktRefreshOrders(); });
 }
 async function subscribeToMyOrdersRealtime(){
@@ -8481,16 +8850,20 @@ async function checkoutCart(){
       try{
         const sb = await getSupabase();
         const { data: updated, error } = await sb.from('game_account_listings')
-          .update({ status: 'sold', buyer_id: state.currentUserId, sold_at: new Date().toISOString() })
+          .update({ status: 'pending_delivery', buyer_id: state.currentUserId, sold_at: new Date().toISOString() })
           .eq('id', item.listingId).eq('status', 'active').select().maybeSingle();
         if(error || !updated){ failed.push(item); continue; }
         const u = currentUser();
-        sendNtfyNotification('🎮 Nouvel achat — Marché',
-          '👤 Achtè: ' + (u?.name||'') + '\n📧 ' + (u?.email||'') +
-          '\n🏆 ' + updated.rank + ' — Niveau ' + updated.level + '\n💰 ' + money(updated.price) +
-          '\n💳 Payer le vendeur via: ' + updated.payment_method + (updated.payment_details ? ' — ' + updated.payment_details + ' (' + updated.payment_name + ')' : '') +
-          '\n📱 WhatsApp vendeur: ' + (updated.seller_whatsapp||''),
-          'urgent', 'moneybag', updated.photos?.[0], 'marche');
+        try{
+          const _on = 'KT-' + Math.random().toString(36).slice(2, 10).toUpperCase();
+          const { data: _or } = await sb.from('orders').insert({ order_no:_on, user_id: state.currentUserId, type:'market_account', status:'en_cours',
+            product: updated.listing_name || updated.rank, variant: updated.rank + ' — Niveau ' + updated.level, price: updated.price }).select().single();
+          if(_or){
+            if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
+            state.orders[state.currentUserId].unshift({ id:_or.id, orderNo:_on, type:'market_account', status:'en_cours', product: updated.listing_name || updated.rank, variant: updated.rank + ' — Niveau ' + updated.level, price: updated.price, date:new Date().toISOString() });
+          }
+        }catch(e){ console.warn('market cart order row failed:', e?.message||e); }
+        ktNotifyMarketSale(updated, u);
         processedAmount += item.price;
         processedCount++;
       }catch(e){ console.warn('market_listing checkout exception:', e?.message||e); failed.push(item); }
@@ -8683,6 +9056,10 @@ function openOrderDetail(orderId){
     `;
   } else if(o.type === 'market_account'){
     bodyHtml += renderOrderField(t('field_account'), escapeHtml(o.variant));
+    if(o.status !== 'terminee'){
+      const _w = {ht:'⏳ Achte a fèt. Admin ap livre kont lan talè — w ap wè detay yo isit la.', fr:'⏳ Achat effectué. L\'admin va livrer le compte sous peu — vous verrez les détails ici.', en:'⏳ Purchase done. The admin will deliver the account shortly — details will appear here.', es:'⏳ Compra realizada. El admin entregará la cuenta pronto — verás los detalles aquí.'};
+      bodyHtml += `<div style="background:var(--amber-dim);color:var(--amber);border-radius:12px;padding:14px;margin-top:14px;font-size:12.5px;font-weight:600;">${_w[currentLang]||_w.fr}</div>`;
+    } else
     bodyHtml += `
       <div style="background:var(--green-dim);border-radius:12px;padding:14px;margin-top:14px;">
         <div style="font-size:10.5px;font-weight:700;letter-spacing:0.04em;color:var(--green);text-transform:uppercase;margin-bottom:10px;">✅ ${t('account_delivered')}</div>
@@ -9314,8 +9691,13 @@ async function fetchMyListings(){
   if(box) box.innerHTML = 'Chajman...';
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('game_account_listings').select('*').eq('seller_id', state.currentUserId).order('created_at', {ascending:false});
+    const { data, error } = await Promise.race([
+      sb.from('game_account_listings').select('*').eq('seller_id', state.currentUserId).order('created_at', {ascending:false}),
+      new Promise(res => setTimeout(() => res({ data:null, error:{ message:'Koneksyon twò dousman — eseye ankò' } }), 12000))
+    ]);
+    state._myListingsErr = '';
     if(error){
+      state._myListingsErr = error.message || 'Erè';
       console.warn('fetchMyListings erè:', error.message);
       if(box) box.innerHTML = '<div style="color:var(--red);font-size:12px;">⚠️ ' + escapeHtml(error.message) + '</div>';
       sendNtfyNotification('🐛 DEBUG — fetchMyListings echwe', '⚠️ ' + error.message + '\n📄 Kòd: ' + (error.code||''), 'high', 'bug', undefined, 'errors');
@@ -9324,13 +9706,15 @@ async function fetchMyListings(){
     state.myListings = data || [];
     renderMyListings();
   }catch(e){
+    state._myListingsErr = (e && e.message) || 'Erè koneksyon';
     console.warn('fetchMyListings exception:', e?.message||e);
     if(box) box.innerHTML = '<div style="color:var(--red);font-size:12px;">⚠️ ' + escapeHtml(e?.message||String(e)) + '</div>';
     sendNtfyNotification('🐛 DEBUG — fetchMyListings exception', '⚠️ ' + (e?.message||e), 'high', 'bug', undefined, 'errors');
   }
 }
-function renderMyListings(){
-  const box = document.getElementById('myListingsBox');
+function myListingsHtml(){ const _b = { innerHTML:'' }; renderMyListings(_b); return _b.innerHTML; }
+function renderMyListings(boxArg){
+  const box = boxArg || document.getElementById('myListingsBox');
   if(!box) return;
   const list = state.myListings || [];
   const statusLabel = { pending_review:'⏳ En attente', active:'✅ Actif sur le marché', rejected:'❌ Rejeté', sold:'💰 Vendu' };
@@ -9396,6 +9780,33 @@ async function fetchActiveListings(){
     console.warn('fetchActiveListings exception:', e?.message||e);
     sendNtfyNotification('🐛 DEBUG — fetchActiveListings exception', '⚠️ ' + (e?.message||e), 'high', 'bug', undefined, 'errors');
   }
+}
+
+const KT_SELLER_TERMS = {
+  ht:{txt:'Mwen li epi mwen aksepte', link:'kondisyon ak règ Marché a', warn:'Koche kare a pou w aksepte kondisyon yo.'},
+  fr:{txt:'J\'ai lu et j\'accepte les', link:'conditions et règles du Marché', warn:'Cochez la case pour accepter les conditions.'},
+  en:{txt:'I have read and accept the', link:'Marketplace terms and rules', warn:'Tick the box to accept the terms.'},
+  es:{txt:'He leído y acepto las', link:'condiciones y reglas del Mercado', warn:'Marca la casilla para aceptar las condiciones.'}
+};
+function ktStartSellerKyc(){
+  const c = document.getElementById('sellerTermsCheck');
+  if(!c || !c.checked){ showToast('⚠️ ' + (KT_SELLER_TERMS[currentLang]||KT_SELLER_TERMS.fr).warn); return; }
+  startKycCapture();
+}
+function ktOpenMarketTerms(){
+  goPage('conditions');
+  setTimeout(() => {
+    try{
+      const card = document.querySelector('#app .card, .card');
+      const nodes = Array.from(document.querySelectorAll('.card h1,.card h2,.card h3,.card h4,.card b,.card strong,.card p,.card div'));
+      const hit = nodes.find(n => n.children.length < 3 && /march[eé]/i.test(n.textContent||'') && (n.textContent||'').length < 120);
+      if(hit){
+        hit.scrollIntoView({behavior:'smooth', block:'start'});
+        const old = hit.style.background; hit.style.background = 'rgba(63,206,124,.25)'; hit.style.borderRadius = '6px';
+        setTimeout(()=>{ hit.style.background = old; }, 2500);
+      }
+    }catch(e){}
+  }, 350);
 }
 function pageMarche(){
   const u = currentUser();
@@ -9468,7 +9879,11 @@ function pageMarche(){
           <div style="font-size:44px;margin:24px 0 10px;">🔐</div>
           <h3 style="font-family:'Rajdhani',sans-serif;font-size:17px;margin:0 0 8px;">${t('kyc_required_title')}</h3>
           <p style="color:var(--muted);font-size:12.5px;line-height:1.6;max-width:280px;margin:0 auto 22px;">${t('kyc_required_desc')}</p>
-          <button class="btn btn-green" style="max-width:260px;margin:0 auto;" onclick="startKycCapture()">${t('btn_verify_identity')}</button>
+          <label style="display:flex;align-items:flex-start;gap:8px;text-align:left;max-width:290px;margin:0 auto 16px;font-size:12.5px;line-height:1.5;cursor:pointer;">
+            <input type="checkbox" id="sellerTermsCheck" style="margin-top:2px;flex-shrink:0;width:17px;height:17px;accent-color:#0a9e3d;">
+            <span>${(KT_SELLER_TERMS[currentLang]||KT_SELLER_TERMS.fr).txt} <span style="color:var(--green);text-decoration:underline;font-weight:700;" onclick="event.preventDefault();event.stopPropagation();ktOpenMarketTerms()">${(KT_SELLER_TERMS[currentLang]||KT_SELLER_TERMS.fr).link}</span></span>
+          </label>
+          <button class="btn btn-green" style="max-width:260px;margin:0 auto;" onclick="ktStartSellerKyc()">${t('btn_verify_identity')}</button>
         `}
       </div>
     `;
@@ -9479,7 +9894,7 @@ function pageMarche(){
     ${tabsHtml}
     <div class="card">
       <div style="font-weight:700;font-size:13px;margin-bottom:10px;">📋 ${t('my_listings')}</div>
-      <div id="myListingsBox">${t('loading')}...</div>
+      <div id="myListingsBox">${state.myListings ? myListingsHtml() : (state._myListingsErr ? '<div style="color:var(--red);font-size:12px;">⚠️ ' + escapeHtml(state._myListingsErr) + '</div>' : t('loading') + '...')}</div>
     </div>
     <div class="card">
       <div class="field-uid"><label>${t('account_photos_label')}</label>
@@ -9654,17 +10069,38 @@ function pageListingDetail(){
   return `
     <div class="page-header"><h2>${t('listing_details_title')}</h2></div>
     <div class="card">
-      <img src="${escapeHtml((l.photos&&l.photos[0])||'')}" style="width:100%;aspect-ratio:1;border-radius:12px;object-fit:cover;background:var(--panel-2);margin-bottom:10px;">
-      <div style="font-weight:700;font-size:14px;">${escapeHtml(l.listing_name||l.rank)}</div><div style="font-size:11.5px;color:var(--muted);margin-bottom:4px;">🏆 ${escapeHtml(l.rank)} — ${t('level_word')} ${escapeHtml(l.level)}</div>
+      ${(() => {
+        const ph = (l.photos && l.photos.length) ? l.photos : [''];
+        const multi = ph.length > 1;
+        return `<div style="position:relative;margin-bottom:10px;">
+          <div id="listingPhotoScroller" onscroll="updateListingPhotoCounter(this)" style="display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;border-radius:12px;background:var(--panel-2);">
+            ${ph.map((u,i) => `<img src="${escapeHtml(u)}" alt="" loading="${i===0?'eager':'lazy'}" style="flex:0 0 100%;width:100%;aspect-ratio:1;object-fit:cover;scroll-snap-align:center;scroll-snap-stop:always;">`).join('')}
+          </div>
+          ${multi ? `<div id="listingPhotoCount" style="position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.6);color:#fff;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;">1 / ${ph.length}</div>
+          <div id="listingPhotoDots" style="position:absolute;left:0;right:0;bottom:10px;display:flex;justify-content:center;gap:6px;pointer-events:none;">${ph.map((_,i) => `<span style="width:${i===0?'18px':'6px'};height:6px;border-radius:999px;background:${i===0?'#fff':'rgba(255,255,255,0.55)'};transition:all .2s;"></span>`).join('')}</div>` : ''}
+        </div>`;
+      })()}
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+        <div style="min-width:0;">
+          <div style="font-weight:700;font-size:14px;">${escapeHtml(l.listing_name||l.rank)}</div><div style="font-size:11.5px;color:var(--muted);margin-bottom:4px;">🏆 ${escapeHtml(l.rank)} — ${t('level_word')} ${escapeHtml(l.level)}</div>
+        </div>
+        <button aria-label="${escapeHtml(t('share_listing'))}" onclick="shareListing('${l.id}')" style="width:32px;height:32px;border-radius:9px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#4b5259;flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+        </button>
+      </div>
       <div style="font-weight:800;color:var(--green);font-size:18px;margin:6px 0 8px;">${money(l.price)}</div>
       ${avgRating ? `<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;"><span style="color:var(--amber);font-size:14px;">${starsHtml(avgRating)}</span><span style="font-size:11.5px;color:var(--muted);">${avgRating} (${reviews.length} ${t('reviews_word')})</span></div>` : `<div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;">${t('no_reviews_yet')}</div>`}
       <div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:12px;color:var(--muted);">
         <div style="width:26px;height:26px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">${escapeHtml((l.sellerName||'V')[0].toUpperCase())}</div>
-        ${t('sold_by')} <b style="color:var(--text);">${escapeHtml(l.sellerName||'Vendeur')}</b>
+        <span style="flex:1;min-width:0;">${t('sold_by')} <b style="color:var(--text);">${escapeHtml(l.sellerName||'Vendeur')}</b></span>
+        <button aria-label="Signaler" onclick="openReportSeller('${l.id}')" style="width:32px;height:32px;border-radius:9px;background:var(--panel);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#d64545;flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V4"/><path d="M4 4h13l-2 4 2 4H4"/></svg>
+        </button>
       </div>
-      <button class="btn btn-green" style="margin-top:12px;" onclick="buyListing('${l.id}')">${t('btn_buy_now')}</button>
-      <button class="btn btn-ghost" style="margin-top:8px;" onclick="addListingToCart('${l.id}')">🛒 ${t('btn_add_cart')}</button>
-      <button class="btn btn-ghost" style="margin-top:8px;" onclick="shareListing('${l.id}')">📤 ${t('share_listing')}</button>
+      <div style="display:flex;gap:10px;margin-top:12px;">
+        <button class="btn btn-ghost" style="flex:1;" onclick="addListingToCart('${l.id}')">${t('btn_add_cart')}</button>
+        <button class="btn btn-green" style="flex:1;" onclick="buyListing('${l.id}')">${t('btn_buy_now')}</button>
+      </div>
     </div>
 
     <div class="card">
@@ -9682,9 +10118,9 @@ function pageListingDetail(){
 
       <div style="border-top:1px solid var(--line);margin-top:12px;padding-top:12px;">
         <div style="font-weight:700;font-size:12.5px;margin-bottom:8px;">${t('leave_review')}</div>
-        <div id="reviewStarPicker" style="font-size:26px;margin-bottom:8px;">${[1,2,3,4,5].map(n => `<span onclick="setReviewRating(${n})" style="cursor:pointer;color:var(--line);" id="star${n}">★</span>`).join('')}</div>
-        <input type="text" id="reviewCommentInput" maxlength="120" placeholder="${t('review_comment_ph')}" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12.5px;color:var(--text);margin-bottom:10px;">
-        <button class="btn btn-ghost" onclick="submitListingReview()">${t('btn_publish_review')}</button>
+        <div id="reviewStarPicker" style="font-size:26px;margin-bottom:8px;">${[1,2,3,4,5].map(n => `<span onclick="setReviewRating(${n})" style="cursor:pointer;color:${n<=selectedReviewRating?'var(--amber)':'var(--line)'};" id="star${n}">★</span>`).join('')}</div>
+        <input type="text" id="reviewCommentInput" maxlength="120" placeholder="${t('review_comment_ph')}" onfocus="showReviewPublish()" oninput="showReviewPublish()" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12.5px;color:var(--text);margin-bottom:10px;">
+        <button id="reviewPublishBtn" class="btn btn-green" style="display:none;margin-top:2px;" onclick="submitListingReview()">${t('btn_publish_review')}</button>
       </div>
     </div>
   `;
@@ -9692,8 +10128,16 @@ function pageListingDetail(){
 function toggleListingReviews(){ listingReviewsExpanded = !listingReviewsExpanded; render(); }
 let selectedReviewRating = 0;
 function setupReviewStarPicker(){
-  selectedReviewRating = 0;
+  selectedReviewRating = 0; // etwal yo vid — se kliyan an ki chwazi yo
   renderReviewStars();
+}
+function showReviewPublish(){ const b = document.getElementById('reviewPublishBtn'); if(b) b.style.display = 'block'; }
+function updateListingPhotoCounter(el){
+  const n = el.children.length; if(n < 2) return;
+  const i = Math.min(n-1, Math.max(0, Math.round(el.scrollLeft / el.clientWidth)));
+  const c = document.getElementById('listingPhotoCount'); if(c) c.textContent = (i+1) + ' / ' + n;
+  const d = document.getElementById('listingPhotoDots');
+  if(d) Array.from(d.children).forEach((x,k) => { x.style.width = k===i ? '18px' : '6px'; x.style.background = k===i ? '#fff' : 'rgba(255,255,255,0.55)'; });
 }
 function setReviewRating(n){
   selectedReviewRating = n;
@@ -9719,9 +10163,60 @@ async function submitListingReview(){
     sendNtfyNotification('⭐ Nouvel avis Marché', '👤 ' + (u?.name||'') + '\n' + '★'.repeat(selectedReviewRating) + '☆'.repeat(5-selectedReviewRating) + (comment ? '\n💬 ' + comment : ''), 'default', 'star', undefined, 'marche');
     showToast(t('review_published'));
     document.getElementById('reviewCommentInput').value = '';
-    selectedReviewRating = 5;
+    const _pb = document.getElementById('reviewPublishBtn'); if(_pb) _pb.style.display = 'none';
+    selectedReviewRating = 0;
     await loadListingReviews(l.id);
   }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
+}
+
+const KT_REPORT_TXT = {
+  ht:{title:'Siyale vandè a', sub:'Poukisa ou ap siyale vandè sa a?', r1:'Fwod (fo kont)', r2:'Li abitye repran kont yo', send:'Voye siyalman', cancel:'Anile', ok:'Siyalman voye ✅ Nou pral verifye.', pick:'Chwazi yon rezon.', login:'Konekte pou siyale.', fail:'Siyalman pa pase, eseye ankò.'},
+  fr:{title:'Signaler le vendeur', sub:'Pourquoi signalez-vous ce vendeur ?', r1:'Fraude (faux compte)', r2:'Il a l\'habitude de reprendre les comptes', send:'Envoyer le signalement', cancel:'Annuler', ok:'Signalement envoyé ✅ Nous allons vérifier.', pick:'Choisissez une raison.', login:'Connectez-vous pour signaler.', fail:'Échec de l\'envoi, réessayez.'},
+  en:{title:'Report seller', sub:'Why are you reporting this seller?', r1:'Fraud (fake account)', r2:'Often takes accounts back', send:'Send report', cancel:'Cancel', ok:'Report sent ✅ We will check it.', pick:'Choose a reason.', login:'Log in to report.', fail:'Could not send, try again.'}
+};
+function ktRT(){ return KT_REPORT_TXT[currentLang] || KT_REPORT_TXT[(currentLang||'').slice(0,2)] || KT_REPORT_TXT.fr; }
+let _ktReportReason = '';
+function openReportSeller(id){
+  if(!state.currentUserId){ showToast('⚠️ ' + ktRT().login); return; }
+  _ktReportReason = '';
+  const T = ktRT();
+  const old = document.getElementById('ktReportOv'); if(old) old.remove();
+  const ov = document.createElement('div');
+  ov.id = 'ktReportOv';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;';
+  ov.onclick = (e)=>{ if(e.target===ov) ov.remove(); };
+  const opt = (k,label)=>`<button type="button" data-r="${k}" onclick="ktPickReport('${k}')" style="width:100%;text-align:left;padding:13px 14px;margin-bottom:8px;border-radius:12px;border:1.5px solid var(--line);background:var(--panel);color:var(--text);font-size:14px;font-weight:600;cursor:pointer;">${label}</button>`;
+  ov.innerHTML = `<div style="width:100%;max-width:480px;background:var(--bg,#fff);color:var(--text);border-radius:22px 22px 0 0;padding:18px 16px 20px;box-sizing:border-box;">
+    <div style="font-weight:800;font-size:17px;margin-bottom:2px;">🚩 ${T.title}</div>
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">${T.sub}</div>
+    ${opt('fraude','1. '+T.r1)}${opt('reprise','2. '+T.r2)}
+    <button id="ktReportSend" onclick="ktSendReport('${id}')" class="btn btn-green" style="width:100%;margin-top:6px;">${T.send}</button>
+    <button onclick="document.getElementById('ktReportOv').remove()" style="width:100%;margin-top:6px;padding:10px;background:none;border:none;color:var(--muted);font-weight:600;font-size:14px;cursor:pointer;">${T.cancel}</button>
+  </div>`;
+  document.body.appendChild(ov);
+}
+function ktPickReport(k){
+  _ktReportReason = k;
+  document.querySelectorAll('#ktReportOv [data-r]').forEach(b=>{
+    const on = b.dataset.r===k;
+    b.style.borderColor = on ? '#d64545' : 'var(--line)';
+    b.style.background = on ? 'rgba(214,69,69,.10)' : 'var(--panel)';
+  });
+}
+function ktSendReport(id){
+  const T = ktRT();
+  if(!_ktReportReason){ showToast('⚠️ ' + T.pick); return; }
+  const l = currentListingDetail;
+  const u = currentUser();
+  const reason = _ktReportReason==='fraude' ? 'Fraude (faux compte)' : 'Il reprend d\'habitude les comptes';
+  const msg = '🚩 Vendeur : ' + (l?.sellerName||'') + (l?.seller_whatsapp ? ' (' + l.seller_whatsapp + ')' : '') +
+    '\n🎮 Compte : ' + (l?.listing_name||l?.rank||'') + ' — ' + money(l?.price||0) +
+    '\n❓ Raison : ' + reason +
+    '\n👤 Signalé par : ' + (u?.name||'') + (u?.email ? ' (' + u.email + ')' : '') +
+    '\n🆔 Annonce : ' + id;
+  sendNtfyNotification('Signalement vendeur', msg, 'urgent', 'triangular_flag_on_post');
+  const ov = document.getElementById('ktReportOv'); if(ov) ov.remove();
+  showToast('✅ ' + T.ok);
 }
 async function shareListing(id){
   const l = currentListingDetail;
@@ -9762,6 +10257,32 @@ function addListingToCart(id){
   showToast(t('added_to_cart_toast'));
   render();
 }
+
+function ktCommissionOf(l){ const v = parseFloat(l && l.commission); return (isFinite(v) && v > 0) ? v : 0; }
+function ktSellerNet(l){ return Math.max(0, Math.round((Number(l.price||0) - ktCommissionOf(l)) * 100) / 100); }
+async function ktNotifyMarketSale(l, buyerUser){
+  let sellerName = l.sellerName || ((state.gameListings||[]).find(x=>x.id===l.id)||{}).sellerName || '';
+  let sellerEmail = '';
+  try{
+    const sb = await getSupabase();
+    const { data: sp } = await sb.from('profiles').select('name, email').eq('id', l.seller_id).maybeSingle();
+    if(sp){ if(!sellerName || sellerName==='Vendeur') sellerName = sp.name || sellerName; sellerEmail = sp.email || ''; }
+  }catch(e){}
+  const comm = ktCommissionOf(l), net = ktSellerNet(l);
+  const payLine = l.payment_method === 'wallet'
+    ? '💳 Paiement vendeur : Wallet interne — crédité automatiquement quand vous cliquez "Livrer" (' + money(net) + ')'
+    : '💳 Paiement vendeur : NatCash — ' + (l.payment_details||'') + ' (' + (l.payment_name||'') + ')\n👉 Envoyer MANUELLEMENT ' + money(net) + ' au vendeur';
+  sendNtfyNotification('🎮 Compte vendu — Marché',
+    '🏪 Le compte « ' + (l.listing_name||l.rank) + ' » du vendeur ' + (sellerName||'?') + (sellerEmail ? ' (' + sellerEmail + ')' : '') + ' a été vendu.' +
+    '\n\n🛒 ACHETEUR\n👤 ' + (buyerUser?.name||'') + '\n📧 ' + (buyerUser?.email||'') +
+    '\n\n🏆 ' + l.rank + ' — Niveau ' + l.level +
+    '\n💰 Prix : ' + money(l.price) +
+    (comm ? '\n📉 Commission : ' + money(comm) + '\n💵 Net vendeur : ' + money(net) : '') +
+    '\n' + payLine +
+    '\n📱 WhatsApp vendeur : ' + (l.seller_whatsapp||'') +
+    '\n\n🚚 À LIVRER : allez dans Admin → « Achats à livrer » et cliquez sur Livrer.',
+    'urgent', 'moneybag', l.photos?.[0], 'marche');
+}
 async function buyListing(id){
   if(!state.currentUserId){ openAuthModal('login'); return; }
   if(blockIfSuspended()) return;
@@ -9774,7 +10295,7 @@ async function buyListing(id){
     try{
       const sb = await getSupabase();
       const { data: updated, error } = await sb.from('game_account_listings')
-        .update({ status: 'sold', buyer_id: state.currentUserId, sold_at: new Date().toISOString() })
+        .update({ status: 'pending_delivery', buyer_id: state.currentUserId, sold_at: new Date().toISOString() })
         .eq('id', id).eq('status', 'active').select();
       if(error){ showToast('⚠️ Erè: ' + error.message); return; }
       if(!updated || updated.length === 0){ showToast('⚠️ Kont sa a pa disponib ankò — yon lòt moun ka deja achte l'); return; }
@@ -9783,30 +10304,20 @@ async function buyListing(id){
 
       const orderNo = 'KT-' + Math.random().toString(36).slice(2, 10).toUpperCase();
       const { data: orderRow } = await sb.from('orders').insert({
-        order_no: orderNo, user_id: state.currentUserId, type: 'market_account', status: 'terminee',
-        product: l.listing_name || l.rank, variant: l.rank + ' — Niveau ' + l.level, price: l.price,
-        market_email: l.account_email, market_password: l.account_password
+        order_no: orderNo, user_id: state.currentUserId, type: 'market_account', status: 'en_cours',
+        product: l.listing_name || l.rank, variant: l.rank + ' — Niveau ' + l.level, price: l.price
       }).select().single();
       if(orderRow){
         if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
         state.orders[state.currentUserId].unshift({
-          id: orderRow.id, orderNo, type:'market_account', status:'terminee',
+          id: orderRow.id, orderNo, type:'market_account', status:'en_cours',
           product: l.listing_name || l.rank, variant: l.rank + ' — Niveau ' + l.level, price: l.price,
-          date: new Date().toISOString(), marketEmail: l.account_email, marketPassword: l.account_password
+          date: new Date().toISOString()
         });
       }
 
       const u = currentUser();
-      const { data: sellerProfile } = await sb.from('profiles').select('name, email').eq('id', l.seller_id).maybeSingle();
-
-      sendNtfyNotification('🎮 Nouvel achat — Marché', 
-        '🛒 ACHETEUR\n👤 ' + (u?.name||'') + '\n📧 ' + (u?.email||'') +
-        '\n\n🏪 VENDEUR\n👤 ' + (sellerProfile?.name||'') + '\n📧 ' + (sellerProfile?.email||'') +
-        '\n\n🏆 ' + l.rank + ' — Niveau ' + l.level + '\n💰 Prix: ' + money(l.price) +
-        '\n💳 Payer le vendeur via: ' + l.payment_method + (l.payment_details ? ' — ' + l.payment_details + ' (' + l.payment_name + ')' : '') +
-        '\n📱 WhatsApp vendeur: ' + (l.seller_whatsapp||'') +
-        '\n\n👉 Le compte a été livré automatiquement à l\'acheteur. Payez le vendeur.',
-        'urgent', 'moneybag', l.photos?.[0], 'marche');
+      ktNotifyMarketSale(l, u);
 
       showToast(t('purchase_success_toast'));
       goPage('commandes');
@@ -9867,6 +10378,38 @@ function estimateBlurScore(canvas){
   const variance = (sumSq/count) - (mean*mean);
   return variance; // pi gwo = pi klè/pi net; pi piti = pi flou
 }
+
+const KT_KYC_MSG = {
+  ht:{low:'📷 Foto a pa ase klè (rezolisyon ba). Eseye ankò.', dark:'💡 Twò nwa. Ale nan yon kote ki gen bon limyè.', bright:'💡 Twò klere (kontre lajè). Evite limyè dirèk dèyè w.', flat:'⚠️ Foto a pa sanble yon vrè foto. Pran yon foto reyèl figi w.', noface:'🙂 Pa wè figi w. Mete figi w nan mitan epi gade kamera a.', multi:'⚠️ Yon sèl moun nan foto a.', far:'📏 Pwoche pi pre — figi w twò piti.'},
+  fr:{low:'📷 Photo pas assez nette (basse résolution). Réessayez.', dark:'💡 Trop sombre. Placez-vous dans un endroit bien éclairé.', bright:'💡 Trop lumineux (contre-jour). Évitez la lumière directe derrière vous.', flat:'⚠️ Ça ne ressemble pas à une vraie photo. Prenez une photo réelle de votre visage.', noface:'🙂 Visage non détecté. Centrez votre visage et regardez la caméra.', multi:'⚠️ Une seule personne sur la photo.', far:'📏 Rapprochez-vous — visage trop petit.'},
+  en:{low:'📷 Photo not clear enough (low resolution). Try again.', dark:'💡 Too dark. Go somewhere well lit.', bright:'💡 Too bright (backlight). Avoid direct light behind you.', flat:'⚠️ This does not look like a real photo. Take a real photo of your face.', noface:'🙂 No face detected. Center your face and look at the camera.', multi:'⚠️ Only one person in the photo.', far:'📏 Move closer — face too small.'},
+  es:{low:'📷 Foto poco clara (baja resolución). Inténtalo de nuevo.', dark:'💡 Muy oscuro. Ve a un lugar bien iluminado.', bright:'💡 Demasiado brillante (contraluz). Evita la luz directa detrás de ti.', flat:'⚠️ No parece una foto real. Toma una foto real de tu rostro.', noface:'🙂 No se detecta el rostro. Centra tu rostro y mira a la cámara.', multi:'⚠️ Solo una persona en la foto.', far:'📏 Acércate — el rostro es muy pequeño.'}
+};
+async function ktKycQuality(canvas){
+  const M = KT_KYC_MSG[currentLang] || KT_KYC_MSG.fr;
+  if(Math.min(canvas.width, canvas.height) < 360) return M.low;
+  try{
+    const c = document.createElement('canvas'); c.width = 64; c.height = 64;
+    const x = c.getContext('2d'); x.drawImage(canvas, 0, 0, 64, 64);
+    const d = x.getImageData(0,0,64,64).data;
+    let sum = 0, sq = 0, n = 64*64;
+    for(let i=0;i<d.length;i+=4){ const y = 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2]; sum += y; sq += y*y; }
+    const mean = sum/n, sd = Math.sqrt(Math.max(0, sq/n - mean*mean));
+    if(mean < 55) return M.dark;
+    if(mean > 215) return M.bright;
+    if(sd < 22) return M.flat;
+  }catch(e){}
+  if('FaceDetector' in window){
+    try{
+      const fd = new window.FaceDetector({ fastMode:true, maxDetectedFaces:3 });
+      const faces = await fd.detect(canvas);
+      if(!faces.length) return M.noface;
+      if(faces.length > 1) return M.multi;
+      if(faces[0].boundingBox.width < canvas.width * 0.2) return M.far;
+    }catch(e){}
+  }
+  return null;
+}
 async function captureKycPhoto(){
   const video = document.getElementById('kycVideo');
   const canvas = document.createElement('canvas');
@@ -9880,6 +10423,12 @@ async function captureKycPhoto(){
   const BLUR_THRESHOLD = 25; // ajistab selon tès reyèl
   if(blurScore < BLUR_THRESHOLD){
     document.getElementById('kycMsg').textContent = t('kyc_photo_blurry');
+    document.getElementById('kycMsg').style.color = 'var(--red)';
+    return;
+  }
+  const _q = await ktKycQuality(canvas);
+  if(_q){
+    document.getElementById('kycMsg').textContent = _q;
     document.getElementById('kycMsg').style.color = 'var(--red)';
     return;
   }
@@ -10225,6 +10774,7 @@ const ADMIN_TABS = [
   {id:'rapo', label:'Rapò'},
   {id:'paramsite', label:'Paramèt'},
   {id:'pub', label:'📢 Pub'},
+  {id:'konesans', label:'🧠 Konesans bot'},
   {id:'kerryrewards', label:'💎 Free Fire Reward'},
   {id:'demanderekonpans', label:'🎁 Demande Rekonpans'},
   {id:'chatkliyan', label:'💬 Chat Kliyan'},
@@ -10907,12 +11457,54 @@ function renderAdminTab(){
     `;
     fetchReferralAdminData();
   }
+  else if(adminTab === 'konesans'){
+    const L = state.botFaq || [];
+    box.innerHTML = `
+      <div class="card">
+        <div class="section-title" style="margin:0 0 6px;"><h3>🧠 Aprann Touski</h3></div>
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Ekri yon kesyon kliyan yo ka poze ak bon repons lan. Touski ap itilize l. Pa mete pri yo la (yo soti sou sit la poukont yo).</div>
+        <div class="field-uid" style="margin-bottom:8px;"><textarea id="faqQ" rows="2" placeholder="Kesyon (ex: Konbyen tan livrezon an pran?)" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font-size:13px;font-family:inherit;"></textarea></div>
+        <div class="field-uid" style="margin-bottom:10px;"><textarea id="faqA" rows="3" placeholder="Repons ou vle Touski bay" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font-size:13px;font-family:inherit;"></textarea></div>
+        <input type="hidden" id="faqEditIdx" value="">
+        <button class="btn btn-green" style="width:100%;" onclick="botFaqAdd()">💾 Sove</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin:16px 0 8px;">Kesyon yo (${L.length})</div>
+      ${L.length === 0 ? '<div class="empty"><div class="em-icon">🧠</div><div class="em-title">Poko gen kesyon</div></div>' : L.map((x,i) => `
+        <div class="card">
+          <div style="font-weight:700;font-size:12.5px;margin-bottom:4px;">❓ ${escapeHtml(x.q)}</div>
+          <div style="font-size:12px;color:var(--muted);white-space:pre-wrap;margin-bottom:8px;">${escapeHtml(x.a)}</div>
+          <div style="display:flex;gap:8px;">
+            <button class="mini-btn" style="flex:1;" onclick="botFaqEdit(${i})">✏️ Modifye</button>
+            <button class="mini-btn" style="flex:1;color:var(--red);" onclick="botFaqDel(${i})">Efase</button>
+          </div>
+        </div>`).join('')}
+    `;
+  }
   else if(adminTab === 'pub'){
+    setTimeout(() => { try{ pubSetType(window._pubType || 'led'); }catch(e){} }, 0);
     box.innerHTML = `
       <div class="card">
         <div class="section-title" style="margin:0 0 10px;"><h3>Ajoute yon pub</h3></div>
-        <div class="field-uid" style="margin-bottom:8px;"><input type="text" id="bannerImageUrl" placeholder="Lyen imaj (URL)"></div>
-        <div class="field-uid" style="margin-bottom:8px;"><input type="file" accept="image/*" onchange="handleBannerImageUpload(this)" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:6px 8px;font-size:11px;"></div>
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button id="pubTLed" class="mini-btn" style="flex:1;padding:11px;font-weight:700;" onclick="pubSetType('led')">💡 Tèks LED</button>
+          <button id="pubTImg" class="mini-btn" style="flex:1;padding:11px;font-weight:700;" onclick="pubSetType('img')">🖼️ Imaj</button>
+        </div>
+        <div id="pubLedForm">
+          <div class="field-uid" style="margin-bottom:8px;"><textarea id="pubLedText" rows="2" maxlength="200" placeholder="Tèks ki pral defile a" oninput="pubLedPreview()" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:10px;font-size:13px;font-family:inherit;"></textarea></div>
+          <div style="display:flex;gap:10px;margin-bottom:8px;">
+            <div style="flex:1;"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Koulè tèks</div><input type="color" id="pubLedFg" value="#ffffff" oninput="pubLedPreview()" style="width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:3px;background:var(--panel-2);"></div>
+            <div style="flex:1;"><div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Koulè background</div><input type="color" id="pubLedBg" value="#0a9e3d" oninput="pubLedPreview()" style="width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:3px;background:var(--panel-2);"></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">${[['#ffffff','#0a9e3d'],['#ffffff','#e23b57'],['#111111','#ffd23f'],['#ffffff','#1565d8'],['#ffd23f','#111111'],['#ffffff','#7b3fe4']].map(c => `<span onclick="pubLedPreset('${c[0]}','${c[1]}')" style="width:28px;height:28px;border-radius:50%;background:${c[1]};border:3px solid ${c[0]};box-shadow:0 0 0 1px var(--line);cursor:pointer;"></span>`).join('')}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Vitès: <span id="pubLedSpdLbl">Nòmal</span></div>
+          <input type="range" id="pubLedSpeed" min="6" max="30" value="16" oninput="pubLedPreview()" style="width:100%;margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Preview:</div>
+          <div id="pubLedPrev" style="border-radius:8px;overflow:hidden;margin-bottom:10px;"></div>
+        </div>
+        <div id="pubImgForm" style="display:none;">
+          <div class="field-uid" style="margin-bottom:8px;"><input type="text" id="bannerImageUrl" placeholder="Lyen imaj (URL)"></div>
+          <div class="field-uid" style="margin-bottom:8px;"><input type="file" accept="image/*" onchange="handleBannerImageUpload(this)" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:6px 8px;font-size:11px;"></div>
+        </div>
         <div class="field-uid" style="margin-bottom:8px;"><input type="number" id="bannerDays" placeholder="Kantite jou anvan pub la ekspire (ex: 7)"></div>
         <div class="field-uid" style="margin-bottom:12px;"><input type="text" id="bannerLink" placeholder="Lyen lè yo klike (opsyonèl)"></div>
         <button class="btn btn-green" style="width:100%;" onclick="addSiteBanner()">+ Ajoute Pub</button>
@@ -10923,7 +11515,7 @@ function renderAdminTab(){
           const expired = b.expiresAt && new Date(b.expiresAt).getTime() < Date.now();
           const daysLeft = b.expiresAt ? Math.max(0, Math.ceil((new Date(b.expiresAt).getTime() - Date.now()) / 86400000)) : null;
           return `<div class="card" style="display:flex;gap:10px;align-items:center;">
-            <img src="${b.imageUrl.replace(/"/g,'')}" style="width:64px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0;">
+            ${ktLedParse(b) ? `<div style="width:64px;height:40px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;overflow:hidden;background:${ktLedParse(b).bg};color:${ktLedParse(b).fg};">💡 LED</div>` : `<img src="${b.imageUrl.replace(/"/g,'')}" style="width:64px;height:40px;border-radius:8px;object-fit:cover;flex-shrink:0;">`}
             <div style="flex:1;min-width:0;">
               <div style="font-size:12.5px;font-weight:700;color:${expired?'var(--red)':'var(--text)'};">${expired?'Ekspire':daysLeft+' jou rete'}</div>
               ${b.linkUrl ? `<div style="font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(b.linkUrl)}</div>` : ''}
@@ -11590,6 +12182,7 @@ function renderPendingListings(){
             <div><b>Mot de passe:</b> ${escapeHtml(l.account_password)}</div>
             <div><b>Paiement:</b> ${escapeHtml(l.payment_method)} ${l.payment_details ? '— ' + escapeHtml(l.payment_details) + ' (' + escapeHtml(l.payment_name||'') + ')' : ''}</div>
           </div>
+          <div class="field-uid" style="margin-bottom:10px;"><label>💸 Komisyon ou pran (HTG) — vandè a ap touche pri a mwens montan sa a</label><input type="text" inputmode="numeric" id="commAmt-${l.id}" placeholder="Ex: 500" value="${escapeHtml(String(l.commission||''))}"></div>
           <div style="display:flex;gap:8px;">
             <button class="mini-btn" style="flex:1;color:var(--green);" onclick="reviewListing('${l.id}','active')">✅ Approuver</button>
             <button class="mini-btn" style="flex:1;color:var(--red);" onclick="reviewListing('${l.id}','rejected')">✕ Rejeter</button>
@@ -11634,8 +12227,10 @@ function renderPendingDeliveries(){
             <div><b>Achtè:</b> ${escapeHtml(l.buyer?.name||'')} — ${escapeHtml(l.buyer?.email||'')}</div>
             <div style="margin-top:6px;"><b>Payer le vendeur:</b> ${escapeHtml(l.payment_method)} ${l.payment_details ? '— ' + escapeHtml(l.payment_details) + ' (' + escapeHtml(l.payment_name||'') + ')' : ''}</div>
             <div><b>WhatsApp vendeur:</b> ${escapeHtml(l.seller_whatsapp||'')}</div>
+            ${ktCommissionOf(l) ? `<div style="margin-top:6px;"><b>Commission:</b> ${money(ktCommissionOf(l))}</div>` : ''}
+            <div><b>Net vendeur:</b> ${money(ktSellerNet(l))}</div>
           </div>
-          <button class="mini-btn" style="width:100%;color:var(--green);" onclick="confirmDelivery('${l.id}')">✅ J'ai payé le vendeur — Confirmer la livraison</button>
+          <button class="mini-btn" style="width:100%;color:var(--green);" onclick="confirmDelivery('${l.id}')">${l.payment_method==='wallet' ? '🚚 Livrer — créditer ' + money(ktSellerNet(l)) + ' au wallet du vendeur' : '🚚 Livrer (j\'ai envoyé ' + money(ktSellerNet(l)) + ' par NatCash)'}</button>
         </div>
       `).join('')}
     </div>
@@ -11649,6 +12244,21 @@ async function confirmDelivery(id){
     if(!updated || updated.length === 0){ showToast('⚠️ PA SOVE — 0 liy modifye'); return; }
     const l = updated[0];
 
+    // 1) Peye vandè a si se wallet entèn (pri - komisyon)
+    if(l.payment_method === 'wallet' && l.seller_id){
+      try{
+        const { data: _w } = await sb.from('wallets').select('balance, bonus_balance').eq('user_id', l.seller_id).maybeSingle();
+        if(_w){ state.wallets[l.seller_id] = Number(_w.balance)||0; if(!state.walletBonus) state.walletBonus = {}; state.walletBonus[l.seller_id] = Number(_w.bonus_balance)||0; }
+        await applyWalletChange(l.seller_id, ktSellerNet(l), 'Vente compte Free Fire (' + (l.listing_name||l.rank) + ')' + (ktCommissionOf(l) ? ' — commission ' + ktCommissionOf(l) + ' HTG' : ''), 'in', false, null, null, null, false);
+      }catch(e){ showToast('⚠️ Wallet vandè pa kredite: ' + (e?.message||e)); }
+    }
+    // 2) Livre kont lan bay achtè a (kòmand lan vin 'terminee' ak detay yo)
+    try{
+      const { data: _o } = await sb.from('orders').select('id').eq('user_id', l.buyer_id).eq('type','market_account').eq('status','en_cours').eq('price', l.price).order('created_at',{ascending:false}).limit(1);
+      if(_o && _o[0]) await sb.from('orders').update({ status:'terminee', market_email:l.account_email, market_password:l.account_password }).eq('id', _o[0].id);
+      else showToast('⚠️ Kòmand achtè a pa jwenn — detay yo pa voye');
+    }catch(e){ showToast('⚠️ Livrezon pa fèt: ' + (e?.message||e)); }
+
     // Efase foto yo nan Storage (pa nesesè ankò apre vant lan) pou konsève espas Supabase
     try{
       const paths = (l.photos||[]).map(url => {
@@ -11661,7 +12271,7 @@ async function confirmDelivery(id){
       }
     }catch(e){ console.warn('Efase foto storage echwe:', e?.message||e); }
 
-    sendNtfyNotification('✅ Livraison confirmée', '🏆 ' + l.rank + ' — Niveau ' + l.level + ' livré à l\'acheteur', 'default', 'white_check_mark', undefined, 'marche');
+    sendNtfyNotification('✅ Livraison confirmée', '🏆 ' + l.rank + ' — Niveau ' + l.level + ' livré à l\'acheteur' + (l.payment_method==='wallet' ? ' — vendeur crédité ' + money(ktSellerNet(l)) : ''), 'default', 'white_check_mark', undefined, 'marche');
     showToast('✅ Livraison confirmée — l\'acheteur voit maintenant les détails');
     await loadPendingDeliveries();
   }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
@@ -11693,7 +12303,15 @@ function toggleMorePhotos(id){
 async function reviewListing(id, decision){
   try{
     const sb = await getSupabase();
-    const { data: updated, error } = await sb.from('game_account_listings').update({ status: decision }).eq('id', id).select();
+    const upd = { status: decision };
+    if(decision === 'active'){
+      const ce = document.getElementById('commAmt-'+id);
+      const cv = ce ? Math.max(0, parseFloat(String(ce.value).replace(/\s/g,'').replace(',','.')) || 0) : 0;
+      const lp = ((state.pendingListings||[]).find(x=>x.id===id)||{}).price;
+      if(lp && cv >= lp){ showToast('⚠️ Komisyon an dwe mwens pase pri a'); return; }
+      upd.commission = cv;
+    }
+    const { data: updated, error } = await sb.from('game_account_listings').update(upd).eq('id', id).select();
     if(error){ showToast('⚠️ SISPANSYON PA SOVE: ' + error.message); return; }
     if(!updated || updated.length === 0){ showToast('⚠️ PA SOVE — RLS bloke oswa ID pa jwenn (0 liy modifye)'); return; }
     showToast(decision === 'active' ? '✅ Kont apwouve — parèt sou Marché a' : 'Kont rejte');
@@ -11985,6 +12603,7 @@ function renderAdminBubbleContent(b){
     b.style.background = 'var(--panel-2)'; b.style.color = 'var(--muted)';
   } else {
     b.innerHTML = formatChatText(m.content) + (m.edited ? '<span style="opacity:0.7;font-size:10.5px;"> · modifye</span>' : '') + (rx.length ? '<div style="margin-top:6px;font-size:15px;">' + rx.join(' ') + '</div>' : '');
+    ktStyleVoiceBubble(b, m.sender === 'admin', m.content, m.created_at);
   }
 }
 function appendAdminChatBubble(m){
@@ -12943,6 +13562,44 @@ async function moveFormField(pid, i, dir){
 
 /* ---- Kategori CRUD ---- */
 /* ---- Site Banners (pub rotative sou paj Boutik) ---- */
+
+function ktLedParse(b){
+  if(!b || typeof b.imageUrl !== 'string' || b.imageUrl.indexOf('led:') !== 0) return null;
+  try{
+    const o = JSON.parse(b.imageUrl.slice(4));
+    const col = c => /^#[0-9a-f]{6}$/i.test(c||'') ? c : null;
+    return { t: String(o.t||'').slice(0,200), fg: col(o.fg) || '#ffffff', bg: col(o.bg) || '#0a9e3d', s: Math.max(6, Math.min(30, parseInt(o.s,10)||16)) };
+  }catch(e){ return null; }
+}
+function ktLedHtml(o, link){
+  const inner = `<span class="track">${escapeHtml(o.t)}</span>`;
+  const st = `background:${o.bg};color:${o.fg};--dur:${o.s}s;`;
+  return link ? `<a class="ktled" href="${escapeHtml(link)}" target="_blank" rel="noopener" style="${st}">${inner}</a>` : `<div class="ktled" style="${st}">${inner}</div>`;
+}
+function renderLedBanner(){
+  const box = document.getElementById('ledBannerBox'); if(!box) return;
+  const leds = activeSiteBanners().map(b => ({ o: ktLedParse(b), link: b.linkUrl })).filter(x => x.o && x.o.t);
+  box.innerHTML = leds.map(x => ktLedHtml(x.o, x.link)).join('');
+}
+function pubSetType(t){
+  window._pubType = t;
+  const on = 'background:var(--green-dim);color:var(--green);border-color:var(--green);';
+  const L = document.getElementById('pubTLed'), I = document.getElementById('pubTImg');
+  if(!L || !I) return;
+  L.style.cssText = L.style.cssText.replace(/background:[^;]*;|color:[^;]*;|border-color:[^;]*;/g,'');
+  I.style.cssText = I.style.cssText.replace(/background:[^;]*;|color:[^;]*;|border-color:[^;]*;/g,'');
+  (t==='led' ? L : I).style.cssText += on;
+  document.getElementById('pubLedForm').style.display = t==='led' ? 'block' : 'none';
+  document.getElementById('pubImgForm').style.display = t==='led' ? 'none' : 'block';
+  pubLedPreview();
+}
+function pubLedPreset(fg, bg){ document.getElementById('pubLedFg').value = fg; document.getElementById('pubLedBg').value = bg; pubLedPreview(); }
+function pubLedPreview(){
+  const el = document.getElementById('pubLedPrev'); if(!el) return;
+  const v = parseInt(document.getElementById('pubLedSpeed').value, 10);
+  const lbl = document.getElementById('pubLedSpdLbl'); if(lbl) lbl.textContent = v <= 10 ? 'Rapid' : v <= 20 ? 'Nòmal' : 'Dousman';
+  el.innerHTML = ktLedHtml({ t: document.getElementById('pubLedText').value.trim() || 'Ekri tèks ou a…', fg: document.getElementById('pubLedFg').value, bg: document.getElementById('pubLedBg').value, s: v });
+}
 async function fetchSiteBanners(){
   try{
     const sb = await getSupabase();
@@ -12950,13 +13607,21 @@ async function fetchSiteBanners(){
     state.siteBanners = (data||[]).map(b => ({ id:b.id, imageUrl:b.image_url, linkUrl:b.link_url, expiresAt:b.expires_at, sortOrder:b.sort_order||0 }));
   }catch(e){ console.warn('fetchSiteBanners failed:', e?.message || e); }
   renderPromoBanner();
+  renderLedBanner();
 }
 function activeSiteBanners(){
   const now = Date.now();
   return (state.siteBanners||[]).filter(b => !b.expiresAt || new Date(b.expiresAt).getTime() > now);
 }
 async function addSiteBanner(){
-  const url = document.getElementById('bannerImageUrl').value.trim();
+  let url;
+  if((window._pubType || 'led') === 'led'){
+    const txt = document.getElementById('pubLedText').value.trim();
+    if(!txt){ showToast('Ekri tèks la dabò'); return; }
+    url = 'led:' + JSON.stringify({ t: txt, fg: document.getElementById('pubLedFg').value, bg: document.getElementById('pubLedBg').value, s: parseInt(document.getElementById('pubLedSpeed').value,10)||16 });
+  } else {
+    url = document.getElementById('bannerImageUrl').value.trim();
+  }
   const days = parseInt(document.getElementById('bannerDays').value, 10);
   const link = document.getElementById('bannerLink').value.trim();
   if(!url){ showToast('Ajoute yon imaj dabò'); return; }
@@ -12967,7 +13632,7 @@ async function addSiteBanner(){
     const { error } = await sb.from('site_banners').insert({ image_url:url, link_url: link||null, expires_at: expiresAt, sort_order: (state.siteBanners.length||0) });
     if(error){ showToast('⚠️ Erè: ' + error.message); return; }
   }catch(e){ showToast('⚠️ Erè: ' + (e?.message||'enkoni')); return; }
-  document.getElementById('bannerImageUrl').value = '';
+  { const _i = document.getElementById('bannerImageUrl'); if(_i) _i.value = ''; const _t = document.getElementById('pubLedText'); if(_t) _t.value = ''; }
   document.getElementById('bannerDays').value = '';
   document.getElementById('bannerLink').value = '';
   showToast('Pub ajoute ✓');
@@ -12988,6 +13653,7 @@ async function deleteSiteBanner(id){
   showToast('Pub efase');
   renderAdminTab();
   renderPromoBanner();
+  renderLedBanner();
 }
 async function handleBannerImageUpload(input){
   const file = input.files[0];
@@ -13003,7 +13669,7 @@ let promoBannerIndex = 0, promoBannerTimer = null;
 function renderPromoBanner(){
   const box = document.getElementById('promoBannerBox');
   if(!box) return;
-  const banners = activeSiteBanners();
+  const banners = activeSiteBanners().filter(b => !ktLedParse(b));
   clearInterval(promoBannerTimer);
   if(banners.length === 0){ box.innerHTML = ''; return; }
   promoBannerIndex = 0;
@@ -13555,6 +14221,7 @@ fetchSiteBanners();
 fetchTutorialsV2();
 fetchTutorialTriggersV2();
 fetchPaymentSettings();
+fetchBotFaq();
 fetchFooterContent();
 if(!sessionStorage.getItem('kt_support_tip_shown')){
   sessionStorage.setItem('kt_support_tip_shown', '1');
@@ -14029,6 +14696,7 @@ function ktPinSwitchFromPasswordForm(){
 /* ---- pòtay prensipal ---- */
 async function ktPinGate(){
   if(ktPin.recovery) return;
+  { const wo = document.getElementById('welcomeOverlay'); if(wo && wo.style.display === 'block') return; } // paj akey: pa mande PIN
   try{
     const sb = await getSupabase();
     const { data } = await sb.auth.getSession();
