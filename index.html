@@ -2862,7 +2862,12 @@ async function requestHumanAgent(){
     const { data: convo, error } = await sb.from('support_conversations').insert({
       user_id: state.currentUserId || null, email, name, status:'human', agent_active:false
     }).select().single();
-    if(error){ showToast('⚠️ Pa ka konekte kounye a — eseye ankò'); return; }
+    if(error){
+      const _em = (error.message||'') + (error.code ? ' ['+error.code+']' : '');
+      showToast('⚠️ Chat pa sove: ' + _em, 7000);
+      try{ sendNtfyNotification('🐞 Chat pa sove', '👤 ' + name + '\n❌ ' + _em + '\n(support_conversations insert)', 'high', 'warning'); }catch(e){}
+      return;
+    }
     supportConversationId = convo.id;
     // supportMode rete 'bot' — Touski Bot kontinye reponn nòmalman, se sèlman yon "tracking" k ap kòmanse
     if(!state.currentUserId) localStorage.setItem('kt_support_convo_id', convo.id);
@@ -2875,7 +2880,8 @@ async function requestHumanAgent(){
       content: m.content
     }));
     if(rows.length){
-      const { data: _bulk } = await sb.from('support_messages').insert(rows).select('id');
+      const { data: _bulk, error: _bulkErr } = await sb.from('support_messages').insert(rows).select('id');
+      if(_bulkErr){ try{ sendNtfyNotification('🐞 Mesaj chat pa sove', '❌ ' + (_bulkErr.message||'') + ' [' + (_bulkErr.code||'') + ']\n(support_messages insert)', 'high', 'warning'); }catch(e){} showToast('⚠️ Mesaj pa sove: ' + (_bulkErr.message||''), 7000); }
       if(_bulk && _bulk.length === _histForDb.length){
         const _box = document.getElementById('supportChatMessages');
         Array.from(_box ? _box.children : []).forEach(r => { const i = r._hist ? _histForDb.indexOf(r._hist) : -1; if(i >= 0) r.dataset.dbid = _bulk[i].id; });
@@ -3719,7 +3725,7 @@ RÈG STRIK KONFIDANSYALITE (SWIV TOUJOU, SAN EKSEPSYON):
     }
     if(!supportConversationId){
       const customerMsgCount = supportChatHistory.filter(m => m.role === 'user').length;
-      if(customerMsgCount >= 5){ requestHumanAgent(); }
+      if(customerMsgCount >= 1){ requestHumanAgent(); }
     }
   }catch(e){
     document.getElementById('supportThinking')?.remove();
@@ -4834,7 +4840,7 @@ async function syncLocalUserFromAuth(authUser, fallbackName){
       accountStatus: profile?.account_status || 'active', suspensionReason: profile?.suspension_reason || '',
       suspendedUntil: profile?.suspended_until || null, suspensionHistory: profile?.suspension_history || [],
       kycStatus: profile?.kyc_status || 'none', kycPhotoUrl: profile?.kyc_photo_url || null,
-      sellerName: profile?.seller_name || null, marketBanned: profile?.market_banned || false };
+      sellerName: profile?.seller_name || null, marketBanned: profile?.market_banned || false, publicId: profile?.public_id || null };
     state.users.push(localUser);
     state.wallets[authUser.id] = state.wallets[authUser.id] || 0;
     state.transactions[authUser.id] = state.transactions[authUser.id] || [];
@@ -6068,6 +6074,7 @@ function pageProduct(){
   let inner;
   if(p.type === 'calculator'){ inner = renderManualSheet(p); }
   else if(p.type === 'form'){ inner = renderFormSheet(p); }
+  else if(p.type === 'api_topup' && !(p.variants||[]).length){ inner = '<div class="sheet-handle"></div><div class="empty"><div class="em-icon">📦</div><div class="em-title">Pa gen opsyon disponib pou pwodwi sa a ankò</div></div>'; }
   else if(p.type === 'api_topup' && !ktIsApiPinProduct(p)){ inner = renderApiTopupSheet(p); }
   else { inner = renderVariantSheet(p); }
   inner = inner.replace('<div class="sheet-handle"></div>', '');
@@ -6076,7 +6083,7 @@ function pageProduct(){
 function renderApiTopupSheet(p){
   const sv = sortedVariants(p);
   const prices = p.variants.map(v=>v.price);
-  const minP = Math.min(...prices), maxP = Math.max(...prices);
+  const minP = prices.length?Math.min(...prices):0, maxP = prices.length?Math.max(...prices):0;
   const selected = p.variants.find(v=>v.id===selectedVariantId) || sv[0];
   return `
     <div class="sheet-handle"></div>
@@ -6098,7 +6105,7 @@ function renderApiTopupSheet(p){
       `).join('')}
     </div>
 
-    ${selected && selected.orderMode === 'api_pin' ? '' : `
+    ${selected && ktVarIsPin(selected) ? '' : `
     <div style="border:1.5px solid #C4B5FD;border-radius:16px;padding:18px;margin-bottom:16px;">
       <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;">
         <span style="font-size:20px;">🎮</span>
@@ -6301,7 +6308,7 @@ async function confirmApiTopupPurchase(productId){
   let variant = p.variants.find(v=>v.id===selectedVariantId);
   if(!variant && p.variants.length > 0){ variant = sortedVariants(p)[0]; selectedVariantId = variant.id; }
   if(!variant){ showToast(t('toast_no_option_contact_admin')); if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.textContent='⚡ '+t('btn_buy_now');} return; }
-  const isGiftCard = variant.orderMode === 'api_pin';
+  const isGiftCard = ktVarIsPin(variant);
   const playerId = isGiftCard ? '' : document.getElementById('apiPlayerId-'+productId).value.trim();
   const serverIdInput = isGiftCard ? null : document.getElementById('apiServerId-'+productId);
   const serverId = variant.fixedServerId || (serverIdInput ? serverIdInput.value.trim() : '');
@@ -6436,7 +6443,7 @@ async function confirmApiTopupPurchase(productId){
 function renderFormSheet(p){
   const sv = sortedVariants(p);
   const prices = p.variants.map(v=>v.price);
-  const minP = Math.min(...prices), maxP = Math.max(...prices);
+  const minP = prices.length?Math.min(...prices):0, maxP = prices.length?Math.max(...prices):0;
   return `
     <div class="sheet-handle"></div>
     
@@ -6537,7 +6544,7 @@ async function confirmFormOrder(productId){
 function renderVariantSheet(p){
   const sv = sortedVariants(p);
   const prices = p.variants.map(v=>v.price);
-  const minP = Math.min(...prices), maxP = Math.max(...prices);
+  const minP = prices.length?Math.min(...prices):0, maxP = prices.length?Math.max(...prices):0;
   return `
     <div class="sheet-handle"></div>
     
@@ -6735,11 +6742,21 @@ async function checkStockAndNotifyIfEmpty(variantId, productName, variantLabel){
 
 
 /* ===== Gift Card API (Apple, Netflix...) — menm eksperyans ak PIN stock, men livrezon via Founisè API ===== */
+function ktVarIsPin(v, p){
+  if(!v) return false;
+  if(v.orderMode === 'api_pin') return true;
+  if(!p){ p = (state.products||[]).find(x => (x.variants||[]).some(y => y === v || y.id === v.id)); }
+  return !!(p && p.type === 'api_topup' && ktLooksGift(p));
+}
+function ktLooksGift(p){
+  try{ if(window.ktGiftProds && window.ktGiftProds[p.id]) return true; }catch(e){}
+  return /gift|card|carte|netflix|apple|itunes|google\s*play|steam|psn|playstation|xbox|amazon|spotify|roblox/i.test(String(p && p.name || ''));
+}
 function ktIsApiPinProduct(p){
-  return !!(p && p.type === 'api_topup' && p.variants && p.variants.length && p.variants.every(v => v.orderMode === 'api_pin'));
+  return !!(p && p.type === 'api_topup' && p.variants && p.variants.length && (p.variants.some(v => v.orderMode === 'api_pin') || ktLooksGift(p)));
 }
 function ktIsApiPinVariantId(variantId){
-  for(const p of state.products){ const v = (p.variants||[]).find(x=>x.id===variantId); if(v) return v.orderMode === 'api_pin'; }
+  for(const p of state.products){ const v = (p.variants||[]).find(x=>x.id===variantId); if(v) return ktVarIsPin(v, p); }
   return false;
 }
 async function ktApiPinBuyOne(variantId){
@@ -6794,7 +6811,7 @@ async function confirmPurchase(productId){
   if(!v){ showToast(t('toast_select_option')); return; }
 
   showToast(t('toast_transaction_processing'));
-  if(v.orderMode === 'api_pin'){
+  if(ktVarIsPin(v)){
     if(window.__ktApiPinBusy) return;
     window.__ktApiPinBusy = true;
     try{
@@ -7615,6 +7632,7 @@ function renderWalletTab(){
     subscribeToMyRechargeRealtime();
     renderRechargeTimerState();
   } else if(walletTab === 'transfert'){
+    ktTrSeq++; window.ktTrRecipient = null;
     box.innerHTML = `
       <div class="card" style="border-radius:24px;padding:30px 28px 28px;">
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;">
@@ -7625,14 +7643,15 @@ function renderWalletTab(){
         </div>
 
         <div style="margin-bottom:20px;">
-          <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">${t('label_recipient_email')}</div>
+          <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">${({ht:'Imèl oswa ID kliyan (8 chif)',fr:'Email ou ID client (8 chiffres)',en:'Email or customer ID (8 digits)',es:'Correo o ID de cliente (8 dígitos)'})[currentLang]||'Email ou ID client'}</div>
           <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #e6e9e7;border-radius:14px;padding:14px 16px;background:#fbfcfb;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa39d" stroke-width="2" style="flex-shrink:0;"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg>
-            <input type="text" id="trEmail" placeholder="email@exemple.com" style="border:none;outline:none;background:transparent;font-size:15px;color:var(--text);width:100%;">
+            <input type="text" id="trEmail" oninput="ktTrLookup()" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="email@exemple.com / 12345678" style="border:none;outline:none;background:transparent;font-size:15px;color:var(--text);width:100%;">
           </div>
+          <div id="trFound"></div>
         </div>
 
-        <div style="margin-bottom:20px;">
+        <div id="trAmtBlock" style="margin-bottom:20px;display:none;">
           <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">${t('label_amount_htg')}</div>
           <div style="position:relative;display:flex;align-items:center;gap:10px;border:1.5px solid #e6e9e7;border-radius:14px;padding:14px 16px;background:#fbfcfb;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa39d" stroke-width="2" style="flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M9 9.5h4.5a1.5 1.5 0 0 1 0 3H10a1.5 1.5 0 0 0 0 3h5"/></svg>
@@ -7641,7 +7660,7 @@ function renderWalletTab(){
           </div>
         </div>
 
-        <button id="trSubmitBtn" onclick="submitTransfer()" style="width:100%;border:none;border-radius:14px;padding:16px;background:linear-gradient(135deg, #1b2027, #0a0d11);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 24px rgba(10,13,17,0.30);">
+        <button id="trSubmitBtn" onclick="submitTransfer()" style="display:none;width:100%;border:none;border-radius:14px;padding:16px;background:linear-gradient(135deg, #1b2027, #0a0d11);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 24px rgba(10,13,17,0.30);">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
           ${t('btn_send_transfer')}
         </button>
@@ -8389,10 +8408,77 @@ function sendTransferEmails(fromUser, toUser, amount){
     }
   }catch(e){ console.warn('sendTransferEmails erè:', e); }
 }
+
+
+async function ktLoadMyPublicId(){
+  try{
+    const u = currentUser(); if(!u || u.publicId) return;
+    const sb = await getSupabase();
+    const { data } = await sb.from('profiles').select('public_id').eq('id', u.id).maybeSingle();
+    if(data && data.public_id){ u.publicId = data.public_id; const el = document.getElementById('ktMyIdVal'); if(el) el.textContent = data.public_id; }
+  }catch(e){}
+}
+function ktCopyMyId(btn){
+  const u = currentUser(); const v = u && u.publicId; if(!v) return;
+  try{ navigator.clipboard.writeText(v); }catch(e){}
+  const old = btn.textContent; btn.textContent = '✓'; setTimeout(() => { btn.textContent = old; }, 1400);
+}
+/* ---- Transfè: chèche destinatè ak imèl OSWA ID 8 chif (otomatik) ---- */
+window.ktTrRecipient = null; let ktTrTimer = null, ktTrSeq = 0;
+function ktTrKind(v){
+  if(/^\d{8}$/.test(v)) return 'id';
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) return 'email';
+  return null;
+}
+function ktTrSet(html, showBtn){
+  const f = document.getElementById('trFound'); if(f) f.innerHTML = html || '';
+  const b = document.getElementById('trSubmitBtn'); if(b) b.style.display = showBtn ? 'flex' : 'none';
+  const a = document.getElementById('trAmtBlock'); if(a) a.style.display = showBtn ? 'block' : 'none';
+}
+function ktTrLookup(){
+  const inp = document.getElementById('trEmail'); if(!inp) return;
+  const v = inp.value.trim().toLowerCase();
+  clearTimeout(ktTrTimer); window.ktTrRecipient = null; ktTrSeq++;
+  const k = ktTrKind(v);
+  const L = currentLang;
+  if(!k){
+    ktTrSet(v ? '<div style="font-size:12px;color:var(--muted);margin-top:8px;">'+({ht:'Kontinye ekri imèl la oswa ID 8 chif la…',fr:"Continuez à écrire l'email ou l'ID à 8 chiffres…",en:'Keep typing the email or 8-digit ID…',es:'Sigue escribiendo el correo o el ID de 8 dígitos…'})[L]+'</div>' : '', false);
+    return;
+  }
+  const seq = ktTrSeq;
+  ktTrSet('<div style="display:flex;align-items:center;gap:10px;margin-top:10px;padding:12px 14px;border:1.5px dashed #c9d3ce;border-radius:12px;font-size:13.5px;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#17C267" stroke-width="3" style="animation:spin 0.8s linear infinite;flex-shrink:0;"><path d="M21 12a9 9 0 1 1-6.2-8.55" stroke-linecap="round"/></svg><b>'+({ht:'Vérification en cours…',fr:'Vérification en cours…',en:'Checking…',es:'Verificando…'})[L]+'</b></div>', false);
+  ktTrTimer = setTimeout(() => ktTrDoLookup(v, seq, 0), 250);
+}
+async function ktTrDoLookup(v, seq, attempt){
+  const L = currentLang;
+  try{
+    const sb = await getSupabase();
+    const call = sb.rpc('lookup_recipient', { p_query: v });
+    const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000));
+    const { data, error } = await Promise.race([call, timeout]);
+    if(seq !== ktTrSeq) return;
+    if(error) throw error;
+    if(!data){
+      ktTrSet('<div style="margin-top:10px;padding:12px 14px;border:1.5px solid #f6c3cc;background:#fdecef;border-radius:12px;font-size:13.5px;color:#a3122b;"><b>'+({ht:'Pa gen kliyan ak imèl oswa ID sa a',fr:'Aucun client avec cet email ou cet ID',en:'No customer with this email or ID',es:'Ningún cliente con este correo o ID'})[L]+'</b></div>', false);
+      return;
+    }
+    if(data.id === state.currentUserId){
+      ktTrSet('<div style="margin-top:10px;padding:12px 14px;border:1.5px solid #f2d9a0;background:#fff6e5;border-radius:12px;font-size:13.5px;"><b>'+({ht:'Se pwòp kont ou sa a',fr:"C'est votre propre compte",en:"That's your own account",es:'Es tu propia cuenta'})[L]+'</b></div>', false);
+      return;
+    }
+    window.ktTrRecipient = { id: data.id, name: data.name, publicId: data.public_id, query: v };
+    ktTrSet('<div style="display:flex;align-items:center;gap:12px;margin-top:10px;padding:12px 14px;border:1.5px solid #bfe8cf;background:#e8f8ee;border-radius:12px;"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#3fce7c,#17a854);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;">'+escapeHtml((data.name||'?').charAt(0).toUpperCase())+'</div><div style="flex:1;min-width:0;"><div style="font-weight:800;font-size:15px;">'+escapeHtml(data.name||'')+'</div><div style="font-size:12px;color:#0a7c3d;">ID '+escapeHtml(data.public_id||'')+' ✓</div></div></div>', true);
+  }catch(e){
+    if(seq !== ktTrSeq) return;
+    if(attempt < 1){ setTimeout(() => { if(seq === ktTrSeq) ktTrDoLookup(v, seq, attempt + 1); }, 1200); return; }
+    ktTrSet('<div style="margin-top:10px;padding:12px 14px;border:1.5px solid #f2d9a0;background:#fff6e5;border-radius:12px;font-size:13.5px;"><b>📶 '+({ht:'Koneksyon an dyanm',fr:'Connexion faible',en:'Weak connection',es:'Conexión débil'})[L]+'</b><div style="font-size:12.5px;margin:3px 0 8px;">'+({ht:'Nou pa ka verifye kounye a. Kont lan pa pèdi.',fr:"Impossible de vérifier maintenant. Le compte n'est pas perdu.",en:"Can't verify right now. The account isn't lost.",es:'No se puede verificar ahora. La cuenta no se perdió.'})[L]+'</div><button onclick="ktTrLookup()" style="border:none;border-radius:10px;padding:8px 14px;font-weight:700;background:#1b1f1d;color:#fff;">↻ '+({ht:'Eseye ankò',fr:'Réessayer',en:'Try again',es:'Reintentar'})[L]+'</button></div>', false);
+  }
+}
 async function submitTransfer(){
   if(blockIfSuspended()) return;
   const email = document.getElementById('trEmail').value.trim().toLowerCase();
   const amount = parseFloat(document.getElementById('trAmount').value);
+  if(!window.ktTrRecipient || window.ktTrRecipient.query !== email){ showToast(({ht:'Tann sit la jwenn moun lan anvan w voye',fr:"Attendez que le client soit trouvé avant d'envoyer",en:'Wait until the customer is found before sending',es:'Espera a que se encuentre al cliente'})[currentLang]); return; }
   if(!email || !amount || amount<=0){ showToast(t('toast_fill_all_correctly')); return; }
   if(checkWalletManipulation(state.currentUserId, amount)) return;
   if(walletBalance() < amount){ showToast(t('toast_insufficient_balance')); return; }
@@ -8410,12 +8496,10 @@ async function submitTransfer(){
   }
   try{
     const sb = await getSupabase();
-    const { data: recipientId, error: lookupErr } = await sb.rpc('find_user_id_by_email', { p_email: email });
-    if(lookupErr) throw lookupErr;
-    if(!recipientId){ showToast(t('toast_no_user_with_email')); return; }
+    const recipientId = window.ktTrRecipient.id;
     if(recipientId === state.currentUserId){ showToast(t('toast_cannot_transfer')); return; }
     const targetLocal = state.users.find(u=>u.id===recipientId);
-    const recipientName = targetLocal ? targetLocal.name : email.split('@')[0];
+    const recipientName = window.ktTrRecipient.name || (targetLocal ? targetLocal.name : email.split('@')[0]);
     const _tArgs = { recipient_id: recipientId, amount, sender_label: 'Transfè bay '+recipientName, recipient_label: 'Transfè resevwa nan men '+senderName+((currentUser() && currentUser().email) ? ' ('+currentUser().email+')' : '') };
     let transferErr = null;
     if(pinHash){
@@ -10699,6 +10783,7 @@ function pageParametres(){
       <button class="btn btn-green" onclick="openAuthModal('login')">${t('btn_login_create')}</button>
     `;
   }
+  setTimeout(ktLoadMyPublicId, 50);
   return `
     <div class="page-header"><h2>${t('drawer_settings')}</h2><p>${t('settings_sub')}</p></div>
     ${!u.savedWhatsapp ? `
@@ -10727,6 +10812,14 @@ function pageParametres(){
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
         <div class="drawer-avatar" style="width:50px;height:50px;font-size:19px;">${u.name.charAt(0).toUpperCase()}</div>
         <div><div style="font-weight:700;font-size:15px;">${escapeHtml(u.name)}</div></div>
+      </div>
+      <div style="border-top:1px solid var(--line);padding-top:14px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">🪪 ${({ht:'ID kliyan mwen',fr:'Mon ID client',en:'My customer ID',es:'Mi ID de cliente'})[currentLang]||'ID'}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#1b1f1d;color:#fff;border-radius:14px;padding:12px 14px;margin-bottom:6px;">
+          <span id="ktMyIdVal" style="font-size:21px;font-weight:800;letter-spacing:.16em;">${u.publicId||'········'}</span>
+          <button onclick="ktCopyMyId(this)" style="border:none;background:rgba(255,255,255,.14);color:#fff;border-radius:10px;padding:8px 13px;font-weight:700;font-size:12px;cursor:pointer;">${({ht:'Kopye',fr:'Copier',en:'Copy',es:'Copiar'})[currentLang]||'Copier'}</button>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);margin-bottom:14px;">${({ht:'Bay ID sa a bay zanmi w pou yo voye kòb ba ou.',fr:'Donnez cet ID à vos amis pour recevoir de l\'argent.',en:'Give this ID to friends so they can send you money.',es:'Da este ID a tus amigos para recibir dinero.'})[currentLang]||''}</div>
       </div>
       <div style="border-top:1px solid var(--line);padding-top:14px;">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;">${t('label_email')}</div>
@@ -12289,7 +12382,7 @@ function renderClientResultsList(){
   if(!listBox) return;
   let filtered, showRank = false;
   if(clientSearchTerm){
-    filtered = state.users.filter(u => (u.email||'').toLowerCase().includes(clientSearchTerm) || (u.name||'').toLowerCase().includes(clientSearchTerm));
+    filtered = state.users.filter(u => (u.email||'').toLowerCase().includes(clientSearchTerm) || (u.name||'').toLowerCase().includes(clientSearchTerm) || String(u.publicId||'').includes(clientSearchTerm));
   } else {
     filtered = [...state.users].sort((a,b) => (state.wallets[b.id]||0) - (state.wallets[a.id]||0)).slice(0, 10);
     showRank = true;
@@ -12301,7 +12394,7 @@ function renderClientResultsList(){
       <div class="card" style="position:relative;">
         ${showRank ? `<div style="position:absolute;top:-8px;left:-8px;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;box-shadow:0 2px 5px rgba(0,0,0,0.15);${rankStyles[i+1]||'background:var(--text);color:#fff;'}">${i+1}</div>` : ''}
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div><div style="font-weight:700;font-size:13.5px;">${escapeHtml(u.name)}</div><div style="color:var(--muted);font-size:11px;">${escapeHtml(u.email||'')}</div>${u.savedWhatsapp?`<div style="display:flex;align-items:center;gap:8px;margin-top:3px;"><span style="color:var(--green);font-size:11px;">📱 ${escapeHtml(u.savedWhatsapp)}</span><button class="mini-btn" style="background:#25D366;color:#fff;border:none;padding:3px 10px;" onclick="sendWhatsAppClient('${u.id}')">WhatsApp</button></div>`:''}</div>
+          <div><div style="font-weight:700;font-size:13.5px;">${escapeHtml(u.name)}</div><div style="color:var(--muted);font-size:11px;">${escapeHtml(u.email||'')}${u.publicId?' · <b style="color:var(--text);letter-spacing:.06em;">ID '+escapeHtml(u.publicId)+'</b>':''}</div>${u.savedWhatsapp?`<div style="display:flex;align-items:center;gap:8px;margin-top:3px;"><span style="color:var(--green);font-size:11px;">📱 ${escapeHtml(u.savedWhatsapp)}</span><button class="mini-btn" style="background:#25D366;color:#fff;border:none;padding:3px 10px;" onclick="sendWhatsAppClient('${u.id}')">WhatsApp</button></div>`:''}</div>
           <div style="font-weight:700;color:var(--green);font-size:14px;">${money(state.wallets[u.id]||0)}</div>
         </div>
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:10px;">
@@ -12326,6 +12419,17 @@ async function searchClientByEmail(){
   const val = document.getElementById('clientSearchInput').value.trim().toLowerCase();
   if(!val) return;
   clientSearchTerm = val;
+  if(/^\d{8}$/.test(val)){
+    try{
+      const sb0 = await getSupabase();
+      const { data: rr } = await sb0.rpc('lookup_recipient', { p_query: val });
+      if(rr && rr.id && !state.users.find(x=>x.id===rr.id)){
+        const { data: pr } = await sb0.from('profiles').select('*').eq('id', rr.id).maybeSingle();
+        if(pr) state.users.push({ id:pr.id, name:pr.name, email:pr.email||'', googlePhoto:null, savedWhatsapp: pr.whatsapp||'', whatsappLabel: pr.whatsapp_label||'', publicId: pr.public_id||null, accountStatus: pr.account_status||'active', kycStatus: pr.kyc_status||'none' });
+      }
+    }catch(e){}
+    renderClientResultsList(); return;
+  }
   if(!val.includes('@')){ renderClientResultsList(); return; } // plain name filter, no lookup needed
   try{
     const sb = await getSupabase();
@@ -12627,10 +12731,11 @@ async function fetchAllUsersFromServer(){
             accountStatus: p.account_status || 'active', suspensionReason: p.suspension_reason || '',
             suspendedUntil: p.suspended_until || null, suspensionHistory: p.suspension_history || [],
             kycStatus: p.kyc_status || 'none', kycPhotoUrl: p.kyc_photo_url || null,
-            marketBanned: p.market_banned || false };
+            marketBanned: p.market_banned || false, publicId: p.public_id || null };
           state.users.push(u);
         } else {
           if(!u.name) u.name = p.name;
+          u.publicId = p.public_id || u.publicId || null;
           u.accountStatus = p.account_status || u.accountStatus || 'active';
           u.suspensionReason = p.suspension_reason || u.suspensionReason || '';
           u.suspendedUntil = p.suspended_until || u.suspendedUntil || null;
@@ -12772,12 +12877,30 @@ async function saveReferralAdminSettings(){
     showToast('Paramèt referral sove ✓');
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
-async function fetchAdminChatConversations(){
+/* lis konvèsasyon yo rafrechi poukont yo: realtime + polling chak 4 segonn */
+let ktAdminChatListTimer = null, ktAdminChatListChan = null;
+function ktAdminChatListWatch(){
+  clearInterval(ktAdminChatListTimer);
+  ktAdminChatListTimer = setInterval(() => {
+    if(currentPage !== 'admin' || adminTab !== 'chatkliyan' || adminChatConversationId || !document.getElementById('adminChatConvoList')){ clearInterval(ktAdminChatListTimer); ktAdminChatListTimer = null; return; }
+    if(!document.hidden) fetchAdminChatConversations(true);
+  }, 4000);
+  if(!ktAdminChatListChan){
+    getSupabase().then(sb => {
+      ktAdminChatListChan = sb.channel('admin_chat_list')
+        .on('postgres_changes', { event:'INSERT', schema:'public', table:'support_messages' }, () => { if(currentPage==='admin' && adminTab==='chatkliyan' && !adminChatConversationId) fetchAdminChatConversations(true); })
+        .on('postgres_changes', { event:'INSERT', schema:'public', table:'support_conversations' }, () => { if(currentPage==='admin' && adminTab==='chatkliyan' && !adminChatConversationId) fetchAdminChatConversations(true); })
+        .subscribe();
+    }).catch(()=>{});
+  }
+}
+async function fetchAdminChatConversations(silent){
+  if(!silent) ktAdminChatListWatch();
   const box = document.getElementById('adminChatConvoList');
   if(!box) return;
   try{
     const sb = await getSupabase();
-    const { data: convos, error } = await sb.from('support_conversations').select('*').eq('status','human').order('last_message_at',{ascending:false});
+    const { data: convos, error } = await sb.from('support_conversations').select('*').order('last_message_at',{ascending:false}).limit(100);
     if(error){ box.innerHTML = '<div style="color:var(--red);font-size:12.5px;">⚠️ ' + escapeHtml(error.message) + '</div>'; return; }
     if(!convos || convos.length===0){ box.innerHTML = '<div class="empty"><div class="em-icon">💬</div><div class="em-title">Pa gen konvèsasyon aktif</div></div>'; return; }
     const convoIds = convos.map(c=>c.id);
@@ -13314,7 +13437,7 @@ function renderApiTopupAdminConfig(p){
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri HTG" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarCost-${p.id}" placeholder="Pri Founisè" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPartnerId-${p.id}" placeholder="Founisè product_id (vid si Verif sèlman)" style="width:110px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
-      ${(()=>{const lv=(p.variants||[]).slice(-1)[0];const gift=(window.ktGiftProds&&window.ktGiftProds[p.id])||(lv&&lv.orderMode==='api_pin');return `<select id="addVarMode-${p.id}" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;"><option value="auto" ${gift?'':'selected'}>Mòd otomatik (Order+Verif)</option><option value="api_pin" ${gift?'selected':''}>🎁 API Gift Card (kòd livre)</option></select>`;})()}
+      ${(()=>{const lv=(p.variants||[]).slice(-1)[0];const gift=ktLooksGift(p)||(lv&&lv.orderMode==='api_pin');return `<select id="addVarMode-${p.id}" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;"><option value="auto" ${gift?'':'selected'}>Mòd otomatik (Order+Verif)</option><option value="api_pin" ${gift?'selected':''}>🎁 API Gift Card (kòd livre)</option></select>`;})()}
       <button class="mini-btn" onclick="addApiTopupVariant('${p.id}')">+ Ajoute</button>
     </div>
   `;
