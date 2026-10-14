@@ -292,14 +292,17 @@ html.dark .bottomnav-inner{background:rgba(22,27,34,0.92);}
   .bottomnav-inner{padding-left:56px;padding-right:56px;}
 }
 .nav-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px;border-radius:12px;color:var(--muted);
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;padding:8px 2px 2px;border-radius:12px;color:var(--muted);min-height:50px;text-align:center;line-height:1.1;
 }
 .nav-btn svg{width:20px;height:20px;}
 .nav-btn span{font-size:9.5px;font-weight:600;}
+.nav-btn .icon-wrap{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;box-sizing:border-box;}
 .nav-btn.active{color:var(--green);}
-.nav-btn .icon-wrap{padding:5px 14px;border-radius:12px;transition:background 0.15s;}
-.nav-btn.active .icon-wrap{background:var(--green-dim);margin-bottom:1px;}
+.nav-btn.active .icon-wrap{width:52px;height:52px;background:var(--green);color:#fff;transform:translateY(-14px);margin-bottom:-14px;border:4px solid #fff;box-shadow:0 6px 16px rgba(22,163,74,0.45);animation:navPop .3s cubic-bezier(.3,1.5,.5,1);}
+html.dark .nav-btn.active .icon-wrap{border-color:#161b22;}
+.nav-btn.active svg{width:22px;height:22px;}
 .nav-btn.active span{font-weight:800;}
+@keyframes navPop{from{transform:translateY(0) scale(.7);}to{transform:translateY(-14px) scale(1);}}
 
 /* ---------- Auth modal ---------- */
 .modal-bg{position:fixed;inset:0;background:rgba(4,6,5,0.7);z-index:90;display:none;align-items:center;justify-content:center;padding:20px;}
@@ -2703,7 +2706,7 @@ async function checkReferralRechargeBonus(userId, amount, isAdminCredit){
     }
 
     const { error: insErr } = await sb.from('referral_earnings').insert({ parrain_id: profile.referred_by, referred_user_id: userId, amount: parrainBonus });
-    if(insErr){ console.warn('checkReferralRechargeBonus insert erè:', insErr.message); return; }
+    if(insErr){ console.warn('checkReferralRechargeBonus insert erè:', insErr.message); try{ await sb.from('profiles').update({ referral_bonus_given: false }).eq('id', userId); }catch(e){} return; } // retire drapo a pou bonis la ka eseye ankò
 
     const { data: parrainNameData } = await sb.rpc('lookup_profile_name', { p_id: profile.referred_by });
     sendNtfyNotification('🎉 Bonis Referral bay', '👤 Fiyèl: ' + (profile.name||'') + '\n👤 Parenn: ' + (parrainNameData||'') + '\n💰 Bonis: ' + money(parrainBonus), 'default', 'moneybag');
@@ -7034,7 +7037,7 @@ async function fetchApiOrders(){
   if(!state.apiClient) return;
   try{
     const sb = await getSupabase();
-    const { data, error } = await sb.from('orders').select('*').eq('api_client_id', state.apiClient.id).order('created_at',{ascending:false}).limit(30);
+    const { data, error } = await sb.from('orders').select('*').eq('api_client_id', state.apiClient.id).order('created_at',{ascending:false}).limit(50);
     if(error){ console.warn('fetchApiOrders erè:', error.message); return; }
     state.apiOrders = (data||[]).map(o => ({
       id:o.id, orderNo:o.order_no, product:o.product, variant:o.variant, price:Number(o.price),
@@ -8046,7 +8049,7 @@ async function submitRecharge(){
       const { data: apiClientCheck } = await sbCheck.from('api_clients').select('id').eq('user_id', state.currentUserId).maybeSingle();
       isReseller = !!apiClientCheck;
     }catch(e){}
-    let successMsg = (isReseller ? 'RESSELLER : ' : 'Client : ') + clientName2;
+    let successMsg = (isReseller ? 'Revandè : ' : 'Client : ') + clientName2;
     successMsg += '\nEmail : ' + (u2 && u2.email ? u2.email : '—');
     successMsg += '\nMontant : HTG ' + amount.toLocaleString('fr-FR');
     successMsg += '\nStatut : Vérifié automatiquement ✅ (pa bezwen aksyon)';
@@ -8535,8 +8538,8 @@ async function submitTransfer(){
 
 /* ================= COMMANDES PAGE ================= */
 let commandeFilter = 'tout';
-function statusLabel(s){ return { en_cours:t('status_en_cours'), terminee:t('status_terminee'), annulee:t('status_annulee'), remboursee:t('status_remboursee') }[s] || s; }
-const STATUS_PILL = { en_cours:'wait', terminee:'ok', annulee:'no', remboursee:'no' };
+function statusLabel(s){ return { en_cours:t('status_en_cours'), terminee:t('status_terminee'), annulee:t('status_annulee'), remboursee:t('status_remboursee'), echouee:'Echwe', failed:'Echwe', echoue:'Echwe', rejetee:'Rejte', rejected:'Rejte', error:'Echwe' }[s] || s; }
+const STATUS_PILL = { en_cours:'wait', terminee:'ok', annulee:'no', remboursee:'no', echouee:'no', failed:'no', echoue:'no', rejetee:'no', rejected:'no', error:'no' };
 
 // Si kolòn cost_price poko egziste nan baz done a, eseye ankò san li — kòmand kliyan pa dwe janm bloke pou rezon sa a
 async function insertOrderResilient(sb, payload, selectCols){
@@ -10941,18 +10944,29 @@ function ktWaDigits(raw){
   if(d.length === 8) d = '509' + d; // nimewo Ayiti san endikatif
   return d;
 }
-function sendWhatsAppClient(userId){
+async function ktEnsureWaNumber(u){
+  if(!u) return '';
+  let n = u.savedWhatsapp || (u.profile && u.profile.whatsapp) || '';
+  if(n) return n;
+  try{
+    const sb = await getSupabase();
+    const { data } = await sb.from('profiles').select('whatsapp, whatsapp_label').eq('id', u.id).maybeSingle();
+    if(data && data.whatsapp){ u.savedWhatsapp = data.whatsapp; if(data.whatsapp_label && !u.whatsappLabel) u.whatsappLabel = data.whatsapp_label; n = data.whatsapp; }
+  }catch(e){}
+  return n;
+}
+async function sendWhatsAppClient(userId){
   const u = state.users.find(x=>x.id===userId);
-  const num = u && (u.savedWhatsapp || (u.profile && u.profile.whatsapp));
+  const num = await ktEnsureWaNumber(u);
   if(!u || !num){ showToast('Pa gen nimewo WhatsApp pou kliyan sa'); return; }
   const msg = `Bonjou ${u.name || 'Kliyan'} 👋\n\nSe *Administration Kerry Topup Official* ki ap ekri w. 🌝\n\n`;
   window.open('https://wa.me/' + ktWaDigits(num) + '?text=' + encodeURIComponent(msg), '_blank');
 }
-function sendWhatsAppOrder(userId, orderId){
+async function sendWhatsAppOrder(userId, orderId){
   const list = state.orders[userId] || [];
   const o = list.find(x=>x.id===orderId);
   const u = state.users.find(x=>x.id===userId);
-  const waNum = u && (u.savedWhatsapp || (u.profile && u.profile.whatsapp));
+  const waNum = await ktEnsureWaNumber(u);
   if(!o || !u || !waNum){ showToast('Pa gen nimewo WhatsApp pou kliyan sa'); return; }
   const digits = ktWaDigits(waNum);
   const noteEl = document.getElementById('resp-' + orderId);
@@ -12480,7 +12494,7 @@ async function adminAdjustWallet(userId, sign){
       const sb = await getSupabase();
       const { data: apiClient } = await sb.from('api_clients').select('id').eq('user_id', userId).maybeSingle();
       if(apiClient){
-        sendNtfyNotification('💰 Wallet Revandè Rechajé', 'RESSELLER : ' + (u?u.name:'') + '\nMontan : +' + money(amt) + '\nNouvo balans : ' + money(state.wallets[userId]||0), 'default', 'moneybag');
+        sendNtfyNotification('Nouveau recharge', 'Revandè : ' + (u?u.name:'') + '\nEmail : ' + (u&&u.email?u.email:'—') + '\nMontant : HTG ' + Number(amt).toLocaleString('fr-FR') + '\nStatut : Rechaj ajoute pa Admin ✅\nNouvo balans : ' + money(state.wallets[userId]||0), 'default', 'moneybag');
       }
     }catch(e){}
   }
@@ -12710,10 +12724,10 @@ function ktQueueMissingUser(userId){
       const ids = [...ktMissingUsers].filter(id => !state.users.find(u => u.id === id)).slice(0, 200);
       if(!ids.length) return;
       const sb = await getSupabase();
-      const { data } = await sb.from('profiles').select('id, name, email').in('id', ids);
+      const { data } = await sb.from('profiles').select('id, name, email, whatsapp, whatsapp_label').in('id', ids);
       (ids||[]).forEach(id => { if(!(data||[]).find(p => p.id === id)) ktNotFoundUsers.add(id); });
       let added = false;
-      (data||[]).forEach(p => { if(!state.users.find(u => u.id === p.id)){ state.users.push({ id:p.id, name:p.name, email:p.email||'', googlePhoto:null, accountStatus:'active', kycStatus:'none' }); added = true; } });
+      (data||[]).forEach(p => { if(!state.users.find(u => u.id === p.id)){ state.users.push({ id:p.id, name:p.name, email:p.email||'', googlePhoto:null, accountStatus:'active', kycStatus:'none', savedWhatsapp:p.whatsapp||'', whatsappLabel:p.whatsapp_label||'' }); added = true; } });
       if((added || ktNotFoundUsers.size) && currentPage === 'admin') renderAdminTab();
     }catch(e){ console.warn('ktQueueMissingUser echwe:', e?.message||e); }
   }, 150);
@@ -12731,11 +12745,14 @@ async function fetchAllUsersFromServer(){
             accountStatus: p.account_status || 'active', suspensionReason: p.suspension_reason || '',
             suspendedUntil: p.suspended_until || null, suspensionHistory: p.suspension_history || [],
             kycStatus: p.kyc_status || 'none', kycPhotoUrl: p.kyc_photo_url || null,
-            marketBanned: p.market_banned || false, publicId: p.public_id || null };
+            marketBanned: p.market_banned || false, publicId: p.public_id || null,
+            savedWhatsapp: p.whatsapp || '', whatsappLabel: p.whatsapp_label || '' };
           state.users.push(u);
         } else {
           if(!u.name) u.name = p.name;
           u.publicId = p.public_id || u.publicId || null;
+          if(p.whatsapp) u.savedWhatsapp = p.whatsapp;
+          if(p.whatsapp_label && !u.whatsappLabel) u.whatsappLabel = p.whatsapp_label;
           u.accountStatus = p.account_status || u.accountStatus || 'active';
           u.suspensionReason = p.suspension_reason || u.suspensionReason || '';
           u.suspendedUntil = p.suspended_until || u.suspendedUntil || null;
