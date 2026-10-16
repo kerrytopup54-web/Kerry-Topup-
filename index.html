@@ -3612,7 +3612,8 @@ async function sendSupportMessage(){
   const _txtRow = addSupportMessage('user', text);
 
   // Si sit la fèmen, kòmanse tracking imedyatman (pa tann 5 mesaj) e pa eseye reponn ak AI
-  if(!isWithinBusinessHours() && !supportConversationId){
+  // Kreye konvèsasyon an IMEDYATMAN ak premye mesaj la (pa tann Touski Bot reponn) — konsa admin toujou wè l
+  if(!supportConversationId){
     await requestHumanAgent();
   }
 
@@ -3625,10 +3626,11 @@ async function sendSupportMessage(){
   }
 
   // Si tracking kòmanse (konvèsasyon eskalade), sove mesaj la nan Admin tou
-  if(supportConversationId){
+  if(supportConversationId && !(_txtRow && _txtRow.dataset.dbid)){
     try{
       const sb = await getSupabase();
-      const { data: _tins } = await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text }).select('id').single();
+      const { data: _tins, error: _tinsErr } = await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text }).select('id').single();
+      if(_tinsErr){ showToast('⚠️ Mesaj pa sove: ' + (_tinsErr.message||''), 6000); try{ sendNtfyNotification('🐞 Mesaj chat pa sove', '❌ ' + (_tinsErr.message||'') + ' [' + (_tinsErr.code||'') + ']\n(support_messages insert)', 'high', 'warning'); }catch(e){} }
       if(_tins && _txtRow) _txtRow.dataset.dbid = _tins.id;
       await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
     }catch(e){ /* pa bloke chat la si tracking echwe */ }
@@ -4924,7 +4926,8 @@ async function fetchWalletFromServer(userId){
     const sb = await getSupabase();
     let { data: walletRow } = await sb.from('wallets').select('*').eq('user_id', userId).single();
     if(!walletRow){
-      const created = await sb.from('wallets').insert({ user_id:userId, balance: state.wallets[userId]||0 }).select().single();
+      try{ await sb.rpc('kt_wallet_ensure'); }catch(e){}
+      const created = await sb.from('wallets').select('*').eq('user_id', userId).maybeSingle();
       walletRow = created.data;
     }
     if(walletRow) state.wallets[userId] = Number(walletRow.balance) || 0;
@@ -5013,26 +5016,39 @@ async function applyWalletChange(userId, delta, label, type, isBonus, txnId, pro
   }
   state.walletBonus[userId] = Math.round(bonus * 100) / 100;
 
+  // SEKIRITE: chanjman wallet la pase sèlman pa sèvè a (kt_wallet_apply). Sèvè a verifye règ yo.
   try{
     const sb = await getSupabase();
-    // De ekriti sa yo endepandan youn ak lòt — voye yo an parallèl pou gaspiye mwens tan sou wondtrip rezo
-    const [{ error: walletErr }, { error: txErr }] = await Promise.all([
-      sb.from('wallets').upsert({ user_id:userId, balance: state.wallets[userId], bonus_balance: bonus }),
-      sb.from('wallet_transactions').insert({ user_id:userId, type, label, amount: Math.abs(delta), txn_id: txnId||null, proof_url: proofUrl||null, reference: reference||null, is_deposit: !!isDepositCategory })
-    ]);
-    if(walletErr){
-      console.warn('wallet upsert erè:', walletErr);
-      sendNtfyNotification('🚨 Erè teknik (paj kliyan)', '📄 Kontèks: Sovgad balans wallet\n🛠️ Detay: ' + walletErr.message, 'urgent', 'rotating_light');
+    const { data: _wr, error: _we } = await sb.rpc('kt_wallet_apply', {
+      p_user: userId, p_delta: delta, p_label: label, p_type: type, p_is_bonus: !!isBonus,
+      p_txn: txnId||null, p_proof: proofUrl||null, p_ref: reference||null, p_is_deposit: !!isDepositCategory
+    });
+    if(_we){
+      // Sèvè a refize: defèt chanjman lokal la
+      state.wallets[userId] = Math.round(((state.wallets[userId]||0) - delta) * 100) / 100;
+      state.transactions[userId].shift();
+      try{ await fetchWalletFromServer(userId); }catch(e){}
+      const _m = _we.message || '';
+      if(/insufficient/i.test(_m)){ showToast('⚠️ Balans ou pa sifi.', 4000); }
+      else { showToast('⚠️ Operasyon wallet la pa pase: ' + _m, 5000); }
+      if(delta > 0 || /blocked|forbidden/i.test(_m)){
+        const _u = (typeof state.users !== 'undefined' && state.users.find(x=>x.id===userId)) || {};
+        sendNtfyNotification('🛡️ Wallet refize pa sèvè', '👤 ' + (_u.name||userId) + '\n📧 ' + (_u.email||'') + '\n💰 ' + delta + ' HTG — ' + label + '\n❌ ' + _m, 'high', 'shield');
+      }
+      return false;
     }
-    if(txErr){
-      console.warn('wallet_transactions insert erè:', txErr);
-      sendNtfyNotification('🚨 Erè teknik (paj kliyan)', '📄 Kontèks: Sovgad tranzaksyon wallet\n🛠️ Detay: ' + txErr.message, 'urgent', 'rotating_light');
-    }
+    if(_wr && typeof _wr.balance === 'number'){ state.wallets[userId] = _wr.balance; state.walletBonus[userId] = _wr.bonus; }
+    return true;
   }catch(e){
     sendNtfyNotification('🚨 Erè teknik (paj kliyan)', '📄 Kontèks: applyWalletChange\n🛠️ Detay: ' + (e?.message||'enkoni'), 'urgent', 'rotating_light');
+    return false;
   }
 }
 
+const KT_BLOCKED_MSG = '🤖 Sheriff Robot detekte w. Kont sa a bloke pou tout tan. Ou pa gen dwa isit la.';
+async function ktIsEmailBlocked(email){
+  try{ const sb = await getSupabase(); const { data } = await sb.rpc('kt_is_blocked', { p_email: email }); return data === true; }catch(e){ return false; }
+}
 async function doRegister(){
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim().toLowerCase();
@@ -5042,12 +5058,14 @@ async function doRegister(){
     showToast(t('toast_password_rules'), 3000, true);
     return;
   }
+  if(await ktIsEmailBlocked(email)){ showToast(KT_BLOCKED_MSG, 6000); return; }
   const btn = document.getElementById('regSubmitBtn');
   if(btn){ btn.disabled = true; btn.textContent = t('creating_account_btn'); }
   try{
     const sb = await getSupabase();
     const { data, error } = await sb.auth.signUp({ email, password: pass });
     if(error){
+      if(/blocked|database error/i.test(error.message)){ showToast(KT_BLOCKED_MSG, 6000); return; }
       if(error.message.includes('already')){ showToast(t('toast_email_already_used')); }
       else { showCustomerError('⚠️ Nou pa t kapab kreye kont ou — eseye ankò.', error.message, 'Enskripsyon'); }
       return;
@@ -5087,6 +5105,7 @@ async function doLogin(){
     const sb = await getSupabase();
     const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
     if(error){
+      if(/banned/i.test(error.message) || await ktIsEmailBlocked(email)){ showToast(KT_BLOCKED_MSG, 6000); return; }
       showToast(error.message.toLowerCase().includes('confirm') ? t('toast_confirm_email_first') : t('toast_wrong_credentials'));
       return;
     }
@@ -6357,14 +6376,10 @@ async function confirmApiTopupPurchase(productId){
 
     if(isGiftCard){
       // Dedwi wallet la AN PARALLÈL ak demand Founisè a — pa gen youn ki depann de lòt la, sa evite tann 2 wondtrip youn apre lòt
-      const [, { data, error }] = await Promise.all([
-        applyWalletChange(state.currentUserId, -totalPrice, p.name + ' — ' + variant.label, 'out'),
-        sb.functions.invoke('partner-order', { body: { local_product_id: variant.id, local_order_id: inserted.id, quantity: qty } })
-      ]);
+      // SEKIRITE: sèvè a (partner-order) retire kòb la ak ranbouse si Founisè a refize
+      const { data, error } = await sb.functions.invoke('partner-order', { body: { local_product_id: variant.id, local_order_id: inserted.id, quantity: qty } });
       if(error || !data || data.error){
-        await sb.from('orders').update({ status: 'remboursee' }).eq('id', inserted.id);
-        await applyWalletChange(state.currentUserId, totalPrice, 'Ranbousman — ' + p.name, 'in');
-        await fetchWalletFromServer(state.currentUserId);
+        try{ await fetchWalletFromServer(state.currentUserId); }catch(e){}
         const realErr = data?.error || await extractFunctionError(error);
         showCustomerError('', realErr, 'Achte Gift Card — ' + p.name, 'toast_order_failed_refunded');
         resetBtn();
@@ -6407,16 +6422,11 @@ async function confirmApiTopupPurchase(productId){
     }
 
     // Dedwi wallet la AN PARALLÈL ak demand Founisè a (dyaman/API) — sa koupe yon wondtrip rezo antye nan tan tann lan
-    const [, { data, error }] = await Promise.all([
-      applyWalletChange(state.currentUserId, -totalPrice, p.name + ' — ' + variant.label, 'out'),
-      sb.functions.invoke('partner-order', { body: { local_product_id: variant.id, local_order_id: inserted.id, player_id: playerId, server_id: serverId || undefined, quantity: qty } })
-    ]);
+    // SEKIRITE: sèvè a (partner-order) retire kòb la ak ranbouse si Founisè a refize
+    const { data, error } = await sb.functions.invoke('partner-order', { body: { local_product_id: variant.id, local_order_id: inserted.id, player_id: playerId, server_id: serverId || undefined, quantity: qty } });
 
     if(error || !data || data.error){
-      // Founisè refize — dedwi lajan an, mete kòmand la "echwe", epi RANBOUSE kliyan an
-      await sb.from('orders').update({ status: 'remboursee' }).eq('id', inserted.id);
-      await applyWalletChange(state.currentUserId, totalPrice, 'Ranbousman — ' + p.name, 'in');
-      await fetchWalletFromServer(state.currentUserId);
+      try{ await fetchWalletFromServer(state.currentUserId); }catch(e){}
       const realErr = data?.error || await extractFunctionError(error);
       showCustomerError('', realErr, 'Achte Free Fire — ' + p.name, 'toast_order_failed_refunded');
       resetBtn();
@@ -6777,13 +6787,9 @@ async function ktApiPinBuyOne(variantId){
     player_id: null, server_id: null, player_name: null
   });
   if(insErr || !inserted) return { ok:false, error: insErr?.message || 'Kreyasyon kòmand echwe' };
-  const [, { data, error }] = await Promise.all([
-    applyWalletChange(state.currentUserId, -price, p.name + ' — ' + v.label, 'out'),
-    sb.functions.invoke('partner-order', { body: { local_product_id: v.id, local_order_id: inserted.id, quantity: 1 } })
-  ]);
+  // SEKIRITE: sèvè a (partner-order) retire kòb la ak ranbouse si Founisè a refize
+  const { data, error } = await sb.functions.invoke('partner-order', { body: { local_product_id: v.id, local_order_id: inserted.id, quantity: 1 } });
   if(error || !data || data.error){
-    await sb.from('orders').update({ status:'remboursee' }).eq('id', inserted.id);
-    await applyWalletChange(state.currentUserId, price, 'Ranbousman — ' + p.name, 'in');
     try{ await fetchWalletFromServer(state.currentUserId); }catch(e){}
     const realErr = data?.error || await extractFunctionError(error);
     return { ok:false, error: realErr || 'Founisè a pa reponn' };
@@ -9072,10 +9078,9 @@ async function checkoutCart(){
         });
         if(insErr || !inserted){ console.warn('api_topup order insert erè:', insErr?.message); failed.push(item); continue; }
 
-        await applyWalletChange(state.currentUserId, -item.price, item.productName + ' — ' + item.variantLabel, 'out');
-
         const cartVariant = state.products.flatMap(pr=>pr.variants||[]).find(v=>v.id===item.variantId);
         if(cartVariant && cartVariant.orderMode === 'api_verif'){
+          await applyWalletChange(state.currentUserId, -item.price, item.productName + ' — ' + item.variantLabel, 'out');
           const order = {
             id: inserted.id, orderNo: itemOrderNo, type:'api_topup', status:'en_cours',
             product: item.productName, variant: item.variantLabel, price: item.price, date: new Date().toISOString(),
@@ -9094,8 +9099,7 @@ async function checkoutCart(){
         });
 
         if(error || !result || result.error){
-          await sb.from('orders').update({ status: 'remboursee' }).eq('id', inserted.id);
-          await applyWalletChange(state.currentUserId, item.price, 'Ranbousman — ' + item.productName, 'in');
+          // sèvè a (partner-order) deja ranbouse si li te retire kòb la
           const u_ = currentUser();
           const realErr = result?.error || await extractFunctionError(error);
           sendNtfyNotification('🚨 Erè teknik (Checkout)', '👤 Moun: ' + (u_?u_.name:'Kliyan konekte') +
