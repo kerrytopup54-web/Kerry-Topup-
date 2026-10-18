@@ -924,6 +924,35 @@ textarea.admin-ta{
 <div id="supportTooltip" style="display:none;position:fixed;bottom:88px;right:74px;z-index:59;background:#fff;color:#14181c;font-size:12px;font-weight:600;border-radius:16px 16px 4px 16px;box-shadow:0 8px 20px rgba(0,0,0,0.15);line-height:1.35;white-space:nowrap;overflow:hidden;max-width:0;padding:0;opacity:0;transition:max-width 1.4s cubic-bezier(0.22,0.9,0.28,1), padding 1.4s cubic-bezier(0.22,0.9,0.28,1), opacity 1s ease;">Je suis là pour t'aider ! 👋</div>
 <div style="position:fixed;bottom:78px;right:16px;z-index:59;width:52px;height:52px;border-radius:50%;background:#3fce7c;animation:supportFabPulse 2.2s ease-out infinite;pointer-events:none;"></div>
 <style>@keyframes supportFabPulse{0%{transform:scale(1);opacity:0.55;}100%{transform:scale(1.7);opacity:0;}}</style>
+<style>
+#ktSuccessOverlay{position:fixed;inset:0;z-index:9998;display:none;align-items:center;justify-content:center;pointer-events:none;background:rgba(15,23,18,0);transition:background 0.3s ease;}
+#ktSuccessOverlay.show{display:flex;pointer-events:auto;background:rgba(15,23,18,0.32);}
+.ktViewOrderBtn{margin-top:18px;background:linear-gradient(135deg,#3fce7c,#0a9e3d);color:#fff;border:none;font-weight:800;font-size:13.5px;padding:11px 22px;border-radius:12px;box-shadow:0 8px 18px rgba(15,166,84,0.35);cursor:pointer;opacity:0;animation:ktLabelIn 0.4s ease-out 0.35s forwards;}
+.ktViewOrderBtn:active{transform:scale(0.96);}
+.ktBadgeWrap{position:relative;width:180px;height:180px;display:flex;align-items:center;justify-content:center;}
+.ktBadge{width:104px;height:104px;border-radius:50%;background:linear-gradient(135deg,#3fce7c,#0a9e3d);display:flex;align-items:center;justify-content:center;box-shadow:0 14px 32px rgba(15,166,84,0.45), 0 0 0 8px rgba(63,206,124,0.18);transform:scale(0);opacity:0;animation:ktBadgePop 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards;}
+.ktBadge svg{width:52px;height:52px;}
+.ktBadgeCheck{stroke-dasharray:40;stroke-dashoffset:40;animation:ktCheckDraw 0.4s ease-out 0.35s forwards;}
+@keyframes ktBadgePop{0%{transform:scale(0);opacity:0;}60%{transform:scale(1.12);opacity:1;}100%{transform:scale(1);opacity:1;}}
+@keyframes ktCheckDraw{to{stroke-dashoffset:0;}}
+.ktRibbon{position:absolute;top:50%;left:50%;border-radius:1px;transform:translate(-50%,-50%);animation-name:ktRibbonFly;animation-timing-function:cubic-bezier(0.22,0.9,0.28,1);animation-fill-mode:forwards;opacity:0;}
+@keyframes ktRibbonFly{0%{transform:translate(-50%,-50%) scale(0.5) rotate(0deg);opacity:0;}12%{opacity:1;}70%{opacity:1;}100%{transform:translate(calc(-50% + var(--px)),calc(-50% + var(--py))) rotate(var(--pr)) scale(0.85);opacity:0;}}
+.ktLabel{margin-top:14px;text-align:center;font-weight:800;font-size:16px;color:var(--text,#14181c);opacity:0;animation:ktLabelIn 0.4s ease-out 0.25s forwards;}
+@keyframes ktLabelIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+</style>
+<div id="ktSuccessOverlay">
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <div class="ktBadgeWrap" id="ktBadgeWrap">
+      <div class="ktBadge">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path class="ktBadgeCheck" d="M5 13l4 4L19 7" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="ktLabel" id="ktSuccessLabel">Achat Réussi 🛒✅️</div>
+    <button class="ktViewOrderBtn" id="ktViewOrderBtn">👁️ Voir la commande</button>
+  </div>
+</div>
 <button id="supportFab" onclick="toggleSupportChat()" style="position:fixed;bottom:78px;right:16px;z-index:60;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border:none;box-shadow:0 6px 16px rgba(15,166,84,0.4);font-size:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;">🐶<span id="supportFabBadge" style="display:none;position:absolute;top:-2px;right:-2px;min-width:20px;height:20px;padding:0 5px;background:#E23B57;border-radius:10px;border:2px solid #fff;color:#fff;font-size:11px;font-weight:800;align-items:center;justify-content:center;font-family:sans-serif;"></span></button>
 <div id="supportChatBg" style="display:none;position:fixed;inset:0;background:linear-gradient(160deg, #071a10 0%, #0a1710 40%, #050b08 100%);z-index:70;flex-direction:column;overflow:hidden;">
   <style>
@@ -1131,7 +1160,7 @@ const TRANSLATIONS = {
     nav_shop:'Boutik', nav_wallet:'Wallet', nav_commandes:'Kòmand', nav_historique:'Historique', nav_redeem:'Redeem Free Fire',
     wallet_title:'Wallet', wallet_sub:'Jere balans ak tranzaksyon ou', wallet_balance:'Balans Aktyèl',
     wallet_secure:'100% Sekirize', tab_recharge:'Recharge', tab_transfert:'Transfert', tab_historique:'Historique',
-    btn_buy_now:'Acheter maintenant', btn_add_cart:'Ajouter au panier', btn_send:'Voye demand lan',
+    btn_buy_now:'Acheter maintenant', btn_add_cart:'Ajouter au panier', btn_send:'Voye demand lan', btn_view_order:'👁️ Voir kòmand lan',
     toast_no_balance:'Balans ou pa ase',
     toast_purchase_success:'Achat Réussi 🛒✅️',
     redeem_title:'Redeem Free Fire', redeem_sub:'Antre kòd PIN ou pou aktive li.',
@@ -1338,7 +1367,7 @@ const TRANSLATIONS = {
     nav_shop:'Boutique', nav_wallet:'Portefeuille', nav_commandes:'Commandes', nav_historique:'Historique', nav_redeem:'Redeem Free Fire',
     wallet_title:'Portefeuille', wallet_sub:'Gérez votre solde et vos transactions', wallet_balance:'Solde Actuel',
     wallet_secure:'100% Sécurisé', tab_recharge:'Recharger', tab_transfert:'Transfert', tab_historique:'Historique',
-    btn_buy_now:'Acheter maintenant', btn_add_cart:'Ajouter au panier', btn_send:'Envoyer la demande',
+    btn_buy_now:'Acheter maintenant', btn_add_cart:'Ajouter au panier', btn_send:'Envoyer la demande', btn_view_order:'👁️ Voir la commande',
     toast_no_balance:'Solde insuffisant',
     toast_purchase_success:'Achat Réussi 🛒✅️',
     redeem_title:'Redeem Free Fire', redeem_sub:'Entrez votre code PIN pour l\'activer.',
@@ -1545,7 +1574,7 @@ const TRANSLATIONS = {
     nav_shop:'Shop', nav_wallet:'Wallet', nav_commandes:'Orders', nav_historique:'History', nav_redeem:'Redeem Free Fire',
     wallet_title:'Wallet', wallet_sub:'Manage your balance and transactions', wallet_balance:'Current Balance',
     wallet_secure:'100% Secure', tab_recharge:'Recharge', tab_transfert:'Transfer', tab_historique:'History',
-    btn_buy_now:'Buy now', btn_add_cart:'Add to cart', btn_send:'Send request',
+    btn_buy_now:'Buy now', btn_add_cart:'Add to cart', btn_send:'Send request', btn_view_order:'👁️ View order',
     toast_no_balance:'Insufficient balance',
     toast_purchase_success:'Purchase Successful 🛒✅️',
     redeem_title:'Redeem Free Fire', redeem_sub:'Enter your PIN code to activate it.',
@@ -1752,7 +1781,7 @@ const TRANSLATIONS = {
     nav_shop:'Tienda', nav_wallet:'Billetera', nav_commandes:'Pedidos', nav_historique:'Historial', nav_redeem:'Redeem Free Fire',
     wallet_title:'Billetera', wallet_sub:'Gestiona tu saldo y tus transacciones', wallet_balance:'Saldo Actual',
     wallet_secure:'100% Seguro', tab_recharge:'Recargar', tab_transfert:'Transferencia', tab_historique:'Historial',
-    btn_buy_now:'Comprar ahora', btn_add_cart:'Añadir al carrito', btn_send:'Enviar solicitud',
+    btn_buy_now:'Comprar ahora', btn_add_cart:'Añadir al carrito', btn_send:'Enviar solicitud', btn_view_order:'👁️ Ver pedido',
     toast_no_balance:'Saldo insuficiente',
     toast_purchase_success:'Compra Exitosa 🛒✅️',
     redeem_title:'Canjear Free Fire', redeem_sub:'Ingresa tu código PIN para activarlo.',
@@ -4613,6 +4642,67 @@ async function cleanupOldOrders(){
   // Kounye a, Admin → Kòmand jis FILTRE afichaj la (gade renderAdminTab),
   // san touche done yo — kliyan yo kenbe istwa konplè yo nan Mes Commandes.
 }
+let ktSuccessHideTimer = null;
+function ktCloseSuccessPopup(){
+  const overlay = document.getElementById('ktSuccessOverlay');
+  if(overlay) overlay.classList.remove('show');
+  clearTimeout(ktSuccessHideTimer);
+}
+function ktShowSuccessPopup(orderId){
+  try{
+    const overlay = document.getElementById('ktSuccessOverlay');
+    const wrap = document.getElementById('ktBadgeWrap');
+    const label = document.getElementById('ktSuccessLabel');
+    const viewBtn = document.getElementById('ktViewOrderBtn');
+    if(!overlay || !wrap){ showToast(t('toast_purchase_success')); goPage('commandes'); return; }
+
+    overlay.classList.remove('show');
+    void overlay.offsetWidth; // reflow pou restat animasyon yo
+    Array.from(wrap.querySelectorAll('.ktRibbon')).forEach(p => p.remove());
+    const badge = wrap.querySelector('.ktBadge');
+    if(badge){ badge.style.animation = 'none'; void badge.offsetWidth; badge.style.animation = ''; }
+    const check = wrap.querySelector('.ktBadgeCheck');
+    if(check){ check.style.animation = 'none'; void check.offsetWidth; check.style.animation = ''; }
+    if(label){ label.textContent = t('toast_purchase_success'); label.style.animation = 'none'; void label.offsetWidth; label.style.animation = ''; }
+
+    const ribbonColors = ['#3fce7c','#0a9e3d','#ffd43b','#ffffff','#2b9cf5','#ff6b6b','#ff9f43'];
+    const n = 24;
+    for(let i=0; i<n; i++){
+      const el = document.createElement('div');
+      el.className = 'ktRibbon';
+      el.style.background = ribbonColors[Math.floor(Math.random()*ribbonColors.length)];
+      const w = 10 + Math.random()*10;
+      el.style.width = w + 'px';
+      el.style.height = (3 + Math.random()*3) + 'px';
+      const angle = (i/n) * Math.PI*2 + (Math.random()*0.5-0.25);
+      const dist = 90 + Math.random()*55;
+      const px = Math.cos(angle)*dist;
+      const py = Math.sin(angle)*dist;
+      const rot = (Math.random() > 0.5 ? 1 : -1) * (360 + Math.random()*540);
+      el.style.setProperty('--px', px + 'px');
+      el.style.setProperty('--py', py + 'px');
+      el.style.setProperty('--pr', rot + 'deg');
+      el.style.animationDuration = (0.9 + Math.random()*0.6) + 's';
+      el.style.animationDelay = (Math.random()*0.15) + 's';
+      wrap.appendChild(el);
+    }
+
+    if(viewBtn){
+      viewBtn.textContent = t('btn_view_order');
+      viewBtn.style.display = orderId ? '' : 'none';
+      viewBtn.onclick = () => {
+        ktCloseSuccessPopup();
+        goPage('commandes');
+        if(orderId){ setTimeout(() => openOrderDetail(orderId), 260); }
+      };
+    }
+
+    overlay.classList.add('show');
+    overlay.onclick = (e) => { if(e.target === overlay) ktCloseSuccessPopup(); };
+    clearTimeout(ktSuccessHideTimer);
+    ktSuccessHideTimer = setTimeout(ktCloseSuccessPopup, 3200);
+  }catch(e){ showToast(t('toast_purchase_success')); goPage('commandes'); }
+}
 function openConfirm(title, text, onYes){
   document.getElementById('cmTitle').textContent = title;
   document.getElementById('cmText').textContent = text;
@@ -6338,8 +6428,8 @@ async function confirmApiTopupPurchase(productId){
   const totalPrice = variant.price * qty;
   const totalCost = variant.costPrice != null ? variant.costPrice * qty : null;
   const resetBtn = () => { if(buyBtn){buyBtn.disabled=false;buyBtn.style.opacity='1';buyBtn.style.cursor='';buyBtn.textContent='⚡ '+t('btn_buy_now');} };
-  const finishPurchaseSuccess = () => {
-    showToast(t('toast_purchase_success')); goPage('commandes');
+  const finishPurchaseSuccess = (orderId) => {
+    setTimeout(() => { ktShowSuccessPopup(orderId); }, 200);
   };
   if(!isGiftCard){
     if(!playerId){ showToast(t('toast_enter_player_id')); resetBtn(); return; }
@@ -6397,7 +6487,7 @@ async function confirmApiTopupPurchase(productId){
       };
       if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
       state.orders[state.currentUserId].unshift(order);
-      finishPurchaseSuccess();
+      finishPurchaseSuccess(order.id);
       try{ fetchWalletFromServer(state.currentUserId); }catch(e){}
       try{ notifyAdminNewOrder(order); }catch(e){}
       try{ incrementRewardProgress(state.currentUserId, variant.id); }catch(e){}
@@ -6414,7 +6504,7 @@ async function confirmApiTopupPurchase(productId){
       };
       if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
       state.orders[state.currentUserId].unshift(order);
-      finishPurchaseSuccess();
+      finishPurchaseSuccess(order.id);
       try{ fetchWalletFromServer(state.currentUserId); }catch(e){}
       try{ notifyAdminNewOrder(order); }catch(e){}
       try{ incrementRewardProgress(state.currentUserId, variant.id); }catch(e){}
@@ -6442,7 +6532,7 @@ async function confirmApiTopupPurchase(productId){
     };
     if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
     state.orders[state.currentUserId].unshift(order);
-    finishPurchaseSuccess();
+    finishPurchaseSuccess(order.id);
     try{ fetchWalletFromServer(state.currentUserId); }catch(e){} // background — pa bezwen tann sa pou kontinye
     try{ notifyAdminNewOrder(order); }catch(e){}
     // notifyAdminNewSale retire — trigger SQL notify_order_terminee deja voye 'Vente confirmée' otomatikman, evite doub
@@ -6832,8 +6922,7 @@ async function confirmPurchase(productId){
       }
       try{ await fetchWalletFromServer(state.currentUserId); }catch(e){}
       await saveState();
-      showToast(t('toast_purchase_success'));
-      goPage('commandes');
+      ktShowSuccessPopup(r.order?.id);
     }catch(e){ relayOrderError(e, 'Gift Card'); }
     finally{ window.__ktApiPinBusy = false; }
     return;
@@ -6870,8 +6959,8 @@ async function confirmPurchase(productId){
     await fetchWalletFromServer(state.currentUserId);
     await fetchRewardProgress(state.currentUserId); // Kerry Rewards handled server-side inside the RPC now
     await saveState();
-    showToast(outOfStock ? t('toast_order_processing') : t('toast_purchase_success'));
-    goPage('commandes');
+    if(outOfStock){ showToast(t('toast_order_processing')); goPage('commandes'); }
+    else { ktShowSuccessPopup(order.id); }
   }catch(e){
     relayOrderError(e, 'Kòmand PIN');
   }
@@ -8981,6 +9070,7 @@ async function checkoutCart(){
   const manualOrdersCreated = [];
   let processedAmount = 0;
   let processedCount = 0;
+  let lastOrderId = null;
   for(const item of itemsToProcess){
     if(item.type === 'pin'){
       let claimedCount = 0;
@@ -9122,6 +9212,7 @@ async function checkoutCart(){
         };
         if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
         state.orders[state.currentUserId].unshift(order);
+        lastOrderId = order.id;
         notifyAdminNewOrder(order);
         // notifyAdminNewSale retire — trigger SQL deja voye 'Vente confirmée' otomatikman
         incrementRewardProgress(state.currentUserId, item.variantId); // fè pwogram fidelite avanse pou acha otomatik yo tou
@@ -9142,6 +9233,7 @@ async function checkoutCart(){
           if(_or){
             if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
             state.orders[state.currentUserId].unshift({ id:_or.id, orderNo:_on, type:'market_account', status:'en_cours', product: updated.listing_name || updated.rank, variant: updated.rank + ' — Niveau ' + updated.level, price: updated.price, date:new Date().toISOString() });
+            lastOrderId = _or.id;
           }
         }catch(e){ console.warn('market cart order row failed:', e?.message||e); }
         ktNotifyMarketSale(updated, u);
@@ -9158,6 +9250,7 @@ async function checkoutCart(){
       };
       if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
       state.orders[state.currentUserId].unshift(order);
+      lastOrderId = order.id;
       await insertOrderToServer(order, state.currentUserId);
       sendOrderReceivedEmail(order, currentUser());
       processedAmount += item.price;
@@ -9185,12 +9278,12 @@ async function checkoutCart(){
   if(failed.length > 0){
     showToast(failed.length + ' atik pa disponib — yo rete nan panye a');
   } else {
-    showToast(t('toast_purchase_success'));
     if(manualOrdersCreated.length > 0){
       notifyAdminOfManualOrders(manualOrdersCreated);
     }
     checkRapidActivity(state.currentUserId);
-    goPage('commandes');
+    if(lastOrderId){ ktShowSuccessPopup(lastOrderId); }
+    else { showToast(t('toast_purchase_success')); goPage('commandes'); }
   }
 }
 function sendNtfyNotification(title, message, priority, tag, attachUrl){
@@ -10608,8 +10701,8 @@ async function buyListing(id){
       const u = currentUser();
       ktNotifyMarketSale(l, u);
 
-      showToast(t('purchase_success_toast'));
-      goPage('commandes');
+      if(orderRow){ ktShowSuccessPopup(orderRow.id); }
+      else { showToast(t('purchase_success_toast')); goPage('commandes'); }
     }catch(e){ showToast('⚠️ Erè: ' + (e?.message||e)); }
   });
 }
