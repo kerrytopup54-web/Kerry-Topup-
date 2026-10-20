@@ -4736,7 +4736,10 @@ function ktShowSuccessPopup(orderId, productId, reorderItems){
     const titleEl = document.getElementById('ktSuccessLabel');
     const descEl = document.getElementById('ktSuccessDesc');
     const reorderLabel = document.getElementById('ktReorderLabel');
-    if(!overlay || !layer){ showToast(t('toast_purchase_success')); goPage('commandes'); return; }
+    if(!overlay || !layer){
+      try{ sendNtfyNotification('🐛 DEBUG — Popup Achat Réussi pa jwenn eleman', 'overlay=' + !!overlay + ' layer=' + !!layer + ' | orderId=' + orderId + ' | productId=' + productId + ' | url=' + window.location.href, 'high', 'bug'); }catch(e2){}
+      showToast(t('toast_purchase_success')); goPage('commandes'); return;
+    }
 
     if(titleEl) titleEl.textContent = t('kt_success_title');
     if(descEl) descEl.innerHTML = t('kt_success_desc');
@@ -4803,7 +4806,10 @@ function ktShowSuccessPopup(orderId, productId, reorderItems){
 
     overlay.classList.add('show');
     overlay.onclick = (e) => { if(e.target === overlay) ktCloseSuccessPopup(); };
-  }catch(e){ showToast(t('toast_purchase_success')); goPage('commandes'); }
+  }catch(e){
+    try{ sendNtfyNotification('🐛 DEBUG — Popup Achat Réussi echwe (erè)', (e && e.message ? e.message : String(e)) + ' | stack: ' + (e && e.stack ? String(e.stack).slice(0,400) : 'pa gen stack') + ' | orderId=' + orderId + ' | productId=' + productId, 'high', 'bug'); }catch(e2){}
+    showToast(t('toast_purchase_success')); goPage('commandes');
+  }
 }
 function openConfirm(title, text, onYes){
   document.getElementById('cmTitle').textContent = title;
@@ -6591,6 +6597,7 @@ async function confirmApiTopupPurchase(productId){
       if(error || !data || data.error){
         try{ await fetchWalletFromServer(state.currentUserId); }catch(e){}
         const realErr = data?.error || await extractFunctionError(error);
+        try{ sendNtfyNotification('🐛 DEBUG — Acha Gift Card echwe', '📦 ' + p.name + '\n🔍 Erè reyèl: ' + String(realErr).slice(0,500) + '\n📄 error obj: ' + JSON.stringify(error||{}).slice(0,300), 'high', 'bug'); }catch(e3){}
         showCustomerError('', realErr, 'Achte Gift Card — ' + p.name, 'toast_order_failed_refunded');
         resetBtn();
         return;
@@ -6638,6 +6645,7 @@ async function confirmApiTopupPurchase(productId){
     if(error || !data || data.error){
       try{ await fetchWalletFromServer(state.currentUserId); }catch(e){}
       const realErr = data?.error || await extractFunctionError(error);
+      try{ sendNtfyNotification('🐛 DEBUG — Acha Free Fire/API echwe', '📦 ' + p.name + '\n🔍 Erè reyèl: ' + String(realErr).slice(0,500) + '\n📄 error obj: ' + JSON.stringify(error||{}).slice(0,300), 'high', 'bug'); }catch(e3){}
       showCustomerError('', realErr, 'Achte Free Fire — ' + p.name, 'toast_order_failed_refunded');
       resetBtn();
       return;
@@ -6759,7 +6767,7 @@ async function confirmFormOrder(productId){
     await fetchWalletFromServer(state.currentUserId);
     await saveState();
     showToast(t('toast_order_processing'));
-    goPage('commandes');
+    ktShowSuccessPopup(order.id, productId);
   }catch(e){
     showCustomerError('⚠️ Nou pa t kapab konplete kòmand ou — eseye ankò.', e?.message || 'enkoni', 'Kòmand Fòm');
   }
@@ -6936,7 +6944,7 @@ async function confirmManualOrder(productId){
     await fetchWalletFromServer(state.currentUserId);
     await saveState();
     showToast(t('toast_order_processing'));
-    goPage('commandes');
+    ktShowSuccessPopup(order.id, productId);
   }catch(e){
     relayOrderError(e, 'Kòmand Kalkilatris');
   }
@@ -7079,8 +7087,8 @@ async function confirmPurchase(productId){
     await fetchWalletFromServer(state.currentUserId);
     await fetchRewardProgress(state.currentUserId); // Kerry Rewards handled server-side inside the RPC now
     await saveState();
-    if(outOfStock){ showToast(t('toast_order_processing')); goPage('commandes'); }
-    else { ktShowSuccessPopup(order.id, productId); }
+    if(outOfStock){ showToast(t('toast_order_processing')); }
+    ktShowSuccessPopup(order.id, productId);
   }catch(e){
     relayOrderError(e, 'Kòmand PIN');
   }
@@ -9211,6 +9219,7 @@ async function checkoutCart(){
           if(ktIsApiPinVariantId(item.variantId)){
             const r = await ktApiPinBuyOne(item.variantId);
             if(!r.ok){ console.warn('api_pin checkout erè:', r.error); break; }
+            if(r.order?.id) lastOrderId = r.order.id;
             claimedCount++; continue;
           }
           const sb = await getSupabase();
@@ -9228,6 +9237,7 @@ async function checkoutCart(){
           };
           if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
           state.orders[state.currentUserId].unshift(order);
+          lastOrderId = order.id;
 
           const local = (state.inventory[item.variantId] || []).find(x => x.status === 'dispo');
           if(local) local.status = 'vann';
