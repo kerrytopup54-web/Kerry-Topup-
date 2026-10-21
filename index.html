@@ -956,7 +956,10 @@ textarea.admin-ta{
     <div class="ktTitle" id="ktSuccessLabel">🎉 Achat réussi !</div>
     <div class="ktDesc" id="ktSuccessDesc">Votre commande a été reçue avec succès.<br>Merci d'avoir choisi <b>Kerry Topup Official</b>, profitez bien de vos achats 🤗🛒💎</div>
     <div class="ktBtns">
-      <button class="ktBtnPrimary" id="ktViewOrderBtn">👁️ Voir la commande</button>
+      <div style="display:flex;gap:10px;width:100%;">
+        <button class="ktBtnPrimary" id="ktClaimBtn" style="display:none;flex:1;padding:13px 8px;background:linear-gradient(135deg,#ffb020,#e68a00);box-shadow:0 8px 18px rgba(230,138,0,0.3);"></button>
+        <button class="ktBtnPrimary" id="ktViewOrderBtn" style="flex:1;padding:13px 8px;">👁️ Voir la commande</button>
+      </div>
       <button class="ktBtnSecondary" id="ktReorderBtn">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0a7c3d" stroke-width="2.6" stroke-linecap="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/></svg>
         <span id="ktReorderLabel">Commander à nouveau</span>
@@ -2196,6 +2199,11 @@ async function fetchProductsFromServer(){
     } else {
       const { data: vars } = await sb.from('variants').select('*');
       const { data: configs } = await sb.from('manual_configs').select('*');
+      try{
+        const { data: gcCfg } = await sb.from('gift_card_variant_config').select('*');
+        window.ktGiftCfg = {};
+        (gcCfg||[]).forEach(c => { window.ktGiftCfg[c.variant_id] = c; });
+      }catch(e){ window.ktGiftCfg = window.ktGiftCfg || {}; }
       state.products = prods.map(p => {
         const obj = {
           id:p.id, name:p.name, category:p.category, icon:p.icon, image:p.image, heroImage:p.hero_image||null, description:p.description,
@@ -4785,6 +4793,16 @@ function ktShowSuccessPopup(orderId, productId, reorderItems){
         if(orderId){ setTimeout(() => openOrderDetail(orderId), 260); }
       };
     }
+    const claimBtn = document.getElementById('ktClaimBtn');
+    if(claimBtn){
+      let nativePin = null;
+      try{ const od = (state.orders[state.currentUserId]||[]).find(o => o.id === orderId); if(od && ktIsNativePin(od.pin)) nativePin = od.pin; }catch(e){}
+      if(nativePin){
+        claimBtn.style.display = '';
+        claimBtn.innerHTML = '🎁 ' + gcT('claimBtn');
+        claimBtn.onclick = () => ktClaimPin(nativePin);
+      } else { claimBtn.style.display = 'none'; }
+    }
     if(reorderBtn){
       reorderBtn.onclick = async () => {
         ktCloseSuccessPopup();
@@ -6557,6 +6575,17 @@ async function confirmApiTopupPurchase(productId){
   const finishPurchaseSuccess = (orderId) => {
     setTimeout(() => { ktShowSuccessPopup(orderId, productId); }, 200);
   };
+  if(isGiftCard && ktIsNativeGift(variant.id)){
+    const rn = await ktApiPinBuyOne(variant.id);
+    if(!rn.ok){
+      if(rn.noBalance){ showToast(t('toast_insufficient_balance')); resetBtn(); goPage('wallet'); }
+      else { showCustomerError('', rn.error, 'Achte Gift Card — ' + p.name, 'toast_order_failed_refunded'); resetBtn(); }
+      return;
+    }
+    try{ await fetchWalletFromServer(state.currentUserId); }catch(e){}
+    finishPurchaseSuccess(rn.order.id);
+    return;
+  }
   if(!isGiftCard){
     if(!playerId){ showToast(t('toast_enter_player_id')); resetBtn(); return; }
     if(!window.verifiedPlayerNames || !window.verifiedPlayerNames[productId]){ showToast(t('verify_player_id_toast')); resetBtn(); return; }
@@ -6990,11 +7019,35 @@ function ktIsApiPinVariantId(variantId){
   for(const p of state.products){ const v = (p.variants||[]).find(x=>x.id===variantId); if(v) return ktVarIsPin(v, p); }
   return false;
 }
+function ktIsNativeGift(variantId){
+  try{ return !!(window.ktGiftCfg && window.ktGiftCfg[variantId]); }catch(e){ return false; }
+}
+// Gift Card natif Kerry Topup: sèvè a (purchase_gift_card_secure) retire kòb la epi jenere PIN KT-...
+async function ktNativeGiftBuy(p, v){
+  const price = v.price;
+  if(walletBalance() < price) return { ok:false, noBalance:true, error:'Balans ensifizan' };
+  const sb = await getSupabase();
+  try{ if(!(await ktEnsureSession(sb))) return { ok:false, error:t('toast_session_expired') }; }catch(e){}
+  const { data: res, error } = await sb.rpc('purchase_gift_card_secure', { p_variant_id: v.id });
+  if(error){
+    try{ await fetchWalletFromServer(state.currentUserId); }catch(e){}
+    const msg = String(error.message || '');
+    return { ok:false, noBalance: /Balans ou pa ase/i.test(msg), error: msg };
+  }
+  const order = { id: res.order_id, orderNo: res.order_no, type:'pin', status:'terminee', product: res.product_name, variant: res.variant_label, price: Number(res.price), date: new Date().toISOString(), pin: res.pin_code };
+  if(!state.orders[state.currentUserId]) state.orders[state.currentUserId] = [];
+  state.orders[state.currentUserId].unshift(order);
+  try{ notifyAdminNewOrder(order); }catch(e){}
+  try{ incrementRewardProgress(state.currentUserId, v.id); }catch(e){}
+  try{ sendOrderReceiptEmail(order, currentUser()); }catch(e){}
+  return { ok:true, order };
+}
 async function ktApiPinBuyOne(variantId){
   // Retounen { ok, order } oswa { ok:false, error, noBalance }
   let p = null, v = null;
   for(const pp of state.products){ const vv = (pp.variants||[]).find(x=>x.id===variantId); if(vv){ p = pp; v = vv; break; } }
   if(!p || !v) return { ok:false, error:'Opsyon pa jwenn' };
+  if(ktIsNativeGift(v.id)) return await ktNativeGiftBuy(p, v);
   const price = v.price;
   if(walletBalance() < price) return { ok:false, noBalance:true, error:'Balans ensifizan' };
   const sb = await getSupabase();
@@ -9572,9 +9625,12 @@ function openOrderDetail(orderId){
           <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;">
             <div style="font-weight:700;color:var(--text);margin-bottom:4px;">${escapeHtml(o.product)}</div>
             <div style="color:var(--muted);font-size:12px;word-break:break-all;margin-bottom:12px;font-family:monospace;">${escapeHtml(o.pin)}</div>
-            <button class="btn btn-green" style="width:100%;display:flex;align-items:center;justify-content:center;gap:7px;" onclick="copyText('${o.pin.replace(/'/g,"\\'")}')">📋 ${t('btn_copy_code')}</button>
+            <div style="display:flex;gap:8px;">
+              ${ktIsNativePin(o.pin) ? `<button class="btn btn-green" style="flex:1;width:auto;padding:13px 8px;display:flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#ffb020,#e68a00);" onclick="ktClaimPin('${o.pin}')">🎁 ${gcT('claimBtn')}</button>` : ''}
+              <button class="btn btn-green" style="flex:1;width:auto;padding:13px 8px;display:flex;align-items:center;justify-content:center;gap:6px;" onclick="copyText('${o.pin.replace(/'/g,"\\'")}')">📋 ${t('btn_copy_code')}</button>
+            </div>
           </div>
-          ${renderRedeemHelp(o.product)}
+          ${ktIsNativePin(o.pin) ? '' : renderRedeemHelp(o.product)}
         ` : `<div style="font-size:12.5px;color:var(--muted);">${renderNonPinStatusMessage(o.status)}</div>`}
       </div>
     `;
@@ -9824,35 +9880,214 @@ async function copyText(t){
 }
 
 /* ================= REDEEM PAGE ================= */
+const KT_GC = {
+ ht:{claimBtn:'Reklame',intro:'Mete PIN ou',pinLbl:'Kòd PIN',prot:'🔒 Sit sa a pwoteje kont ou kont fwod.',verify:'Vérifier',verifying:'Ap verifye...',pinInvalid:'⚠️ Kòd sa a pa valid.',pinUsed:'⚠️ Kòd sa a deja itilize. Tanpri mete yon lòt PIN.',tooMany:'⚠️ Twòp eseye. Tann kèk minit epi eseye ankò.',netErr:'⚠️ Pwoblèm koneksyon. Eseye ankò.',bravo:'Felisitasyon 🎊🎉',have:'ou gen yon kòd',bonus:'bonis',acct:'Non ki sou kont lan',idErr:'⚠️ Nou pa jwenn kont sa a. Tcheke ID a epi eseye ankò.',recharge:'⚡ Recharje',recharging:'Ap recharje...',done:'🎉 Dyaman yo voye!',doneMsg:'fèk ateri sou kont Free Fire {name}. Louvri jwèt la pou wè yo!',procTitle:'⏳ Kòmand ou an kou',procMsg:'Dyaman yo ap rive sou kont Free Fire {name} nan kèk minit.',again:'Reklame yon lòt kòd',claimErr:'⚠️ Nou pa t kapab livre dyaman yo. PIN ou an sekirite, eseye ankò.'},
+ fr:{claimBtn:'Réclamer',intro:'Insérez votre PIN',pinLbl:'Code PIN',prot:'🔒 Ce site est protégé contre la fraude.',verify:'Vérifier',verifying:'Vérification...',pinInvalid:'⚠️ Ce code est invalide.',pinUsed:'⚠️ Ce code a déjà été utilisé. Veuillez entrer un autre PIN.',tooMany:'⚠️ Trop d\'essais. Attendez quelques minutes.',netErr:'⚠️ Problème de connexion. Réessayez.',bravo:'Félicitations 🎊🎉',have:'vous avez un code de',bonus:'de bonus',acct:'Nom du compte',idErr:'⚠️ Compte introuvable. Vérifiez l\'ID et réessayez.',recharge:'⚡ Recharger',recharging:'Recharge en cours...',done:'🎉 Diamants envoyés !',doneMsg:'viennent d\'arriver sur le compte Free Fire {name}. Ouvrez le jeu pour les voir !',procTitle:'⏳ Commande en cours',procMsg:'Les diamants arrivent sur le compte Free Fire {name} dans quelques minutes.',again:'Réclamer un autre code',claimErr:'⚠️ Impossible de livrer les diamants. Votre PIN est en sécurité, réessayez.'},
+ en:{claimBtn:'Claim',intro:'Enter your PIN',pinLbl:'PIN code',prot:'🔒 This site is protected against fraud.',verify:'Verify',verifying:'Verifying...',pinInvalid:'⚠️ This code is invalid.',pinUsed:'⚠️ This code has already been used. Please enter another PIN.',tooMany:'⚠️ Too many attempts. Wait a few minutes.',netErr:'⚠️ Connection problem. Try again.',bravo:'Congratulations 🎊🎉',have:'you have a code worth',bonus:'bonus',acct:'Account name',idErr:'⚠️ Account not found. Check the ID and try again.',recharge:'⚡ Top up',recharging:'Topping up...',done:'🎉 Diamonds sent!',doneMsg:'just landed on Free Fire account {name}. Open the game to see them!',procTitle:'⏳ Order in progress',procMsg:'The diamonds will reach Free Fire account {name} in a few minutes.',again:'Claim another code',claimErr:'⚠️ We could not deliver the diamonds. Your PIN is safe, please try again.'},
+ es:{claimBtn:'Reclamar',intro:'Inserta tu PIN',pinLbl:'Código PIN',prot:'🔒 Este sitio está protegido contra el fraude.',verify:'Verificar',verifying:'Verificando...',pinInvalid:'⚠️ Este código no es válido.',pinUsed:'⚠️ Este código ya fue usado. Ingresa otro PIN.',tooMany:'⚠️ Demasiados intentos. Espera unos minutos.',netErr:'⚠️ Problema de conexión. Inténtalo de nuevo.',bravo:'Felicidades 🎊🎉',have:'tienes un código de',bonus:'de bono',acct:'Nombre de la cuenta',idErr:'⚠️ Cuenta no encontrada. Revisa el ID e inténtalo de nuevo.',recharge:'⚡ Recargar',recharging:'Recargando...',done:'🎉 ¡Diamantes enviados!',doneMsg:'acaban de llegar a la cuenta de Free Fire {name}. ¡Abre el juego para verlos!',procTitle:'⏳ Pedido en curso',procMsg:'Los diamantes llegarán a la cuenta Free Fire {name} en unos minutos.',again:'Canjear otro código',claimErr:'⚠️ No pudimos entregar los diamantes. Tu PIN está seguro, inténtalo de nuevo.'}
+};
+function gcT(k){ const l = (typeof currentLang!=='undefined' && KT_GC[currentLang]) ? currentLang : 'fr'; return KT_GC[l][k] || KT_GC.fr[k] || k; }
+window.__gcSt = window.__gcSt || { step:'A' };
 function pageRedeem(){
-  const steps = [
-    t('redeem_step1'), t('redeem_step2'), t('redeem_step3'), t('redeem_step4'), t('redeem_step5')
-  ];
+  setTimeout(gcRestore, 0);
   return `
-    <div class="page-header"><h2>${t('redeem_title')}</h2><p>${t('redeem_sub')}</p></div>
-    <div class="instr-card${redeemInstructionsExpanded?' open':''}" id="redeemInstrCard" style="background:#0B1F14;border-radius:20px;overflow:hidden;margin-bottom:16px;">
-      <div onclick="toggleRedeemInstructions()" style="display:flex;align-items:center;gap:10px;padding:20px;cursor:pointer;">
-        <div style="width:34px;height:34px;border-radius:10px;background:#17C267;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">📋</div>
-        <div style="flex:1;color:#17C267;font-weight:800;font-size:13.5px;letter-spacing:0.03em;text-transform:uppercase;">${t('redeem_instr_title')}</div>
-        <div id="redeemInstrArrow" style="width:26px;height:26px;border-radius:50%;background:rgba(23,194,103,0.15);color:#17C267;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform 0.3s;transform:rotate(${redeemInstructionsExpanded?'180deg':'0deg'});">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M7 10l5 5 5-5z"/></svg>
+    <style>
+      .gc-wrap{width:100%;box-sizing:border-box;max-width:420px;margin:0 auto;padding:6px 2px 30px;}
+      .gc-stage{position:relative;overflow:hidden;min-height:430px;width:100%;}
+      .gc-view{position:absolute;top:0;left:0;width:100%;transition:transform .4s cubic-bezier(.65,0,.35,1),opacity .35s ease;}
+      .gc-enter{transform:translateX(100%);opacity:0;z-index:1;pointer-events:none;}
+      .gc-current{transform:translateX(0);opacity:1;z-index:2;}
+      .gc-exit{transform:translateX(-100%);opacity:0;z-index:1;pointer-events:none;}
+      .gc-title{text-align:center;margin:26px 0 12px;color:var(--green);font-family:'Rajdhani',sans-serif;font-weight:800;font-size:27px;letter-spacing:.02em;text-transform:uppercase;}
+      .gc-lbl{text-align:center;color:#9aa39c;font-size:15px;margin:0 0 8px;}
+      .gc-input{width:100%;background:var(--panel-2);border:1.5px solid var(--line);border-radius:13px;color:var(--text);padding:14px 12px;font-size:14px;outline:none;font-family:'JetBrains Mono',monospace;text-align:center;margin-bottom:14px;}
+      .gc-input:focus{border-color:var(--green);}
+      .gc-input.gc-plain{font-family:inherit;font-size:15px;letter-spacing:normal;}
+      .gc-btn{width:100%;padding:15px;border-radius:14px;font-weight:700;font-size:14.5px;border:none;cursor:pointer;font-family:inherit;color:#fff;background:linear-gradient(135deg,#0FA654,#0C8A45);box-shadow:0 8px 18px rgba(15,166,84,.3);transition:background .3s;}
+      .gc-btn.gc-claim{background:linear-gradient(135deg,#ffb020,#e68a00);box-shadow:0 8px 18px rgba(230,138,0,.3);}
+      .gc-btn:disabled{opacity:.4;box-shadow:none;cursor:not-allowed;}
+      .gc-err{display:none;background:rgba(226,59,87,.1);border-radius:12px;padding:12px 14px;margin-top:10px;color:#E23B57;font-weight:600;font-size:13px;text-align:center;}
+      .gc-err.show{display:block;}
+      .gc-note{text-align:center;color:#9aa39c;font-size:12px;margin-top:26px;line-height:1.5;}
+      .gc-bravo{position:relative;text-align:center;background:linear-gradient(135deg,#0FA654,#0C8A45);border-radius:18px;padding:22px 18px;margin-bottom:18px;overflow:hidden;box-shadow:0 12px 28px rgba(15,166,84,.35);}
+      .gc-bravo b{display:block;font-size:15px;font-weight:800;color:#fff;}
+      .gc-bravo small{display:block;font-size:13px;color:rgba(255,255,255,.85);margin-top:4px;}
+      .gc-amt{font-family:'Rajdhani',sans-serif;font-weight:800;font-size:22px;color:#fff;background:rgba(255,255,255,.16);display:inline-block;padding:7px 18px;border-radius:999px;margin-top:10px;}
+      .gc-acct{display:none;margin:-2px 0 14px;}
+      .gc-acct.show{display:block;}
+      .gc-done{display:none;text-align:center;padding:40px 8px 10px;}
+      .gc-done.show{display:block;}
+      .gc-badge{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#3fce7c,#0a9e3d);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;box-shadow:0 10px 24px rgba(15,166,84,.35);}
+      .gc-spin{width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .7s linear infinite;vertical-align:-2px;margin-right:6px;}
+    </style>
+    <div class="gc-wrap">
+      <div class="gc-stage" id="gcStage">
+        <div class="gc-view gc-current" id="gcViewA">
+          <div class="gc-title">${escapeHtml(gcT('intro'))}</div>
+          <div class="gc-lbl">${escapeHtml(gcT('pinLbl'))}</div>
+          <input type="text" class="gc-input" id="gcPin" maxlength="60" autocomplete="off" autocapitalize="characters" spellcheck="false" oninput="gcClearErr('gcPinErr')" onkeydown="if(event.key==='Enter')gcVerifyPin()">
+          <button class="gc-btn" id="gcPinBtn" onclick="gcVerifyPin()">${escapeHtml(gcT('verify'))}</button>
+          <div class="gc-err" id="gcPinErr"></div>
+          <div class="gc-note">${escapeHtml(gcT('prot'))}</div>
+        </div>
+        <div class="gc-view gc-enter" id="gcViewB">
+          <div class="gc-bravo"><b>${escapeHtml(gcT('bravo'))}</b><small>${escapeHtml(gcT('have'))}</small><span class="gc-amt" id="gcAmt"></span></div>
+          <input type="text" inputmode="numeric" class="gc-input gc-plain" id="gcId" maxlength="15" autocomplete="off" oninput="gcIdInput()" onkeydown="if(event.key==='Enter')gcIdAction()">
+          <div class="gc-acct" id="gcAcct"></div>
+          <button class="gc-btn" id="gcIdBtn" onclick="gcIdAction()" disabled>${escapeHtml(gcT('verify'))}</button>
+          <div class="gc-err" id="gcIdErr"></div>
         </div>
       </div>
-      <div id="redeemInstrBody" style="max-height:${redeemInstructionsExpanded?'600px':'0'};overflow:hidden;transition:max-height 0.35s ease;">
-        <div style="padding:0 20px 20px;">
-          ${steps.map((s,i) => `
-            <div style="display:flex;gap:12px;margin-bottom:${i<steps.length-1?'16px':'0'};">
-              <div style="width:24px;height:24px;border-radius:50%;background:#17C267;color:#0B1F14;font-weight:800;font-size:12.5px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${i+1}</div>
-              <div style="color:#E5F5EC;font-size:13px;line-height:1.55;">${s}</div>
-            </div>
-          `).join('')}
-        </div>
+      <div class="gc-done" id="gcDone">
+        <div class="gc-badge"><svg width="42" height="42" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h2 style="font-family:'Rajdhani',sans-serif;font-size:21px;margin:0 0 8px;" id="gcDoneT"></h2>
+        <p style="color:var(--muted);font-size:13.5px;line-height:1.5;max-width:300px;margin:0 auto 22px;" id="gcDoneM"></p>
+        <button class="gc-btn" onclick="gcReset()">${escapeHtml(gcT('again'))}</button>
       </div>
-    </div>
-    <div class="card" style="padding:0;overflow:hidden;">
-      <iframe src="https://redeem.hype.games/widget/" title="Kerry Topup Redeem" style="width:100%;height:1000px;border:none;display:block;" loading="lazy"></iframe>
     </div>
   `;
+}
+function ktIsNativePin(code){ return /^KT-[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i.test(String(code||'')); }
+function ktClaimPin(code){
+  try{ ktCloseSuccessPopup(); }catch(e){}
+  window.__gcSt = { step:'A' };
+  goPage('redeem');
+  setTimeout(() => { const i = document.getElementById('gcPin'); if(i){ i.value = code; gcVerifyPin(); } }, 350);
+}
+function gcEl(id){ return document.getElementById(id); }
+function gcAcctCard(name){
+  return `<div style="display:flex;align-items:center;gap:14px;background:rgba(15,166,84,0.06);border:1px dashed var(--green);border-radius:14px;padding:14px;margin-top:12px;">
+    ${ktVerifyIconHtml({ name:'Free Fire' })}
+    <div>
+      <div style="color:var(--green);font-weight:700;font-size:14px;">${t('toast_account_found')}</div>
+      <div style="color:var(--text);font-size:13px;margin:2px 0 6px;">${t('label_player_name')} : <b>${escapeHtml(name || '')}</b></div>
+      <span style="background:#ECFDF5;color:#059669;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px;">${t('badge_account_verified')}</span>
+    </div></div>`;
+}
+function gcShowErr(id, msg){ const e = gcEl(id); if(e){ e.textContent = msg; e.classList.add('show'); } }
+function gcClearErr(id){ const e = gcEl(id); if(e) e.classList.remove('show'); }
+function gcAmtText(st){ return st.diamonds + ' 💎' + (st.bonus ? ' + ' + st.bonus + ' ' + gcT('bonus') : ''); }
+function gcGoStep(step){
+  const A = gcEl('gcViewA'), B = gcEl('gcViewB'); if(!A || !B) return;
+  if(step === 'B'){ A.className='gc-view gc-exit'; B.className='gc-view gc-current'; }
+  else { A.className='gc-view gc-current'; B.className='gc-view gc-enter'; }
+}
+// Re-konstwi eta a si paj la re-rann (egzanp kliyan chanje lang)
+function gcRestore(){
+  const st = window.__gcSt; if(!st || !gcEl('gcViewA')) return;
+  if(st.step === 'B' || st.step === 'done'){
+    gcEl('gcAmt').textContent = gcAmtText(st);
+    gcEl('gcId').value = st.playerId || '';
+    gcEl('gcIdBtn').disabled = !(st.playerId);
+    if(st.idVerified){ gcEl('gcAcct').innerHTML = gcAcctCard(st.name); gcEl('gcAcct').classList.add('show'); gcEl('gcIdBtn').textContent = gcT('recharge'); gcEl('gcIdBtn').classList.add('gc-claim'); }
+    gcEl('gcViewA').style.transition = gcEl('gcViewB').style.transition = 'none';
+    gcGoStep('B');
+    setTimeout(()=>{ const a=gcEl('gcViewA'), b=gcEl('gcViewB'); if(a&&b){ a.style.transition=b.style.transition=''; } }, 50);
+  }
+  if(st.step === 'done') gcShowDone(st.doneStatus);
+}
+function gcShowDone(status){
+  const st = window.__gcSt;
+  gcEl('gcStage').style.display = 'none';
+  const proc = status === 'processing';
+  gcEl('gcDoneT').textContent = gcT(proc ? 'procTitle' : 'done');
+  gcEl('gcDoneM').textContent = proc ? gcT('procMsg').replace('{name}', st.name || st.playerId)
+    : ((st.diamonds||0) + (st.bonus||0)) + ' 💎 ' + gcT('doneMsg').replace('{name}', st.name || st.playerId);
+  gcEl('gcDone').classList.add('show');
+}
+async function gcVerifyPin(){
+  const input = gcEl('gcPin'); const btn = gcEl('gcPinBtn');
+  const code = (input.value || '').replace(/\s/g, '').toUpperCase();
+  if(!code || btn.disabled) return;
+  gcClearErr('gcPinErr');
+  btn.disabled = true; btn.innerHTML = '<span class="gc-spin"></span>' + escapeHtml(gcT('verifying'));
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.functions.invoke('gift-redeem', { body: { action:'verify_pin', code } });
+    if(error && !data){
+      const msg = String(await extractFunctionError(error) || '');
+      gcShowErr('gcPinErr', /too_many/i.test(msg) ? gcT('tooMany') : gcT('netErr'));
+      return;
+    }
+    if(!data || !data.valid){
+      gcShowErr('gcPinErr', data && data.reason === 'used' ? gcT('pinUsed') : gcT('pinInvalid'));
+      return;
+    }
+    window.__gcSt = { step:'B', code, diamonds:data.diamonds, bonus:data.bonus, pid:data.partner_product_id, playerId:'', idVerified:false, name:null };
+    gcEl('gcAmt').textContent = gcAmtText(window.__gcSt);
+    gcGoStep('B');
+  }catch(e){
+    gcShowErr('gcPinErr', gcT('netErr'));
+  }finally{
+    btn.disabled = false; btn.textContent = gcT('verify');
+  }
+}
+function gcIdInput(){
+  const st = window.__gcSt; const input = gcEl('gcId');
+  input.value = input.value.replace(/\D/g, '');
+  st.playerId = input.value.trim();
+  gcClearErr('gcIdErr');
+  if(st.idVerified){
+    st.idVerified = false; st.name = null;
+    gcEl('gcAcct').classList.remove('show');
+    const b = gcEl('gcIdBtn'); b.textContent = gcT('verify'); b.classList.remove('gc-claim');
+  }
+  gcEl('gcIdBtn').disabled = !st.playerId;
+}
+async function gcIdAction(){
+  const st = window.__gcSt; const btn = gcEl('gcIdBtn');
+  if(!st || btn.disabled) return;
+  const sb = await getSupabase();
+  if(!st.idVerified){
+    if(!/^\d{5,15}$/.test(st.playerId)){ gcShowErr('gcIdErr', t('toast_player_not_found')); return; }
+    btn.disabled = true;
+    gcEl('gcAcct').innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin-top:8px;"><span class="verif-spinner"></span>' + escapeHtml(t('verifying_in_progress')) + '</div>';
+    gcEl('gcAcct').classList.add('show');
+    try{
+      const { data, error } = await sb.functions.invoke('partner-verify', { body: { partner_product_id: String(st.pid), player_id: st.playerId } });
+      if(error || !data || data.error){ gcEl('gcAcct').classList.remove('show'); gcShowErr('gcIdErr', gcT('netErr')); }
+      else if(!data.valid){ gcEl('gcAcct').classList.remove('show'); gcShowErr('gcIdErr', t('toast_player_not_found')); }
+      else {
+        st.idVerified = true; st.name = data.name || '';
+        gcEl('gcAcct').innerHTML = gcAcctCard(st.name); gcEl('gcAcct').classList.add('show');
+        btn.classList.add('gc-claim');
+      }
+    }catch(e){ gcEl('gcAcct').classList.remove('show'); gcShowErr('gcIdErr', gcT('netErr')); }
+    btn.disabled = false; btn.textContent = st.idVerified ? gcT('recharge') : gcT('verify');
+    return;
+  }
+  // Recharger — sèvè a livre dyaman yo bay founisè a
+  btn.disabled = true; btn.innerHTML = '<span class="gc-spin"></span>' + escapeHtml(gcT('recharging'));
+  try{
+    const { data, error } = await sb.functions.invoke('gift-redeem', { body: { action:'claim', code: st.code, player_id: st.playerId, player_name: st.name || undefined } });
+    if(error && !data){
+      const msg = String(await extractFunctionError(error) || '');
+      gcShowErr('gcIdErr', /too_many/i.test(msg) ? gcT('tooMany') : gcT('claimErr'));
+      btn.disabled = false; btn.textContent = gcT('recharge'); return;
+    }
+    if(data && data.valid === false){
+      gcShowErr('gcIdErr', gcT('pinUsed'));
+      btn.disabled = false; btn.textContent = gcT('recharge'); return;
+    }
+    if(!data || !data.success){
+      gcShowErr('gcIdErr', gcT('claimErr'));
+      btn.disabled = false; btn.textContent = gcT('recharge'); return;
+    }
+    st.step = 'done'; st.doneStatus = data.status;
+    gcShowDone(data.status);
+  }catch(e){
+    gcShowErr('gcIdErr', gcT('claimErr'));
+    btn.disabled = false; btn.textContent = gcT('recharge');
+  }
+}
+function gcReset(){
+  window.__gcSt = { step:'A' };
+  gcEl('gcDone').classList.remove('show');
+  gcEl('gcStage').style.display = 'block';
+  gcEl('gcPin').value = ''; gcEl('gcId').value = '';
+  gcEl('gcAcct').classList.remove('show');
+  const b = gcEl('gcIdBtn'); b.textContent = gcT('verify'); b.classList.remove('gc-claim'); b.disabled = true;
+  gcGoStep('A');
 }
 async function doRedeem(codeOverride){
   const code = codeOverride || document.getElementById('redeemInput').value.trim();
@@ -11326,6 +11561,7 @@ const ADMIN_TABS = [
   {id:'kliyan', label:'Kliyan'},
   {id:'kòmand', label:'Kòmand'},
   {id:'founisè', label:'🔗 Katalòg Founisè'},
+  {id:'gcpins', label:'🎟️ Gift Card'},
   {id:'kyc', label:'🔐 Vérifications KYC'},
   {id:'listings', label:'🎮 Comptes à vérifier'},
   {id:'delivery', label:'🚚 Achats à livrer'},
@@ -12186,6 +12422,15 @@ function renderAdminTab(){
         </div>
       `).join('')}
     `;
+  }
+  else if(adminTab === 'gcpins'){
+    box.innerHTML = `
+      <div class="card">
+        <div style="font-weight:700;font-size:13px;margin-bottom:10px;">🎟️ Tout PIN yo</div>
+        <input type="text" id="gcPinSearch" placeholder="Chèche yon PIN oswa ID jwè..." style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;color:var(--text);margin-bottom:10px;" oninput="ktRenderGcPins()">
+        <div id="gcPinList" style="font-size:12.5px;color:var(--muted);">Chajman...</div>
+      </div>`;
+    ktLoadGcPins();
   }
   else if(adminTab === 'founisè'){
     box.innerHTML = `
@@ -13669,10 +13914,11 @@ function renderApiTopupAdminConfig(p){
             <button class="mini-btn" onclick="removeVariant('${p.id}','${v.id}')">✕</button>
           </div>
           <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-            <select onchange="updateApiTopupVariantField('${p.id}','${v.id}','order_mode',this.value)" style="flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11.5px;">
+            <select onchange="ktOrderModeChange('${p.id}','${v.id}',this.value)" style="flex:1;min-width:150px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11.5px;">
               <option value="api_order" ${v.orderMode!=='api_verif' && v.orderMode!=='api_pin'?'selected':''}>🔗 API Order + Verif</option>
               <option value="api_verif" ${v.orderMode==='api_verif'?'selected':''}>🛡️ API Verif sèlman (manyèl)</option>
-              <option value="api_pin" ${v.orderMode==='api_pin'?'selected':''}>🎁 API Gift Card (kòd livre)</option>
+              <option value="api_pin" ${v.orderMode==='api_pin' && !(v.ktPending||ktIsNativeGift(v.id))?'selected':''}>🎁 API Gift Card (kòd livre)</option>
+              <option value="kt_pin" ${(v.ktPending||ktIsNativeGift(v.id))?'selected':''}>🎟️ PIN Système Kerry Topup</option>
             </select>
             <input type="text" class="mono" style="width:70px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11.5px;" value="${v.partnerProductId||''}" placeholder="Founisè ID" onchange="updateApiTopupVariantField('${p.id}','${v.id}','partner_product_id',this.value)">
             <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);white-space:nowrap;">
@@ -13680,6 +13926,7 @@ function renderApiTopupAdminConfig(p){
             </label>
             <input type="text" class="mono" style="width:90px;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:5px;font-size:11.5px;" value="${v.fixedServerId||''}" placeholder="Server ID fiks" title="Si ranpli: kliyan pa wè chan Server ID, sistèm voye VALÈ SA A otomatikman pou TOUT achte. Si vid: kliyan antre pwòp ID li." onchange="updateApiTopupVariantField('${p.id}','${v.id}','fixed_server_id',this.value)">
           </div>
+          ${(v.ktPending||ktIsNativeGift(v.id)) ? ktGiftLinkHtml(v) : ''}
           <div style="margin-top:6px;">
             ${getEquivalenceGroupMembers(v.equivalenceGroup, v.id).map(m => `
               <div style="display:flex;align-items:center;gap:6px;background:var(--green-dim);border-radius:6px;padding:5px 8px;margin-bottom:4px;">
@@ -13700,10 +13947,110 @@ function renderApiTopupAdminConfig(p){
       <input type="text" id="addVarPrice-${p.id}" placeholder="Pri HTG" style="width:70px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarCost-${p.id}" placeholder="Pri Founisè" style="width:80px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
       <input type="text" id="addVarPartnerId-${p.id}" placeholder="Founisè product_id (vid si Verif sèlman)" style="width:110px;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;">
-      ${(()=>{const lv=(p.variants||[]).slice(-1)[0];const gift=ktLooksGift(p)||(lv&&lv.orderMode==='api_pin');return `<select id="addVarMode-${p.id}" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;"><option value="auto" ${gift?'':'selected'}>Mòd otomatik (Order+Verif)</option><option value="api_pin" ${gift?'selected':''}>🎁 API Gift Card (kòd livre)</option></select>`;})()}
+      ${(()=>{const lv=(p.variants||[]).slice(-1)[0];const gift=ktLooksGift(p)||(lv&&lv.orderMode==='api_pin');return `<select id="addVarMode-${p.id}" style="width:100%;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;color:var(--text);padding:7px 9px;font-size:12px;"><option value="auto" ${gift?'':'selected'}>Mòd otomatik (Order+Verif)</option><option value="api_pin" ${gift?'selected':''}>🎁 API Gift Card (kòd livre)</option><option value="kt_pin">🎟️ PIN Système Kerry Topup</option></select>`;})()}
       <button class="mini-btn" onclick="addApiTopupVariant('${p.id}')">+ Ajoute</button>
     </div>
   `;
+}
+/* ===== KERRY GIFT CARD NATIF — lis PIN Admin ===== */
+let ktGcPins = [];
+async function ktLoadGcPins(){
+  try{
+    const sb = await getSupabase();
+    const { data, error } = await sb.from('gift_card_pins').select('*').order('created_at', { ascending:false }).limit(300);
+    if(error){ const el = document.getElementById('gcPinList'); if(el) el.textContent = '⚠️ ' + error.message; return; }
+    ktGcPins = data || [];
+    ktRenderGcPins();
+  }catch(e){ const el = document.getElementById('gcPinList'); if(el) el.textContent = '⚠️ Erè koneksyon'; }
+}
+function ktRenderGcPins(){
+  const el = document.getElementById('gcPinList'); if(!el) return;
+  const q = (document.getElementById('gcPinSearch')?.value || '').trim().toLowerCase();
+  const rows = ktGcPins.filter(r => !q || String(r.code).toLowerCase().includes(q) || String(r.player_id||'').includes(q));
+  if(!rows.length){ el.textContent = 'Pa gen PIN.'; return; }
+  const label = { disponible:['Disponib','#0C8A45'], reclame_en_cours:['Ap trete','#b36b00'], utilise:['Itilize','#6B7A6E'], anile:['Anile','#E23B57'] };
+  el.innerHTML = rows.map(r => {
+    const [txt, col] = label[r.status] || [r.status, '#6B7A6E'];
+    return `<div style="border-bottom:1px solid var(--line);padding:9px 0;">
+      <div style="font-family:monospace;font-size:11.5px;color:var(--text);word-break:break-all;">${escapeHtml(r.code)}</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:4px;flex-wrap:wrap;">
+        <span style="font-weight:700;">${r.diamonds}${r.bonus?' + '+r.bonus:''} 💎</span>
+        <span style="color:${col};font-weight:700;font-size:11.5px;">${txt}</span>
+        ${r.player_id ? `<span style="font-size:11.5px;">ID: ${escapeHtml(r.player_id)}${r.player_name?' ('+escapeHtml(r.player_name)+')':''}</span>`:''}
+        <span style="font-size:11px;margin-left:auto;">${new Date(r.created_at).toLocaleDateString()}</span>
+        ${r.status==='disponible' ? `<button class="mini-btn" onclick="ktCancelGcPin('${r.id}')">Anile</button>`:''}
+      </div></div>`;
+  }).join('');
+}
+async function ktCancelGcPin(id){
+  if(!confirm('Anile PIN sa a? Kliyan an pa pral ka itilize l ankò.')) return;
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('gift_card_pins').update({ status:'anile' }).eq('id', id).eq('status','disponible');
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    ktLoadGcPins();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
+
+/* ===== KERRY GIFT CARD NATIF — konfigirasyon Admin ===== */
+function ktParseDiamonds(label){
+  const m2 = String(label||'').match(/(\d+)\s*\+\s*(\d+)/);
+  if(m2) return { d: parseInt(m2[1]), b: parseInt(m2[2]) };
+  const m1 = String(label||'').match(/(\d+)/);
+  return m1 ? { d: parseInt(m1[1]), b: 0 } : { d: 0, b: 0 };
+}
+function ktGiftLinkHtml(v){
+  const cfg = (window.ktGiftCfg && window.ktGiftCfg[v.id]) || null;
+  const ff = [];
+  state.products.forEach(pp => (pp.variants||[]).forEach(vv => { if(vv.partnerProductId && vv.id !== v.id && vv.orderMode !== 'api_pin') ff.push({ id: vv.id, label: pp.name + ' — ' + vv.label }); }));
+  const shown = cfg ? `${cfg.diamonds}${cfg.bonus?' + '+cfg.bonus:''} 💎` : '';
+  return `
+    <div style="margin-top:8px;padding:8px;border-radius:8px;background:${cfg?'var(--green-dim)':'rgba(255,176,32,0.14)'};">
+      <div style="font-size:11.5px;font-weight:700;margin-bottom:6px;">🎟️ PIN Système Kerry Topup ${cfg?'<span style="color:var(--green-2);">✓ '+shown+'</span>':'<span style="color:#b36b00;">— chwazi opsyon ki livre dyaman yo</span>'}</div>
+      <select style="width:100%;background:var(--panel);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:6px;font-size:11.5px;" onchange="if(this.value)ktLinkGift('${v.id}',this.value)">
+        <option value="">🔗 Opsyon Free Fire ki livre dyaman yo lè PIN nan reklame...</option>
+        ${ff.map(o => `<option value="${o.id}" ${cfg&&cfg.topup_variant_id===o.id?'selected':''}>${escapeHtml(o.label)}</option>`).join('')}
+      </select>
+      <div style="font-size:10.5px;color:var(--muted);margin-top:5px;">Kliyan an achte opsyon sa a → sistèm nan jenere PIN lan → li reklame l sou paj Redeem. Dyaman yo li nan non opsyon Free Fire a (egzanp 100+10).</div>
+    </div>`;
+}
+async function ktOrderModeChange(productId, variantId, value){
+  const p = state.products.find(x=>x.id===productId);
+  const v = p && p.variants.find(x=>x.id===variantId); if(!v) return;
+  if(value === 'kt_pin'){
+    v.ktPending = true;
+    if(v.orderMode !== 'api_pin') await updateApiTopupVariantField(productId, variantId, 'order_mode', 'api_pin');
+    renderAdminTab();
+    return;
+  }
+  v.ktPending = false;
+  if(ktIsNativeGift(variantId)){
+    try{
+      const sb = await getSupabase();
+      const { error } = await sb.from('gift_card_variant_config').delete().eq('variant_id', variantId);
+      if(error){ showToast('⚠️ Pa sove: ' + error.message); return; }
+      if(window.ktGiftCfg) delete window.ktGiftCfg[variantId];
+    }catch(e){ showToast('⚠️ Erè koneksyon'); return; }
+  }
+  await updateApiTopupVariantField(productId, variantId, 'order_mode', value);
+  renderAdminTab();
+}
+async function ktLinkGift(variantId, topupId){
+  let v = null, ffv = null;
+  state.products.forEach(pp => (pp.variants||[]).forEach(x => { if(x.id===variantId) v = x; if(x.id===topupId) ffv = x; }));
+  if(!v || !ffv) return;
+  let { d, b } = ktParseDiamonds(ffv.label);
+  if(!(d > 0)) ({ d, b } = ktParseDiamonds(v.label));
+  if(!(d > 0)){ showToast('Pa jwenn kantite dyaman nan non opsyon an'); return; }
+  try{
+    const sb = await getSupabase();
+    const row = { variant_id: variantId, diamonds: d, bonus: b, topup_variant_id: topupId };
+    const { error } = await sb.from('gift_card_variant_config').upsert(row);
+    if(error){ showToast('⚠️ Pa sove: ' + error.message); return; }
+    window.ktGiftCfg = window.ktGiftCfg || {}; window.ktGiftCfg[variantId] = row; v.ktPending = false;
+    showToast('Lye ✓ ' + d + (b ? ' + ' + b : '') + ' 💎');
+    renderAdminTab();
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
 async function addApiTopupVariant(productId){
   const label = document.getElementById('addVarName-'+productId).value.trim();
@@ -13714,7 +14061,8 @@ async function addApiTopupVariant(productId){
   if(!label || !price){ showToast('Ranpli omwen non ak pri'); return; }
   const p = state.products.find(x=>x.id===productId);
   const modeSel = document.getElementById('addVarMode-'+productId);
-  const orderMode = (modeSel && modeSel.value === 'api_pin') ? 'api_pin' : (partnerId ? 'api_order' : 'api_verif');
+  const isKtPin = !!(modeSel && modeSel.value === 'kt_pin');
+  const orderMode = (isKtPin || (modeSel && modeSel.value === 'api_pin')) ? 'api_pin' : (partnerId ? 'api_order' : 'api_verif');
   const newVariant = { id: uid(), label, price, costPrice, partnerProductId: partnerId?parseInt(partnerId):null, requiresServerId: false, orderMode };
   try{
     const sb = await getSupabase();
@@ -13724,9 +14072,10 @@ async function addApiTopupVariant(productId){
     if(error){ showToast('⚠️ Pa sove sou sèvè a: ' + error.message); return; }
     if(data) newVariant.id = data.id;
   }catch(e){ showToast('⚠️ Erè koneksyon: ' + (e?.message||'enkoni')); return; }
+  if(isKtPin) newVariant.ktPending = true;
   p.variants.push(newVariant);
   renderAdminTab();
-  showToast(orderMode==='api_pin' ? 'Opsyon ajoute ✓ (API Gift Card)' : partnerId ? 'Opsyon ajoute ✓ (API Order + Verif)' : 'Opsyon ajoute ✓ (Verif sèlman — manyèl)');
+  showToast(isKtPin ? 'Opsyon ajoute ✓ — kounya chwazi opsyon Free Fire a' : orderMode==='api_pin' ? 'Opsyon ajoute ✓ (API Gift Card)' : partnerId ? 'Opsyon ajoute ✓ (API Order + Verif)' : 'Opsyon ajoute ✓ (Verif sèlman — manyèl)');
 }
 async function updateApiTopupVariantField(productId, variantId, field, value){
   const p = state.products.find(x=>x.id===productId);
