@@ -391,6 +391,45 @@ html.dark .nav-btn.active .icon-wrap{border-color:#161b22;}
 
 /* Orders */
 .order-card{background:var(--panel);border-radius:20px;padding:16px;margin-bottom:12px;box-shadow:0 4px 16px rgba(20,40,30,0.04);}
+/* ===== KT2 — nouvo lis (Historique / Kòmand / API revandè) ===== */
+.kt2-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:0 6px 22px rgba(15,60,35,.06);overflow:hidden;margin-bottom:14px;}
+.kt2-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:16px 18px 12px;}
+.kt2-head h3{margin:0;font-size:15px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:9px;}
+.kt2-head h3 i{width:30px;height:30px;border-radius:10px;background:var(--panel-2);display:inline-flex;align-items:center;justify-content:center;font-style:normal;font-size:14px;}
+.kt2-count{background:linear-gradient(135deg,#d8f5e2,#b8ecc9);color:#0a7c3d;font-weight:800;font-size:12px;padding:6px 12px;border-radius:30px;white-space:nowrap;}
+.kt2-sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 14px;}
+.kt2-sum div{border-radius:14px;padding:11px 13px;background:var(--panel-2);}
+.kt2-sum small{display:block;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.kt2-sum b{font-size:16px;font-weight:800;}
+.kt2-sum .in b{color:#0a9e3d}.kt2-sum .out b{color:#e0304a}
+.kt2-day{padding:10px 18px 6px;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--panel-2);border-top:1px solid var(--line);}
+.kt2-row{display:flex;align-items:center;gap:13px;padding:13px 18px;border-top:1px solid var(--line);}
+.kt2-day + .kt2-row{border-top:none;}
+.kt2-ico{width:42px;height:42px;border-radius:14px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;background:#e6f7ec;}
+.kt2-ico.out{background:#fdecef}.kt2-ico.tr{background:#e8f0fe}
+.kt2-t{flex:1;min-width:0;}
+.kt2-t b{display:block;font-size:14px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kt2-t span{display:block;font-size:11.5px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.kt2-amt{text-align:right;flex-shrink:0;font-weight:800;font-size:15.5px;white-space:nowrap;}
+.kt2-amt small{font-size:10.5px;font-weight:700;color:var(--muted);margin-left:3px;}
+.kt2-amt.in{color:#0a9e3d}.kt2-amt.out{color:#e0304a}
+.kt2-more{width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:14px;color:#0a9e3d;font-weight:700;font-size:13.5px;background:none;border:none;border-top:1px solid var(--line);cursor:pointer;font-family:inherit;}
+.kt2-ord{position:relative;display:block;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px 14px 12px 18px;margin-bottom:11px;box-shadow:0 5px 18px rgba(15,60,35,.06);overflow:hidden;cursor:pointer;}
+.kt2-ord::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:#17a854;}
+.kt2-ord.en_cours::before{background:#f0a81a}.kt2-ord.anile::before{background:#e0304a}
+.kt2-ord-top{display:flex;align-items:center;gap:12px;}
+.kt2-ord .thumb{width:46px;height:46px;border-radius:14px;background:var(--panel-2);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:22px;flex-shrink:0;}
+.kt2-ord .thumb img{width:100%;height:100%;object-fit:cover;}
+.kt2-ord .nm{flex:1;min-width:0}.kt2-ord .nm b{display:block;font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.kt2-ord .nm span{display:block;font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kt2-ord .pr{text-align:right;flex-shrink:0}.kt2-ord .pr b{display:block;font-size:15px;font-weight:800;color:var(--text)}
+.kt2-ord-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:11px;padding-top:10px;border-top:1px dashed var(--line);font-size:11.5px;color:var(--muted);}
+.kt2-ord-foot .no{font-family:'JetBrains Mono',monospace;font-size:11px;}
+.kt2-ord-foot .go{color:#0a9e3d;font-weight:800;display:flex;align-items:center;gap:4px;}
+.kt2-bd{display:inline-block;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:800;margin-top:4px;}
+.kt2-bd.terminee{background:#e1f6e8;color:#0a8a3a}.kt2-bd.en_cours{background:#fff3da;color:#b57908}.kt2-bd.anile{background:#fdeaee;color:#cc2a44}
+.kt2-stats{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-bottom:14px;}
+.kt2-stats div{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px 8px;text-align:center;box-shadow:0 4px 14px rgba(15,60,35,.05);}
+.kt2-stats b{display:block;font-size:19px;font-weight:800;color:var(--text)}.kt2-stats small{display:block;font-size:10.5px;font-weight:700;color:var(--muted);margin-top:3px;letter-spacing:.03em}
 .order-card-v2{background:var(--panel);border-radius:20px;margin-bottom:16px;position:relative;overflow:hidden;box-shadow:0 18px 45px rgba(20,40,30,0.10), 0 2px 8px rgba(0,0,0,0.04);}
 .order-card-v2::before{content:'';display:block;height:6px;background:linear-gradient(90deg, #0a7c3d, #17a854, #0a7c3d);background-size:200% auto;animation:ocShimmer 3.5s linear infinite;}
 .order-card-v2.status-en_cours::before{background:linear-gradient(90deg, #E0A526, #F0C158, #E0A526);background-size:200% auto;}
@@ -983,6 +1022,9 @@ textarea.admin-ta{
     html:not(.dark) #supportChatBg [style*="background:rgba(255,255,255,0.06)"]{background:#f3f7f4 !important;border-color:#d5e4da !important;}
     html:not(.dark) #supportChatBg [style*="background:rgba(255,255,255,0.08)"]{background:#eaf1ec !important;}
     html:not(.dark) #supportChatBg [style*="background:rgba(255,255,255,0.07)"]{background:#f1f5f2 !important;border-color:#dbe8df !important;box-shadow:none !important;}
+    html:not(.dark) #supportChatBg #supportChatInput{color:#10241a !important;-webkit-text-fill-color:#10241a !important;caret-color:#0a9e3d;}
+    html:not(.dark) #supportChatBg #supportChatInput::placeholder{color:#6b7a6e !important;opacity:1;}
+    html:not(.dark) #supportChatBg #supportChatInput, html:not(.dark) #supportChatBg textarea, html:not(.dark) #supportChatBg input[type=text]{color:#10241a !important;}
     html:not(.dark) #supportChatBg #supportModelMenu{background:#fff !important;box-shadow:0 12px 30px rgba(0,0,0,0.15) !important;}
     @keyframes ktcFloat{0%,100%{transform:translateY(0) scale(1);opacity:0.22;}50%{transform:translateY(-22px) scale(1.25);opacity:0.5;}}
     @keyframes ktcFloat2{0%,100%{transform:translateY(0) rotate(0deg);opacity:0.16;}50%{transform:translateY(-30px) rotate(12deg);opacity:0.38;}}
@@ -1376,7 +1418,7 @@ const TRANSLATIONS = {
     notif_admin_replied_title:'Admin reponn kòmand #{n}',
     checkout_title:'Kòmande', reseller_tagline:'Platfòm konfyans ou pou revann rechaj jwèt yo — rapid, san tèt chaje, ak pi bon pri sou mache a.',
     reseller_no_access_title:'Ou pa gen aksè API', reseller_no_access_desc:'Kontakte Admin Kerry Topup pou mande aksè founisè.', reseller_whatsapp_contact:'💬 Kontakte sou WhatsApp',
-    reseller_access_suffix:'— Accès API', reseller_connected_as_prefix:'Konekte kòm',
+    reseller_access_suffix:'— Aksè API', reseller_connected_as_prefix:'Konekte kòm',
     api_loading_key:'Ap chaje kle API ou...', api_access_heading:'🔑 Aksè API', api_test_connection_btn:'🛰️ Teste koneksyon an',
     api_regen_cooldown_prefix:'🔄 Reyinisyalizasyon nan', api_regen_cta:'▶ Régénérer les idantifyan yo',
     api_recent_orders_heading:'📦 Kòmand resan yo', api_no_orders_yet:'Pa gen kòmand atravè API a poko.',
@@ -7246,6 +7288,21 @@ function refreshHistoriqueView(){
 }
 let historiqueExpanded = false;
 const HISTORIQUE_VISIBLE_COUNT = 5;
+const KT2_L = {
+  ht:{today:'Jodi a',yest:'Yè',in:'Total rechaj',out:'Total depans',tx:'tranzaksyon',rc:'rechaj'},
+  fr:{today:"Aujourd'hui",yest:'Hier',in:'Total rechargé',out:'Total dépensé',tx:'transactions',rc:'recharges'},
+  en:{today:'Today',yest:'Yesterday',in:'Total recharged',out:'Total spent',tx:'transactions',rc:'recharges'},
+  es:{today:'Hoy',yest:'Ayer',in:'Total recargado',out:'Total gastado',tx:'transacciones',rc:'recargas'}
+};
+function kt2L(k){ return (KT2_L[currentLang] || KT2_L.fr)[k]; }
+function kt2DayLabel(d){
+  const dt = new Date(d); const n = new Date();
+  const ymd = x => x.getFullYear()*10000 + (x.getMonth()+1)*100 + x.getDate();
+  const y = new Date(n.getTime() - 86400000);
+  if(ymd(dt) === ymd(n)) return kt2L('today');
+  if(ymd(dt) === ymd(y)) return kt2L('yest');
+  return dt.toLocaleDateString(ktLocale(), { day:'2-digit', month:'long', year:'numeric' });
+}
 function pageHistorique(onlyRecharges){
   const allTxs = state.transactions[state.currentUserId] || [];
   const isDeposit = t => t.isDepositCategory === true || (t.type === 'in' && (/rechaj/i.test(t.label||'') || /bonus/i.test(t.label||'') || /ajistman admin \(kredi/i.test(t.label||'')));
@@ -7256,14 +7313,14 @@ function pageHistorique(onlyRecharges){
   const countLabel = onlyRecharges ? t('count_recharges') : t('count_transactions');
   return `
     <div class="card" style="padding:0;overflow:hidden;">
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 22px 16px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <div style="width:30px;height:30px;border-radius:9px;background:var(--panel-2);display:flex;align-items:center;justify-content:center;color:var(--text);flex-shrink:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:22px 20px 18px;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+          <div style="width:36px;height:36px;border-radius:11px;box-shadow:inset 0 0 0 1px rgba(20,24,28,.06);background:linear-gradient(135deg,#f4f7f5,#eef1ef);display:flex;align-items:center;justify-content:center;color:var(--text);flex-shrink:0;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3.5 2"/></svg>
           </div>
-          <div style="font-weight:800;font-size:14px;letter-spacing:0.03em;">${titleText}</div>
+          <div style="font-weight:800;font-size:14px;letter-spacing:0.2px;white-space:nowrap;">${titleText}</div>
         </div>
-        <span style="background:linear-gradient(135deg, #d8f5e2, #b8ecc9);color:#0a7c3d;font-weight:700;font-size:12.5px;padding:7px 14px;border-radius:30px;white-space:nowrap;">${txs.length} ${countLabel}</span>
+        <span style="background:linear-gradient(135deg, #d8f5e2, #b8ecc9);color:#0a7c3d;font-weight:800;font-size:12px;padding:8px 13px;border-radius:30px;white-space:nowrap;flex-shrink:0;box-shadow:0 4px 12px rgba(10,124,61,.12);">${txs.length} ${countLabel}</span>
       </div>
       ${txs.length===0 ? `<div class="empty"><div class="em-icon">📭</div><div class="em-title">${t('no_x_yet')} ${countLabel}</div></div>` : `
         <div>
@@ -7273,23 +7330,23 @@ function pageHistorique(onlyRecharges){
             const hasProof = isRechargeType && t.txnId;
             const clickAttr = hasProof ? `onclick="openRechargeProof(${allTxs.indexOf(t)})"` : '';
             return `
-            <div ${clickAttr} style="display:flex;flex-wrap:nowrap;align-items:center;gap:14px;padding:15px 22px;border-top:1px solid #f2f4f3;${hasProof?'cursor:pointer;':''}">
-              <div class="tx-icon-v2" style="flex-shrink:0;width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;${t.type==='in'?'background:linear-gradient(135deg, #3fce7c, #17a854);':'background:#1b1f1d;'}color:#fff;">
+            <div ${clickAttr} style="display:flex;flex-wrap:nowrap;align-items:center;gap:16px;padding:17px 24px;border-top:1px solid #f2f4f3;${hasProof?'cursor:pointer;':''}">
+              <div class="tx-icon-v2" style="flex-shrink:0;width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;${t.type==='in'?'background:linear-gradient(145deg,#4fe08c,#0a9e3d);box-shadow:0 8px 18px rgba(10,158,61,.3),inset 0 2px 3px rgba(255,255,255,.3),inset 0 -3px 6px rgba(0,0,0,.15);':'background:linear-gradient(145deg,#3a4249,#171b1e);box-shadow:0 8px 18px rgba(20,24,28,.28),inset 0 2px 3px rgba(255,255,255,.1),inset 0 -3px 6px rgba(0,0,0,.25);'}color:#fff;">
                 ${isTransferTx ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h15M15 4l4 4-4 4"/><path d="M20 16H5M9 12l-4 4 4 4"/></svg>' : isRechargeType ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>' : (t.type==='in'?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M6 13l6 6 6-6"/></svg>':'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 19V5M6 11l6-6 6 6"/></svg>')}
               </div>
               <div style="flex:1 1 0%;min-width:0;">
-                <div style="font-weight:700;font-size:14.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.txnId ? escapeHtml(t.txnId) : (isRechargeType ? window.t('admin_added') : escapeHtml(ktTranslateTxLabel(t.label)))}</div>
-                <div style="color:#9aa39d;font-size:12px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${new Date(t.date).toLocaleDateString(ktLocale())} · ${new Date(t.date).toLocaleTimeString(ktLocale(),{hour:'2-digit',minute:'2-digit'})}</div>
+                <div style="font-weight:700;font-size:14.5px;color:#14181c;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.txnId ? escapeHtml(t.txnId) : (isRechargeType ? window.t('admin_added') : escapeHtml(ktTranslateTxLabel(t.label)))}</div>
+                <div style="color:#9aa39d;font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${new Date(t.date).toLocaleDateString(ktLocale())} · ${new Date(t.date).toLocaleTimeString(ktLocale(),{hour:'2-digit',minute:'2-digit'})}</div>
               </div>
               <div style="text-align:right;flex-shrink:0;white-space:nowrap;">
-                <span style="color:${t.type==='in'?'#0a9e3d':'#e0304a'};font-weight:800;font-size:16px;">${t.type==='in'?'+':'-'}${t.amount.toLocaleString('fr-FR')}</span>
-                <span style="color:#9aa39d;font-weight:600;font-size:11.5px;margin-left:3px;">HTG</span>
+                <span style="color:${t.type==='in'?'#0a9e3d':'#e5484d'};font-weight:800;font-size:17px;letter-spacing:-.3px;">${t.type==='in'?'+':'-'}${t.amount.toLocaleString('fr-FR')}</span>
+                <span style="color:#9aa39d;font-weight:700;font-size:11px;margin-left:3px;">HTG</span>
               </div>
             </div>
           `;}).join('')}
         </div>
         ${remaining > 0 ? `
-          <button onclick="historiqueExpanded=!historiqueExpanded;refreshHistoriqueView();" style="width:100%;display:flex;align-items:center;justify-content:center;gap:6px;padding:16px;color:#0a9e3d;font-weight:700;font-size:13.5px;background:none;border:none;border-top:1px solid #f2f4f3;cursor:pointer;">
+          <button onclick="historiqueExpanded=!historiqueExpanded;refreshHistoriqueView();" style="width:100%;display:flex;align-items:center;justify-content:center;gap:7px;padding:18px;color:#0a9e3d;font-weight:700;font-size:13.5px;background:none;border:none;border-top:1px solid #f2f4f3;cursor:pointer;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" style="transition:transform 0.2s;transform:rotate(${historiqueExpanded?'180deg':'0deg'});"><path d="M7 10l5 5 5-5z"/></svg>
             ${historiqueExpanded ? t('show_less') : t('show_x_more').replace('{n}', remaining).replace('{label}', countLabel)}
           </button>
@@ -7351,7 +7408,17 @@ async function fetchApiOrders(){
       id:o.id, orderNo:o.order_no, product:o.product, variant:o.variant, price:Number(o.price),
       status:o.status, date:o.created_at
     }));
+    const r2 = await sb.from('orders').select('status,price,created_at').eq('api_client_id', state.apiClient.id).limit(10000);
+    if(!r2.error) state.apiStatRows = (r2.data||[]).map(o => ({status:o.status, price:Number(o.price||0), date:o.created_at}));
   }catch(e){ console.warn('fetchApiOrders exception:', e?.message||e); }
+}
+function apiResetKey(){ return 'kt_api_reset_' + (state.apiClient ? state.apiClient.id : ''); }
+function apiResetAt(){ try{ return localStorage.getItem(apiResetKey()) || ''; }catch(e){ return ''; } }
+function resetApiStats(){
+  const msg = {ht:'Réinitialiser estatistik yo? (Kòmand yo pa efase, se konte a selman ki reyinisyalize.)',fr:'Réinitialiser les statistiques ? (Les commandes ne sont pas supprimées, seuls les compteurs sont remis à zéro.)',en:'Reset the statistics to zero? (Orders are not deleted, only the counters.)',es:'¿Reiniciar las estadísticas a cero? (Los pedidos no se borran, solo los contadores.)'}[currentLang] || 'Reset statistics to zero?';
+  if(!confirm(msg)) return;
+  try{ localStorage.setItem(apiResetKey(), new Date().toISOString()); }catch(e){}
+  render();
 }
 function toggleApiFieldVisibility(field){
   const el = document.getElementById('apiField-'+field);
@@ -7638,28 +7705,37 @@ function pageApiSupplier(){
   };
   const resellerName = c && c.resellerName ? c.resellerName : 'Revandè';
   const initials = resellerName.split(' ').map(w=>w[0]).filter(Boolean).slice(0,2).join('').toUpperCase() || 'KT';
+  const rstAt = apiResetAt();
+  const statRows = (state.apiStatRows || orders).filter(o => !rstAt || new Date(o.date) > new Date(rstAt));
+  const totalCount = statRows.length;
+  const okCount = statRows.filter(o => o.status === 'terminee').length;
+  const failCount = statRows.filter(o => o.status === 'annulee' || o.status === 'remboursee').length;
+  const spent = statRows.filter(o => o.status === 'terminee').reduce((a,o) => a + Number(o.price||0), 0);
+  const K2A = (({ht:{ord:'Total kòmand',ok:'Reyisi',ko:'Anile',spent:'Total depanse',reset:'Réinitialiser',recent:'Dènye kòmand API'},fr:{ord:'Total commandes',ok:'Réussies',ko:'Annulées',spent:'Total dépensé',reset:'Réinitialiser',recent:'Dernières commandes API'},en:{ord:'Total orders',ok:'Successful',ko:'Canceled',spent:'Total spent',reset:'Reset',recent:'Latest API orders'},es:{ord:'Total pedidos',ok:'Exitosos',ko:'Cancelados',spent:'Total gastado',reset:'Reiniciar',recent:'Últimos pedidos API'}})[currentLang]) || {ord:'Total orders',ok:'Successful',ko:'Canceled',spent:'Total spent',reset:'Reset',recent:'Latest API orders'};
   return `
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
-    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:16px;">${escapeHtml(initials)}</div>
-    <div>
-      <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">${escapeHtml(resellerName)} ${t('reseller_access_suffix')}</div>
-      <div style="color:var(--muted);font-size:11px;">${t('reseller_connected_as_prefix')} ${escapeHtml(resellerName)}</div>
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+    <div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#3fce7c,#0a9e3d);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:18px;box-shadow:0 8px 18px rgba(10,158,61,.3);">${escapeHtml(initials)}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(resellerName)}</div>
+      <div style="color:var(--muted);font-size:12px;">${t('reseller_access_suffix').replace(/^—\s*/,'')}</div>
     </div>
+    <span style="background:#e1f6e8;color:#0a8a3a;font-weight:800;font-size:11px;padding:6px 11px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;"><i style="width:7px;height:7px;border-radius:50%;background:#17a854;display:inline-block;"></i>${t('badge_active')}</span>
   </div>
 
-  <div style="background:linear-gradient(135deg,#0a9e3d,#0d5c2b);border-radius:22px;padding:3px;margin-bottom:14px;box-shadow:0 16px 34px rgba(10,20,15,0.28);">
-  <div style="position:relative;border-radius:20px;padding:24px 22px;overflow:hidden;background:rgba(255,255,255,0.12);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.25);color:#fff;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
-      <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.06em;">
-        <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:15px;">💳</div>
-        ${t('wallet_reseller_label')}
-      </div>
-      <div style="font-size:10.5px;color:#fff;font-weight:700;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;margin-right:6px;box-shadow:0 0 0 3px rgba(255,255,255,0.25);"></span>${t('badge_active')}</div>
-    </div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">${t('wallet_balance')}</div>
-    <div style="font-size:34px;font-weight:900;letter-spacing:-0.5px;">${money(walletBalance())}</div>
+  <div style="position:relative;overflow:hidden;border-radius:22px;padding:22px 22px 20px;margin-bottom:12px;color:#fff;background:radial-gradient(120% 90% at 105% -10%,rgba(255,255,255,0.32),transparent 55%),linear-gradient(135deg,#3fce7c 0%,#0a9e3d 55%,#086e2c 100%);box-shadow:0 18px 40px rgba(10,158,61,0.32);">
+    <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:8px;">💳 ${t('wallet_reseller_label')}</div>
+    <div style="font-size:36px;font-weight:900;letter-spacing:-1px;margin:10px 0 2px;text-shadow:0 2px 12px rgba(0,0,0,.2);">${money(walletBalance()).replace(' HTG','').trim()} <span style="font-size:16px;font-weight:700;opacity:.9;">HTG</span></div>
+    <div style="font-size:11.5px;color:rgba(255,255,255,.85);font-weight:600;">${t('wallet_balance')}</div>
+    <button onclick="walletTab='recharge';goPage('wallet')" style="margin-top:14px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:999px;padding:8px 16px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;">+ ${t('tab_recharge')}</button>
   </div>
+
+  <div class="kt2-stats">
+    <div><b>${totalCount}</b><small>${K2A.ord}</small></div>
+    <div><b style="color:#0a9e3d;">${okCount}</b><small>${K2A.ok}</small></div>
+    <div><b style="color:#e11d48;">${failCount}</b><small>${K2A.ko}</small></div>
+    <div><b>${spent.toLocaleString('fr-FR')}</b><small>${K2A.spent} (HTG)</small></div>
   </div>
+  <button onclick="resetApiStats()" style="display:block;margin:-4px 0 14px auto;background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:6px 14px;font-size:11.5px;font-weight:700;cursor:pointer;font-family:inherit;">↺ ${K2A.reset}</button>
 
   ${!c ? `<div class="card"><div style="text-align:center;color:var(--muted);padding:20px;">${t('api_loading_key')}</div></div>` : `
   <div class="card" style="margin-bottom:14px;">
@@ -7691,30 +7767,17 @@ function pageApiSupplier(){
     })()}
   </div>
 
-  <div class="card">
-    <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px;">${t('api_recent_orders_heading')}</div>
-    ${orders.length===0 ? `<div style="text-align:center;color:var(--muted);padding:16px 0;font-size:13px;">${t('api_no_orders_yet')}</div>` : `
-    <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;font-size:12px;">
-      <thead><tr>
-        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_product')}</th>
-        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_total')}</th>
-        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_status')}</th>
-        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_date')}</th>
-      </tr></thead>
-      <tbody>
-        ${orders.map(o => `
-          <tr>
-            <td style="padding:9px 6px;border-bottom:1px solid var(--line);">${escapeHtml(o.product)} — ${escapeHtml(o.variant)}</td>
-            <td style="padding:9px 6px;border-bottom:1px solid var(--line);">${money(o.price)}</td>
-            <td style="padding:9px 6px;border-bottom:1px solid var(--line);">${statusBadge(o.status)}</td>
-            <td style="padding:9px 6px;border-bottom:1px solid var(--line);color:var(--muted);">${new Date(o.date).toLocaleDateString('fr-FR')}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-    </div>
-    `}
+  <div class="kt2-card">
+    <div class="kt2-head"><h3><i>📦</i>${K2A.recent}</h3></div>
+    ${orders.length===0 ? `<div style="text-align:center;color:var(--muted);padding:18px 0 22px;font-size:13px;">${t('api_no_orders_yet')}</div>` : orders.map(o => {
+      const sc = o.status==='terminee' ? 'terminee' : (o.status==='en_cours' ? 'en_cours' : 'anile');
+      const dt = new Date(o.date);
+      return `<div class="kt2-row">
+        <div class="kt2-ico ${sc==='anile'?'out':''}">${sc==='anile'?'↩️':(/gift|pin/i.test(o.product||'')?'🎟️':'💎')}</div>
+        <div class="kt2-t"><b>${escapeHtml(o.product)}</b><span>${escapeHtml(o.variant||'')} · ${dt.toLocaleDateString(ktLocale(),{day:'2-digit',month:'short'})} ${dt.toLocaleTimeString(ktLocale(),{hour:'2-digit',minute:'2-digit'})}</span></div>
+        <div style="text-align:right;flex-shrink:0;"><div class="kt2-amt" style="color:${sc==='anile'?'#e0304a':'var(--text)'};">${Number(o.price||0).toLocaleString('fr-FR')}<small>HTG</small></div><span class="kt2-bd ${sc}">${statusLabel(o.status)||o.status}</span></div>
+      </div>`;
+    }).join('')}
   </div>
   `}
   `;
@@ -15193,33 +15256,75 @@ if('serviceWorker' in navigator){
 function isAlreadyInstalled(){
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
+const KT_INSTALL_COOLDOWN_DAYS = 7;
+function isIOSDevice(){
+  const ua = navigator.userAgent || '';
+  return /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+}
+function installDismissedRecently(){
+  try{
+    const t0 = Number(localStorage.getItem('kt_install_dismissed_at') || 0);
+    return t0 && (Date.now() - t0) < KT_INSTALL_COOLDOWN_DAYS * 86400000;
+  }catch(e){ return false; }
+}
 function showInstallBannerIfEligible(){
   if(isAlreadyInstalled()) return;
-  if(!deferredInstallPrompt) return;
+  if(installDismissedRecently()) return;
+  if(!deferredInstallPrompt && !isIOSDevice()) return;
   const banner = document.getElementById('installBanner');
   if(banner) banner.style.display = 'flex';
 }
 window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredInstallPrompt = e;
-  showInstallBannerIfEligible();
+  setTimeout(showInstallBannerIfEligible, 6000);
 });
+if(isIOSDevice()) setTimeout(showInstallBannerIfEligible, 6000);
 window.addEventListener('appinstalled', () => {
   const banner = document.getElementById('installBanner');
   if(banner) banner.style.display = 'none';
   deferredInstallPrompt = null;
+  try{ localStorage.setItem('kt_install_dismissed_at', String(Date.now()+365*86400000)); }catch(e){}
 });
+const KT_IOS_L = {
+  ht:{t:'Enstale Kerry Topup sou iPhone',s1:'Peze bouton Pataje',s2:'Chwazi "Ajoute sou ekran dakèy"',s3:'Peze "Ajoute"',ok:'Mwen konprann',n:'Si w pa wè l, louvri sit la nan Safari.'},
+  fr:{t:'Installer Kerry Topup sur iPhone',s1:'Appuyez sur le bouton Partager',s2:'Choisissez « Sur l’écran d’accueil »',s3:'Appuyez sur « Ajouter »',ok:'Compris',n:'Si vous ne le voyez pas, ouvrez le site dans Safari.'},
+  en:{t:'Install Kerry Topup on iPhone',s1:'Tap the Share button',s2:'Choose “Add to Home Screen”',s3:'Tap “Add”',ok:'Got it',n:'If you don’t see it, open the site in Safari.'},
+  es:{t:'Instalar Kerry Topup en iPhone',s1:'Toca el botón Compartir',s2:'Elige «Añadir a pantalla de inicio»',s3:'Toca «Añadir»',ok:'Entendido',n:'Si no lo ves, abre el sitio en Safari.'}
+};
+function showIOSInstallHelp(){
+  const L = KT_IOS_L[currentLang] || KT_IOS_L.en;
+  let m = document.getElementById('ktIosInstall');
+  if(m) m.remove();
+  m = document.createElement('div');
+  m.id = 'ktIosInstall';
+  m.style.cssText = 'position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;';
+  m.onclick = (e)=>{ if(e.target===m) m.remove(); };
+  m.innerHTML = `<div style="background:#fff;color:#10241a;width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));">
+    <div style="font-weight:800;font-size:17px;margin-bottom:14px;">${L.t}</div>
+    ${[['1','⬆️',L.s1],['2','➕',L.s2],['3','✅',L.s3]].map(r=>`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #e3ebe5;"><span style="width:28px;height:28px;border-radius:50%;background:#e8f7ec;color:#0f7a37;font-weight:800;display:grid;place-items:center;flex:none;">${r[0]}</span><span style="font-size:14px;font-weight:600;flex:1;">${r[2]}</span><span style="font-size:20px;">${r[1]}</span></div>`).join('')}
+    <div style="font-size:12px;color:#6b7d72;margin:10px 0 14px;">${L.n}</div>
+    <button onclick="document.getElementById('ktIosInstall').remove()" style="width:100%;padding:13px;border:0;border-radius:14px;background:#00D26A;color:#fff;font-weight:800;font-size:14px;">${L.ok}</button>
+  </div>`;
+  document.body.appendChild(m);
+}
 async function triggerPWAInstall(){
   const banner = document.getElementById('installBanner');
-  if(!deferredInstallPrompt){ if(banner) banner.style.display = 'none'; return; }
+  if(!deferredInstallPrompt){
+    if(isIOSDevice()){ showIOSInstallHelp(); return; }
+    if(banner) banner.style.display = 'none';
+    return;
+  }
   deferredInstallPrompt.prompt();
   const choice = await deferredInstallPrompt.userChoice;
   deferredInstallPrompt = null;
   if(banner) banner.style.display = 'none';
+  if(!choice || choice.outcome !== 'accepted'){ try{ localStorage.setItem('kt_install_dismissed_at', String(Date.now())); }catch(e){} }
 }
 function dismissInstallBanner(){
   const banner = document.getElementById('installBanner');
   if(banner) banner.style.display = 'none';
+  try{ localStorage.setItem('kt_install_dismissed_at', String(Date.now())); }catch(e){}
 }
 setupPWAManifest();
 registerServiceWorker();
