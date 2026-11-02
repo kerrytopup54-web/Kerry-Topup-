@@ -526,6 +526,33 @@ html.dark .nav-btn.active .icon-wrap{border-color:#161b22;}
 .toast .t-tx{flex:1;min-width:0;word-break:break-word;}
 @media (prefers-color-scheme:dark){ .toast{background:#18211c;color:#eaf5ee;border-color:rgba(255,255,255,0.08);} }
 
+
+/* Toast v3 — kat modèn: ikòn gradyan, tit, mesaj, ba pwogresyon */
+.toast{
+  top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 92px);left:50%;width:calc(100% - 28px);max-width:420px;
+  transform:translateX(-50%) translateY(28px) scale(.97);opacity:0;
+  display:flex;align-items:center;gap:13px;text-align:left;position:fixed;overflow:hidden;
+  background:rgba(255,255,255,.97);color:#10241a;border:1px solid rgba(15,30,22,.06);border-left:0 !important;
+  border-radius:20px;padding:13px 16px 15px 13px;font-size:13.5px;font-weight:500;line-height:1.4;
+  box-shadow:0 18px 44px rgba(10,30,20,.22),0 2px 8px rgba(10,30,20,.08);backdrop-filter:blur(12px);
+  transition:opacity .28s ease, transform .42s cubic-bezier(.2,1.2,.3,1);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0) scale(1);}
+.toast .t-ic{width:42px;height:42px;border-radius:14px;color:#fff;font-size:0;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-style:normal;font-family:inherit;
+  background:linear-gradient(145deg,#4fe08c,#0a9e3d);box-shadow:0 6px 14px rgba(10,158,61,.35),inset 0 2px 3px rgba(255,255,255,.35);}
+.toast.err .t-ic{background:linear-gradient(145deg,#ff7a7f,#e5484d);box-shadow:0 6px 14px rgba(229,72,77,.35),inset 0 2px 3px rgba(255,255,255,.35);}
+.toast.warn .t-ic{background:linear-gradient(145deg,#ffc15a,#f5a623);box-shadow:0 6px 14px rgba(245,166,35,.35),inset 0 2px 3px rgba(255,255,255,.35);}
+.toast.info .t-ic{background:linear-gradient(145deg,#6aa8ff,#3b82f6);box-shadow:0 6px 14px rgba(59,130,246,.35),inset 0 2px 3px rgba(255,255,255,.35);font-size:0;}
+.toast .t-ic svg{width:22px;height:22px;}
+.toast .t-tx{flex:1;min-width:0;word-break:break-word;}
+.toast .t-ti{display:block;font-weight:800;font-size:14px;letter-spacing:-.1px;margin-bottom:1px;}
+.toast .t-ms{display:block;color:#4d6457;font-weight:500;font-size:13px;}
+.toast .t-bar{position:absolute;left:0;bottom:0;height:3.5px;width:100%;background:#0a9e3d;transform-origin:left;transform:scaleX(1);opacity:.85;}
+.toast.err .t-bar{background:#e5484d;}.toast.warn .t-bar{background:#f5a623;}.toast.info .t-bar{background:#3b82f6;}
+.toast.show .t-bar{animation:ktToastBar var(--td,3s) linear forwards;}
+@keyframes ktToastBar{to{transform:scaleX(0);}}
+@media (prefers-color-scheme:dark){ .toast{background:rgba(24,33,28,.97);color:#eaf5ee;border-color:rgba(255,255,255,.08);} .toast .t-ms{color:#a9c2b3;} }
+
 .empty{text-align:center;padding:50px 20px;color:var(--muted);}
 .empty .em-icon{font-size:34px;margin-bottom:10px;}
 .empty .em-title{font-family:'Rajdhani',sans-serif;font-size:16px;color:var(--text);margin-bottom:4px;}
@@ -1052,7 +1079,7 @@ textarea.admin-ta{
     </div>
     <script>document.getElementById('supportChatHeaderLogo').src=window.KT_LOGO_SRC;</script>
     <div style="flex:1;min-width:0;">
-      <div style="font-weight:800;font-size:15.5px;"><span id="supportBotName">Touski Bot</span> <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:4px;">👤 Kerry Cadet en ligne</span></div>
+      <div style="font-weight:800;font-size:15.5px;"><span id="supportBotName">Mes toutous 🐶</span> <span id="supportModeLabel" style="display:none;font-size:10px;font-weight:700;background:#E3EEFC;color:#1565D8;padding:2px 8px;border-radius:8px;margin-left:4px;"></span></div>
       <div style="font-size:11.5px;display:flex;align-items:center;gap:5px;margin-top:1px;opacity:0.92;"><span style="width:6px;height:6px;border-radius:50%;background:#B6FFCF;"></span><span data-i18n="chat_status_online">An liy</span></div>
     </div>
   </div>
@@ -1075,6 +1102,11 @@ textarea.admin-ta{
         <span style="font-size:22px;">🐕</span>
         <span style="flex:1;min-width:0;"><span style="display:block;font-weight:800;font-size:14px;">Foulon <span style="color:#93b1a1;font-weight:600;">7.5</span></span><span id="personaDescFoulon" style="display:block;font-size:11.5px;color:#93b1a1;margin-top:1px;"></span></span>
         <span id="personaCheckFoulon" style="color:#3fce7c;font-weight:900;"></span>
+      </button>
+      <button onclick="pickSupportPersona('titipiti')" style="width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:11px 12px;border:none;border-radius:12px;background:transparent;color:#e8f5ec;cursor:pointer;font-family:inherit;">
+        <span style="font-size:22px;">🐶</span>
+        <span style="flex:1;min-width:0;"><span style="display:block;font-weight:800;font-size:14px;">Ti piti <span style="color:#93b1a1;font-weight:600;">3.0</span></span><span id="personaDescTitipiti" style="display:block;font-size:11.5px;color:#93b1a1;margin-top:1px;"></span></span>
+        <span id="personaCheckTitipiti" style="color:#3fce7c;font-weight:900;"></span>
       </button>
     </div>
     <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(63,206,124,0.22);border-radius:26px;padding:10px 12px 10px 14px;">
@@ -1313,7 +1345,7 @@ const TRANSLATIONS = {
     settings_sub_guest:'Konekte pou jere kont ou', not_logged_title:'Ou pa konekte',
     not_logged_sub:'Konekte oswa kreye yon kont pou wè paramèt ou.', btn_login_create:'Konekte / Kreye Kont',
     settings_sub:'Jere kont ou', whatsapp_add_title:'Ajoute nimewo WhatsApp ou',
-    whatsapp_add_sub:'Pou nou ka idantifye w rapid lè w kontakte nou.',
+    whatsapp_add_sub:'Pou nou kapab kontakte w rapid si w jwenn yon pwoblèm nan sistèm lan.',
     label_email:'Email', label_password:'Modpas',
     notif_title:'Notifikasyon', notif_sub:'Resevwa yon alèt dirèkteman sou telefòn ou (kòmand fini, nouvo pwodwi, elatriye)',
     btn_enable_notif:'Aktive notifikasyon yo',
@@ -1425,7 +1457,7 @@ const TRANSLATIONS = {
     table_col_product:'Pwodwi', table_col_total:'Total', table_col_status:'Estati', table_col_date:'Dat',
     status_completed:'Konplete', status_pending:'An atant', status_failed:'Echwe',
     chat_header_title:'Sipò Kerry Topup', chat_status_online:'An liy', chat_input_placeholder:'Ekri kesyon ou...',
-    chat_greeting_open:"Bonjou ! Se mwen menm Touski Bot 🐶. Kijan m ka ede w jodi a ? (Rechaj, acha, PIN, elatriye)",
+    chat_greeting_open:"Bonjou ! Se mwen menm Mes toutous 🐶. Kijan m ka ede w jodi a ? (Rechaj, acha, PIN, elatriye)",
     chat_greeting_closed:"Bonjou e mèsi paske w kontakte nou 👋\n\nSèvis nou an fèmen kounye a. Nou disponib chak jou soti 8h00AM pou rive 8h30PM.\n\nOu ka kite mesaj ou ak imèl ou : n ap reponn ou de w nou louvri ankò.\n\nMèsi pou konfyans ou e a byento !",
     chat_recording_label:'Ap anrejistre mesaj vokal...', btn_back:'Retounen', toast_mic_denied:'Nou pa ka jwenn aksè mikwo a — verifye pèmisyon telefòn ou',
     toast_sending_voice:'Ap voye mesaj vokal la...', toast_voice_sent:'Mesaj vokal voye ✓',
@@ -1521,7 +1553,7 @@ const TRANSLATIONS = {
     settings_sub_guest:'Connectez-vous pour gérer votre compte', not_logged_title:'Vous n\'êtes pas connecté',
     not_logged_sub:'Connectez-vous ou créez un compte pour voir vos paramètres.', btn_login_create:'Se connecter / Créer un compte',
     settings_sub:'Gérez votre compte', whatsapp_add_title:'Ajoutez votre numéro WhatsApp',
-    whatsapp_add_sub:'Pour qu\'on puisse vous identifier rapidement quand vous nous contactez.',
+    whatsapp_add_sub:'Pour pouvoir vous contacter rapidement si vous rencontrez un problème dans le système.',
     label_email:'Email', label_password:'Mot de passe',
     notif_title:'Notifications', notif_sub:'Recevez une alerte directement sur votre téléphone (commande terminée, nouveaux produits, etc.)',
     btn_enable_notif:'Activer les notifications',
@@ -1633,7 +1665,7 @@ const TRANSLATIONS = {
     table_col_product:'Produit', table_col_total:'Total', table_col_status:'Statut', table_col_date:'Date',
     status_completed:'Terminée', status_pending:'En attente', status_failed:'Échouée',
     chat_header_title:'Support Kerry Topup', chat_status_online:'En ligne', chat_input_placeholder:'Écrivez votre question...',
-    chat_greeting_open:"Bonjour ! Je suis Touski Bot 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)",
+    chat_greeting_open:"Bonjour ! Je suis Mes toutous 🐶. Comment puis-je vous aider aujourd'hui ? (Recharge, achat, PIN, etc.)",
     chat_greeting_closed:"Bonjour et merci de nous avoir contactés 👋\n\nNotre service est actuellement fermé. Nous sommes disponibles tous les jours de 8h00AM à 8h30PM.\n\nN'hésitez pas à nous laisser votre message et votre email : nous y répondrons dès la réouverture.\n\nMerci de votre confiance et à très bientôt !",
     chat_recording_label:'Enregistrement du message vocal...', btn_back:'Retour', toast_mic_denied:'Impossible d\'accéder au micro — vérifiez les autorisations de votre téléphone',
     toast_sending_voice:'Envoi du message vocal...', toast_voice_sent:'Message vocal envoyé ✓',
@@ -1729,7 +1761,7 @@ const TRANSLATIONS = {
     settings_sub_guest:'Log in to manage your account', not_logged_title:'You are not logged in',
     not_logged_sub:'Log in or create an account to see your settings.', btn_login_create:'Log in / Create account',
     settings_sub:'Manage your account', whatsapp_add_title:'Add your WhatsApp number',
-    whatsapp_add_sub:'So we can identify you quickly when you contact us.',
+    whatsapp_add_sub:'So we can contact you quickly if you run into a problem with the system.',
     label_email:'Email', label_password:'Password',
     notif_title:'Notifications', notif_sub:'Get an alert directly on your phone (order completed, new products, etc.)',
     btn_enable_notif:'Enable notifications',
@@ -1841,7 +1873,7 @@ const TRANSLATIONS = {
     table_col_product:'Product', table_col_total:'Total', table_col_status:'Status', table_col_date:'Date',
     status_completed:'Completed', status_pending:'Pending', status_failed:'Failed',
     chat_header_title:'Kerry Topup Support', chat_status_online:'Online', chat_input_placeholder:'Type your question...',
-    chat_greeting_open:"Hello! I'm Touski Bot 🐶. How can I help you today? (Recharge, purchase, PIN, etc.)",
+    chat_greeting_open:"Hello! I'm Mes toutous 🐶. How can I help you today? (Recharge, purchase, PIN, etc.)",
     chat_greeting_closed:"Hello and thanks for contacting us 👋\n\nOur service is currently closed. We're available every day from 8:00AM to 8:30PM.\n\nFeel free to leave us your message and email: we'll reply as soon as we reopen.\n\nThank you for your trust, see you soon!",
     chat_recording_label:'Recording voice message...', btn_back:'Back', toast_mic_denied:'Can\'t access the microphone — check your phone permissions',
     toast_sending_voice:'Sending voice message...', toast_voice_sent:'Voice message sent ✓',
@@ -1937,7 +1969,7 @@ const TRANSLATIONS = {
     settings_sub_guest:'Inicia sesión para gestionar tu cuenta', not_logged_title:'No has iniciado sesión',
     not_logged_sub:'Inicia sesión o crea una cuenta para ver tus ajustes.', btn_login_create:'Iniciar sesión / Crear cuenta',
     settings_sub:'Gestiona tu cuenta', whatsapp_add_title:'Añade tu número de WhatsApp',
-    whatsapp_add_sub:'Para poder identificarte rápidamente cuando nos contactes.',
+    whatsapp_add_sub:'Para poder contactarte rápidamente si tienes un problema con el sistema.',
     label_email:'Correo', label_password:'Contraseña',
     notif_title:'Notificaciones', notif_sub:'Recibe una alerta directamente en tu teléfono (pedido completado, nuevos productos, etc.)',
     btn_enable_notif:'Activar notificaciones',
@@ -2049,7 +2081,7 @@ const TRANSLATIONS = {
     table_col_product:'Producto', table_col_total:'Total', table_col_status:'Estado', table_col_date:'Fecha',
     status_completed:'Completado', status_pending:'Pendiente', status_failed:'Fallido',
     chat_header_title:'Soporte Kerry Topup', chat_status_online:'En línea', chat_input_placeholder:'Escribe tu pregunta...',
-    chat_greeting_open:"¡Hola! Soy Touski Bot 🐶. ¿Cómo puedo ayudarte hoy? (Recarga, compra, PIN, etc.)",
+    chat_greeting_open:"¡Hola! Soy Mes toutous 🐶. ¿Cómo puedo ayudarte hoy? (Recarga, compra, PIN, etc.)",
     chat_greeting_closed:"Hola y gracias por contactarnos 👋\n\nNuestro servicio está cerrado en este momento. Estamos disponibles todos los días de 8:00AM a 8:30PM.\n\nNo dudes en dejarnos tu mensaje y tu correo: te responderemos en cuanto reabramos.\n\n¡Gracias por tu confianza, hasta pronto!",
     chat_recording_label:'Grabando mensaje de voz...', btn_back:'Volver', toast_mic_denied:'No podemos acceder al micrófono — revisa los permisos de tu teléfono',
     toast_sending_voice:'Enviando mensaje de voz...', toast_voice_sent:'Mensaje de voz enviado ✓',
@@ -2825,6 +2857,8 @@ async function getOrRestoreSupportConversation(){
     if(convo){
       supportConversationId = convo.id;
       state.supportAgentActive = convo.agent_active !== false;
+      state.supportAgentName = convo.agent_name || '';
+      updateAgentBadgeDisplay();
       const { data: msgs } = await sb.from('support_messages').select('*').eq('conversation_id', convo.id).order('created_at',{ascending:true});
       supportChatHistory = [];
       document.getElementById('supportChatMessages').innerHTML = '';
@@ -2956,7 +2990,9 @@ function confirmBroadcastToAllClients(){
     '"' + title + '" — ' + body,
     async () => {
       try{
+        const savedBc = await saveBroadcastMessage(title, body);
         await sendPushToAll(title, body, '/');
+        if(!savedBc) showToast('⚠️ Push voye, men mesaj la pa anrejistre nan ti kloch la');
         logActivity('Voye mesaj bay tout kliyan: ' + title);
         showToast('✅ Mesaj voye bay tout kliyan yo');
         const t1 = document.getElementById('broadcastTitle'); if(t1) t1.value = '';
@@ -2986,9 +3022,17 @@ async function applyReferralFirstPurchaseDiscount(userId, orderAmount){
     showToast('🎁 Rediksyon premye acha: +' + money(refundAmount));
   }catch(e){ console.warn('applyReferralFirstPurchaseDiscount exception:', e?.message||e); }
 }
+const KT_AGENT_ONLINE = {
+  ht:(n)=>`👤 ${n} an liy`,
+  fr:(n)=>`👤 ${n} est en ligne`,
+  en:(n)=>`👤 ${n} is online`,
+  es:(n)=>`👤 ${n} está en línea`
+};
 function updateAgentBadgeDisplay(){
   const label = document.getElementById('supportModeLabel');
   if(!label) return;
+  const nm = state.supportAgentName || 'Kerry Topup';
+  label.textContent = (KT_AGENT_ONLINE[currentLang] || KT_AGENT_ONLINE.en)(nm);
   label.style.display = state.supportAgentActive ? 'inline-block' : 'none';
 }
 
@@ -3008,6 +3052,7 @@ function subscribeToSupportMessages(conversationId){
       .on('postgres_changes', { event:'UPDATE', schema:'public', table:'support_messages', filter:'conversation_id=eq.'+conversationId }, (payload) => { applyRemoteSupportUpdate(payload.new); })
       .on('postgres_changes', { event:'UPDATE', schema:'public', table:'support_conversations', filter:'id=eq.'+conversationId }, (payload) => {
         state.supportAgentActive = payload.new.agent_active !== false;
+        state.supportAgentName = payload.new.agent_name || '';
         updateAgentBadgeDisplay();
       })
       .subscribe();
@@ -3043,7 +3088,7 @@ async function requestHumanAgent(){
       return;
     }
     supportConversationId = convo.id;
-    // supportMode rete 'bot' — Touski Bot kontinye reponn nòmalman, se sèlman yon "tracking" k ap kòmanse
+    // supportMode rete 'bot' — Mes toutous kontinye reponn nòmalman, se sèlman yon "tracking" k ap kòmanse
     if(!state.currentUserId) localStorage.setItem('kt_support_convo_id', convo.id);
 
     // Kopye TOUT istwa konvèsasyon an (Touski + kliyan) nan baz done a
@@ -3097,27 +3142,31 @@ async function toggleSupportChat(){
 
 /* ===== Chat: chwa "modèl" (Touski 5.5 / Foulon 7.5) ===== */
 let supportPersona = 'touski';
-try{ const sp = localStorage.getItem('kt_chat_persona'); if(sp === 'foulon' || sp === 'touski') supportPersona = sp; }catch(e){}
+try{ const sp = localStorage.getItem('kt_chat_persona'); if(sp === 'foulon' || sp === 'touski' || sp === 'titipiti') supportPersona = sp; }catch(e){}
 const PERSONA_TXT = {
-  ht:{ effort:'Mwayen', reply:'Reponn', touski:'Rapid, chalerè ak jwèt 🐶', foulon:'Kalm, detaye, etap pa etap', switched:(n)=>`— Kounya se ${n} k ap reponn ou —` },
-  fr:{ effort:'Moyen', reply:'Répondre à', touski:'Rapide, chaleureux et joueur 🐶', foulon:'Calme, détaillé, étape par étape', switched:(n)=>`— C'est maintenant ${n} qui vous répond —` },
-  en:{ effort:'Medium', reply:'Reply to', touski:'Quick, warm and playful 🐶', foulon:'Calm, detailed, step by step', switched:(n)=>`— ${n} is now answering you —` },
-  es:{ effort:'Medio', reply:'Responder a', touski:'Rápido, cálido y juguetón 🐶', foulon:'Calmado, detallado, paso a paso', switched:(n)=>`— Ahora te responde ${n} —` }
+  ht:{ effort:'Mwayen', reply:'Reponn', touski:'Rapid, chalerè ak jwèt 🐶', foulon:'Kalm, detaye, etap pa etap', titipiti:'Dous, senp, mo kout 🐾', switched:(n)=>`— Kounya se ${n} k ap reponn ou —` },
+  fr:{ effort:'Moyen', reply:'Répondre à', touski:'Rapide, chaleureux et joueur 🐶', foulon:'Calme, détaillé, étape par étape', titipiti:'Doux, simple, mots courts 🐾', switched:(n)=>`— C'est maintenant ${n} qui vous répond —` },
+  en:{ effort:'Medium', reply:'Reply to', touski:'Quick, warm and playful 🐶', foulon:'Calm, detailed, step by step', titipiti:'Gentle, simple, short words 🐾', switched:(n)=>`— ${n} is now answering you —` },
+  es:{ effort:'Medio', reply:'Responder a', touski:'Rápido, cálido y juguetón 🐶', foulon:'Calmado, detallado, paso a paso', titipiti:'Dulce, simple, palabras cortas 🐾', switched:(n)=>`— Ahora te responde ${n} —` }
 };
-function personaName(p){ return p === 'foulon' ? 'Foulon' : 'Touski'; }
+function personaName(p){ return p === 'foulon' ? 'Foulon' : p === 'titipiti' ? 'Ti piti' : 'Touski'; }
+function personaVersion(p){ return p === 'foulon' ? '7.5' : p === 'titipiti' ? '3.0' : '5.5'; }
 function applySupportPersonaUI(){
   const T = PERSONA_TXT[currentLang] || PERSONA_TXT.en;
   const nm = personaName(supportPersona);
   const set = (id, v) => { const el = document.getElementById(id); if(el) el.textContent = v; };
-  set('supportModelChipName', nm + ' ' + (supportPersona === 'foulon' ? '7.5' : '5.5'));
+  set('supportModelChipName', nm + ' ' + personaVersion(supportPersona));
   set('supportModelChipEffort', T.effort);
   const inp = document.getElementById('supportChatInput');
   if(inp) inp.placeholder = (T.reply || 'Reply to') + ' ' + nm + '...';
-  set('supportBotName', supportPersona === 'foulon' ? 'Foulon' : 'Touski Bot');
+  set('supportBotName', 'Mes toutous 🐶');
   set('personaDescTouski', T.touski);
   set('personaDescFoulon', T.foulon);
+  set('personaDescTitipiti', T.titipiti);
   set('personaCheckTouski', supportPersona === 'touski' ? '✓' : '');
   set('personaCheckFoulon', supportPersona === 'foulon' ? '✓' : '');
+  set('personaCheckTitipiti', supportPersona === 'titipiti' ? '✓' : '');
+  try{ updateAgentBadgeDisplay(); }catch(e){}
 }
 function toggleSupportModelMenu(ev){
   if(ev) ev.stopPropagation();
@@ -3145,6 +3194,9 @@ document.addEventListener('click', function(e){
   if(m && m.style.display === 'block' && !m.contains(e.target)) m.style.display = 'none';
 });
 function personaInstruction(){
+  if(supportPersona === 'titipiti'){
+    return "PERSONALITE: Non ou se Ti piti 🐶 (modèl 3.0). Ou se yon ti chen bebe dous, jantiy ak senp. Itilize mo kout ak fraz senp (1 a 3 fraz), ton dous ak chalerè, kèk emoji 🐶🐾 sèlman. Pa itilize mo konplike. Si kesyon an difisil, bay repons lan an kout epi pwopoze ede plis.";
+  }
   if(supportPersona === 'foulon'){
     return "PERSONALITE: Non ou se Foulon (modèl 7.5). Ou kalm, pwofesyonèl ak anpil pasyans. Reponn an detay, etap pa etap (1, 2, 3), ak yon ton respektye ak chalerè; kèk emoji sèlman. Verifye kliyan an konprann anvan ou fini.";
   }
@@ -3153,9 +3205,9 @@ function personaInstruction(){
 
 let supportChatLangChosen = true; // chwa lang nan chat la retire — bot la swiv lang kliyan an ekri
 function sendChatGreeting(){
-  const nm = supportPersona === 'foulon' ? 'Foulon' : 'Touski Bot';
+  const nm = personaName(supportPersona);
   if(isWithinBusinessHours()){
-    addSupportMessage('assistant', t('chat_greeting_open').replace(/Touski Bot/g, nm));
+    addSupportMessage('assistant', t('chat_greeting_open').replace(/Mes toutous/g, nm));
   } else {
     addSupportMessage('assistant', t('chat_greeting_closed'));
   }
@@ -3744,7 +3796,7 @@ async function sendSupportVoiceMessage(blob){
     const u = currentUser();
     const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
     const email = state.currentUserId ? ((u&&u.email)||'') : '';
-    sendNtfyNotification('🎤 Nouvo mesaj vokal kliyan (Touski Bot)', '👤 ' + name + '\n📧 ' + email + '\n▶️ Peze notifikasyon an pou tande mesaj la', 'default', 'microphone', url);
+    sendNtfyNotification('🎤 Nouvo mesaj vokal kliyan (Mes toutous)', '👤 ' + name + '\n📧 ' + email + '\n▶️ Peze notifikasyon an pou tande mesaj la', 'default', 'microphone', url);
   }
   if(supportConversationId){
     try{
@@ -3799,7 +3851,7 @@ async function sendSupportMessage(){
   const _txtRow = addSupportMessage('user', text);
 
   // Si sit la fèmen, kòmanse tracking imedyatman (pa tann 5 mesaj) e pa eseye reponn ak AI
-  // Kreye konvèsasyon an IMEDYATMAN ak premye mesaj la (pa tann Touski Bot reponn) — konsa admin toujou wè l
+  // Kreye konvèsasyon an IMEDYATMAN ak premye mesaj la (pa tann Mes toutous reponn) — konsa admin toujou wè l
   if(!supportConversationId){
     await requestHumanAgent();
   }
@@ -3809,7 +3861,7 @@ async function sendSupportMessage(){
     const u = currentUser();
     const name = state.currentUserId ? ((u&&u.name)||'Kliyan') : 'Kliyan (envite)';
     const email = state.currentUserId ? ((u&&u.email)||'') : '';
-    sendNtfyNotification('💬 Nouvo mesaj kliyan (Touski Bot)', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'default', 'speech_balloon');
+    sendNtfyNotification('💬 Nouvo mesaj kliyan (Mes toutous)', '👤 ' + name + '\n📧 ' + email + '\n💬 "' + text + '"', 'default', 'speech_balloon');
   }
 
   // Si tracking kòmanse (konvèsasyon eskalade), sove mesaj la nan Admin tou
@@ -3823,7 +3875,7 @@ async function sendSupportMessage(){
     }catch(e){ /* pa bloke chat la si tracking echwe */ }
   }
 
-  // Si sit la fèmen, oswa OU (Admin) pran kontwòl manyèlman, Touski Bot rete an silans
+  // Si sit la fèmen, oswa OU (Admin) pran kontwòl manyèlman, Mes toutous rete an silans
   if(!isWithinBusinessHours() || state.supportAgentActive) return;
 
   const thinking = document.createElement('div');
@@ -4780,8 +4832,19 @@ function showToast(msg, duration, skipNtfy){
     else kind = 'info';
     const clean = raw.replace(/^\s*(⚠️|✅|❌|🚫|🚨|ℹ️)\s*/,'');
     t.className = 'toast ' + kind;
-    t.innerHTML = '<span class="t-ic">' + (kind==='ok' ? '✅' : (kind==='err' ? '❌' : (kind==='warn' ? '⚠️' : 'i'))) + '</span><span class="t-tx"></span>';
-    t.querySelector('.t-tx').textContent = clean;
+    const TTL = { ht:{ok:'Siksè',err:'Erè',warn:'Atansyon',info:'Enfòmasyon'}, fr:{ok:'Succès',err:'Erreur',warn:'Attention',info:'Information'}, en:{ok:'Success',err:'Error',warn:'Warning',info:'Info'}, es:{ok:'Éxito',err:'Error',warn:'Atención',info:'Información'} };
+    const ICO = {
+      ok:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+      err:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+      warn:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 6v8"/><circle cx="12" cy="18.2" r="1.2" fill="#fff"/></svg>',
+      info:'<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M12 11v6"/><circle cx="12" cy="7" r="1.2" fill="#fff"/></svg>'
+    };
+    t.className = 'toast ' + kind;
+    t.style.setProperty('--td', ((duration || 3000) / 1000) + 's');
+    t.innerHTML = '<span class="t-ic">' + ICO[kind] + '</span><span class="t-tx"><span class="t-ti"></span><span class="t-ms"></span></span><span class="t-bar"></span>';
+    t.querySelector('.t-ti').textContent = (TTL[currentLang] || TTL.en)[kind];
+    t.querySelector('.t-ms').textContent = clean;
+    t.classList.remove('show');
     void t.offsetWidth;
     t.classList.add('show');
   }
@@ -5404,6 +5467,7 @@ async function doLogin(){
     }
     await syncLocalUserFromAuth(data.user);
     await saveState();
+    setTimeout(ktAccRememberCurrent, 300);
     closeAuthModal();
     showToast(t('toast_welcome_prefix') + ' ' + currentUser().name);
     afterAuthSuccess();
@@ -5903,14 +5967,45 @@ function getNotifItems(){
       items.push({ id:'mrev-'+r.id, cat:'transaction', status:'transaction', text: SN.rev(n, st, r.comment || ''), date:r.created_at });
     });
   }
+  // Mesaj admin voye bay tout kliyan (7 dènye jou)
+  (state.broadcasts || []).filter(b => b && b.date && new Date(b.date).getTime() >= Date.now() - 7*24*3600*1000).forEach(b => {
+    items.push({ id:'bc-'+b.id, cat:'admin', status:'response', text: (b.title ? b.title + '\n' : '') + (b.body || ''), date:b.date });
+  });
   return items.filter(n => !dismissed.includes(n.id)).sort((a,b) => new Date(b.date) - new Date(a.date));
+}
+async function fetchBroadcasts(){
+  try{
+    const sb = await getSupabase();
+    const { data } = await sb.from('site_content').select('content').eq('key','broadcast_messages').maybeSingle();
+    let arr = [];
+    try{ arr = JSON.parse((data && data.content) || '[]'); }catch(e){ arr = []; }
+    if(!Array.isArray(arr)) arr = [];
+    const sig = JSON.stringify(arr.map(x => x.id));
+    const changed = sig !== state._bcSig;
+    state._bcSig = sig; state.broadcasts = arr;
+    return changed;
+  }catch(e){ return false; }
+}
+async function saveBroadcastMessage(title, body){
+  try{
+    const sb = await getSupabase();
+    const { data } = await sb.from('site_content').select('content').eq('key','broadcast_messages').maybeSingle();
+    let arr = [];
+    try{ arr = JSON.parse((data && data.content) || '[]'); }catch(e){ arr = []; }
+    if(!Array.isArray(arr)) arr = [];
+    arr.unshift({ id: Date.now().toString(36), title, body, date: new Date().toISOString() });
+    arr = arr.slice(0, 20);
+    const { error } = await sb.from('site_content').upsert({ key:'broadcast_messages', content: JSON.stringify(arr), updated_at: new Date().toISOString() });
+    return !error;
+  }catch(e){ return false; }
 }
 async function fetchSellerNotifs(){
   if(!state.currentUserId) return false;
+  const bcChanged = await fetchBroadcasts();
   try{
     const sb = await getSupabase();
     const { data: ls, error } = await sb.from('game_account_listings').select('id, listing_name, rank, level, price, status, sold_at').eq('seller_id', state.currentUserId);
-    if(error || !ls) return false;
+    if(error || !ls) return bcChanged;
     const names = {}; ls.forEach(l => { names[l.id] = l.listing_name || (l.rank + ' — Niv ' + l.level); });
     let reviews = [];
     if(ls.length){
@@ -5921,8 +6016,8 @@ async function fetchSellerNotifs(){
     const sig = JSON.stringify([next.sold.map(l => l.id), next.reviews.map(r => r.id)]);
     const changed = sig !== state._sellerSig;
     state._sellerNotifs = next; state._sellerSig = sig;
-    return changed;
-  }catch(e){ return false; }
+    return changed || bcChanged;
+  }catch(e){ return bcChanged; }
 }
 function getUnseenNotifCount(){
   if(!state.seenNotifIds) state.seenNotifIds = [];
@@ -7711,22 +7806,28 @@ function pageApiSupplier(){
   const okCount = statRows.filter(o => o.status === 'terminee').length;
   const failCount = statRows.filter(o => o.status === 'annulee' || o.status === 'remboursee').length;
   const spent = statRows.filter(o => o.status === 'terminee').reduce((a,o) => a + Number(o.price||0), 0);
-  const K2A = (({ht:{ord:'Total kòmand',ok:'Reyisi',ko:'Anile',spent:'Total depanse',reset:'Réinitialiser',recent:'Dènye kòmand API'},fr:{ord:'Total commandes',ok:'Réussies',ko:'Annulées',spent:'Total dépensé',reset:'Réinitialiser',recent:'Dernières commandes API'},en:{ord:'Total orders',ok:'Successful',ko:'Canceled',spent:'Total spent',reset:'Reset',recent:'Latest API orders'},es:{ord:'Total pedidos',ok:'Exitosos',ko:'Cancelados',spent:'Total gastado',reset:'Reiniciar',recent:'Últimos pedidos API'}})[currentLang]) || {ord:'Total orders',ok:'Successful',ko:'Canceled',spent:'Total spent',reset:'Reset',recent:'Latest API orders'};
+  const K2A = (({ht:{ord:'Total kòmand',ok:'Reyisi',ko:'Anile',spent:'Total depanse',reset:'Réinitialiser'},fr:{ord:'Total commandes',ok:'Réussies',ko:'Annulées',spent:'Total dépensé',reset:'Réinitialiser'},en:{ord:'Total orders',ok:'Successful',ko:'Canceled',spent:'Total spent',reset:'Reset'},es:{ord:'Total pedidos',ok:'Exitosos',ko:'Cancelados',spent:'Total gastado',reset:'Reiniciar'}})[currentLang]) || {ord:'Total orders',ok:'Successful',ko:'Canceled',spent:'Total spent',reset:'Reset'};
   return `
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-    <div style="width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#3fce7c,#0a9e3d);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:18px;box-shadow:0 8px 18px rgba(10,158,61,.3);">${escapeHtml(initials)}</div>
-    <div style="flex:1;min-width:0;">
-      <div style="font-weight:800;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(resellerName)}</div>
-      <div style="color:var(--muted);font-size:12px;">${t('reseller_access_suffix').replace(/^—\s*/,'')}</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+    <div style="width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--green-2));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-family:'Rajdhani',sans-serif;font-size:16px;">${escapeHtml(initials)}</div>
+    <div>
+      <div style="font-family:'Rajdhani',sans-serif;font-weight:800;font-size:17px;">${escapeHtml(resellerName)} ${t('reseller_access_suffix')}</div>
+      <div style="color:var(--muted);font-size:11px;">${t('reseller_connected_as_prefix')} ${escapeHtml(resellerName)}</div>
     </div>
-    <span style="background:#e1f6e8;color:#0a8a3a;font-weight:800;font-size:11px;padding:6px 11px;border-radius:999px;display:inline-flex;align-items:center;gap:6px;"><i style="width:7px;height:7px;border-radius:50%;background:#17a854;display:inline-block;"></i>${t('badge_active')}</span>
   </div>
 
-  <div style="position:relative;overflow:hidden;border-radius:22px;padding:22px 22px 20px;margin-bottom:12px;color:#fff;background:radial-gradient(120% 90% at 105% -10%,rgba(255,255,255,0.32),transparent 55%),linear-gradient(135deg,#3fce7c 0%,#0a9e3d 55%,#086e2c 100%);box-shadow:0 18px 40px rgba(10,158,61,0.32);">
-    <div style="font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.85);display:flex;align-items:center;gap:8px;">💳 ${t('wallet_reseller_label')}</div>
-    <div style="font-size:36px;font-weight:900;letter-spacing:-1px;margin:10px 0 2px;text-shadow:0 2px 12px rgba(0,0,0,.2);">${money(walletBalance()).replace(' HTG','').trim()} <span style="font-size:16px;font-weight:700;opacity:.9;">HTG</span></div>
-    <div style="font-size:11.5px;color:rgba(255,255,255,.85);font-weight:600;">${t('wallet_balance')}</div>
-    <button onclick="walletTab='recharge';goPage('wallet')" style="margin-top:14px;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);color:#fff;border-radius:999px;padding:8px 16px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit;">+ ${t('tab_recharge')}</button>
+  <div style="background:linear-gradient(135deg,#0a9e3d,#0d5c2b);border-radius:22px;padding:3px;margin-bottom:14px;box-shadow:0 16px 34px rgba(10,20,15,0.28);">
+  <div style="position:relative;border-radius:20px;padding:24px 22px;overflow:hidden;background:rgba(255,255,255,0.12);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.25);color:#fff;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+      <div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.8);text-transform:uppercase;letter-spacing:0.06em;">
+        <div style="width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:15px;">💳</div>
+        ${t('wallet_reseller_label')}
+      </div>
+      <div style="font-size:10.5px;color:#fff;font-weight:700;"><span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;margin-right:6px;box-shadow:0 0 0 3px rgba(255,255,255,0.25);"></span>${t('badge_active')}</div>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:700;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;">${t('wallet_balance')}</div>
+    <div style="font-size:34px;font-weight:900;letter-spacing:-0.5px;">${money(walletBalance())}</div>
+  </div>
   </div>
 
   <div class="kt2-stats">
@@ -7767,17 +7868,30 @@ function pageApiSupplier(){
     })()}
   </div>
 
-  <div class="kt2-card">
-    <div class="kt2-head"><h3><i>📦</i>${K2A.recent}</h3></div>
-    ${orders.length===0 ? `<div style="text-align:center;color:var(--muted);padding:18px 0 22px;font-size:13px;">${t('api_no_orders_yet')}</div>` : orders.map(o => {
-      const sc = o.status==='terminee' ? 'terminee' : (o.status==='en_cours' ? 'en_cours' : 'anile');
-      const dt = new Date(o.date);
-      return `<div class="kt2-row">
-        <div class="kt2-ico ${sc==='anile'?'out':''}">${sc==='anile'?'↩️':(/gift|pin/i.test(o.product||'')?'🎟️':'💎')}</div>
-        <div class="kt2-t"><b>${escapeHtml(o.product)}</b><span>${escapeHtml(o.variant||'')} · ${dt.toLocaleDateString(ktLocale(),{day:'2-digit',month:'short'})} ${dt.toLocaleTimeString(ktLocale(),{hour:'2-digit',minute:'2-digit'})}</span></div>
-        <div style="text-align:right;flex-shrink:0;"><div class="kt2-amt" style="color:${sc==='anile'?'#e0304a':'var(--text)'};">${Number(o.price||0).toLocaleString('fr-FR')}<small>HTG</small></div><span class="kt2-bd ${sc}">${statusLabel(o.status)||o.status}</span></div>
-      </div>`;
-    }).join('')}
+  <div class="card">
+    <div style="font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;margin-bottom:12px;">${t('api_recent_orders_heading')}</div>
+    ${orders.length===0 ? `<div style="text-align:center;color:var(--muted);padding:16px 0;font-size:13px;">${t('api_no_orders_yet')}</div>` : `
+    <div style="overflow-x:auto;">
+    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+      <thead><tr>
+        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_product')}</th>
+        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_total')}</th>
+        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_status')}</th>
+        <th style="text-align:left;color:var(--muted);font-weight:700;font-size:10px;text-transform:uppercase;padding:6px;border-bottom:1px solid var(--line);">${t('table_col_date')}</th>
+      </tr></thead>
+      <tbody>
+        ${orders.map(o => `
+          <tr>
+            <td style="padding:9px 6px;border-bottom:1px solid var(--line);">${escapeHtml(o.product)} — ${escapeHtml(o.variant)}</td>
+            <td style="padding:9px 6px;border-bottom:1px solid var(--line);">${money(o.price)}</td>
+            <td style="padding:9px 6px;border-bottom:1px solid var(--line);">${statusBadge(o.status)}</td>
+            <td style="padding:9px 6px;border-bottom:1px solid var(--line);color:var(--muted);">${new Date(o.date).toLocaleDateString('fr-FR')}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+    </div>
+    `}
   </div>
   `}
   `;
@@ -8033,6 +8147,13 @@ function renderWalletTab(){
             <span style="position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:13px;font-weight:700;color:#9aa39d;background:#eef1ef;padding:4px 10px;border-radius:8px;">HTG</span>
           </div>
         </div>
+
+        <div id="trNoteBlock" style="margin-bottom:20px;display:none;">
+          <div style="font-size:11.5px;letter-spacing:1px;font-weight:700;color:#8a9096;text-transform:uppercase;margin-bottom:10px;">${({ht:'Nòt (opsyonèl)',fr:'Note (facultatif)',en:'Note (optional)',es:'Nota (opcional)'})[currentLang] || 'Note (optional)'}</div>
+          <div style="display:flex;align-items:center;gap:10px;border:1.5px solid #e6e9e7;border-radius:14px;padding:14px 16px;background:#fbfcfb;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9aa39d" stroke-width="2" style="flex-shrink:0;"><path d="M4 4h16v12H8l-4 4z"/></svg>
+            <input type="text" id="trNote" maxlength="120" autocomplete="off" placeholder="${({ht:'Ex: pou manje a, mèsi…',fr:'Ex : pour le repas, merci…',en:'Ex: for lunch, thanks…',es:'Ej: para la comida, gracias…'})[currentLang] || ''}" style="border:none;outline:none;background:transparent;font-size:15px;color:var(--text);width:100%;">
+          </div>
 
         <button id="trSubmitBtn" onclick="submitTransfer()" style="display:none;width:100%;border:none;border-radius:14px;padding:16px;background:linear-gradient(135deg, #1b2027, #0a0d11);color:#fff;font-weight:700;font-size:15.5px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 10px 24px rgba(10,13,17,0.30);">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
@@ -8761,7 +8882,8 @@ function sendWalletCreditedEmail(user, amount, ref){
 }
 
 /* ---- 4) Transfert (voye ak resevwa) ---- */
-function sendTransferEmails(fromUser, toUser, amount){
+function sendTransferEmails(fromUser, toUser, amount, note){
+  const noteRow = note ? `<tr><td style="width:40%;padding:8px 0;"><b>Note</b></td><td style="width:60%;padding:8px 0;text-align:right;">${escapeHtml(note)}</td></tr>` : '';
   try{
     const dateStr = fmtDate(new Date());
     if(fromUser && fromUser.email){
@@ -8773,6 +8895,7 @@ function sendTransferEmails(fromUser, toUser, amount){
         details_block: `<h3>Détails du transfert</h3><table width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;">
           <tr><td style="width:40%;padding:8px 0;"><b>Destinataire</b></td><td style="width:60%;padding:8px 0;text-align:right;">${toUser ? toUser.name : ''}</td></tr>
           <tr><td style="width:40%;padding:8px 0;"><b>Date</b></td><td style="width:60%;padding:8px 0;text-align:right;">${dateStr}</td></tr>
+          ${noteRow}
           <tr><td style="width:40%;padding:8px 0;font-size:18px;"><b>Montant envoyé</b></td><td style="width:60%;padding:8px 0;text-align:right;font-size:20px;color:#00D26A;"><b>-${(amount||0).toLocaleString('fr-FR')} HTG</b></td></tr>
         </table>`,
         action_button: actionButtonHtml('Voir mon Wallet', '/wallet')
@@ -8787,6 +8910,7 @@ function sendTransferEmails(fromUser, toUser, amount){
         details_block: `<h3>Détails du transfert</h3><table width="100%" cellpadding="0" cellspacing="0" style="width:100%;table-layout:fixed;">
           <tr><td style="width:40%;padding:8px 0;"><b>Expéditeur</b></td><td style="width:60%;padding:8px 0;text-align:right;">${fromUser ? fromUser.name : ''}</td></tr>
           <tr><td style="width:40%;padding:8px 0;"><b>Date</b></td><td style="width:60%;padding:8px 0;text-align:right;">${dateStr}</td></tr>
+          ${noteRow}
           <tr><td style="width:40%;padding:8px 0;font-size:18px;"><b>Montant reçu</b></td><td style="width:60%;padding:8px 0;text-align:right;font-size:20px;color:#00D26A;"><b>+${(amount||0).toLocaleString('fr-FR')} HTG</b></td></tr>
         </table>`,
         action_button: actionButtonHtml('Voir mon Wallet', '/wallet')
@@ -8820,6 +8944,7 @@ function ktTrSet(html, showBtn){
   const f = document.getElementById('trFound'); if(f) f.innerHTML = html || '';
   const b = document.getElementById('trSubmitBtn'); if(b) b.style.display = showBtn ? 'flex' : 'none';
   const a = document.getElementById('trAmtBlock'); if(a) a.style.display = showBtn ? 'block' : 'none';
+  const nb = document.getElementById('trNoteBlock'); if(nb) nb.style.display = showBtn ? 'block' : 'none';
 }
 function ktTrLookup(){
   const inp = document.getElementById('trEmail'); if(!inp) return;
@@ -8871,6 +8996,7 @@ async function submitTransfer(){
   const transferableAmount = walletBalance() - (state.walletBonus?.[state.currentUserId] || 0);
   if(amount > transferableAmount){ showToast(t('cannot_transfer_bonus_toast'), 4000); return; }
   const senderName = currentUser().name;
+  const trNote = ((document.getElementById('trNote')||{}).value || '').trim().replace(/\s+/g,' ').slice(0,120);
   let pinHash = '';
   if(typeof ktPinAsk === 'function'){ pinHash = await ktPinAsk(({ht:'Pou rezon sekirite, pou voye lajan ou dwe konfime kòd PIN ou.',fr:"Pour des raisons de sécurité, pour envoyer de l'argent vous devez confirmer votre code PIN.",en:'For security reasons, to send money you must confirm your PIN code.',es:'Por razones de seguridad, para enviar dinero debes confirmar tu código PIN.'})[currentLang]); if(pinHash === null) return; }
   const _trBtn = document.getElementById('trSubmitBtn');
@@ -8886,7 +9012,7 @@ async function submitTransfer(){
     if(recipientId === state.currentUserId){ showToast(t('toast_cannot_transfer')); return; }
     const targetLocal = state.users.find(u=>u.id===recipientId);
     const recipientName = window.ktTrRecipient.name || (targetLocal ? targetLocal.name : email.split('@')[0]);
-    const _tArgs = { recipient_id: recipientId, amount, sender_label: 'Transfè bay '+recipientName, recipient_label: 'Transfè resevwa nan men '+senderName+((currentUser() && currentUser().email) ? ' ('+currentUser().email+')' : '') };
+    const _tArgs = { recipient_id: recipientId, amount, sender_label: 'Transfè bay '+recipientName+(trNote ? ' — 📝 '+trNote : ''), recipient_label: 'Transfè resevwa nan men '+senderName+((currentUser() && currentUser().email) ? ' ('+currentUser().email+')' : '')+(trNote ? ' — 📝 '+trNote : '') };
     let transferErr = null;
     if(pinHash){
       // Vèsyon ki verifye PIN la sou sèvè a (si SQL la enstale); sinon retounen sou ansyen fonksyon an
@@ -8909,8 +9035,9 @@ async function submitTransfer(){
     ntfyMsg += '\nDe email : ' + (senderUser && senderUser.email ? senderUser.email : '—');
     ntfyMsg += '\nÀ email : ' + email;
     ntfyMsg += '\nMontant : HTG ' + amount.toLocaleString('fr-FR');
+    if(trNote) ntfyMsg += '\nNote : ' + trNote;
     sendNtfyNotification('🔄 Nouveau transfert', ntfyMsg, 'default', 'arrows_counterclockwise');
-    setTimeout(() => sendTransferEmails(currentUser(), { name: recipientName, email: email }, amount), 2600);
+    setTimeout(() => sendTransferEmails(currentUser(), { name: recipientName, email: email }, amount, trNote), 2600);
   }catch(e){
     showToast('Pa ka konekte ak sèvè a — eseye ankò');
   }finally{
@@ -9321,7 +9448,7 @@ function submitCheckout(){
     }
   }
   const btn = document.getElementById('checkoutSubmitBtn');
-  if(btn){ btn.disabled = true; btn.textContent = t('btn_processing'); btn.style.opacity = '0.7'; }
+  if(btn){ btn.disabled = true; btn.innerHTML = '<span style="width:18px;height:18px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .8s linear infinite;flex:0 0 auto;"></span><span>'+t('btn_processing')+'</span>'; btn.style.opacity = '0.9'; }
   checkoutCart();
 }
 function goToRechargeFromCheckout(){
@@ -11381,6 +11508,179 @@ async function captureKycPhoto(){
     }catch(e){ document.getElementById('kycMsg').textContent = '⚠️ Erè: ' + (e?.message||e); document.getElementById('kycCaptureBtn').disabled=false; }
   }, 'image/jpeg', 0.9);
 }
+
+/* ===== Plizyè kont (tankou WhatsApp) — sesyon sere, pa modpas ===== */
+const KT_ACC_L = {
+  ht:{ title:'Kont mwen yo', add:'Ajouter un compte Kerry Topup', active:'Aktif', email:'Imèl', pass:'Modpas', btn:'Ajouter', adding:'Ajout en cours…', cancel:'Anile', switchTo:'Bascule sou', switchBtn:'Bascule', switched:'Ou sou kont', added:'Kont ajoute ✓', exists:'Kont sa a deja ajoute', fill:'Ranpli imèl ak modpas', wrong:'Imèl oswa modpas pa bon', expired:'Sesyon an ekspire — antre modpas la ankò', remove:'Retire kont sa a nan lis la ?', switchBtnTitle:'Chanje kont', sub:'Ajoute yon lòt kont pou w ka chanje rapid.' },
+  fr:{ title:'Mes comptes', add:'Ajouter un compte Kerry Topup', active:'Actif', email:'E-mail', pass:'Mot de passe', btn:'Ajouter', adding:'Ajout en cours…', cancel:'Annuler', switchTo:'Basculer sur', switchBtn:'Basculer', switched:'Vous êtes sur le compte', added:'Compte ajouté ✓', exists:'Ce compte est déjà ajouté', fill:'Remplissez e-mail et mot de passe', wrong:'E-mail ou mot de passe incorrect', expired:'Session expirée — saisissez le mot de passe à nouveau', remove:'Retirer ce compte de la liste ?', switchBtnTitle:'Changer de compte', sub:'Ajoutez un autre compte pour basculer rapidement.' },
+  en:{ title:'My accounts', add:'Add a Kerry Topup account', active:'Active', email:'Email', pass:'Password', btn:'Add', adding:'Adding…', cancel:'Cancel', switchTo:'Switch to', switchBtn:'Switch', switched:'You are now on', added:'Account added ✓', exists:'This account is already added', fill:'Fill in email and password', wrong:'Wrong email or password', expired:'Session expired — enter the password again', remove:'Remove this account from the list?', switchBtnTitle:'Switch account', sub:'Add another account to switch quickly.' },
+  es:{ title:'Mis cuentas', add:'Añadir una cuenta Kerry Topup', active:'Activa', email:'Correo', pass:'Contraseña', btn:'Añadir', adding:'Añadiendo…', cancel:'Cancelar', switchTo:'Cambiar a', switchBtn:'Cambiar', switched:'Ahora estás en la cuenta', added:'Cuenta añadida ✓', exists:'Esta cuenta ya está añadida', fill:'Completa correo y contraseña', wrong:'Correo o contraseña incorrectos', expired:'Sesión expirada — ingresa la contraseña otra vez', remove:'¿Quitar esta cuenta de la lista?', switchBtnTitle:'Cambiar de cuenta', sub:'Añade otra cuenta para cambiar rápido.' }
+};
+function kacL(k){ return (KT_ACC_L[currentLang] || KT_ACC_L.en)[k]; }
+function ktAccList(){ try{ const a = JSON.parse(localStorage.getItem('kt_accounts') || '[]'); return Array.isArray(a) ? a : []; }catch(e){ return []; } }
+function ktAccSave(a){ try{ localStorage.setItem('kt_accounts', JSON.stringify(a)); }catch(e){} }
+async function ktAccRememberCurrent(){
+  try{
+    const u = currentUser(); if(!u) return;
+    const sb = await getSupabase();
+    const { data } = await sb.auth.getSession();
+    const ss = data && data.session; if(!ss || !ss.user || ss.user.id !== u.id) return;
+    const list = ktAccList();
+    const entry = { id:u.id, email:(u.email||ss.user.email||'').toLowerCase(), name:u.name || ss.user.email, session:{ access_token:ss.access_token, refresh_token:ss.refresh_token } };
+    const i = list.findIndex(x => x.id === u.id);
+    if(i >= 0) list[i] = Object.assign(list[i], entry); else list.push(entry);
+    ktAccSave(list);
+  }catch(e){}
+}
+function ktAccAvatar(name, size){
+  return `<div class="drawer-avatar" style="width:${size}px;height:${size}px;font-size:${Math.round(size*0.4)}px;flex-shrink:0;">${escapeHtml((name||'?').charAt(0).toUpperCase())}</div>`;
+}
+function ktAccNext(){
+  const u = currentUser(); if(!u) return null;
+  const list = ktAccList().filter(x => x.id !== u.id);
+  if(!list.length) return null;
+  // kont ki swiv sa ki aktif la nan lis la (sik)
+  const all = ktAccList(); const idx = all.findIndex(x => x.id === u.id);
+  for(let k = 1; k <= all.length; k++){ const c = all[(idx + k) % all.length]; if(c && c.id !== u.id) return c; }
+  return list[0];
+}
+function ktAccountsCardHtml(){
+  const u = currentUser(); if(!u) return '';
+  const list = ktAccList();
+  if(!list.some(x => x.id === u.id)) setTimeout(ktAccRememberCurrent, 200);
+  const nx = ktAccNext();
+  const ring = `<svg width="54" height="54" viewBox="0 0 54 54" fill="none" stroke="#8a9096" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;inset:0;"><path d="M8 24a19 19 0 0 1 32-11"/><path d="M41 6v8h-8"/><path d="M46 30a19 19 0 0 1-32 11"/><path d="M13 48v-8h8"/></svg>`;
+  return `
+  <div style="display:flex;align-items:center;gap:12px;background:var(--panel,#fff);border:1px solid var(--line);border-radius:28px;padding:14px 16px;margin-bottom:16px;box-shadow:0 6px 20px rgba(20,40,30,.08);">
+    ${ktAccAvatar(u.name, 46)}
+    <div style="flex:1;min-width:0;font-weight:700;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(u.name)}</div>
+    ${nx ? `<button onclick="ktAccAskSwitch('${nx.id}')" title="${escapeHtml(kacL('switchBtnTitle'))}" style="position:relative;width:54px;height:54px;border:none;background:none;padding:0;cursor:pointer;flex-shrink:0;">${ring}<span style="position:absolute;left:9px;top:9px;">${ktAccAvatar(nx.name, 36)}</span></button>` : ''}
+    <button onclick="ktAccOpenList()" aria-label="${escapeHtml(kacL('title'))}" style="width:44px;height:44px;border-radius:50%;border:none;background:#e9ecef;color:#10241a;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+  </div>`;
+}
+function ktAccOpenList(){
+  const u = currentUser(); if(!u) return;
+  const list = ktAccList();
+  const others = list.filter(x => x.id !== u.id);
+  const rows = others.map(a => `
+    <div style="display:flex;align-items:center;gap:12px;padding:12px 4px 4px;">
+      <div onclick="ktAccAskSwitch('${a.id}')" style="display:flex;align-items:center;gap:14px;flex:1;min-width:0;cursor:pointer;">
+        ${ktAccAvatar(a.name, 48)}
+        <div style="min-width:0;"><div style="font-weight:600;font-size:16.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(a.name||a.email)}</div><div style="font-size:13.5px;color:#6b7d72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(maskEmail(a.email||''))}</div></div>
+      </div>
+      <button onclick="ktAccRemove('${a.id}')" style="width:32px;height:32px;border-radius:50%;border:none;background:none;color:#9aa39d;font-size:15px;cursor:pointer;flex-shrink:0;">✕</button>
+    </div>`).join('');
+  ktAccSheet(`
+    <div style="width:46px;height:5px;border-radius:3px;background:#d5dad7;margin:-10px auto 16px;"></div>
+    <div style="border:1.5px solid #dfe5e1;border-radius:20px;padding:12px 14px;">
+      <div style="display:flex;align-items:center;gap:14px;padding:4px 4px 10px;">
+        ${ktAccAvatar(u.name, 48)}
+        <div style="flex:1;min-width:0;font-weight:600;font-size:16.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${escapeHtml(u.name)}</div>
+        <span style="width:30px;height:30px;border-radius:50%;background:#0a9e3d;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+      </div>
+      ${rows}
+    </div>
+    <button onclick="ktAccOpenAdd()" style="width:100%;margin-top:16px;padding:15px;border-radius:30px;border:1.5px solid #cfd6d2;background:#fff;color:#10241a;font-weight:600;font-size:15.5px;cursor:pointer;font-family:inherit;">＋ ${kacL('add')}</button>
+    <div style="text-align:center;margin-top:16px;font-weight:800;font-size:14px;color:#0a9e3d;letter-spacing:.2px;">Kerry Topup Official</div>`);
+}
+function ktAccSheet(inner){
+  let m = document.getElementById('ktAccSheet'); if(m) m.remove();
+  m = document.createElement('div'); m.id = 'ktAccSheet';
+  m.style.cssText = 'position:fixed;inset:0;z-index:100001;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;';
+  m.onclick = (e)=>{ if(e.target === m) m.remove(); };
+  m.innerHTML = `<div style="background:var(--panel,#fff);color:var(--text,#10241a);width:100%;max-width:480px;border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));">${inner}</div>`;
+  document.body.appendChild(m);
+}
+function ktAccOpenAdd(){
+  const inp = 'width:100%;box-sizing:border-box;border:1.5px solid #e6e9e7;border-radius:14px;padding:14px 16px;font-size:15px;background:#fbfcfb;color:#10241a;outline:none;margin-bottom:10px;';
+  ktAccSheet(`
+    <div style="font-weight:800;font-size:17px;margin-bottom:4px;">${kacL('add')}</div>
+    <div style="font-size:12.5px;color:var(--muted);margin-bottom:14px;">${kacL('sub')}</div>
+    <input id="ktAccEmail" type="email" autocapitalize="none" autocomplete="off" placeholder="${kacL('email')}" style="${inp}">
+    <input id="ktAccPass" type="password" autocomplete="off" placeholder="${kacL('pass')}" style="${inp}">
+    <div style="display:flex;gap:10px;margin-top:6px;">
+      <button onclick="document.getElementById('ktAccSheet').remove()" style="flex:1;padding:14px;border-radius:14px;border:1.5px solid #e6e9e7;background:#fff;color:#10241a;font-weight:700;font-size:14px;cursor:pointer;">${kacL('cancel')}</button>
+      <button id="ktAccAddBtn" onclick="ktAccDoAdd()" style="flex:1;padding:14px;border-radius:14px;border:none;background:#00D26A;color:#fff;font-weight:800;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">${kacL('btn')}</button>
+    </div>`);
+}
+async function ktAccDoAdd(){
+  const email = (document.getElementById('ktAccEmail').value || '').trim().toLowerCase();
+  const pass = document.getElementById('ktAccPass').value || '';
+  if(!email || !pass){ showToast(kacL('fill')); return; }
+  const btn = document.getElementById('ktAccAddBtn');
+  const old = btn.innerHTML;
+  btn.disabled = true; btn.style.opacity = '.7';
+  btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" style="animation:spin 0.8s linear infinite;"><path d="M21 12a9 9 0 1 1-6.2-8.55" stroke-linecap="round"/></svg> ' + kacL('adding');
+  try{
+    await getSupabase();
+    // Kliyan tanporè: pa deranje sesyon kont aktif la
+    const tmp = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth:{ persistSession:false, autoRefreshToken:false, detectSessionInUrl:false } });
+    const { data, error } = await tmp.auth.signInWithPassword({ email, password: pass });
+    if(error || !data || !data.session){ showToast(kacL('wrong')); btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = old; return; }
+    let name = email;
+    try{ const { data: pr } = await tmp.from('profiles').select('name').eq('id', data.user.id).maybeSingle(); if(pr && pr.name) name = pr.name; }catch(e){}
+    const list = ktAccList();
+    if(list.some(x => x.id === data.user.id)){ showToast(kacL('exists')); btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = old; return; }
+    await ktAccRememberCurrent();
+    const list2 = ktAccList();
+    list2.push({ id:data.user.id, email, name, session:{ access_token:data.session.access_token, refresh_token:data.session.refresh_token } });
+    ktAccSave(list2);
+    document.getElementById('ktAccSheet')?.remove();
+    showToast(kacL('added'));
+    render();
+  }catch(e){
+    showToast(kacL('wrong')); btn.disabled = false; btn.style.opacity = ''; btn.innerHTML = old;
+  }
+}
+function ktAccRemove(id){
+  openConfirm(kacL('remove'), '', () => { ktAccSave(ktAccList().filter(x => x.id !== id)); render(); });
+}
+function ktAccAskSwitch(id){ ktAccDoSwitch(id); }
+function ktAccLoading(show, a){
+  let o = document.getElementById('ktAccLoading'); if(o) o.remove();
+  if(!show) return;
+  o = document.createElement('div'); o.id = 'ktAccLoading';
+  o.style.cssText = 'position:fixed;inset:0;z-index:100002;display:flex;align-items:center;justify-content:center;background:rgba(20,24,28,.38);';
+  o.innerHTML = `<div class="ktCard" style="opacity:1;animation:ktCardIn .3s ease-out forwards;padding:34px 26px 30px;">
+    <div style="position:relative;width:96px;height:96px;margin-bottom:6px;">
+      <svg width="96" height="96" viewBox="0 0 96 96" style="position:absolute;inset:0;animation:spin .9s linear infinite;"><circle cx="48" cy="48" r="44" fill="none" stroke="#e3ebe5" stroke-width="4"/><path d="M48 4a44 44 0 0 1 44 44" fill="none" stroke="#0a9e3d" stroke-width="4" stroke-linecap="round"/></svg>
+      <div style="position:absolute;left:12px;top:12px;">${ktAccAvatar(a.name || a.email, 72)}</div>
+    </div>
+    <div class="ktTitle" style="font-size:17px;opacity:1;animation:none;">${escapeHtml(kacL('switchTo'))} ${escapeHtml(a.name || a.email)}…</div>
+  </div>`;
+  document.body.appendChild(o);
+}
+async function ktAccDoSwitch(id){
+  const list = ktAccList();
+  const a = list.find(x => x.id === id); if(!a) return;
+  document.getElementById('ktAccSheet')?.remove();
+  const _t0 = Date.now();
+  ktAccLoading(true, a);
+  try{
+    const sb = await getSupabase();
+    await ktAccRememberCurrent(); // sere sesyon aktyèl la (tokens ki fre) anvan chanje
+    const { data, error } = await sb.auth.setSession({ access_token:a.session.access_token, refresh_token:a.session.refresh_token });
+    if(error || !data || !data.session || !data.user){
+      ktAccLoading(false);
+      showToast(kacL('expired'), 4500);
+      if(typeof doLogoutConfirmed === 'function'){ await doLogoutConfirmed(); }
+      openAuthModal('login');
+      setTimeout(() => { const le = document.getElementById('loginEmail'); if(le) le.value = a.email; }, 200);
+      return;
+    }
+    const l2 = ktAccList(); const i = l2.findIndex(x => x.id === id);
+    if(i >= 0){ l2[i].session = { access_token:data.session.access_token, refresh_token:data.session.refresh_token }; ktAccSave(l2); }
+    state.isAdmin = false; state.isSuperAdmin = false; state.currentAdminPerms = null;
+    await syncLocalUserFromAuth(data.user);
+    await saveState();
+    const _wait = 1500 - (Date.now() - _t0); if(_wait > 0) await new Promise(r => setTimeout(r, _wait));
+    ktAccLoading(false);
+    showToast(kacL('switched') + ' ' + (currentUser() ? currentUser().name : a.name));
+    afterAuthSuccess();
+    goPage('parametres');
+  }catch(e){ ktAccLoading(false); showToast(kacL('expired')); }
+}
+
 function pageParametres(){
   const u = currentUser();
   if(!u){
@@ -11393,14 +11693,22 @@ function pageParametres(){
   setTimeout(ktLoadMyPublicId, 50);
   return `
     <div class="page-header"><h2>${t('drawer_settings')}</h2><p>${t('settings_sub')}</p></div>
+    ${ktAccountsCardHtml()}
     ${!u.savedWhatsapp ? `
-    <div style="background:linear-gradient(135deg,#fff4de,#ffe9c2);border:1px solid #f3ddA0;border-radius:16px;padding:18px;margin-bottom:16px;">
-      <div style="font-weight:800;font-size:13.5px;margin-bottom:6px;">📱 ${t('whatsapp_add_title')}</div>
-      <div style="font-size:12px;color:#8a6a2a;margin-bottom:10px;">${t('whatsapp_add_sub')}</div>
-      <div style="border:1.5px solid #e6e9e7;border-radius:12px;padding:12px 14px;background:#fffdf8;margin-bottom:10px;">
-        <input type="tel" id="paramsWhatsapp" placeholder="Ex: 4261-xxxx" style="border:none;outline:none;background:transparent;width:100%;font-size:14px;">
+    <div style="position:relative;overflow:hidden;background:linear-gradient(160deg,#ffffff 0%,#effaf3 100%);border:1px solid #cfe9d6;border-radius:24px;padding:20px;margin-bottom:16px;box-shadow:0 12px 30px rgba(10,158,61,.12);">
+      <div style="position:absolute;right:-34px;top:-34px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(37,211,102,.25),transparent 70%);pointer-events:none;"></div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;position:relative;">
+        <div style="width:50px;height:50px;border-radius:16px;background:linear-gradient(145deg,#4fe08c,#17a854);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 18px rgba(10,158,61,.3),inset 0 2px 3px rgba(255,255,255,.3);"><svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.2 13.9c-.2.6-1.3 1.2-1.8 1.2-.5.1-1 .2-3.3-.7-2.8-1.1-4.5-4-4.7-4.2-.1-.2-1.1-1.5-1.1-2.8 0-1.3.7-2 .9-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.4.6c-.1.2-.3.3-.1.6.2.3.8 1.3 1.7 2.1 1.2 1 2.1 1.4 2.4 1.5.3.1.5.1.6-.1l.9-1.1c.2-.2.4-.2.6-.1l1.9.9c.2.1.4.2.5.3.1.2.1.8-.1 1.4z"/></svg></div>
+        <div style="min-width:0;">
+          <div style="font-weight:800;font-size:16px;color:#10241a;">${t('whatsapp_add_title')}</div>
+          <div style="font-size:12.5px;color:#5f7a6a;margin-top:2px;line-height:1.4;">${t('whatsapp_add_sub')}</div>
+        </div>
       </div>
-      <button onclick="confirmWhatsappNumber()" style="width:100%;background:#14181c;color:#fff;border:none;border-radius:12px;padding:13px;font-weight:700;font-size:13.5px;cursor:pointer;">${t('btn_confirm')}</button>
+      <div style="position:relative;display:flex;align-items:center;gap:0;border:1.5px solid #cfe9d6;border-radius:16px;background:#fff;overflow:hidden;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:6px;padding:0 12px;height:52px;background:#f1f9f4;border-right:1.5px solid #cfe9d6;font-weight:700;font-size:14px;color:#10241a;flex-shrink:0;">🇭🇹 <span>+509</span></div>
+        <input type="tel" id="paramsWhatsapp" placeholder="4261-xxxx" style="border:none;outline:none;background:transparent;width:100%;font-size:16px;font-weight:600;color:#10241a;padding:0 14px;height:52px;">
+      </div>
+      <button onclick="confirmWhatsappNumber()" style="position:relative;width:100%;background:linear-gradient(135deg,#17c964,#0a9e3d);color:#fff;border:none;border-radius:16px;padding:15px;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 10px 22px rgba(10,158,61,.3);">${t('btn_confirm')}</button>
     </div>` : `
     <div class="card" style="margin-bottom:16px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">📱 WhatsApp</div>
@@ -11525,12 +11833,41 @@ async function grantAdminAccess(){
     const { data: profileRow } = await sb.from('profiles').select('id').eq('email', email).maybeSingle();
     if(profileRow){
       await sb.from('admin_permissions').upsert({ user_id: profileRow.id, perms, updated_at: new Date().toISOString() });
+      state.admins = state.admins.filter(x => x.id !== profileRow.id);
       state.admins.push({ id: profileRow.id, name: targetName || email, email, perms });
     }
     logActivity('Bay aksè admin — ' + (targetName||email));
     await saveState(); renderAdminTab();
     showToast('✅ Aksè admin bay — ' + (targetName||email));
   }catch(e){ showToast('⚠️ Erè koneksyon: ' + (e?.message||e)); }
+}
+async function loadAdminsList(){
+  state._adminsLoading = true;
+  try{
+    const sb = await getSupabase();
+    const { data: profs, error } = await sb.from('profiles').select('id,name,email,is_admin,is_super_admin').eq('is_admin', true);
+    if(error){ showToast('⚠️ ' + error.message); state._adminsLoading = false; return; }
+    const { data: perms } = await sb.from('admin_permissions').select('user_id,perms');
+    const pmap = {}; (perms || []).forEach(r => { pmap[r.user_id] = r.perms || {}; });
+    state.admins = (profs || []).filter(p => !p.is_super_admin && p.email !== ADMIN_EMAIL).map(p => ({ id:p.id, name:p.name || p.email, email:p.email, perms: pmap[p.id] || {} }));
+    state._adminsLoaded = true;
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+  state._adminsLoading = false;
+  if(adminTab === 'administratè') renderAdminTab();
+}
+async function saveAdminPerms(userId){
+  const a = state.admins.find(x => x.id === userId); if(!a) return;
+  const perms = {};
+  ADMIN_TABS.filter(t=>t.id!=='administratè').forEach(t => { const el = document.getElementById('pe-'+userId+'-'+t.id); if(el) perms[t.id] = el.checked; });
+  perms.adminGere = document.getElementById('pe-'+userId+'-adminGere')?.checked || false;
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('admin_permissions').upsert({ user_id: userId, perms, updated_at: new Date().toISOString() });
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    a.perms = perms;
+    logActivity('Modifye aksè admin — ' + a.email);
+    showToast('✅ Aksè ' + a.name + ' mete ajou');
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
 async function revokeAdminAccess(userId, email){
   try{
@@ -11702,6 +12039,7 @@ const ADMIN_TABS = [
   {id:'kerryrewards', label:'💎 Free Fire Reward'},
   {id:'demanderekonpans', label:'🎁 Demande Rekonpans'},
   {id:'chatkliyan', label:'💬 Chat Kliyan'},
+  {id:'kominote', label:'👥 Kominote'},
   {id:'referraladmin', label:'🎁 Referral'},
   {id:'sekirite', label:'🔒 Sekirite'},
   {id:'tutorialmanager', label:'🎓 Tutorial Manager'},
@@ -11890,7 +12228,7 @@ function renderAdminTab(){
   if(!tabsBox) return;
   const visibleTabs = getVisibleAdminTabs();
   if(!visibleTabs.find(t=>t.id===adminTab) && visibleTabs.length) adminTab = visibleTabs[0].id;
-  tabsBox.innerHTML = visibleTabs.map(t => '<div class="atab ' + (adminTab===t.id?'active':'') + '" onclick="switchAdminTab(\'' + t.id + '\')">' + t.label + '</div>').join('');
+  tabsBox.innerHTML = visibleTabs.filter(t=>t.id!=='kominote').map(t => '<div class="atab ' + ((adminTab===t.id || (t.id==='chatkliyan' && adminTab==='kominote'))?'active':'') + '" onclick="switchAdminTab(\'' + t.id + '\')">' + t.label + '</div>').join('');
   const box = document.getElementById('adminContent');
 
   if(adminTab === 'produits'){
@@ -12339,6 +12677,10 @@ function renderAdminTab(){
     `;
     fetchRewardRequestsForAdmin();
   }
+  else if(adminTab === 'kominote'){
+    box.innerHTML = '<div style="color:var(--muted);">Chajman...</div>';
+    try{ window.kcCommunity.adminRender(box); }catch(e){ box.innerHTML = '<div style="color:var(--red);">Erè: '+escapeHtml(e.message||'')+'</div>'; }
+  }
   else if(adminTab === 'chatkliyan'){
     if(adminChatConversationId){
       box.innerHTML = `
@@ -12356,15 +12698,15 @@ function renderAdminTab(){
           </div>
         </div>
         <div id="adminChatMessages" style="background:var(--panel);border-radius:14px;padding:14px;height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">Chajman...</div>
-        <div style="display:flex;gap:6px;">
+        <div style="display:flex;gap:6px;align-items:flex-end;">
           <label style="width:38px;height:38px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;cursor:pointer;">📷<input type="file" accept="image/*,video/*" style="display:none;" onchange="sendAdminChatImage(this)"></label>
-          <input type="text" id="adminChatInput" placeholder="Ekri repons ou..." style="flex:1;background:var(--panel-2);border:1px solid var(--line);border-radius:20px;padding:10px 14px;font-size:13px;" onkeydown="if(event.key==='Enter')sendAdminChatMessage()">
+          <textarea id="adminChatInput" rows="1" placeholder="Ekri repons ou..." style="flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:18px;padding:10px 14px;font-size:14px;line-height:1.4;resize:none;overflow-y:auto;max-height:140px;font-family:inherit;color:var(--text);outline:none;" oninput="ktAdminChatGrow(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey && !(window.matchMedia && matchMedia('(pointer:coarse)').matches)){event.preventDefault();sendAdminChatMessage();}"></textarea>
           <button class="btn btn-green" style="width:auto;padding:10px 18px;" onclick="sendAdminChatMessage()">Voye</button>
         </div>
       `;
       loadAdminChatConversation(adminChatConversationId);
     } else {
-      box.innerHTML = `<div id="adminChatConvoList">Chajman...</div>`;
+      box.innerHTML = (window.kcCommunity ? window.kcCommunity.switcher('chat') : '') + `<div id="adminChatConvoList">Chajman...</div>`;
       fetchAdminChatConversations();
     }
   }
@@ -12671,8 +13013,22 @@ function renderAdminTab(){
           <button class="btn btn-green" onclick="grantAdminAccess()">Bay Aksè Admin</button>
         </div>
         <div class="card"><div style="font-weight:700;font-size:13px;margin-bottom:8px;">Lis Admin</div>
-          ${state.admins.length===0 ? '<div style="color:var(--muted);font-size:12px;">Pa gen lòt admin.</div>' :
-            state.admins.map(a => `<div class="tx-row"><span>${escapeHtml(a.name)} — ${escapeHtml(a.email)}</span><button class="mini-btn" style="color:var(--red);" onclick="revokeAdminAccess('${a.id}','${escapeHtml(a.email)}')">Retire</button></div>`).join('')}
+          ${state.admins.length===0 ? '<div style="color:var(--muted);font-size:12px;">' + (state._adminsLoaded ? 'Pa gen lòt admin.' : 'Chajman...') + '</div>' :
+            state.admins.map(a => {
+              const pm = a.perms || {};
+              return `<div style="border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;">
+                  <div style="min-width:0;"><div style="font-weight:700;font-size:13px;">${escapeHtml(a.name)}</div><div style="font-size:11px;color:var(--muted);word-break:break-all;">${escapeHtml(a.email)}</div></div>
+                  <button class="mini-btn" style="color:var(--red);flex-shrink:0;" onclick="revokeAdminAccess('${a.id}','${escapeHtml(a.email)}')">Retire</button>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;">Sa li ka jere :</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;">
+                  ${ADMIN_TABS.filter(t=>t.id!=='administratè').map(t => `<label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><input type="checkbox" id="pe-${a.id}-${t.id}" ${pm[t.id] ? 'checked' : ''}> ${t.label}</label>`).join('')}
+                  <label style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><input type="checkbox" id="pe-${a.id}-adminGere" ${pm.adminGere ? 'checked' : ''}> 🔑 Aksè total (tout tab)</label>
+                </div>
+                <button class="btn btn-green" style="width:100%;" onclick="saveAdminPerms('${a.id}')">💾 Sove chanjman</button>
+              </div>`;
+            }).join('')}
         </div>
         <div class="card"><div style="font-weight:700;font-size:13px;margin-bottom:8px;">Journal d'activité</div>
           ${state.activityLog.length===0 ? '<div style="color:var(--muted);font-size:12px;">Pa gen aktivite.</div>' :
@@ -12681,6 +13037,7 @@ function renderAdminTab(){
       ` : `<div class="empty"><div class="em-icon">🔒</div><div class="em-title">Sèlman Super Admin</div>Antre ak kòd Super Admin pou jere administratè ak wè Journal d'activité.</div>`}
     `;
   }
+  if(adminTab === 'administratè' && state.isSuperAdmin && !state._adminsLoaded && !state._adminsLoading){ loadAdminsList(); }
   document.querySelectorAll('.desc-autogrow').forEach(ta => { ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight+2) + 'px'; });
 }
 function renderSecurityCard(u){
@@ -13574,11 +13931,11 @@ function renderAgentToggleUI(){
   if(!label) return;
   if(adminCurrentConvoAgentActive){
     label.textContent = '🧑‍💼 Ou ap jere konvèsasyon sa a';
-    sub.textContent = 'Touski Bot pa reponn pandan l aktif';
+    sub.textContent = 'Mes toutous pa reponn pandan l aktif';
     sw.style.background = 'var(--green)';
     knob.style.left = '22px';
   } else {
-    label.textContent = '🐶 Touski Bot ap reponn otomatikman';
+    label.textContent = '🐶 Mes toutous ap reponn otomatikman';
     sub.textContent = 'Peze pou pran konvèsasyon an w menm';
     sw.style.background = 'var(--line)';
     knob.style.left = '2px';
@@ -13590,9 +13947,13 @@ async function toggleAgentActive(){
   renderAgentToggleUI();
   try{
     const sb = await getSupabase();
-    const { error } = await sb.from('support_conversations').update({ agent_active: adminCurrentConvoAgentActive }).eq('id', adminChatConversationId);
+    const me = currentUser();
+    const agentName = adminCurrentConvoAgentActive ? ((me && me.name) ? String(me.name).trim().split(/\s+/).slice(0,2).join(' ') : 'Kerry Topup') : null;
+    let { error } = await sb.from('support_conversations').update({ agent_active: adminCurrentConvoAgentActive, agent_name: agentName }).eq('id', adminChatConversationId);
+    // Si kolòn agent_name poko egziste, kontinye san li (non an pap parèt, men sistèm nan pa kase)
+    if(error && /agent_name/i.test(error.message || '')){ ({ error } = await sb.from('support_conversations').update({ agent_active: adminCurrentConvoAgentActive }).eq('id', adminChatConversationId)); }
     if(error){ showToast('⚠️ ' + error.message); adminCurrentConvoAgentActive = !adminCurrentConvoAgentActive; renderAgentToggleUI(); return; }
-    showToast(adminCurrentConvoAgentActive ? 'Ou pran konvèsasyon an ✓' : 'Touski Bot reprann otomatikman ✓');
+    showToast(adminCurrentConvoAgentActive ? 'Ou pran konvèsasyon an ✓' : 'Mes toutous reprann otomatikman ✓');
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
 async function loadAdminChatConversation(id){
@@ -13759,11 +14120,13 @@ async function sendAdminChatImage(input){
     appendAdminChatBubble(inserted);
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
+function ktAdminChatGrow(el){ el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 140) + 'px'; }
 async function sendAdminChatMessage(){
   const input = document.getElementById('adminChatInput');
   const text = input.value.trim();
   if(!text || !adminChatConversationId) return;
   input.value = '';
+  input.style.height = 'auto';
   try{
     const sb = await getSupabase();
     const { data: inserted, error } = await sb.from('support_messages').insert({ conversation_id: adminChatConversationId, sender:'admin', content:text }).select().single();
@@ -16022,6 +16385,799 @@ function ktPinSettingsHtml(){
       }
     }
   });
+})();
+
+</script>
+<script>
+/* ===== KC GLOBAL CHAT — Kominote ===== */
+(function(){
+'use strict';
+const KC_TXT = {
+ ht:{tabSupport:'Sipò',tabCommunity:'Kominote',title:'KERRY TOPUP CHAT',online:n=>`${n} manm en liy`,ph:'Ekri nan kominote a...',pin:'📌 Byenvini nan kominote Kerry Topup. Respekte tout moun, pa pataje modpas, ID oswa enfòmasyon pèsonèl ou.',
+  replyTo:'Reponn',search:'Chèche nan mesaj yo...',results:n=>`${n} rezilta`,noRes:'Pa gen rezilta',mute:'Mete kominote a an silans',unmute:'Retire silans lan',leave:'Kite kominote a',join:'Rejwenn kominote a',rules:'Règ kominote a',
+  rulesTxt:'• Respekte tout moun\n• Pa pataje modpas, kòd PIN, ID oswa nimewo kat\n• Pa fè spam ni piblisite\n• Admin ka efase mesaj ak bloke moun ki pa respekte règ yo',
+  needLogin:'Konekte pou antre nan kominote a',loginBtn:'Konekte',left:'Ou kite kominote a',rejoin:'Rejwenn',banned:'Admin bloke w nan kominote a.',
+  report:'Rapòte',reported:'Mesaj la rapòte, mèsi 🙏',copy:'Kopye',copied:'Kopye ✓',del:'Efase mesaj la',delAsk:'Efase mesaj sa a?',ban:'Bloke moun sa a',banAsk:'Bloke moun sa a nan kominote a?',unban:'Debloke moun sa a',
+  deleted:'🚫 Mesaj sa a efase',more:'Chaje mesaj ki pi vye yo',fail:'⚠️ Mesaj pa voye, eseye ankò',sending:'Ap voye...',mic:'Mikwofòn pa otorize',rec:'Ap anrejistre mesaj vokal...',cancel:'Anile',
+  empty:'Pa gen mesaj ankò. Ekri premye a! 👋',today:'Jodi a',yest:'Yè',reports:n=>`⚠️ ${n} rapò`,muted:'Kominote a an silans',unmuted:'Silans lan retire',leftOk:'Ou kite kominote a',joined:'Ou tounen nan kominote a',reply:'Reponn',yes:'Wi',no:'Non',slow:'Tann yon ti moman anvan w voye yon lòt mesaj',bad:'Mesaj sa a vyole règ yo 📏'},
+ fr:{tabSupport:'Support',tabCommunity:'Communauté',title:'KERRY TOPUP CHAT',online:n=>`${n} membre${n>1?'s':''} en ligne`,ph:'Écrire dans la communauté...',pin:'📌 Bienvenue dans la communauté Kerry Topup. Respectez tout le monde, ne partagez pas vos mots de passe, ID ou infos personnelles.',
+  replyTo:'Répondre à',search:'Rechercher dans les messages...',results:n=>`${n} résultat${n>1?'s':''}`,noRes:'Aucun résultat',mute:'Mettre en sourdine',unmute:'Réactiver les notifications',leave:'Quitter la communauté',join:'Rejoindre la communauté',rules:'Règles de la communauté',
+  rulesTxt:'• Respectez tout le monde\n• Ne partagez pas mots de passe, PIN, ID ou numéros de carte\n• Pas de spam ni de publicité\n• Les admins peuvent supprimer des messages et bloquer les membres',
+  needLogin:'Connectez-vous pour rejoindre la communauté',loginBtn:'Se connecter',left:'Vous avez quitté la communauté',rejoin:'Rejoindre',banned:"Un admin vous a bloqué de la communauté.",
+  report:'Signaler',reported:'Message signalé, merci 🙏',copy:'Copier',copied:'Copié ✓',del:'Supprimer le message',delAsk:'Supprimer ce message ?',ban:'Bloquer cette personne',banAsk:'Bloquer cette personne de la communauté ?',unban:'Débloquer cette personne',
+  deleted:'🚫 Ce message a été supprimé',more:'Charger les anciens messages',fail:'⚠️ Message non envoyé, réessayez',sending:'Envoi...',mic:'Micro non autorisé',rec:'Enregistrement du message vocal...',cancel:'Annuler',
+  empty:"Aucun message. Écrivez le premier ! 👋",today:"Aujourd'hui",yest:'Hier',reports:n=>`⚠️ ${n} signalement${n>1?'s':''}`,muted:'Communauté en sourdine',unmuted:'Sourdine retirée',leftOk:'Vous avez quitté la communauté',joined:'Vous êtes de retour dans la communauté',reply:'Répondre',yes:'Oui',no:'Non',slow:'Attendez un instant avant un autre message',bad:'Ce message enfreint les règles 📏'},
+ en:{tabSupport:'Support',tabCommunity:'Community',title:'KERRY TOPUP CHAT',online:n=>`${n} member${n>1?'s':''} online`,ph:'Write in the community...',pin:'📌 Welcome to the Kerry Topup community. Be respectful and never share your password, ID or personal info.',
+  replyTo:'Reply to',search:'Search messages...',results:n=>`${n} result${n>1?'s':''}`,noRes:'No results',mute:'Mute community',unmute:'Unmute',leave:'Leave community',join:'Rejoin community',rules:'Community rules',
+  rulesTxt:'• Respect everyone\n• Never share passwords, PINs, IDs or card numbers\n• No spam or advertising\n• Admins can delete messages and block members who break the rules',
+  needLogin:'Log in to join the community',loginBtn:'Log in',left:'You left the community',rejoin:'Rejoin',banned:'An admin has blocked you from the community.',
+  report:'Report',reported:'Message reported, thank you 🙏',copy:'Copy',copied:'Copied ✓',del:'Delete message',delAsk:'Delete this message?',ban:'Block this person',banAsk:'Block this person from the community?',unban:'Unblock this person',
+  deleted:'🚫 This message was deleted',more:'Load older messages',fail:'⚠️ Message not sent, try again',sending:'Sending...',mic:'Microphone not allowed',rec:'Recording voice message...',cancel:'Cancel',
+  empty:'No messages yet. Write the first one! 👋',today:'Today',yest:'Yesterday',reports:n=>`⚠️ ${n} report${n>1?'s':''}`,muted:'Community muted',unmuted:'Unmuted',leftOk:'You left the community',joined:'You are back in the community',reply:'Reply',yes:'Yes',no:'No',slow:'Wait a moment before sending another message',bad:'This message breaks the rules 📏'},
+ es:{tabSupport:'Soporte',tabCommunity:'Comunidad',title:'KERRY TOPUP CHAT',online:n=>`${n} miembro${n>1?'s':''} en línea`,ph:'Escribe en la comunidad...',pin:'📌 Bienvenido a la comunidad Kerry Topup. Respeta a todos y no compartas tu contraseña, ID ni datos personales.',
+  replyTo:'Responder a',search:'Buscar en los mensajes...',results:n=>`${n} resultado${n>1?'s':''}`,noRes:'Sin resultados',mute:'Silenciar comunidad',unmute:'Quitar silencio',leave:'Salir de la comunidad',join:'Volver a la comunidad',rules:'Reglas de la comunidad',
+  rulesTxt:'• Respeta a todos\n• No compartas contraseñas, PIN, ID ni números de tarjeta\n• Sin spam ni publicidad\n• Los admins pueden borrar mensajes y bloquear miembros',
+  needLogin:'Inicia sesión para unirte a la comunidad',loginBtn:'Iniciar sesión',left:'Saliste de la comunidad',rejoin:'Volver',banned:'Un admin te bloqueó de la comunidad.',
+  report:'Denunciar',reported:'Mensaje denunciado, gracias 🙏',copy:'Copiar',copied:'Copiado ✓',del:'Borrar mensaje',delAsk:'¿Borrar este mensaje?',ban:'Bloquear a esta persona',banAsk:'¿Bloquear a esta persona de la comunidad?',unban:'Desbloquear a esta persona',
+  deleted:'🚫 Este mensaje fue eliminado',more:'Cargar mensajes anteriores',fail:'⚠️ Mensaje no enviado, intenta de nuevo',sending:'Enviando...',mic:'Micrófono no permitido',rec:'Grabando mensaje de voz...',cancel:'Cancelar',
+  empty:'Aún no hay mensajes. ¡Escribe el primero! 👋',today:'Hoy',yest:'Ayer',reports:n=>`⚠️ ${n} denuncia${n>1?'s':''}`,muted:'Comunidad silenciada',unmuted:'Silencio quitado',leftOk:'Saliste de la comunidad',joined:'Volviste a la comunidad',reply:'Responder',yes:'Sí',no:'No',slow:'Espera un momento antes de enviar otro mensaje',bad:'Este mensaje infringe las reglas 📏'}
+};
+const T = (k, ...a) => { const d = KC_TXT[(typeof currentLang!=='undefined'&&KC_TXT[currentLang])?currentLang:'fr']; const v = d[k]; return typeof v === 'function' ? v(...a) : v; };
+const EMOJIS = ['👍','❤️','😂','😮','😢','🙏'];
+const kc = { built:false, tab:'support', list:[], byId:new Map(), me:{muted:false,left:false,banned:false}, unread:0, online:0, replyTo:null, searchOpen:false, loadedAll:false,
+  msgCh:null, presCh:null, presUid:null, subscribed:false, rec:null, lastSent:0, loading:false };
+const $ = id => document.getElementById(id);
+const esc = s => (typeof escapeHtml==='function'?escapeHtml(s):String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])));
+const uidNow = () => { try{ const u=currentUser(); return u&&u.id||null; }catch(e){ return null; } };
+const logged = () => { try{ return !!(typeof isLoggedIn==='function'?isLoggedIn():uidNow()); }catch(e){ return false; } };
+const lsKey = () => 'kc_state_' + (uidNow()||'x');
+
+/* ---------- Background (menm pou Sipò ak Kominote) ---------- */
+function patternSvg(stroke){
+  const ic = {
+   dia:'<path d="M0 8 10 0h20l10 8-20 26z"/><path d="M0 8h40M10 0l10 34M30 0 20 34"/>',
+   crown:'<path d="M0 28 4 6l12 12 8-16 8 16 12-12 4 22z"/><path d="M0 34h44"/>',
+   pad:'<rect x="0" y="6" width="48" height="26" rx="13"/><path d="M12 14v10M7 19h10"/><circle cx="33" cy="16" r="2.5"/><circle cx="40" cy="22" r="2.5"/>',
+   star:'<path d="M20 0l5 13h14l-11 8 4 14-12-9-12 9 4-14L1 13h14z"/>',
+   flame:'<path d="M18 0c2 10 12 14 12 26a12 12 0 0 1-24 0c0-6 4-9 6-13 2 3 3 4 5 4 0-6-2-10 1-17z"/>',
+   heart:'<path d="M0 10c0-7 8-10 14-4 6-6 14-3 14 4 0 10-14 18-14 18S0 20 0 10z"/>',
+   plus:'<circle cx="14" cy="14" r="12"/><path d="M14 6v16M8 14h12"/>'};
+  const items=[['dia',14,14,-12],['pad',92,10,8],['crown',160,18,10],['star',58,56,12],['flame',128,62,-8],['heart',12,92,6],['dia',70,100,14],['pad',132,106,-10],['crown',14,146,-6],['star',100,150,-12],['plus',160,150,0],['flame',50,176,10],['heart',140,184,8]];
+  let b = items.map(i=>`<g transform="translate(${i[1]},${i[2]}) rotate(${i[3]}) scale(.62)">${ic[i[0]]}</g>`).join('');
+  const tx=(x,y,r,fs)=>`<text x="${x}" y="${y}" transform="rotate(${r} ${x} ${y})" font-family="Arial Black,Impact,sans-serif" font-style="italic" font-weight="900" font-size="${fs}" fill="${stroke}" fill-opacity=".13" stroke="none" letter-spacing=".8">FREE FIRE</text>`;
+  b += tx(30,52,-14,11)+tx(110,98,-12,11)+tx(8,134,-14,11)+tx(96,196,-10,11);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="190" height="210" viewBox="0 0 190 210" fill="none" stroke="${stroke}" stroke-opacity=".12" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">${b}</svg>`;
+}
+function injectCss(){
+  if($('kcCss')) return;
+  const light = 'url("data:image/svg+xml;utf8,'+encodeURIComponent(patternSvg('#4f7a62'))+'")';
+  const dark = 'url("data:image/svg+xml;utf8,'+encodeURIComponent(patternSvg('#9fd9b6'))+'")';
+  const s = document.createElement('style'); s.id='kcCss';
+  s.textContent = `
+  .kcPat{background-color:#f7fbf8 !important;background-image:${light} !important;background-size:190px 210px !important;}
+  html.dark .kcPat{background-color:transparent !important;background-image:${dark} !important;}
+  .kcWrap{background:rgba(7,26,16,.75);border-top:1px solid rgba(63,206,124,.18);}
+  html:not(.dark) .kcWrap{background:#fff !important;border-top-color:#e3ece6 !important;}
+  .kc-bubble code{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(0,0,0,.14);padding:1px 6px;border-radius:6px;font-size:.92em;}
+  .kc-bubble s{opacity:.85;}
+  .kcTyp{display:flex;align-items:center;gap:8px;margin:4px 0 6px;}
+  .kcTypAv{width:26px;height:26px;border-radius:50%;color:#0a7c3d;font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;flex-shrink:0;}
+  html.dark .kcTypAv{border-color:#071a10;}
+  .kcTypB{background:rgba(255,255,255,.92);border:1px solid rgba(63,206,124,.25);border-radius:16px 16px 16px 4px;padding:11px 14px;display:flex;gap:4px;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.08);}
+  html.dark .kcTypB{background:rgba(255,255,255,.08);}
+  .kcDot{width:7px;height:7px;border-radius:50%;background:#0a9e3d;display:block;animation:kcDn 1s infinite ease-in-out;}
+  .kcDot:nth-child(2){animation-delay:.15s}.kcDot:nth-child(3){animation-delay:.3s}
+  @keyframes kcDn{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+  .kcRules{align-self:stretch;background:linear-gradient(135deg,#eaf9f0,#d9f3e3);border:1px solid #bfe9cf;border-radius:18px;margin-bottom:10px;box-shadow:0 4px 14px rgba(10,158,61,.10);overflow:hidden;flex-shrink:0;}
+  html.dark .kcRules{background:linear-gradient(135deg,rgba(63,206,124,.14),rgba(63,206,124,.07));border-color:rgba(63,206,124,.3);}
+  .kcRulesHd{width:100%;display:flex;align-items:center;gap:11px;padding:11px 14px;border:none;background:transparent;color:#0a5c2c;font-family:inherit;cursor:pointer;}
+  html.dark .kcRulesHd{color:#b6ffcf;}
+  .kcRulesHd b{display:block;font-size:14px;font-weight:800;} .kcRulesHd small{display:block;font-size:11.5px;font-weight:600;opacity:.75;margin-top:1px;}
+  .kcRulesIc{width:34px;height:34px;border-radius:11px;background:linear-gradient(145deg,#4fe08c,#0a9e3d);box-shadow:0 5px 12px rgba(10,158,61,.3);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+  .kcRulesCh{transition:transform .25s ease;flex-shrink:0;} .kcRules.open .kcRulesCh{transform:rotate(180deg);}
+  .kcRulesBd{max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 14px;} .kcRules.open .kcRulesBd{max-height:420px;padding-bottom:12px;}
+  .kcRule{display:flex;align-items:flex-start;gap:11px;padding:8px 0;border-top:1px dashed rgba(10,158,61,.25);color:#10241a;}
+  html.dark .kcRule{color:#e8f5ec;}
+  .kcRuleIc{width:30px;height:30px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,.08);}
+  html.dark .kcRuleIc{background:rgba(255,255,255,.1);}
+  .kcRule b{display:block;font-size:13px;font-weight:800;} .kcRule small{display:block;font-size:12px;opacity:.75;margin-top:1px;line-height:1.35;}
+  .kcRow{touch-action:pan-y;position:relative;transition:transform .18s ease;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+  .kcRow.kcDrag{transition:none;}
+  .kcRowIc{position:absolute;left:-46px;top:50%;margin-top:-17px;width:34px;height:34px;border-radius:50%;background:rgba(10,158,61,.16);color:#0a9e3d;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.6);}
+  .kcFlash .kc-bubble{animation:kcFlash 1.4s ease;}
+  @keyframes kcFlash{0%,60%{box-shadow:0 0 0 4px rgba(255,200,40,.75)}100%{box-shadow:none}}
+  .kcHit .kc-bubble{box-shadow:0 0 0 3px rgba(255,200,40,.7) !important;}
+  .kcTab{flex:1;text-align:center;padding:10px 0 11px;font-weight:700;font-size:13.5px;color:#fff;opacity:.8;border:none;background:transparent;font-family:inherit;cursor:pointer;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;}
+  .kcTab.on{background:#fff;color:#0a9e3d;opacity:1;font-weight:800;}
+  html.dark .kcTab.on{background:#071a10;color:#3fce7c;}
+  .kcBadge{background:#e23b57;color:#fff;border-radius:9px;font-size:10px;font-weight:800;padding:1px 6px;min-width:16px;text-align:center;}
+  .kcHdrBtn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.16);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .kcSheetBg{position:fixed;inset:0;z-index:100001;background:rgba(10,20,15,.45);display:flex;align-items:flex-end;justify-content:center;}
+  .kcSheet{width:100%;max-width:480px;background:#fff;color:#10241a;border-radius:22px 22px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));box-shadow:0 -10px 40px rgba(0,0,0,.25);animation:kcUp .22s ease-out;}
+  html.dark .kcSheet{background:#10241a;color:#e8f5ec;}
+  @keyframes kcUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+  .kcReactRow{display:flex;justify-content:space-around;background:#f1f5f2;border-radius:999px;padding:6px 8px;margin-bottom:10px;}
+  html.dark .kcReactRow{background:rgba(255,255,255,.08);}
+  .kcReactRow button{border:none;background:none;font-size:26px;padding:4px 6px;cursor:pointer;border-radius:50%;}
+  .kcAct{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 12px;border:none;background:transparent;color:inherit;font-size:15px;font-weight:600;font-family:inherit;border-radius:12px;cursor:pointer;}
+  .kcAct:active{background:rgba(10,158,61,.1);} .kcAct.red{color:#e5484d;}
+  .kcPop{position:absolute;right:12px;top:58px;z-index:20;background:#fff;color:#10241a;border-radius:16px;box-shadow:0 14px 36px rgba(0,0,0,.28);padding:6px;min-width:230px;}
+  html.dark .kcPop{background:#10241a;color:#e8f5ec;}
+  .kcChip{display:inline-flex;align-items:center;gap:3px;background:#fff;border:1px solid #d5e4da;border-radius:12px;padding:1px 7px;font-size:12px;font-weight:700;color:#10241a;box-shadow:0 1px 3px rgba(0,0,0,.12);cursor:pointer;}
+  .kcChip.me{background:#dff5e7;border-color:#3fce7c;}
+  .kcQuote{border-left:4px solid #0a9e3d;background:rgba(10,158,61,.1);border-radius:8px;padding:5px 9px;margin-bottom:6px;font-size:12.5px;text-align:left;cursor:pointer;max-width:100%;}
+  .kcMine .kcQuote{border-left-color:#fff;background:rgba(255,255,255,.2);}
+  .kcQuote b{display:block;font-size:11.5px;font-weight:800;color:#0a9e3d;} .kcMine .kcQuote b{color:#fff;}
+  .kcQuote span{display:block;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .kcDay{align-self:center;font-size:11px;font-weight:700;color:#5b6b62;background:rgba(255,255,255,.85);padding:3px 12px;border-radius:10px;margin:6px 0;}
+  .kcPin{background:#e8f8ee;border:1px solid #bfe9cf;color:#0a7c3d;border-radius:12px;padding:8px 12px;font-size:12px;font-weight:600;margin-bottom:8px;line-height:1.4;}
+  html.dark .kcPin{background:rgba(63,206,124,.12);border-color:rgba(63,206,124,.3);color:#b6ffcf;}
+  .kcCard{margin:auto;text-align:center;background:#fff;border:1px solid #d5e4da;border-radius:20px;padding:24px 20px;max-width:300px;box-shadow:0 10px 30px rgba(10,30,20,.12);color:#10241a;}
+  html.dark .kcCard{background:#10241a;border-color:rgba(63,206,124,.3);color:#e8f5ec;}
+  .kcBtn{border:none;background:linear-gradient(135deg,#3fce7c,#0a9e3d);color:#fff;font-weight:800;font-size:14px;padding:11px 22px;border-radius:14px;margin-top:14px;font-family:inherit;cursor:pointer;}
+  html.dark #kcSearch{background:#10241a !important;border-color:rgba(63,206,124,.2) !important;}
+  html.dark #kcSearchIn{background:rgba(255,255,255,.08) !important;color:#e8f5ec !important;border-color:rgba(63,206,124,.25) !important;}
+  #kcInput{color:#10241a;-webkit-text-fill-color:#10241a;} html.dark #kcInput{color:#e8f5ec;-webkit-text-fill-color:#e8f5ec;}
+  #kcFeed mark{background:#ffe27a;color:inherit;border-radius:3px;}
+  `;
+  document.head.appendChild(s);
+}
+
+/* ---------- Konstriksyon UI ---------- */
+function build(){
+  if(kc.built) return true;
+  const bg = $('supportChatBg'), msgs = $('supportChatMessages'), logo = $('supportChatHeaderLogo');
+  if(!bg || !msgs || !logo) return false;
+  injectCss();
+  const header = logo.closest('div[style*="linear-gradient(135deg"]');
+  if(!header) return false;
+  const origTitle = $('supportBotName').closest('div[style*="flex:1"]');
+  kc.header = header; kc.origTitle = origTitle;
+  msgs.classList.add('kcPat');
+  // Titre Kominote (pwòp li)
+  const ct = document.createElement('div'); ct.id='kcTitle'; ct.style.cssText='flex:1;min-width:0;display:none;';
+  ct.innerHTML = '<div id="kcTitleTx" style="font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div><div style="font-size:11.5px;display:flex;align-items:center;gap:5px;margin-top:1px;opacity:.95;"><span style="width:7px;height:7px;border-radius:50%;background:#B6FFCF;"></span><span id="kcOnline"></span></div>';
+  origTitle.after(ct);
+  // Bouton rechèch + 3 pwen
+  const hb = document.createElement('div'); hb.id='kcHdrBtns'; hb.style.cssText='display:none;gap:8px;align-items:center;';
+  hb.innerHTML = '<button class="kcHdrBtn" id="kcSearchBtn" aria-label="Search"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button><button class="kcHdrBtn" id="kcMoreBtn" aria-label="Menu"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button>';
+  ct.after(hb);
+  // Onglè yo
+  const tabs = document.createElement('div'); tabs.id='kcTabs'; tabs.style.cssText='display:flex;gap:6px;padding:0 14px;background:linear-gradient(135deg,#17a854,#0a7c3d);flex-shrink:0;position:relative;';
+  tabs.innerHTML = '<button class="kcTab on" id="kcTabSup"></button><button class="kcTab" id="kcTabCom"></button>';
+  header.after(tabs);
+  // Rechèch
+  const sr = document.createElement('div'); sr.id='kcSearch'; sr.style.cssText='display:none;flex-shrink:0;padding:8px 12px;background:#fff;border-bottom:1px solid #e3ece6;align-items:center;gap:8px;';
+  sr.innerHTML = '<input id="kcSearchIn" type="text" autocomplete="off" style="flex:1;border:1px solid #d5e4da;background:#f3f7f4;border-radius:14px;padding:9px 12px;font-size:14px;outline:none;color:#10241a;font-family:inherit;"><span id="kcSearchCnt" style="font-size:12px;font-weight:700;color:#5b6b62;white-space:nowrap;"></span><button id="kcSearchX" style="border:none;background:none;font-size:18px;color:#5b6b62;cursor:pointer;">✕</button>';
+  tabs.after(sr);
+  // Feed
+  const feed = document.createElement('div'); feed.id='kcFeed'; feed.className='kcPat';
+  feed.style.cssText = 'position:relative;flex:1;overflow-y:auto;overflow-x:hidden;padding:18px 16px;display:none;flex-direction:column;gap:2px;';
+  msgs.after(feed);
+  // Antre tèks Kominote
+  const origWrap = $('supportChatInput').closest('div[style*="rgba(7,26,16"]');
+  kc.origWrap = origWrap;
+  const wrap = document.createElement('div'); wrap.id='kcInputWrap';
+  wrap.className='kcWrap'; wrap.style.cssText='position:relative;display:none;flex-shrink:0;padding:12px 14px 6px;backdrop-filter:blur(10px);flex-direction:column;';
+  wrap.innerHTML = `
+   <div id="kcRecBar" style="display:none;align-items:center;gap:10px;padding:2px 6px 10px;color:#E23B57;"><span style="width:9px;height:9px;border-radius:50%;background:#E23B57;animation:pillPulse 1s ease-in-out infinite;"></span><span id="kcRecT" style="font-weight:700;font-size:13px;">0:00</span><span id="kcRecL" style="flex:1;font-size:13px;font-weight:600;"></span><button id="kcRecX" style="border:none;background:none;color:#93b1a1;font-size:12.5px;font-weight:700;cursor:pointer;"></button></div>
+   <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(63,206,124,0.22);border-radius:30px;padding:8px 8px 8px 8px;">
+     <div id="kcReplyBar" style="display:none;align-items:center;gap:10px;background:rgba(10,158,61,.12);border-left:4px solid #0a9e3d;border-radius:10px;padding:6px 10px;margin:0 0 8px;"><div style="flex:1;min-width:0;"><div id="kcReplyN" style="font-weight:800;font-size:12px;color:#0a9e3d;"></div><div id="kcReplyT" style="font-size:12.5px;color:#93b1a1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div></div><button id="kcReplyX" style="width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,.1);color:#93b1a1;cursor:pointer;font-size:12px;">✕</button></div>
+     <div style="display:flex;align-items:center;gap:8px;">
+       <label aria-label="Image" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#e8f5ec;flex-shrink:0;cursor:pointer;font-size:22px;line-height:1;font-weight:300;">+<input id="kcFile" type="file" accept="image/*,video/*" style="display:none;"></label>
+       <textarea id="kcInput" rows="1" enterkeyhint="enter" style="flex:1;min-width:0;box-sizing:border-box;border:none;outline:none;background:transparent;padding:9px 2px;font-size:15px;color:#e8f5ec;resize:none;overflow-y:auto;max-height:120px;line-height:1.4;font-family:inherit;display:block;align-self:center;"></textarea>
+       <button id="kcMic" aria-label="Send" style="width:40px;height:40px;border-radius:50%;background:#0FA654;border:none;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;cursor:pointer;">
+         <svg id="kcMicI" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke-linecap="round"/></svg>
+         <svg id="kcSendI" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M2.5 21.5 22 12 2.5 2.5 2.5 10 16 12 2.5 14z"/></svg>
+       </button>
+     </div>
+   </div>`;
+  origWrap.before(wrap);
+  // Evènman
+  $('kcTabSup').onclick = () => setTab('support');
+  $('kcTabCom').onclick = () => setTab('community');
+  $('kcSearchBtn').onclick = () => toggleSearch();
+  $('kcSearchX').onclick = () => toggleSearch(false);
+  $('kcSearchIn').oninput = applySearch;
+  $('kcMoreBtn').onclick = (e) => { e.stopPropagation(); openPop(); };
+  $('kcReplyX').onclick = () => setReply(null);
+  const inp = $('kcInput');
+  inp.addEventListener('input', () => { syncSend(); onTypingInput(); });
+  inp.addEventListener('blur', () => { clearTimeout(_typT); setTyping(false); });
+  inp.addEventListener('keydown', e => { if(e.key==='Enter' && !e.shiftKey && !window.matchMedia('(pointer:coarse)').matches){ e.preventDefault(); sendText(); } });
+  $('kcMic').onclick = () => { if(inp.value.trim()) sendText(); else toggleRec(); };
+  $('kcRecX').onclick = () => stopRec(true);
+  $('kcFile').onchange = (e) => sendFile(e.target);
+  feed.addEventListener('click', () => closePop());
+  kc.built = true;
+  applyLang();
+  return true;
+}
+function applyLang(){
+  if(!kc.built) return;
+  $('kcTabSup').textContent = '💬 ' + T('tabSupport');
+  $('kcTabCom').innerHTML = '👥 ' + T('tabCommunity') + '<span class="kcBadge" id="kcUnread" style="display:none;"></span>';
+  $('kcTitleTx').innerHTML = '<b><i>'+esc(T('title'))+'</i></b>'; const bn=$('supportBotName'); if(bn) bn.innerHTML = '<b><i>'+esc(T('title'))+'</i></b>';
+  $('kcInput').placeholder = T('ph');
+  $('kcSearchIn').placeholder = T('search');
+  $('kcRecL').textContent = T('rec'); $('kcRecX').textContent = T('cancel');
+  updateOnline(); updateUnread();
+}
+function setTab(tab){
+  if(!build()) return;
+  kc.tab = tab;
+  const com = tab === 'community';
+  $('kcTabSup').classList.toggle('on', !com); $('kcTabCom').classList.toggle('on', com);
+  $('supportChatMessages').style.display = com ? 'none' : 'flex';
+  $('kcFeed').style.display = com ? 'flex' : 'none';
+  kc.origWrap.style.display = com ? 'none' : '';
+  const rb = $('supportRecordingBar'), ep = $('supportEmojiPanel'); if(com){ if(rb) rb.style.display='none'; if(ep) ep.style.display='none'; }
+  kc.origTitle.style.display = com ? 'none' : '';
+  $('kcTitle').style.display = com ? 'block' : 'none';
+  $('kcHdrBtns').style.display = com ? 'flex' : 'none';
+  if(!com){ toggleSearch(false); closePop(); }
+  if(com){ kc.unread = 0; updateUnread(); markSeen(); applyLang(); enter(); }
+  updateInputState();
+}
+function updateInputState(){
+  const com = kc.tab === 'community'; const ok = logged() && !kc.me.banned && !kc.me.left;
+  $('kcInputWrap').style.display = (com && ok) ? 'flex' : 'none';
+}
+
+/* ---------- Done: chaje / abònman ---------- */
+async function sb(){ return await getSupabase(); }
+async function loadMe(){
+  kc.me = { muted:false, left:false, banned:false };
+  try{ const o = JSON.parse(localStorage.getItem(lsKey())||'{}'); kc.me.muted = !!o.muted; kc.me.left = !!o.left; }catch(e){}
+  const uid = uidNow(); if(!uid) return;
+  try{
+    const c = await sb();
+    const { data } = await c.from('community_members').select('muted,left_group,banned').eq('user_id', uid).maybeSingle();
+    if(data){ kc.me.muted = !!data.muted; kc.me.left = !!data.left_group; kc.me.banned = !!data.banned; }
+  }catch(e){}
+}
+async function saveMe(){
+  try{ localStorage.setItem(lsKey(), JSON.stringify({muted:kc.me.muted,left:kc.me.left})); }catch(e){}
+  const uid = uidNow(); if(!uid) return;
+  try{ const c = await sb(); await c.from('community_members').upsert({ user_id:uid, muted:kc.me.muted, left_group:kc.me.left, updated_at:new Date().toISOString() }, { onConflict:'user_id' }); }catch(e){}
+}
+let _enterBusy = false;
+async function enter(){
+  if(!build() || _enterBusy) return;
+  _enterBusy = true;
+  try{
+    const feed = $('kcFeed');
+    if(!logged()){ kc.list=[]; kc.byId.clear(); renderGate('login'); updateInputState(); return; }
+    await loadMe(); updateInputState();
+    if(kc.me.left){ renderGate('left'); return; }
+    if(!kc.list.length || feed.dataset.gate){ feed.dataset.gate=''; await loadMessages(true); }
+    await subscribe();
+    joinPresence();
+  } finally { _enterBusy = false; }
+}
+function renderGate(kind){
+  const feed = $('kcFeed'); feed.dataset.gate = kind;
+  const txt = kind==='login' ? T('needLogin') : kind==='left' ? T('left') : T('banned');
+  const btn = kind==='login' ? `<button class="kcBtn" id="kcGateBtn">${esc(T('loginBtn'))}</button>` : kind==='left' ? `<button class="kcBtn" id="kcGateBtn">${esc(T('rejoin'))}</button>` : '';
+  feed.innerHTML = `<div class="kcCard"><div style="font-size:34px;">${kind==='banned'?'🚫':'👥'}</div><div style="font-weight:800;font-size:15px;margin-top:8px;">${esc(txt)}</div>${btn}</div>`;
+  const b = $('kcGateBtn');
+  if(b) b.onclick = async () => {
+    if(kind==='login'){ try{ toggleSupportChat(); }catch(e){} try{ openAuthModal('login'); }catch(e){} }
+    else { kc.me.left=false; await saveMe(); kc.list=[]; kc.byId.clear(); toast(T('joined')); updateInputState(); await enter(); }
+  };
+}
+function toast(m){ try{ showToast(m, 3000, true); }catch(e){} }
+async function loadMessages(reset){
+  if(kc.loading) return; kc.loading = true;
+  try{
+    const c = await sb();
+    let q = c.from('community_messages').select('*').order('created_at',{ascending:false}).limit(60);
+    if(!reset && kc.list.length) q = q.lt('created_at', kc.list[0].created_at);
+    const { data, error } = await q;
+    if(error) throw error;
+    const rows = (data||[]).reverse();
+    if(reset){ kc.list = []; kc.byId.clear(); }
+    kc.loadedAll = (data||[]).length < 60;
+    kc.list = rows.concat(kc.list);
+    kc.list.forEach(m => kc.byId.set(m.id, m));
+    const feed = $('kcFeed'); const prevH = feed.scrollHeight, prevT = feed.scrollTop;
+    renderAll();
+    if(reset) feed.scrollTop = feed.scrollHeight; else feed.scrollTop = feed.scrollHeight - prevH + prevT;
+  }catch(e){ const feed=$('kcFeed'); if(feed && !kc.list.length){ feed.dataset.gate=''; feed.innerHTML = `<div class="kcCard"><div style="font-size:30px;">⚠️</div><div style="font-weight:700;font-size:14px;margin-top:8px;">${esc(T('fail'))}</div><button class="kcBtn" id="kcRetry">↻</button></div>`; const r=$('kcRetry'); if(r) r.onclick=()=>enter(); } }
+  finally { kc.loading = false; }
+}
+async function subscribe(){
+  if(kc.msgCh) return;
+  try{
+    const c = await sb();
+    kc.msgCh = c.channel('kc_community_msgs')
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'community_messages'}, p => onRemoteInsert(p.new))
+      .on('postgres_changes',{event:'UPDATE',schema:'public',table:'community_messages'}, p => onRemoteUpdate(p.new))
+      .subscribe();
+  }catch(e){}
+}
+function onRemoteInsert(m){
+  if(!m || kc.byId.has(m.id)) return;
+  if(kc.me.left || kc.me.banned) return;
+  kc.list.push(m); kc.byId.set(m.id, m);
+  const mine = m.user_id === uidNow();
+  const viewing = kc.tab === 'community' && typeof supportChatOpen!=='undefined' && supportChatOpen;
+  if(kc.built && !$('kcFeed').dataset.gate){
+    const feed = $('kcFeed'); const near = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 140;
+    appendRow(m); if(near || mine) feed.scrollTop = feed.scrollHeight;
+  }
+  if(viewing) markSeen();
+  else if(!mine && !kc.me.muted){ kc.unread++; updateUnread(); }
+}
+function onRemoteUpdate(m){
+  if(!m || !kc.byId.has(m.id)) return;
+  const old = kc.byId.get(m.id); Object.assign(old, m);
+  rerenderRow(old);
+}
+function markSeen(){ try{ localStorage.setItem('kc_seen_'+(uidNow()||'x'), new Date().toISOString()); }catch(e){} }
+async function bootUnread(){
+  try{
+    if(!logged() || kc.me.muted || kc.me.left) return;
+    const seen = localStorage.getItem('kc_seen_'+uidNow());
+    if(!seen){ markSeen(); return; }
+    const c = await sb();
+    const { count } = await c.from('community_messages').select('id',{count:'exact',head:true}).gt('created_at', seen).neq('user_id', uidNow());
+    kc.unread = count||0; updateUnread();
+  }catch(e){}
+}
+function updateUnread(){
+  const el = $('kcUnread'); if(!el) return;
+  el.style.display = kc.unread>0 && kc.tab!=='community' ? 'inline-block' : 'none';
+  el.textContent = kc.unread>99 ? '99+' : String(kc.unread);
+}
+
+
+/* ---------- "Ap ekri..." (ti pwofil + 3 ti pwen) ---------- */
+function myName(){ try{ const u=currentUser(); return (u&&u.name)||''; }catch(e){ return ''; } }
+function typers(){
+  const out=[]; if(!kc.presCh) return out; const me=uidNow();
+  try{ const st=kc.presCh.presenceState(); Object.keys(st).forEach(k=>{ if(k===me) return; const metas=st[k]||[]; const last=metas[metas.length-1]; if(last && last.typing) out.push({ id:k, n:last.n||'?' }); }); }catch(e){}
+  return out;
+}
+function renderTyping(){
+  const feed = $('kcFeed'); if(!feed || feed.dataset.gate) return;
+  const list = typers(); let el = $('kcTyping');
+  if(!list.length){ if(el) el.remove(); return; }
+  const key = list.map(x=>x.id).sort().join(',');
+  const near = feed.scrollHeight - feed.scrollTop - feed.clientHeight < 140;
+  if(!el){ el = document.createElement('div'); el.id='kcTyping'; el.className='kcTyp'; }
+  if(el.dataset.k !== key){
+    const shown = list.slice(0,3); const more = list.length - shown.length;
+    el.dataset.k = key;
+    el.innerHTML = '<div style="display:flex;">' + shown.map((x,i)=>`<div class="kcTypAv" style="background:${colorFor(x.id)};margin-left:${i?-9:0}px;">${esc(String(x.n).trim().charAt(0).toUpperCase()||'?')}</div>`).join('') + (more>0?`<div class="kcTypAv" style="background:#e3ece6;margin-left:-9px;font-size:10px;">+${more}</div>`:'') + '</div><div class="kcTypB"><i class="kcDot"></i><i class="kcDot"></i><i class="kcDot"></i></div>';
+  }
+  feed.appendChild(el);
+  if(near) feed.scrollTop = feed.scrollHeight;
+}
+let _typOn=false, _typT=null, _typLast=0;
+async function setTyping(on){
+  if(!kc.presCh) return;
+  const now = Date.now();
+  if(on === _typOn && (!on || now-_typLast < 2500)) return;
+  _typOn = on; _typLast = now;
+  try{ await kc.presCh.track({ typing:on, n:myName(), t:now }); }catch(e){}
+}
+function onTypingInput(){
+  const has = $('kcInput').value.trim().length>0;
+  if(!has){ clearTimeout(_typT); setTyping(false); return; }
+  setTyping(true); clearTimeout(_typT); _typT = setTimeout(()=>setTyping(false), 3000);
+}
+
+/* ---------- Presence (manm en liy) ---------- */
+async function joinPresence(){
+  const uid = uidNow();
+  if(!uid){ leavePresence(); return; }
+  if(kc.presCh && kc.presUid === uid) return;
+  leavePresence();
+  try{
+    const c = await sb();
+    kc.presUid = uid;
+    const ch = c.channel('kc_community_presence', { config:{ presence:{ key: uid } } });
+    ch.on('presence',{event:'sync'}, () => { try{ kc.online = Object.keys(ch.presenceState()).length; }catch(e){} updateOnline(); renderTyping(); });
+    ch.subscribe(async (st) => { if(st === 'SUBSCRIBED'){ try{ await ch.track({ typing:false, n:myName(), t: Date.now() }); }catch(e){} } });
+    kc.presCh = ch;
+  }catch(e){}
+}
+async function leavePresence(){
+  if(kc.presCh){ try{ const c = await sb(); await c.removeChannel(kc.presCh); }catch(e){} }
+  kc.presCh = null; kc.presUid = null; kc.online = 0; updateOnline();
+}
+function updateOnline(){ const el = $('kcOnline'); if(el) el.textContent = T('online', Math.max(kc.online, logged()?1:0)); }
+
+
+/* ---------- Style tèks (tankou WhatsApp): *gra* _kouche_ ~bare~ `kòd` ---------- */
+const FB='(^|[\\s(>])', FA='(?=$|[\\s.,!?)<:;])';
+function fmtPlain(h){
+  const codes=[];
+  h = h.replace(new RegExp(FB+'`([^`\\n]+)`'+FA,'g'),(m,a,c)=>{ codes.push(c); return a+'\u0001'+(codes.length-1)+'\u0002'; });
+  [['\\*','b'],['_','i'],['~','s']].forEach(([ch,tag]) => {
+    h = h.replace(new RegExp(FB+ch+'([^'+ch+'\\n]+)'+ch+FA,'g'),(m,a,t)=>a+'<'+tag+'>'+t+'</'+tag+'>');
+  });
+  return h.replace(/\u0001(\d+)\u0002/g,(m,i)=>'<code>'+codes[+i]+'</code>');
+}
+function fmtHtml(html){
+  return String(html).split(/(<a\b[^>]*>[\s\S]*?<\/a>|<[^>]+>)/g).map((part,i)=> i%2 ? part : fmtPlain(part)).join('');
+}
+function stripFmt(t){
+  let h = String(t);
+  h = h.replace(new RegExp(FB+'`([^`\\n]+)`'+FA,'g'),'$1$2');
+  ['\\*','_','~'].forEach(ch => { h = h.replace(new RegExp(FB+ch+'([^'+ch+'\\n]+)'+ch+FA,'g'),'$1$2'); });
+  return h;
+}
+const isMedia = c => (typeof ktIsVoiceText==='function' && (ktIsVoiceText(c)||ktIsImageText(c)||ktIsVideoText(c)));
+
+
+/* ---------- Kat règ (dropdown) ---------- */
+const KC_RULES = {
+ ht:{title:'Règ kominote a',sub:'Peze pou w wè tout règ yo',items:[['🤝','Respekte tout moun','Pa joure, pa meprize pesonn.'],['🔒','Pa pataje enfòmasyon prive','Modpas, kòd PIN, ID oswa nimewo kat pa janm pou pataje.'],['🚫','Pa spam, pa piblisite','Pa voye menm mesaj la plizyè fwa, pa fè piblisite.'],['🛡️','Admin gen dwa entèvni','Admin ka efase mesaj ak bloke moun ki pa respekte règ yo.']]},
+ fr:{title:'Règles de la communauté',sub:'Appuyez pour voir toutes les règles',items:[['🤝','Respectez tout le monde','Pas d’insultes, pas de mépris.'],['🔒','Ne partagez pas d’infos privées','Mots de passe, PIN, ID ou numéros de carte : jamais.'],['🚫','Pas de spam ni de publicité','N’envoyez pas le même message plusieurs fois.'],['🛡️','Les admins peuvent intervenir','Ils peuvent supprimer des messages et bloquer les membres.']]},
+ en:{title:'Community rules',sub:'Tap to see all the rules',items:[['🤝','Respect everyone','No insults, no disrespect.'],['🔒','Never share private info','Passwords, PINs, IDs or card numbers: never.'],['🚫','No spam or advertising','Don’t send the same message repeatedly.'],['🛡️','Admins can step in','They can delete messages and block members who break the rules.']]},
+ es:{title:'Reglas de la comunidad',sub:'Toca para ver todas las reglas',items:[['🤝','Respeta a todos','Sin insultos ni faltas de respeto.'],['🔒','No compartas datos privados','Contraseñas, PIN, ID o números de tarjeta: nunca.'],['🚫','Sin spam ni publicidad','No envíes el mismo mensaje varias veces.'],['🛡️','Los admins pueden intervenir','Pueden borrar mensajes y bloquear a quien incumpla las reglas.']]}
+};
+const RT = () => KC_RULES[(typeof currentLang!=='undefined'&&KC_RULES[currentLang])?currentLang:'fr'];
+function buildRulesCard(){
+  const R = RT();
+  const c = document.createElement('div'); c.id='kcRules'; c.className='kcRules' + (kc.rulesOpen?' open':'');
+  c.innerHTML = `<button type="button" class="kcRulesHd"><span class="kcRulesIc">🛡️</span><span style="flex:1;min-width:0;text-align:left;"><b>${esc(R.title)}</b><small>${esc(R.sub)}</small></span><svg class="kcRulesCh" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button><div class="kcRulesBd">${R.items.map(it=>`<div class="kcRule"><span class="kcRuleIc">${it[0]}</span><span><b>${esc(it[1])}</b><small>${esc(it[2])}</small></span></div>`).join('')}</div>`;
+  c.querySelector('.kcRulesHd').onclick = (e) => { e.stopPropagation(); kc.rulesOpen = !kc.rulesOpen; c.classList.toggle('open', kc.rulesOpen); };
+  return c;
+}
+
+/* ---------- Rendering ---------- */
+const VERIFIED = '<svg class="kcVer" width="16" height="16" viewBox="0 0 24 24" aria-label="verified" style="vertical-align:-3px;margin-left:5px;"><path fill="#25D366" d="M12 1.5l2.6 1.9 3.2-.1 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.1L12 22.5l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.1z"/><path d="m8 12.4 2.8 2.8 5.2-5.6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const COLORS = ['#d8f5e2','#cfe3ff','#ffe5c7','#f6d6f0','#fff2b8','#d6f2f2'];
+function colorFor(id){ let h=0; for(const ch of String(id)) h=(h*31+ch.charCodeAt(0))>>>0; return COLORS[h%COLORS.length]; }
+function dayKey(d){ return d.getFullYear()+'-'+d.getMonth()+'-'+d.getDate(); }
+function dayLabel(d){
+  const n = new Date(), y = new Date(Date.now()-864e5);
+  if(dayKey(d)===dayKey(n)) return T('today'); if(dayKey(d)===dayKey(y)) return T('yest');
+  try{ return d.toLocaleDateString(currentLang||'fr',{day:'numeric',month:'short'}); }catch(e){ return d.toDateString(); }
+}
+function hhmm(iso){ const d=new Date(iso); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function flags(m, prev){
+  const cont = prev && prev.user_id===m.user_id && dayKey(new Date(prev.created_at))===dayKey(new Date(m.created_at)) && (new Date(m.created_at)-new Date(prev.created_at))<5*60e3;
+  m._showName = !cont; if(cont) prev._hideAv = true;
+  return cont;
+}
+function renderAll(){
+  const feed = $('kcFeed'); feed.innerHTML = ''; feed.dataset.gate='';
+  feed.appendChild(buildRulesCard());
+  if(!kc.loadedAll && kc.list.length){ const b=document.createElement('button'); b.className='kcBtn'; b.style.cssText+='align-self:center;margin:4px 0 8px;padding:7px 16px;font-size:12.5px;'; b.textContent=T('more'); b.onclick=()=>loadMessages(false); feed.appendChild(b); }
+  if(!kc.list.length){ const e=document.createElement('div'); e.className='kcDay'; e.textContent=T('empty'); feed.appendChild(e); return; }
+  let prev=null, lastDay=null;
+  kc.list.forEach(m => { m._hideAv=false; });
+  kc.list.forEach(m => {
+    const d = new Date(m.created_at), dk = dayKey(d);
+    if(dk!==lastDay){ const s=document.createElement('div'); s.className='kcDay'; s.textContent=dayLabel(d); feed.appendChild(s); lastDay=dk; prev=null; }
+    flags(m, prev); prev = m;
+  });
+  kc.list.forEach(m => feed.appendChild(buildRow(m)));
+  kc.lastDay = lastDay;
+  renderTyping();
+}
+function appendRow(m){
+  const feed = $('kcFeed');
+  const empty = feed.querySelector('.kcDay[data-empty]'); if(empty) empty.remove();
+  if(!kc.list.length || kc.list.length===1){ if(feed.querySelector('.kcDay') && !feed.querySelector('.kcRow')) feed.querySelectorAll('.kcDay').forEach(x=>x.remove()); }
+  const idx = kc.list.indexOf(m); const prev = idx>0 ? kc.list[idx-1] : null;
+  const d = new Date(m.created_at), dk = dayKey(d);
+  if(!prev || dayKey(new Date(prev.created_at))!==dk){ const s=document.createElement('div'); s.className='kcDay'; s.textContent=dayLabel(d); feed.appendChild(s); }
+  m._hideAv=false; flags(m, prev);
+  if(prev && prev._hideAv){ const pr = feed.querySelector('.kcRow[data-id="'+prev.id+'"] .kcAv'); if(pr) pr.style.visibility='hidden'; }
+  feed.appendChild(buildRow(m));
+  renderTyping();
+}
+function rerenderRow(m){
+  const old = $('kcFeed') && $('kcFeed').querySelector('.kcRow[data-id="'+m.id+'"]'); if(!old) return;
+  old.replaceWith(buildRow(m));
+}
+function avatarHtml(m, mine){
+  const vis = m._hideAv ? 'visibility:hidden;' : '';
+  if(m.is_admin) return `<div class="kcAv" style="width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid rgba(63,206,124,0.3);overflow:hidden;flex-shrink:0;padding:2px;box-sizing:border-box;${vis}"><img src="${window.KT_LOGO_SRC||''}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>`;
+  const ini = esc((m.name||'?').trim().charAt(0).toUpperCase()||'?');
+  if(mine) return `<div class="kcAv" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3fce7c,#0a9e3d);color:#fff;font-weight:800;font-size:13px;border:1.5px solid rgba(255,255,255,0.35);${vis}">${ini}</div>`;
+  return `<div class="kcAv" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${colorFor(m.user_id)};color:#0a7c3d;font-weight:800;font-size:13px;${vis}">${ini}</div>`;
+}
+function buildRow(m){
+  const me = uidNow(); const mine = m.user_id === me;
+  const row = document.createElement('div');
+  row.className = 'kcRow' + (mine?' kcMine':''); row.dataset.id = m.id;
+  row.style.cssText = 'display:flex;gap:8px;margin-bottom:6px;align-items:flex-end;' + (mine?'flex-direction:row-reverse;':'');
+  let bubbleStyle;
+  if(mine) bubbleStyle = 'background:linear-gradient(135deg,#3fce7c,#0a9e3d);color:#fff;border-radius:16px 16px 4px 16px;box-shadow:0 4px 14px rgba(10,158,61,0.35);';
+  else if(m.is_admin) bubbleStyle = 'background:#1565D8;color:#fff;border-radius:16px 16px 16px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.2);';
+  else bubbleStyle = 'background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);color:#e8f5ec;border-radius:16px 16px 16px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
+  bubbleStyle += 'padding:10px 14px;max-width:100%;font-size:14.5px;white-space:pre-wrap;line-height:1.5;box-sizing:border-box;';
+  const nameLine = (!mine && m._showName) ? `<div style="font-size:11.5px;font-weight:800;color:#0a9e3d;margin:0 0 3px 4px;">${esc(m.name||'')}${m.is_admin?VERIFIED:''}</div>` : '';
+  let inner;
+  if(m.deleted){ inner = `<span style="opacity:.7;font-style:italic;">${esc(T('deleted'))}</span>`; }
+  else {
+    const q = m.reply_to ? `<div class="kcQuote" data-q="${esc(m.reply_to)}"><b>${esc(m.reply_name||'')}</b><span>${esc(m.reply_text||'')}</span></div>` : '';
+    const rep = (state && state.isAdmin && m.reports>0) ? `<div style="font-size:11px;font-weight:800;color:#e5484d;margin-bottom:4px;">${esc(T('reports', m.reports))}</div>` : '';
+    { const body = (typeof formatChatText==='function' ? formatChatText(m.content, true) : esc(m.content)); inner = rep + q + (isMedia(m.content) ? body : fmtHtml(body)); }
+  }
+  row.innerHTML = `<div class="kcRowIc"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v3"/></svg></div>` + avatarHtml(m, mine) +
+    `<div style="display:flex;flex-direction:column;max-width:82%;min-width:0;align-items:${mine?'flex-end':'flex-start'};">${nameLine}<div class="kc-bubble" style="${bubbleStyle}">${inner}</div><div class="kcReacts" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:-6px;position:relative;z-index:1;padding:0 6px;"></div></div>`;
+  const b = row.querySelector('.kc-bubble');
+  if(!m.deleted){
+    try{ if(typeof ktStyleVoiceBubble==='function') ktStyleVoiceBubble(b, mine, m.content, m.created_at); }catch(e){}
+    if(!b.querySelector('.ktv-ts')){ const t = document.createElement('span'); t.style.cssText='float:right;margin:6px 0 -4px 12px;font-size:10px;opacity:.6;'; t.textContent = hhmm(m.created_at); b.appendChild(t); }
+    renderReacts(row, m);
+  }
+  const qEl = row.querySelector('.kcQuote'); if(qEl) qEl.onclick = (e) => { e.stopPropagation(); jumpTo(qEl.dataset.q); };
+  attachGestures(row, m);
+  return row;
+}
+function renderReacts(row, m){
+  const box = row.querySelector('.kcReacts'); if(!box) return; box.innerHTML='';
+  const me = uidNow(); const r = m.reactions || {};
+  Object.keys(r).forEach(e => { const arr = r[e]||[]; if(!arr.length) return;
+    const c = document.createElement('span'); c.className = 'kcChip' + (arr.includes(me)?' me':''); c.textContent = e + (arr.length>1?' '+arr.length:'');
+    c.onclick = (ev) => { ev.stopPropagation(); react(m, e); }; box.appendChild(c); });
+  box.style.display = box.children.length ? 'flex' : 'none';
+  if(box.children.length) box.style.marginTop = '-4px';
+}
+
+/* ---------- Jès: glise pou reponn, peze long pou meni ---------- */
+function attachGestures(row, m){
+  if(m.deleted) return;
+  let sx=0, sy=0, dx=0, drag=false, moved=false, timer=null, vibr=false;
+  const ic = row.querySelector('.kcRowIc');
+  const clear = () => { if(timer){ clearTimeout(timer); timer=null; } };
+  row.addEventListener('touchstart', e => { const t=e.touches[0]; sx=t.clientX; sy=t.clientY; dx=0; drag=false; moved=false; vibr=false; clear();
+    timer = setTimeout(() => { if(!moved){ timer=null; try{ navigator.vibrate&&navigator.vibrate(15); }catch(_){} openMenu(m, row); } }, 480); }, {passive:true});
+  row.addEventListener('touchmove', e => { const t=e.touches[0]; const ddx=t.clientX-sx, ddy=t.clientY-sy;
+    if(!drag && (Math.abs(ddx)>8 || Math.abs(ddy)>8)){ moved=true; clear(); }
+    if(!drag && ddx>10 && Math.abs(ddx)>Math.abs(ddy)*1.3){ drag=true; row.classList.add('kcDrag'); }
+    if(drag){ dx = Math.max(0, Math.min(ddx, 84)); row.style.transform = `translateX(${dx}px)`; const p = Math.min(1, dx/56); ic.style.opacity = p; ic.style.transform = `scale(${.6+.4*p})`;
+      if(dx>=56 && !vibr){ vibr=true; try{ navigator.vibrate&&navigator.vibrate(10); }catch(_){} } } }, {passive:true});
+  const end = () => { clear(); if(drag){ row.classList.remove('kcDrag'); row.style.transform=''; ic.style.opacity=0; ic.style.transform='scale(.6)'; if(dx>=56) setReply(m); } drag=false; };
+  row.addEventListener('touchend', end); row.addEventListener('touchcancel', end);
+  row.addEventListener('contextmenu', e => { e.preventDefault(); openMenu(m, row); });
+  row.addEventListener('dblclick', () => setReply(m));
+}
+function setReply(m){
+  kc.replyTo = m;
+  const bar = $('kcReplyBar'); if(!bar) return;
+  if(!m){ bar.style.display='none'; return; }
+  bar.style.display='flex';
+  $('kcReplyN').textContent = T('replyTo') + ' ' + (m.name||'');
+  $('kcReplyT').textContent = previewText(m);
+  $('kcInput').focus();
+}
+function previewText(m){
+  const c = m.content||'';
+  if(typeof ktIsVoiceText==='function' && ktIsVoiceText(c)) return '🎤';
+  if(typeof ktIsImageText==='function' && ktIsImageText(c)) return '📷';
+  if(typeof ktIsVideoText==='function' && ktIsVideoText(c)) return '🎬';
+  return stripFmt(c).replace(/\s+/g,' ').slice(0,90);
+}
+function jumpTo(id){
+  const r = $('kcFeed').querySelector('.kcRow[data-id="'+id+'"]'); if(!r) return;
+  if(kc.searchOpen) toggleSearch(false);
+  r.scrollIntoView({block:'center',behavior:'smooth'}); r.classList.remove('kcFlash'); void r.offsetWidth; r.classList.add('kcFlash');
+  setTimeout(()=>r.classList.remove('kcFlash'),1600);
+}
+
+/* ---------- Meni (réaction, repons, kopye, rapòte, efase) ---------- */
+function closeSheet(){ const o=$('kcSheetBg'); if(o) o.remove(); }
+function openMenu(m, row){
+  closeSheet(); closePop();
+  const me = uidNow(); const mine = m.user_id===me; const admin = !!(state && state.isAdmin);
+  const o = document.createElement('div'); o.id='kcSheetBg'; o.className='kcSheetBg';
+  o.onclick = (e) => { if(e.target===o) closeSheet(); };
+  const reacts = EMOJIS.map(e => `<button data-e="${e}">${e}</button>`).join('');
+  const isText = !(typeof ktIsVoiceText==='function' && (ktIsVoiceText(m.content)||ktIsImageText(m.content)||ktIsVideoText(m.content)));
+  const act = (id, ic, txt, red) => `<button class="kcAct${red?' red':''}" data-a="${id}"><span style="width:22px;text-align:center;">${ic}</span>${esc(txt)}</button>`;
+  o.innerHTML = `<div class="kcSheet"><div class="kcReactRow">${reacts}</div>${act('reply','↩️',T('reply'))}${isText?act('copy','📋',T('copy')):''}${!mine?act('report','🚩',T('report'),true):''}${(mine||admin)?act('del','🗑️',T('del'),true):''}${(admin&&!mine)?act('ban','🚫',T('ban'),true):''}</div>`;
+  document.body.appendChild(o);
+  o.querySelectorAll('.kcReactRow button').forEach(b => b.onclick = () => { closeSheet(); react(m, b.dataset.e); });
+  o.querySelectorAll('.kcAct').forEach(b => b.onclick = async () => {
+    const a = b.dataset.a; closeSheet();
+    if(a==='reply') setReply(m);
+    else if(a==='copy'){ try{ await navigator.clipboard.writeText(m.content); toast(T('copied')); }catch(e){} }
+    else if(a==='report') reportMsg(m);
+    else if(a==='del'){ if(confirm(T('delAsk'))) delMsg(m); }
+    else if(a==='ban'){ if(confirm(T('banAsk'))) banUser(m); }
+  });
+}
+async function react(m, emoji){
+  const me = uidNow(); if(!me) return;
+  // optimiste
+  const r = JSON.parse(JSON.stringify(m.reactions||{}));
+  Object.keys(r).forEach(k => { if(k!==emoji){ r[k]=(r[k]||[]).filter(x=>x!==me); if(!r[k].length) delete r[k]; } });
+  r[emoji] = r[emoji]||[]; if(r[emoji].includes(me)) r[emoji]=r[emoji].filter(x=>x!==me); else r[emoji].push(me); if(!r[emoji].length) delete r[emoji];
+  m.reactions = r; const row = $('kcFeed').querySelector('.kcRow[data-id="'+m.id+'"]'); if(row) renderReacts(row, m);
+  try{ const c = await sb(); const { data, error } = await c.rpc('community_react', { p_id:m.id, p_emoji:emoji }); if(error) throw error; if(data){ m.reactions = data; if(row) renderReacts(row, m); } }catch(e){}
+}
+async function reportMsg(m){ try{ const c = await sb(); const { error } = await c.rpc('community_report', { p_id:m.id, p_reason:'user' }); if(error) throw error; toast(T('reported')); }catch(e){ toast(T('fail')); } }
+async function delMsg(m){ try{ const c = await sb(); const { error } = await c.rpc('community_delete', { p_id:m.id }); if(error) throw error; m.deleted=true; m.content='…'; m.reactions={}; rerenderRow(m); }catch(e){ toast(T('fail')); } }
+async function banUser(m){ try{ const c = await sb(); const { error } = await c.rpc('community_ban', { p_user:m.user_id, p_banned:true }); if(error) throw error; toast('✓'); }catch(e){ toast(T('fail')); } }
+
+/* ---------- Meni 3 pwen anlè ---------- */
+function closePop(){ const p=$('kcPop'); if(p) p.remove(); }
+function openPop(){
+  if($('kcPop')){ closePop(); return; }
+  const p = document.createElement('div'); p.id='kcPop'; p.className='kcPop';
+  const it = (id, ic, tx, red) => `<button class="kcAct${red?' red':''}" data-a="${id}"><span style="width:22px;text-align:center;">${ic}</span>${esc(tx)}</button>`;
+  p.innerHTML = it('mute', kc.me.muted?'🔔':'🔕', kc.me.muted?T('unmute'):T('mute')) + it('rules','📜',T('rules')) + (kc.me.left?it('join','↩️',T('join')):it('leave','🚪',T('leave'),true));
+  $('supportChatBg').appendChild(p);
+  p.querySelectorAll('.kcAct').forEach(b => b.onclick = async (e) => { e.stopPropagation(); const a=b.dataset.a; closePop();
+    if(a==='mute'){ kc.me.muted=!kc.me.muted; await saveMe(); toast(kc.me.muted?T('muted'):T('unmuted')); }
+    else if(a==='rules'){ kc.rulesOpen=true; const rc=$('kcRules'); if(rc){ rc.classList.add('open'); $('kcFeed').scrollTo({top:0,behavior:'smooth'}); } }
+    else if(a==='leave'){ if(confirm(T('leave')+' ?')){ kc.me.left=true; await saveMe(); kc.list=[]; kc.byId.clear(); try{ if(kc.msgCh){ const c=await sb(); c.removeChannel(kc.msgCh); kc.msgCh=null; } }catch(_){} renderGate('left'); updateInputState(); toast(T('leftOk')); } }
+    else if(a==='join'){ kc.me.left=false; await saveMe(); toast(T('joined')); updateInputState(); await enter(); }
+  });
+}
+
+/* ---------- Rechèch ---------- */
+function toggleSearch(force){
+  const open = force===undefined ? !kc.searchOpen : !!force;
+  kc.searchOpen = open; const sr = $('kcSearch'); if(!sr) return;
+  sr.style.display = open ? 'flex' : 'none';
+  if(open){ $('kcSearchIn').value=''; $('kcSearchIn').focus(); applySearch(); }
+  else { $('kcSearchIn').value=''; applySearch(); }
+}
+function norm(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function applySearch(){
+  const q = norm($('kcSearchIn').value.trim()); const feed = $('kcFeed'); const cnt = $('kcSearchCnt');
+  const rows = feed.querySelectorAll('.kcRow');
+  if(!kc.searchOpen || !q){ rows.forEach(r=>{ r.style.display='flex'; r.classList.remove('kcHit'); }); feed.querySelectorAll('.kcDay,.kcPin,.kcRules').forEach(x=>x.style.display=''); cnt.textContent=''; return; }
+  let n=0;
+  rows.forEach(r => { const m = kc.byId.get(r.dataset.id); const hit = m && !m.deleted && (norm(m.content).includes(q) || norm(m.name).includes(q) || norm(m.reply_text).includes(q));
+    r.style.display = hit ? 'flex' : 'none'; r.classList.toggle('kcHit', !!hit); if(hit) n++; });
+  feed.querySelectorAll('.kcDay,.kcPin,.kcRules').forEach(x=>x.style.display='none');
+  cnt.textContent = n ? T('results', n) : T('noRes');
+}
+document.addEventListener('click', (e) => { const r = e.target.closest && e.target.closest('#kcFeed .kcRow'); if(r && kc.searchOpen && $('kcSearchIn').value.trim()){ const id=r.dataset.id; toggleSearch(false); setTimeout(()=>jumpTo(id),50); } }, true);
+
+/* ---------- Voye mesaj ---------- */
+function syncSend(){
+  const i = $('kcInput'); i.style.height='auto'; i.style.height = Math.min(i.scrollHeight,120)+'px';
+  const has = i.value.trim().length>0; $('kcMicI').style.display = has?'none':'block'; $('kcSendI').style.display = has?'block':'none';
+}
+async function insertMsg(content){
+  if(Date.now()-kc.lastSent < 700){ toast(T('slow')); return false; }
+  const uid = uidNow(); if(!uid){ return false; }
+  const rt = kc.replyTo;
+  const row = { user_id:uid, content };
+  if(rt){ row.reply_to = rt.id; row.reply_name = rt.name; row.reply_text = previewText(rt); }
+  try{
+    const c = await sb();
+    const { data, error } = await c.from('community_messages').insert(row).select().single();
+    if(error) throw error;
+    kc.lastSent = Date.now();
+    if(data && !kc.byId.has(data.id)){ kc.list.push(data); kc.byId.set(data.id, data); appendRow(data); const f=$('kcFeed'); f.scrollTop=f.scrollHeight; }
+    setReply(null);
+    markSeen();
+    return true;
+  }catch(e){
+    const msg = String((e&&e.message)||'');
+    if(/Tann|wait/i.test(msg)) toast(T('slow')); else toast(T('fail'));
+    return false;
+  }
+}
+async function sendText(){
+  const i = $('kcInput'); const text = i.value.trim(); if(!text) return;
+  if(typeof ktBlockBadText==='function' && ktBlockBadText(text)) return;
+  const ok = await insertMsg(text.slice(0,2000));
+  if(ok){ i.value=''; syncSend(); clearTimeout(_typT); setTyping(false); }
+}
+async function sendFile(input){
+  const f = input.files[0]; if(!f) return; input.value='';
+  toast(T('sending'));
+  try{ const url = await uploadImageToStorage(f); if(!url){ toast(T('fail')); return; } await insertMsg(url); }catch(e){ toast(T('fail')); }
+}
+let recTimer=null;
+async function toggleRec(){
+  if(kc.rec && kc.rec.mr && kc.rec.mr.state==='recording'){ stopRec(false); return; }
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    const mime = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : '';
+    const mr = mime ? new MediaRecorder(stream,{mimeType:mime}) : new MediaRecorder(stream);
+    const st = { mr, chunks:[], cancel:false, t0:Date.now() }; kc.rec = st;
+    mr.ondataavailable = e => { if(e.data && e.data.size>0) st.chunks.push(e.data); };
+    mr.onstop = async () => {
+      stream.getTracks().forEach(t=>t.stop()); clearInterval(recTimer); $('kcRecBar').style.display='none'; $('kcMic').style.background='#0FA654';
+      if(st.cancel || !st.chunks.length) return;
+      toast(T('sending'));
+      try{ const blob = new Blob(st.chunks,{type:mr.mimeType||'audio/webm'}); const file = new File([blob], (typeof uid==='function'?uid():Date.now())+'.weba',{type:blob.type});
+        const url = await uploadImageToStorage(file); if(!url){ toast(T('fail')); return; } await insertMsg(url); }catch(e){ toast(T('fail')); }
+    };
+    mr.start(); $('kcRecBar').style.display='flex'; $('kcMic').style.background='#E23B57';
+    recTimer = setInterval(()=>{ const s=Math.floor((Date.now()-st.t0)/1000); $('kcRecT').textContent = Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); },500);
+  }catch(e){ toast(T('mic')); }
+}
+function stopRec(cancel){ if(kc.rec && kc.rec.mr && kc.rec.mr.state==='recording'){ kc.rec.cancel = !!cancel; kc.rec.mr.stop(); } }
+
+
+/* ---------- Paj admin: Kominote ---------- */
+async function openAsAdmin(){
+  try{ if(typeof supportChatOpen==='undefined' || !supportChatOpen) await window.toggleSupportChat(); }catch(e){}
+  setTab('community');
+}
+
+function switcher(active){
+  const pill=(id,label,on,click)=>`<button onclick="${click}" style="flex:1;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:13.5px;padding:11px 8px;border-radius:14px;${on?'background:linear-gradient(135deg,#17a854,#0a7c3d);color:#fff;box-shadow:0 6px 14px rgba(10,158,61,.3);':'background:var(--panel-2);color:var(--text);border:1px solid var(--line);'}">${label}</button>`;
+  return `<div style="display:flex;gap:8px;margin-bottom:14px;">${pill('chat','💬 Mesaj kliyan',active==='chat',"switchAdminTab('chatkliyan')")}${pill('kom','👥 Kominote',active==='kom',"switchAdminTab('kominote');kcCommunity.openAsAdmin()")}</div>`;
+}
+async function adminRender(box){
+  const logo = window.KT_LOGO_SRC||'';
+  box.innerHTML = switcher('kom') + `
+   <div style="background:linear-gradient(135deg,#17a854,#0a7c3d);color:#fff;border-radius:18px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+     <div style="width:46px;height:46px;border-radius:50%;background:#fff;padding:4px;box-sizing:border-box;flex-shrink:0;"><img src="${logo}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>
+     <div style="flex:1;min-width:0;"><div style="font-weight:800;font-size:15px;">KERRY TOPUP CHAT</div><div id="kcAdOnline" style="font-size:12px;opacity:.92;margin-top:2px;">…</div></div>
+   </div>
+   <button class="btn btn-green" id="kcAdOpen" style="width:100%;">👥 Louvri Kominote a</button>
+   <div style="font-size:11.5px;color:var(--muted);margin:6px 2px 0;">Ou wè l menm jan ak kliyan yo. Ou ekri kòm <b>Kerry Topup</b> ak badj verifye ✓.</div>
+   <div style="font-weight:800;font-size:14px;margin:20px 0 8px;">⚠️ Mesaj ki rapòte</div>
+   <div id="kcAdReports" style="display:flex;flex-direction:column;gap:8px;"><div style="color:var(--muted);font-size:13px;">Chajman...</div></div>`;
+  $('kcAdOpen').onclick = openAsAdmin;
+  const on = $('kcAdOnline'); if(on) on.textContent = '🟢 ' + KC_TXT.ht.online(Math.max(kc.online,1));
+  const holder = $('kcAdReports');
+  try{
+    const c = await sb();
+    const { data, error } = await c.from('community_messages').select('*').gt('reports',0).eq('deleted',false).order('reports',{ascending:false}).limit(30);
+    if(error) throw error;
+    if(!data || !data.length){ holder.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:14px;text-align:center;background:var(--panel);border-radius:14px;">Pa gen mesaj rapòte ✅</div>'; return; }
+    holder.innerHTML = '';
+    data.forEach(m => {
+      const media = isMedia(m.content);
+      const card = document.createElement('div');
+      card.style.cssText = 'background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px;';
+      card.innerHTML = `<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><b style="font-size:13px;">${esc(m.name||'')}</b><span style="font-size:11px;font-weight:800;color:#fff;background:#e5484d;border-radius:8px;padding:2px 8px;">⚠️ ${m.reports}</span><span style="flex:1;"></span><span style="font-size:11px;color:var(--muted);">${esc(hhmm(m.created_at))}</span></div>
+        <div style="font-size:13.5px;word-break:break-word;margin-bottom:10px;">${media ? '📎 ' + esc(previewText(m)) : esc(String(m.content).slice(0,300))}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;"><button class="mini-btn" data-a="see">Wè nan chat</button><button class="mini-btn" data-a="ok">✓ Pa gen pwoblèm</button><button class="mini-btn" data-a="del" style="color:#e5484d;">🗑️ Efase</button><button class="mini-btn" data-a="ban" style="color:#e5484d;">🚫 Bloke</button></div>`;
+      card.querySelectorAll('button').forEach(b => b.onclick = async () => {
+        const a = b.dataset.a;
+        try{
+          if(a==='see'){ await openAsAdmin(); setTimeout(()=>jumpTo(m.id),400); return; }
+          const c2 = await sb();
+          if(a==='ok'){ const { error:e } = await c2.rpc('community_clear_reports',{ p_id:m.id }); if(e) throw e; }
+          if(a==='del'){ if(!confirm(T('delAsk'))) return; const { error:e } = await c2.rpc('community_delete',{ p_id:m.id }); if(e) throw e; }
+          if(a==='ban'){ if(!confirm(T('banAsk'))) return; const { error:e } = await c2.rpc('community_ban',{ p_user:m.user_id, p_banned:true }); if(e) throw e; return toast('✓'); }
+          card.remove(); if(!holder.children.length) holder.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:14px;text-align:center;background:var(--panel);border-radius:14px;">Pa gen mesaj rapòte ✅</div>';
+        }catch(e){ toast(T('fail')); }
+      });
+      holder.appendChild(card);
+    });
+  }catch(e){ holder.innerHTML = '<div style="color:var(--red);font-size:13px;">⚠️ Pa ka chaje rapò yo. Èske w kouri SQL la?</div>'; }
+}
+
+
+const _origPersonaUI = window.applySupportPersonaUI;
+if(typeof _origPersonaUI === 'function'){
+  window.applySupportPersonaUI = function(){ const r = _origPersonaUI.apply(this, arguments); try{ const bn=$('supportBotName'); if(bn) bn.innerHTML = '<b><i>'+esc(T('title'))+'</i></b>'; }catch(e){} return r; };
+}
+
+/* ---------- Konekte ak chat la ---------- */
+const _orig = window.toggleSupportChat;
+window.toggleSupportChat = async function(){
+  const r = await _orig.apply(this, arguments);
+  try{
+    if(typeof supportChatOpen!=='undefined' && supportChatOpen){ if(build()){ applyLang(); if(kc.tab==='community') enter(); } }
+    else { closePop(); closeSheet(); }
+  }catch(e){}
+  return r;
+};
+// Lang chanje
+setInterval(() => { if(kc.built){ const l = (typeof currentLang!=='undefined')?currentLang:''; if(kc._lang!==l){ kc._lang=l; applyLang(); if(kc.tab==='community' && kc.list.length && !$('kcFeed').dataset.gate) renderAll(); } } }, 1500);
+// Boot (abònman an arye plan pou badj ak manm en liy)
+async function boot(){
+  try{
+    if(!logged()){ if(kc.presCh) leavePresence(); return; }
+    if(kc.bootUid !== uidNow()){ kc.bootUid = uidNow(); kc.list=[]; kc.byId.clear(); if(kc.msgCh){ try{ const c=await sb(); c.removeChannel(kc.msgCh); }catch(_){} kc.msgCh=null; } kc.me={muted:false,left:false,banned:false}; await loadMe(); }
+    if(!kc.me.left && !kc.me.banned){ await subscribe(); if(!kc.unreadBooted){ kc.unreadBooted=true; bootUnread(); } }
+    await joinPresence();
+  }catch(e){}
+}
+setTimeout(boot, 4000); setInterval(boot, 25000);
+window.kcCommunity = { kc, setTab, build, adminRender, openAsAdmin, switcher };
 })();
 
 </script>
