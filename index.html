@@ -685,16 +685,24 @@ textarea.admin-ta{
 .sk-labels{position:absolute;bottom:3px;left:0;right:0;display:flex;justify-content:space-around;font-size:7px;font-weight:bold}
 @keyframes ktSpin{to{transform:rotate(360deg)}}
 
-.ktv{display:flex;align-items:center;gap:10px;min-width:215px;}
-.ktv-play{width:46px;height:46px;border-radius:50%;border:none;background:#ff3b14;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;cursor:pointer;}
+.ktv{display:flex;align-items:flex-start;gap:8px;min-width:225px;}
+.ktv-spd{display:none;min-width:40px;height:30px;padding:0 8px;border:none;border-radius:15px;background:#e9efeb;color:#2b3b32;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;flex-shrink:0;align-items:center;justify-content:center;}
+.ktv.playing .ktv-spd{display:flex;}
+.ktv.playing .ktv-mic{display:none;}
+.ktv-play{width:34px;height:30px;border-radius:50%;border:none;background:transparent;color:#4a5a51;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0;cursor:pointer;}
 .ktv-mid{flex:1;min-width:0;}
-.ktv-bar{height:7px;border-radius:4px;background:#e4e4e4;position:relative;cursor:pointer;}
-.ktv-bar i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:4px;background:#ff3b14;}
-.ktv-time{font-size:12.5px;color:#6b6b6b;margin-top:5px;line-height:1;}
-.ktv-mic{color:#e5532f;flex-shrink:0;}
-.ktv-ts{text-align:right;font-size:11px;color:#9a9a9a;margin-top:4px;line-height:1;}
-.ktv-mine .ktv-play{background:#fff;color:#0a9e3d;}
-.ktv-mine .ktv-bar{background:rgba(255,255,255,.38);}
+.ktv-bar{height:30px;position:relative;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:2px;}
+.ktv-bar b{flex:1;min-width:3px;max-width:4px;border-radius:2px;background:#c4cfc8;align-self:center;}
+.ktv-bar b.on{background:#0a9e3d;}
+.ktv-bar i{position:absolute;left:0;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;border-radius:50%;background:#0a9e3d;display:none;pointer-events:none;}
+.ktv.playing .ktv-bar i,.ktv.seeked .ktv-bar i{display:block;}
+.ktv-time{font-size:12px;color:#6b7a71;margin-top:1px;line-height:1;}
+.ktv-mic{color:#7b8a81;flex-shrink:0;margin-top:5px;}
+.ktv-ts{text-align:right;font-size:11px;color:#8a978f;margin-top:-12px;line-height:1;}
+.ktv-mine .ktv-play{color:#fff;}
+.ktv-mine .ktv-spd{background:rgba(0,0,0,.2);color:#fff;}
+.ktv-mine .ktv-bar b{background:rgba(255,255,255,.42);}
+.ktv-mine .ktv-bar b.on{background:#fff;}
 .ktv-mine .ktv-bar i{background:#fff;}
 .ktv-mine .ktv-time,.ktv-mine .ktv-ts{color:rgba(255,255,255,.88);}
 .ktv-mine .ktv-mic{color:rgba(255,255,255,.92);}
@@ -1074,7 +1082,7 @@ textarea.admin-ta{
     </button>
     <div style="position:relative;width:40px;height:40px;flex-shrink:0;">
       <div style="width:100%;height:100%;border-radius:50%;background:#fff;padding:4px;box-sizing:border-box;overflow:hidden;"><img id="supportChatHeaderLogo" src="" alt="Kerry Topup" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>
-      <span style="position:absolute;bottom:-2px;right:-2px;width:11px;height:11px;background:#3fce7c;border:2px solid #0a7c3d;border-radius:50%;"></span>
+      <svg width="19" height="19" viewBox="0 0 24 24" aria-label="verified" style="position:absolute;bottom:-4px;right:-5px;filter:drop-shadow(0 0 1.5px rgba(0,0,0,.35));"><path fill="#25D366" stroke="#fff" stroke-width="1.2" d="M12 1.5l2.6 1.9 3.2-.1 1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1-3.2-.1L12 22.5l-2.6-1.9-3.2.1-1-3.1-2.6-1.9 1-3.1-1-3.1 2.6-1.9 1-3.1 3.2.1z"/><path d="m8 12.4 2.8 2.8 5.2-5.6" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
     <script>document.getElementById('supportChatHeaderLogo').src=window.KT_LOGO_SRC;</script>
     <div style="flex:1;min-width:0;">
@@ -3112,7 +3120,7 @@ async function requestHumanAgent(){
       if(_bulkErr){ try{ sendNtfyNotification('🐞 Mesaj chat pa sove', '❌ ' + (_bulkErr.message||'') + ' [' + (_bulkErr.code||'') + ']\n(support_messages insert)', 'high', 'warning'); }catch(e){} showToast('⚠️ Mesaj pa sove: ' + (_bulkErr.message||''), 7000); }
       if(_bulk && _bulk.length === _histForDb.length){
         const _box = document.getElementById('supportChatMessages');
-        Array.from(_box ? _box.children : []).forEach(r => { const i = r._hist ? _histForDb.indexOf(r._hist) : -1; if(i >= 0) r.dataset.dbid = _bulk[i].id; });
+        Array.from(_box ? _box.children : []).forEach(r => { const i = r._hist ? _histForDb.indexOf(r._hist) : -1; if(i >= 0){ r.dataset.dbid = _bulk[i].id; if(ktSupIsHidden(_bulk[i].id)) r.style.display = 'none'; } });
       }
     }
 
@@ -3242,20 +3250,30 @@ function pickChatLang(l){
   sendChatGreeting();
 }
 
-const KT_V_PLAY = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"><path d="M7 4.5v15l12-7.5z"/></svg>';
-const KT_V_PAUSE = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4.2" height="15" rx="1.2"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.2"/></svg>';
+const KT_V_PLAY = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.2v15.6a1 1 0 0 0 1.5.86l12.4-7.8a1 1 0 0 0 0-1.72L8.5 3.34A1 1 0 0 0 7 4.2z"/></svg>';
+const KT_V_PAUSE = '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><rect x="5.5" y="3.5" width="4.6" height="17" rx="1.3"/><rect x="13.9" y="3.5" width="4.6" height="17" rx="1.3"/></svg>';
+function ktVWaveHtml(src){ let h = 7; for(const ch of String(src||'')) h = (h * 31 + ch.charCodeAt(0)) >>> 0; let o = ''; for(let k = 0; k < 32; k++){ h = (h * 1103515245 + 12345) >>> 0; const v = 8 + ((h >>> 8) % 17); o += '<b style="height:' + v + 'px"></b>'; } return o; }
 let _ktVoiceCur = null;
 function ktVFmt(sec){ sec = Math.max(0, Math.floor(sec||0)); return Math.floor(sec/60) + ':' + String(sec%60).padStart(2,'0'); }
 function ktVoiceClick(ev, el){
   ev.stopPropagation();
-  const btn = el.querySelector('.ktv-play'), bar = el.querySelector('.ktv-bar'), fill = bar.firstElementChild, tm = el.querySelector('.ktv-time');
+  const btn = el.querySelector('.ktv-play'), bar = el.querySelector('.ktv-bar'), dot = bar.querySelector('i'), bars = bar.querySelectorAll('b'), tm = el.querySelector('.ktv-time'), spd = el.querySelector('.ktv-spd');
+  if(ev.target.closest('.ktv-spd')){
+    const a0 = el._a; const steps = [1, 1.5, 2]; el._si = ((el._si || 0) + 1) % steps.length;
+    spd.textContent = (steps[el._si] === 1.5 ? '1.5' : String(steps[el._si])) + '×';
+    if(a0) a0.playbackRate = steps[el._si];
+    return;
+  }
   let a = el._a;
   if(!a){
     a = el._a = new Audio(el.dataset.src);
     a.preload = 'auto';
     const upd = () => {
       const d = isFinite(a.duration) ? a.duration : 0;
-      fill.style.width = d ? Math.min(100, a.currentTime / d * 100) + '%' : '0%';
+      const pr = d ? Math.min(1, a.currentTime / d) : 0;
+      dot.style.left = (pr * 100) + '%';
+      const n = Math.round(pr * bars.length);
+      bars.forEach((x, k) => x.classList.toggle('on', k < n));
       tm.textContent = a.paused && a.currentTime === 0 ? ktVFmt(d) : ktVFmt(a.currentTime);
     };
     a.addEventListener('timeupdate', upd);
@@ -3265,14 +3283,15 @@ function ktVoiceClick(ev, el){
         a.addEventListener('timeupdate', function fix(){ a.removeEventListener('timeupdate', fix); a.currentTime = 0; upd(); });
       } else upd();
     });
-    a.addEventListener('play', () => { btn.innerHTML = KT_V_PAUSE; });
-    a.addEventListener('pause', () => { btn.innerHTML = KT_V_PLAY; upd(); });
-    a.addEventListener('ended', () => { a.currentTime = 0; btn.innerHTML = KT_V_PLAY; fill.style.width = '0%'; upd(); });
+    a.addEventListener('play', () => { btn.innerHTML = KT_V_PAUSE; el.classList.add('playing'); });
+    a.addEventListener('pause', () => { btn.innerHTML = KT_V_PLAY; el.classList.remove('playing'); upd(); });
+    a.addEventListener('ended', () => { a.currentTime = 0; btn.innerHTML = KT_V_PLAY; el.classList.remove('playing'); upd(); });
     el._upd = upd;
   }
   if(ev.target.closest('.ktv-bar') && isFinite(a.duration) && a.duration > 0){
     const r = bar.getBoundingClientRect();
     a.currentTime = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width)) * a.duration;
+    el.classList.add('seeked');
     if(a.paused) a.play().catch(()=>{});
     return;
   }
@@ -3348,7 +3367,7 @@ function formatChatText(text, plain){
   });
   escaped = escaped.replace(/(https?:\/\/[^\s<]+\.(?:weba|ogg|mp3|wav|m4a)(?:\?[^\s<]*)?)/gi, (url) => {
     if(!_okMedia(url)) return url;
-    return `<div class="ktv" data-src="${url}" onclick="ktVoiceClick(event,this)"><button type="button" class="ktv-play" aria-label="Play">${KT_V_PLAY}</button><div class="ktv-mid"><div class="ktv-bar"><i></i></div><div class="ktv-time">0:00</div></div><svg class="ktv-mic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></div>`;
+    return `<div class="ktv" data-src="${url}" onclick="ktVoiceClick(event,this)"><button type="button" class="ktv-spd" aria-label="Speed">1×</button><button type="button" class="ktv-play" aria-label="Play">${KT_V_PLAY}</button><div class="ktv-mid"><div class="ktv-bar">${ktVWaveHtml(url)}<i></i></div><div class="ktv-time">0:00</div></div><svg class="ktv-mic" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v4"/></svg></div>`;
   });
   if(plain) return ktLinkify(escaped);
   escaped = escaped.replace(/(https?:\/\/[^\s<]*(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))[a-zA-Z0-9_-]{11}[^\s<]*)/gi, (url) => {
@@ -3418,7 +3437,16 @@ function updateChatCalculator(uid_, productId){
 (function(){ if(document.getElementById('ktDotsCss')) return; const s = document.createElement('style'); s.id = 'ktDotsCss'; s.textContent = '@keyframes ktDot{0%,80%,100%{transform:translateY(0);opacity:.35}40%{transform:translateY(-6px);opacity:1}} .kt-dots{display:inline-flex;gap:5px;align-items:center;height:14px}.kt-dots i{width:8px;height:8px;border-radius:50%;background:currentColor;display:inline-block;animation:ktDot 1.1s infinite ease-in-out}.kt-dots i:nth-child(2){animation-delay:.18s}.kt-dots i:nth-child(3){animation-delay:.36s}'; document.head.appendChild(s); })();
 function ktDotsHtml(){ return '<span class="kt-dots"><i></i><i></i><i></i></span>'; }
 function ktEditBtnLabel(){ return ({ht:'Modifye',fr:'Modifier',en:'Edit',es:'Editar'})[currentLang] || 'Edit'; }
-function ktEditedLabel(){ return ({ht:' · modifye',fr:' · modifié',en:' · edited',es:' · editado'})[currentLang] || ' · edited'; }
+function ktEditedLabel(){ return ({ht:'Modifye ',fr:'Modifié ',en:'Edited ',es:'Editado '})[currentLang] || 'Edited '; }
+function ktSupHHMM(w){ const d = w ? new Date(w) : new Date(); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
+function ktSupHiddenKey(){ return 'kt_sup_hidden_' + ((typeof state !== 'undefined' && state.currentUserId) || 'x'); }
+function ktSupHiddenSet(){ try{ return new Set(JSON.parse(localStorage.getItem(ktSupHiddenKey()) || '[]')); }catch(e){ return new Set(); } }
+function ktSupIsHidden(id){ return !!id && ktSupHiddenSet().has(String(id)); }
+function ktSupHideForMe(row){
+  const id = row.dataset.dbid;
+  if(id){ try{ const h = ktSupHiddenSet(); h.add(String(id)); localStorage.setItem(ktSupHiddenKey(), JSON.stringify(Array.from(h).slice(-800))); }catch(e){} }
+  row.style.display = 'none';
+}
 function ktIsMediaUrl(s){ return /^https?:\/\/\S+\.(jpg|jpeg|png|webp|gif|mp4|webm|mov|m4v|3gp|weba|ogg|mp3|wav|m4a)(\?\S*)?$/i.test(String(s||'').trim()); }
 let supportTypingTimer = null;
 function showSupportTyping(){
@@ -3453,7 +3481,8 @@ function sendSupportTyping(){
 }
 function setSupportBubbleText(row, text, edited){
   const b = row.querySelector('.kc-bubble'); if(!b) return;
-  b.innerHTML = formatChatText(text, !!(row.dataset && row.dataset.role === 'user')) + (edited ? '<span style="opacity:0.6;font-size:11px;">' + ktEditedLabel() + '</span>' : '');
+  const _ts = (!ktIsMediaUrl(text)) ? '<span class="kt-sts" style="float:right;margin:6px 0 -4px 12px;font-size:10px;opacity:.6;">' + (edited ? ktEditedLabel() : '') + ktSupHHMM(row._when) + '</span>' : '';
+  b.innerHTML = formatChatText(text, !!(row.dataset && row.dataset.role === 'user')) + _ts;
   row._text = text; row._edited = !!edited;
   if(row._hist) row._hist.content = text;
 }
@@ -3494,6 +3523,7 @@ function addSupportMessage(role, text, skipHistory, meta){
   row._hist = entry;
   row._text = text;
   if(meta.id) row.dataset.dbid = meta.id;
+  row._when = meta.created_at || new Date().toISOString();
   row._reactions = (meta.reactions && typeof meta.reactions === 'object') ? meta.reactions : {};
   const _logoAv = `<div class="kc-av" style="width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid rgba(63,206,124,0.3);overflow:hidden;flex-shrink:0;padding:2px;box-sizing:border-box;"><img src="${window.KT_LOGO_SRC}" alt="Kerry Topup" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>`;
   let avatarHtml = _logoAv;
@@ -3506,7 +3536,6 @@ function addSupportMessage(role, text, skipHistory, meta){
   }
   const styles = {
     user: 'background:linear-gradient(135deg, #3fce7c, #0a9e3d);color:#fff;border-radius:16px 16px 4px 16px;box-shadow:0 4px 14px rgba(10,158,61,0.35);',
-    admin: 'background:#1565D8;color:#fff;border-radius:16px 16px 16px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.2);',
     assistant: 'background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);backdrop-filter:blur(6px);color:#e8f5ec;border-radius:16px 16px 16px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);'
   };
   const bubbleStyle = (styles[role] || styles.assistant) + 'padding:14px 16px;max-width:100%;font-size:14.5px;white-space:pre-wrap;line-height:1.55;box-sizing:border-box;';
@@ -3516,7 +3545,8 @@ function addSupportMessage(role, text, skipHistory, meta){
   ktStyleVoiceBubble(row.querySelector('.kc-bubble'), role === 'user', text, meta.created_at);
   if(role === 'admin') hideSupportTyping();
   if(meta.deleted) applySupportDeleted(row);
-  else { renderSupportReactions(row); if(meta.edited) setSupportBubbleText(row, text, true); }
+  else { renderSupportReactions(row); if(!ktIsMediaUrl(text)) setSupportBubbleText(row, text, !!meta.edited); }
+  if(meta.id && ktSupIsHidden(meta.id)) row.style.display = 'none';
   attachSupportMsgMenu(row);
   box.scrollTop = box.scrollHeight;
   return row;
@@ -3561,12 +3591,14 @@ function openSupportMsgMenu(row, rect){
   const bg = document.getElementById('supportChatBg'); if(!bg) return;
   const mine = row.dataset.role === 'user';
   const myReact = (row._reactions || {}).customer;
-  const T = { ht:'Siprime pou tout moun', fr:'Supprimer pour tout le monde', en:'Delete for everyone', es:'Eliminar para todos' }[currentLang] || 'Delete for everyone';
+  const T = { ht:'Efase pou tout moun', fr:'Supprimer pour tout le monde', en:'Delete for everyone', es:'Borrar para todos' }[currentLang] || 'Delete for everyone';
+  const TME = { ht:'Efase pou mwen', fr:'Supprimer pour moi', en:'Delete for me', es:'Borrar para mí' }[currentLang] || 'Delete for me';
   const m = document.createElement('div');
   m.id = 'supportMsgMenu';
   m.style.cssText = 'position:fixed;z-index:80;background:#10241a;border:1px solid rgba(63,206,124,0.3);border-radius:18px;padding:8px;box-shadow:0 18px 44px rgba(0,0,0,0.55);min-width:200px;';
   m.innerHTML = '<div style="display:flex;gap:4px;justify-content:center;">' + SUPPORT_REACT_EMOJIS.map(e => `<button data-e="${e}" style="width:38px;height:38px;border:none;border-radius:50%;background:${myReact===e?'rgba(63,206,124,0.25)':'transparent'};font-size:21px;cursor:pointer;">${e}</button>`).join('') + '</div>' +
-    (mine && !ktIsMediaUrl(row._text) ? `<button data-edit="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#e8f5ec;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">✏️ ${({ht:'Modifye',fr:'Modifier',en:'Edit',es:'Editar'})[currentLang] || 'Edit'}</button>` : '') +
+    (mine && !ktIsMediaUrl(row._text) ? `<button data-edit="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#f4fbf6;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">✏️ ${({ht:'Modifye',fr:'Modifier',en:'Edit',es:'Editar'})[currentLang] || 'Edit'}</button>` : '') +
+    (!row._deleted ? `<button data-delme="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#ff8a8a;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">🙈 ${TME}</button>` : '') +
     (mine ? `<button data-del="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#ff8a8a;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">🗑️ ${T}</button>` : '');
   bg.appendChild(m);
   const mh = m.offsetHeight, mw = m.offsetWidth;
@@ -3578,6 +3610,7 @@ function openSupportMsgMenu(row, rect){
     e.stopPropagation();
     if(b.dataset.e){ reactToSupportMessage(row, b.dataset.e); }
     else if(b.dataset.edit){ editSupportMessage(row); }
+    else if(b.dataset.delme){ const q = { ht:'Efase mesaj sa a sèlman pou ou ?', fr:'Supprimer ce message seulement pour vous ?', en:'Delete this message only for you?', es:'¿Borrar este mensaje solo para ti?' }[currentLang] || 'Delete for me?'; if(confirm(q)) ktSupHideForMe(row); }
     else if(b.dataset.del){ deleteSupportMessage(row); }
     closeSupportMsgMenu();
   });
@@ -16470,28 +16503,28 @@ const KC_TXT = {
   replyTo:'Reponn',search:'Chèche nan mesaj yo...',results:n=>`${n} rezilta`,noRes:'Pa gen rezilta',mute:'Mete kominote a an silans',unmute:'Retire silans lan',leave:'Kite kominote a',join:'Rejwenn kominote a',rules:'Règ kominote a',disapItem:'Mesaj ki disparèt',disapInfo:'Mesaj yo disparèt apre',disapSub:'Chwazi konbyen tan mesaj yo rete nan kominote a. Sa konsène tout moun.',disapWarn:'Mesaj ki pi vye pase tan sa a ap efase pou tout tan. Kontinye?',disapOk:'Chanjman fèt ✓',h24:'24 èdtan',dayWord:'jou',
   rulesTxt:'• Respekte tout moun\n• Pa pataje modpas, kòd PIN, ID oswa nimewo kat\n• Pa fè spam ni piblisite\n• Admin ka efase mesaj ak bloke moun ki pa respekte règ yo',
   needLogin:'Konekte pou antre nan kominote a',loginBtn:'Konekte',left:'Ou kite kominote a',rejoin:'Rejwenn',banned:'Admin bloke w nan kominote a.',
-  report:'Rapòte',reported:'Mesaj la rapòte, mèsi 🙏',copy:'Kopye',copied:'Kopye ✓',del:'Efase mesaj la',delAsk:'Efase mesaj sa a?',ban:'Bloke moun sa a',banAsk:'Bloke moun sa a nan kominote a?',unban:'Debloke moun sa a',
+  delAll:'Efase pou tout moun',delMe:'Efase pou mwen',delMeAsk:'Efase mesaj sa a sèlman pou ou ?',edit:'Modifye',editSave:'Sove',editCancel:'Anile',editedL:'Modifye ',report:'Rapòte',reported:'Mesaj la rapòte, mèsi 🙏',copy:'Kopye',copied:'Kopye ✓',del:'Efase mesaj la',delAsk:'Efase mesaj sa a?',ban:'Bloke moun sa a',banAsk:'Bloke moun sa a nan kominote a?',unban:'Debloke moun sa a',
   deleted:'🚫 Mesaj sa a efase',more:'Chaje mesaj ki pi vye yo',fail:'⚠️ Mesaj pa voye, eseye ankò',sending:'Ap voye...',mic:'Mikwofòn pa otorize',rec:'Ap anrejistre mesaj vokal...',cancel:'Anile',
   empty:'Pa gen mesaj ankò. Ekri premye a! 👋',today:'Jodi a',yest:'Yè',reports:n=>`⚠️ ${n} rapò`,muted:'Kominote a an silans',unmuted:'Silans lan retire',leftOk:'Ou kite kominote a',joined:'Ou tounen nan kominote a',reply:'Reponn',yes:'Wi',no:'Non',slow:'Tann yon ti moman anvan w voye yon lòt mesaj',bad:'Mesaj sa a vyole règ yo 📏'},
  fr:{tabSupport:'Support',tabCommunity:'Communauté',title:'KERRY TOPUP CHAT',online:n=>`${n} membre${n>1?'s':''} en ligne`,ph:'Écrire dans la communauté...',pin:'📌 Bienvenue dans la communauté Kerry Topup. Respectez tout le monde, ne partagez pas vos mots de passe, ID ou infos personnelles.',
   replyTo:'Répondre à',search:'Rechercher dans les messages...',results:n=>`${n} résultat${n>1?'s':''}`,noRes:'Aucun résultat',mute:'Mettre en sourdine',unmute:'Réactiver les notifications',leave:'Quitter la communauté',join:'Rejoindre la communauté',rules:'Règles de la communauté',disapItem:'Messages éphémères',disapInfo:'Les messages disparaissent après',disapSub:'Choisissez combien de temps les messages restent dans la communauté. Cela concerne tout le monde.',disapWarn:'Les messages plus anciens que cette durée seront supprimés définitivement. Continuer ?',disapOk:'Modification enregistrée ✓',h24:'24 heures',dayWord:'jours',
   rulesTxt:'• Respectez tout le monde\n• Ne partagez pas mots de passe, PIN, ID ou numéros de carte\n• Pas de spam ni de publicité\n• Les admins peuvent supprimer des messages et bloquer les membres',
   needLogin:'Connectez-vous pour rejoindre la communauté',loginBtn:'Se connecter',left:'Vous avez quitté la communauté',rejoin:'Rejoindre',banned:"Un admin vous a bloqué de la communauté.",
-  report:'Signaler',reported:'Message signalé, merci 🙏',copy:'Copier',copied:'Copié ✓',del:'Supprimer le message',delAsk:'Supprimer ce message ?',ban:'Bloquer cette personne',banAsk:'Bloquer cette personne de la communauté ?',unban:'Débloquer cette personne',
+  delAll:'Supprimer pour tout le monde',delMe:'Supprimer pour moi',delMeAsk:'Supprimer ce message seulement pour vous ?',edit:'Modifier',editSave:'Enregistrer',editCancel:'Annuler',editedL:'Modifié ',report:'Signaler',reported:'Message signalé, merci 🙏',copy:'Copier',copied:'Copié ✓',del:'Supprimer le message',delAsk:'Supprimer ce message ?',ban:'Bloquer cette personne',banAsk:'Bloquer cette personne de la communauté ?',unban:'Débloquer cette personne',
   deleted:'🚫 Ce message a été supprimé',more:'Charger les anciens messages',fail:'⚠️ Message non envoyé, réessayez',sending:'Envoi...',mic:'Micro non autorisé',rec:'Enregistrement du message vocal...',cancel:'Annuler',
   empty:"Aucun message. Écrivez le premier ! 👋",today:"Aujourd'hui",yest:'Hier',reports:n=>`⚠️ ${n} signalement${n>1?'s':''}`,muted:'Communauté en sourdine',unmuted:'Sourdine retirée',leftOk:'Vous avez quitté la communauté',joined:'Vous êtes de retour dans la communauté',reply:'Répondre',yes:'Oui',no:'Non',slow:'Attendez un instant avant un autre message',bad:'Ce message enfreint les règles 📏'},
  en:{tabSupport:'Support',tabCommunity:'Community',title:'KERRY TOPUP CHAT',online:n=>`${n} member${n>1?'s':''} online`,ph:'Write in the community...',pin:'📌 Welcome to the Kerry Topup community. Be respectful and never share your password, ID or personal info.',
   replyTo:'Reply to',search:'Search messages...',results:n=>`${n} result${n>1?'s':''}`,noRes:'No results',mute:'Mute community',unmute:'Unmute',leave:'Leave community',join:'Rejoin community',rules:'Community rules',disapItem:'Disappearing messages',disapInfo:'Messages disappear after',disapSub:'Choose how long messages stay in the community. This applies to everyone.',disapWarn:'Messages older than this will be permanently deleted. Continue?',disapOk:'Saved ✓',h24:'24 hours',dayWord:'days',
   rulesTxt:'• Respect everyone\n• Never share passwords, PINs, IDs or card numbers\n• No spam or advertising\n• Admins can delete messages and block members who break the rules',
   needLogin:'Log in to join the community',loginBtn:'Log in',left:'You left the community',rejoin:'Rejoin',banned:'An admin has blocked you from the community.',
-  report:'Report',reported:'Message reported, thank you 🙏',copy:'Copy',copied:'Copied ✓',del:'Delete message',delAsk:'Delete this message?',ban:'Block this person',banAsk:'Block this person from the community?',unban:'Unblock this person',
+  delAll:'Delete for everyone',delMe:'Delete for me',delMeAsk:'Delete this message only for you?',edit:'Edit',editSave:'Save',editCancel:'Cancel',editedL:'Edited ',report:'Report',reported:'Message reported, thank you 🙏',copy:'Copy',copied:'Copied ✓',del:'Delete message',delAsk:'Delete this message?',ban:'Block this person',banAsk:'Block this person from the community?',unban:'Unblock this person',
   deleted:'🚫 This message was deleted',more:'Load older messages',fail:'⚠️ Message not sent, try again',sending:'Sending...',mic:'Microphone not allowed',rec:'Recording voice message...',cancel:'Cancel',
   empty:'No messages yet. Write the first one! 👋',today:'Today',yest:'Yesterday',reports:n=>`⚠️ ${n} report${n>1?'s':''}`,muted:'Community muted',unmuted:'Unmuted',leftOk:'You left the community',joined:'You are back in the community',reply:'Reply',yes:'Yes',no:'No',slow:'Wait a moment before sending another message',bad:'This message breaks the rules 📏'},
  es:{tabSupport:'Soporte',tabCommunity:'Comunidad',title:'KERRY TOPUP CHAT',online:n=>`${n} miembro${n>1?'s':''} en línea`,ph:'Escribe en la comunidad...',pin:'📌 Bienvenido a la comunidad Kerry Topup. Respeta a todos y no compartas tu contraseña, ID ni datos personales.',
   replyTo:'Responder a',search:'Buscar en los mensajes...',results:n=>`${n} resultado${n>1?'s':''}`,noRes:'Sin resultados',mute:'Silenciar comunidad',unmute:'Quitar silencio',leave:'Salir de la comunidad',join:'Volver a la comunidad',rules:'Reglas de la comunidad',disapItem:'Mensajes temporales',disapInfo:'Los mensajes desaparecen después de',disapSub:'Elige cuánto tiempo permanecen los mensajes en la comunidad. Afecta a todos.',disapWarn:'Los mensajes más antiguos que este plazo se borrarán para siempre. ¿Continuar?',disapOk:'Guardado ✓',h24:'24 horas',dayWord:'días',
   rulesTxt:'• Respeta a todos\n• No compartas contraseñas, PIN, ID ni números de tarjeta\n• Sin spam ni publicidad\n• Los admins pueden borrar mensajes y bloquear miembros',
   needLogin:'Inicia sesión para unirte a la comunidad',loginBtn:'Iniciar sesión',left:'Saliste de la comunidad',rejoin:'Volver',banned:'Un admin te bloqueó de la comunidad.',
-  report:'Denunciar',reported:'Mensaje denunciado, gracias 🙏',copy:'Copiar',copied:'Copiado ✓',del:'Borrar mensaje',delAsk:'¿Borrar este mensaje?',ban:'Bloquear a esta persona',banAsk:'¿Bloquear a esta persona de la comunidad?',unban:'Desbloquear a esta persona',
+  delAll:'Borrar para todos',delMe:'Borrar para mí',delMeAsk:'¿Borrar este mensaje solo para ti?',edit:'Editar',editSave:'Guardar',editCancel:'Cancelar',editedL:'Editado ',report:'Denunciar',reported:'Mensaje denunciado, gracias 🙏',copy:'Copiar',copied:'Copiado ✓',del:'Borrar mensaje',delAsk:'¿Borrar este mensaje?',ban:'Bloquear a esta persona',banAsk:'¿Bloquear a esta persona de la comunidad?',unban:'Desbloquear a esta persona',
   deleted:'🚫 Este mensaje fue eliminado',more:'Cargar mensajes anteriores',fail:'⚠️ Mensaje no enviado, intenta de nuevo',sending:'Enviando...',mic:'Micrófono no permitido',rec:'Grabando mensaje de voz...',cancel:'Cancelar',
   empty:'Aún no hay mensajes. ¡Escribe el primero! 👋',today:'Hoy',yest:'Ayer',reports:n=>`⚠️ ${n} denuncia${n>1?'s':''}`,muted:'Comunidad silenciada',unmuted:'Silencio quitado',leftOk:'Saliste de la comunidad',joined:'Volviste a la comunidad',reply:'Responder',yes:'Sí',no:'No',slow:'Espera un momento antes de enviar otro mensaje',bad:'Este mensaje infringe las reglas 📏'}
 };
@@ -16992,11 +17025,12 @@ function buildRow(m){
   const b = row.querySelector('.kc-bubble');
   if(!m.deleted){
     try{ if(typeof ktStyleVoiceBubble==='function') ktStyleVoiceBubble(b, mine, m.content, m.created_at); }catch(e){}
-    if(!b.querySelector('.ktv-ts')){ const t = document.createElement('span'); t.style.cssText='float:right;margin:6px 0 -4px 12px;font-size:10px;opacity:.6;'; t.textContent = hhmm(m.created_at); b.appendChild(t); }
+    if(!b.querySelector('.ktv-ts')){ const t = document.createElement('span'); t.style.cssText='float:right;margin:6px 0 -4px 12px;font-size:10px;opacity:.6;'; t.textContent = (m.edited ? T('editedL') : '') + hhmm(m.created_at); b.appendChild(t); }
     renderReacts(row, m);
   }
   const qEl = row.querySelector('.kcQuote'); if(qEl) qEl.onclick = (e) => { e.stopPropagation(); jumpTo(qEl.dataset.q); };
   attachGestures(row, m);
+  if(isHidden(m.id)) row.style.display='none';
   return row;
 }
 function renderReacts(row, m){
@@ -17060,7 +17094,7 @@ function openMenu(m, row){
   const reacts = EMOJIS.map(e => `<button data-e="${e}">${e}</button>`).join('');
   const isText = !(typeof ktIsVoiceText==='function' && (ktIsVoiceText(m.content)||ktIsImageText(m.content)||ktIsVideoText(m.content)));
   const act = (id, ic, txt, red) => `<button class="kcAct${red?' red':''}" data-a="${id}"><span style="width:22px;text-align:center;">${ic}</span>${esc(txt)}</button>`;
-  o.innerHTML = `<div class="kcSheet"><div class="kcReactRow">${reacts}</div>${act('reply','↩️',T('reply'))}${isText?act('copy','📋',T('copy')):''}${!mine?act('report','🚩',T('report'),true):''}${(mine||admin)?act('del','🗑️',T('del'),true):''}${(admin&&!mine)?act('ban','🚫',T('ban'),true):''}</div>`;
+  o.innerHTML = `<div class="kcSheet"><div class="kcReactRow">${reacts}</div>${act('reply','↩️',T('reply'))}${isText?act('copy','📋',T('copy')):''}${!mine?act('report','🚩',T('report'),true):''}${(mine&&isText)?act('edit','✏️',T('edit')):''}${act('delme','🙈',T('delMe'),true)}${(mine||admin)?act('del','🗑️',T('delAll'),true):''}${(admin&&!mine)?act('ban','🚫',T('ban'),true):''}</div>`;
   document.body.appendChild(o);
   o.querySelectorAll('.kcReactRow button').forEach(b => b.onclick = () => { closeSheet(); react(m, b.dataset.e); });
   o.querySelectorAll('.kcAct').forEach(b => b.onclick = async () => {
@@ -17068,9 +17102,33 @@ function openMenu(m, row){
     if(a==='reply') setReply(m);
     else if(a==='copy'){ try{ await navigator.clipboard.writeText(m.content); toast(T('copied')); }catch(e){} }
     else if(a==='report') reportMsg(m);
+    else if(a==='edit') openEdit(m);
+    else if(a==='delme'){ if(confirm(T('delMeAsk'))) hideForMe(m); }
     else if(a==='del'){ if(confirm(T('delAsk'))) delMsg(m); }
     else if(a==='ban'){ if(confirm(T('banAsk'))) banUser(m); }
   });
+}
+/* ---------- Efase pou mwen (lokal) + Modifye ---------- */
+function hiddenKey(){ return 'kc_hidden_' + (uidNow()||'x'); }
+function hiddenSet(){ try{ return new Set(JSON.parse(localStorage.getItem(hiddenKey())||'[]')); }catch(e){ return new Set(); } }
+function isHidden(id){ return hiddenSet().has(id); }
+function hideForMe(m){
+  try{ const h = hiddenSet(); h.add(m.id); localStorage.setItem(hiddenKey(), JSON.stringify(Array.from(h).slice(-800))); }catch(e){}
+  const row = $('kcFeed') && $('kcFeed').querySelector('.kcRow[data-id="'+m.id+'"]'); if(row) row.style.display='none';
+}
+function openEdit(m){
+  closeSheet();
+  const o = document.createElement('div'); o.id='kcSheetBg'; o.className='kcSheetBg';
+  o.onclick = (e) => { if(e.target===o) closeSheet(); };
+  o.innerHTML = `<div class="kcSheet"><div style="font-weight:800;font-size:16px;margin:2px 4px 10px;">✏️ ${esc(T('edit'))}</div><textarea id="kcEditTx" maxlength="2000" rows="4" style="width:100%;box-sizing:border-box;border:1.5px solid #d5e4da;border-radius:14px;padding:12px 14px;font-size:15px;font-family:inherit;resize:none;outline:none;background:#f7faf8;color:#10241a;line-height:1.4;"></textarea><div style="display:flex;gap:10px;margin-top:12px;"><button id="kcEditNo" style="flex:1;padding:13px;border-radius:14px;border:1.5px solid #d5e4da;background:#fff;color:#10241a;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;">${esc(T('editCancel'))}</button><button id="kcEditOk" class="kcBtn" style="flex:1;margin-top:0;">${esc(T('editSave'))}</button></div></div>`;
+  document.body.appendChild(o);
+  const ta = $('kcEditTx'); ta.value = m.content; setTimeout(()=>{ try{ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }catch(e){} }, 120);
+  $('kcEditNo').onclick = closeSheet;
+  $('kcEditOk').onclick = async () => {
+    const v = ta.value.trim(); if(!v || v === m.content){ closeSheet(); return; }
+    try{ const c = await sb(); const { error } = await c.rpc('community_edit', { p_id:m.id, p_content:v }); if(error) throw error; m.content = v; m.edited = true; closeSheet(); rerenderRow(m); }
+    catch(e){ toast(T('fail')); }
+  };
 }
 async function react(m, emoji){
   const me = uidNow(); if(!me) return;
@@ -17355,7 +17413,6 @@ setTimeout(boot, 4000); setInterval(boot, 25000);
 
 window.kcCommunity = { kc, setTab, build, adminRender, openAsAdmin, switcher };
 })();
-
 </script>
 <script>
 /* ===== KT FAVORIS — Zanmi favori + Mande kòb ===== */
