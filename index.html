@@ -738,6 +738,10 @@ textarea.admin-ta{
 .hm-faq details[open] summary::after{transform:rotate(180deg);}
 .hm-faq p{margin:10px 0 0;color:var(--muted);font-size:12.5px;line-height:1.6;}
 .hm-final{text-align:center;padding:28px 12px 8px;}
+.ktAdmBx{background:var(--panel,#fff);border:1.5px solid #cfe6d8;border-radius:26px;padding:10px 12px 10px 14px;}
+.ktAdmTa{width:100%;box-sizing:border-box;border:none;outline:none;background:transparent;padding:6px 2px 12px;font-size:15px;color:var(--text);resize:none;overflow-y:auto;max-height:140px;line-height:1.4;font-family:inherit;display:block;}
+.ktAdmPl{width:38px;height:38px;border-radius:50%;background:var(--panel-2);display:flex;align-items:center;justify-content:center;color:var(--text);flex-shrink:0;cursor:pointer;font-size:22px;line-height:1;font-weight:300;border:none;font-family:inherit;padding:0;}
+.ktAdmMic{width:40px;height:40px;border-radius:50%;background:#0FA654;border:none;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;}
 </style>
 <script>(function(){ try{ localStorage.removeItem('kt_dark'); document.documentElement.classList.remove('dark'); }catch(e){} })();</script>
 </head>
@@ -1117,10 +1121,11 @@ textarea.admin-ta{
       </button>
     </div>
     <div style="background:rgba(255,255,255,0.06);border:1px solid rgba(63,206,124,0.22);border-radius:26px;padding:10px 12px 10px 14px;">
+      <div id="supportReplyBar" style="display:none;align-items:center;gap:10px;background:rgba(10,158,61,.14);border-left:4px solid #0a9e3d;border-radius:10px;padding:6px 10px;margin:0 0 8px;"><div style="flex:1;min-width:0;"><div id="supportReplyN" style="font-weight:800;font-size:12px;color:#0a9e3d;"></div><div id="supportReplyT" style="font-size:12.5px;color:#5f7d6c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div></div><button type="button" onclick="ktSupSetReply(null)" aria-label="x" style="width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,.12);color:#5f7d6c;cursor:pointer;font-size:12px;">✕</button></div>
       <div id="supportImgPrev" style="display:none;padding:4px 2px 8px;"></div>
       <textarea id="supportChatInput" rows="1" enterkeyhint="enter" placeholder="Reponn Touski..." style="width:100%;box-sizing:border-box;border:none;outline:none;background:transparent;padding:6px 2px 12px;font-size:15px;color:#e8f5ec;resize:none;overflow-y:auto;max-height:120px;line-height:1.4;font-family:inherit;display:block;" oninput="updateSupportSendBtn()" onkeydown="if(event.key==='Enter' && !event.shiftKey && !window.matchMedia('(pointer:coarse)').matches){event.preventDefault();sendSupportMessage();}"></textarea>
       <div style="display:flex;align-items:center;gap:8px;">
-        <label aria-label="Image" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#e8f5ec;flex-shrink:0;cursor:pointer;font-size:22px;line-height:1;font-weight:300;">+<input type="file" accept="image/*,video/*" style="display:none;" onchange="sendSupportImage(this)"></label>
+        <button type="button" id="supportPlusBtn" aria-label="+" onclick="ktSupPlus(this)" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#e8f5ec;flex-shrink:0;cursor:pointer;font-size:22px;line-height:1;font-weight:300;border:none;font-family:inherit;padding:0;">+</button><input type="file" id="supportGalleryIn" accept="image/*,video/*" style="display:none;" onchange="sendSupportImage(this)">
         <button id="supportModelChip" onclick="toggleSupportModelMenu(event)" style="display:flex;align-items:center;gap:6px;height:38px;padding:0 14px;border-radius:19px;border:none;background:rgba(255,255,255,0.08);color:#e8f5ec;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;"><span id="supportModelChipName">Touski 5.5</span><span id="supportModelChipEffort" style="color:#93b1a1;font-weight:600;">Moyen</span></button>
         <span style="flex:1;"></span>
         <button id="supportMicBtn" onclick="onSupportMicSendClick()" aria-label="Voye mesaj vokal" style="width:40px;height:40px;border-radius:50%;background:#0FA654;border:none;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;">
@@ -2869,7 +2874,7 @@ async function getOrRestoreSupportConversation(){
       const { data: msgs } = await sb.from('support_messages').select('*').eq('conversation_id', convo.id).order('created_at',{ascending:true});
       supportChatHistory = [];
       document.getElementById('supportChatMessages').innerHTML = '';
-      (msgs||[]).forEach(m => addSupportMessage(m.sender==='customer'?'user':(m.sender==='admin'?'admin':'assistant'), m.content, true, { id:m.id, reactions:m.reactions, deleted:!!m.deleted, edited:!!m.edited }));
+      (msgs||[]).forEach(m => addSupportMessage(m.sender==='customer'?'user':(m.sender==='admin'?'admin':'assistant'), m.content, true, { id:m.id, reactions:m.reactions, deleted:!!m.deleted, edited:!!m.edited, reply_to:m.reply_to, reply_name:m.reply_name, reply_text:m.reply_text }));
       await sb.from('support_messages').update({ read_by_customer:true }).eq('conversation_id', convo.id).eq('sender','admin');
       updateSupportFabBadge();
       subscribeToSupportMessages(convo.id);
@@ -3110,11 +3115,11 @@ async function requestHumanAgent(){
 
     // Kopye TOUT istwa konvèsasyon an (Touski + kliyan) nan baz done a
     const _histForDb = supportChatHistory.filter(m => !m.deleted);
-    const rows = _histForDb.map(m => ({
+    const rows = _histForDb.map(m => Object.assign({
       conversation_id: convo.id,
       sender: m.role === 'user' ? 'customer' : 'bot',
       content: m.content
-    }));
+    }, m.reply_text ? { reply_to:m.reply_to || null, reply_name:m.reply_name, reply_text:m.reply_text } : {}));
     if(rows.length){
       const { data: _bulk, error: _bulkErr } = await sb.from('support_messages').insert(rows).select('id');
       if(_bulkErr){ try{ sendNtfyNotification('🐞 Mesaj chat pa sove', '❌ ' + (_bulkErr.message||'') + ' [' + (_bulkErr.code||'') + ']\n(support_messages insert)', 'high', 'warning'); }catch(e){} showToast('⚠️ Mesaj pa sove: ' + (_bulkErr.message||''), 7000); }
@@ -3351,7 +3356,249 @@ function ktLinkify(h){
     return pre + '<a href="' + clean.replace(/"/g,'') + '" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="color:inherit;text-decoration:underline;word-break:break-all;">' + url.slice(0, url.length - tail.length) + '</a>' + tail;
   });
 }
+/* ===== KT CARDS — meni "+", kat ID / Evènman / Kòmand / Sondaj ===== */
+const KTC_L = {
+  ht:{gal:'Galri',poll:'Sondaj',pid:'ID jwè',ev:'Evènman',ord:'Kòmand mwen',idT:'ID jwè',name:'Non jwè',copy:'Kopye ID a',copied:'ID kopye',
+    going:'Mwen pral la',goingOn:'Mwen pral la ✓',goingN:n=>n+' moun ap vini',votes:n=>n+' vòt',voters:'Moun ki vote',noVoters:'Pèsonn poko vote',
+    game:'Jwèt',chooseGame:'Chwazi yon jwèt',playerId:'ID jwè a',serverId:'Server ID',verify:'Verifye ID a',verifying:'Ap verifye…',found:'Kont jwenn',
+    notFound:'Pa jwenn jwè sa a. Verifye ID a.',failV:'Pa kapab verifye kounye a. Eseye ankò.',send:'Voye',cancel:'Anile',save:'Anrejistre',
+    evTitle:'Tit evènman an',evDate:'Dat',evTime:'Lè',evDesc:'Detay (opsyonèl)',evNew:'Nouvo evènman',
+    pQ:'Kesyon an',pOpt:'Opsyon',pAdd:'Ajoute yon opsyon',pMulti:'Pèmèt plizyè repons',pNew:'Nouvo sondaj',pEdit:'Modifye sondaj',pNeed:'Mete kesyon an ak omwen 2 opsyon.',
+    ordPick:'Chwazi yon kòmand',noOrd:'Ou poko gen kòmand.',viewOrd:'Wè kòmand lan',odNo:'Kòmand',odProd:'Pwodwi',odPrice:'Pri',odSt:'Estati',odDt:'Dat',needLogin:'Konekte anvan.',noGame:'Pa gen jwèt ki gen verifikasyon otomatik.',fail:'Pa mache. Eseye ankò.'},
+  fr:{gal:'Galerie',poll:'Sondage',pid:'ID joueur',ev:'Événement',ord:'Mes commandes',idT:'ID joueur',name:'Nom du joueur',copy:"Copier l'ID",copied:'ID copié',
+    going:'Je viens',goingOn:'Je viens ✓',goingN:n=>n+(n>1?' personnes viennent':' personne vient'),votes:n=>n+(n>1?' votes':' vote'),voters:'Votants',noVoters:'Personne n\'a voté',
+    game:'Jeu',chooseGame:'Choisir un jeu',playerId:'ID du joueur',serverId:'Server ID',verify:"Vérifier l'ID",verifying:'Vérification…',found:'Compte trouvé',
+    notFound:"Joueur introuvable. Vérifiez l'ID.",failV:'Vérification impossible pour le moment. Réessayez.',send:'Envoyer',cancel:'Annuler',save:'Enregistrer',
+    evTitle:"Titre de l'événement",evDate:'Date',evTime:'Heure',evDesc:'Détails (facultatif)',evNew:'Nouvel événement',
+    pQ:'Question',pOpt:'Option',pAdd:'Ajouter une option',pMulti:'Autoriser plusieurs réponses',pNew:'Nouveau sondage',pEdit:'Modifier le sondage',pNeed:'Ajoutez la question et au moins 2 options.',
+    ordPick:'Choisir une commande',noOrd:"Vous n'avez pas encore de commande.",viewOrd:'Voir la commande',odNo:'Commande',odProd:'Produit',odPrice:'Prix',odSt:'Statut',odDt:'Date',needLogin:"Connectez-vous d'abord.",noGame:'Aucun jeu avec vérification automatique.',fail:'Échec. Réessayez.'},
+  en:{gal:'Gallery',poll:'Poll',pid:'Player ID',ev:'Event',ord:'My orders',idT:'Player ID',name:'Player name',copy:'Copy ID',copied:'ID copied',
+    going:"I'm going",goingOn:"I'm going ✓",goingN:n=>n+(n>1?' people going':' person going'),votes:n=>n+(n>1?' votes':' vote'),voters:'Voters',noVoters:'No votes yet',
+    game:'Game',chooseGame:'Choose a game',playerId:'Player ID',serverId:'Server ID',verify:'Verify ID',verifying:'Verifying…',found:'Account found',
+    notFound:'Player not found. Check the ID.',failV:'Cannot verify right now. Try again.',send:'Send',cancel:'Cancel',save:'Save',
+    evTitle:'Event title',evDate:'Date',evTime:'Time',evDesc:'Details (optional)',evNew:'New event',
+    pQ:'Question',pOpt:'Option',pAdd:'Add an option',pMulti:'Allow multiple answers',pNew:'New poll',pEdit:'Edit poll',pNeed:'Add the question and at least 2 options.',
+    ordPick:'Choose an order',noOrd:"You don't have any orders yet.",viewOrd:'View order',odNo:'Order',odProd:'Product',odPrice:'Price',odSt:'Status',odDt:'Date',needLogin:'Please log in first.',noGame:'No game with automatic verification.',fail:'Failed. Try again.'},
+  es:{gal:'Galería',poll:'Encuesta',pid:'ID de jugador',ev:'Evento',ord:'Mis pedidos',idT:'ID de jugador',name:'Nombre del jugador',copy:'Copiar ID',copied:'ID copiado',
+    going:'Voy',goingOn:'Voy ✓',goingN:n=>n+(n>1?' personas van':' persona va'),votes:n=>n+(n>1?' votos':' voto'),voters:'Votantes',noVoters:'Nadie ha votado',
+    game:'Juego',chooseGame:'Elegir un juego',playerId:'ID del jugador',serverId:'Server ID',verify:'Verificar ID',verifying:'Verificando…',found:'Cuenta encontrada',
+    notFound:'Jugador no encontrado. Revisa el ID.',failV:'No se puede verificar ahora. Inténtalo de nuevo.',send:'Enviar',cancel:'Cancelar',save:'Guardar',
+    evTitle:'Título del evento',evDate:'Fecha',evTime:'Hora',evDesc:'Detalles (opcional)',evNew:'Nuevo evento',
+    pQ:'Pregunta',pOpt:'Opción',pAdd:'Añadir una opción',pMulti:'Permitir varias respuestas',pNew:'Nueva encuesta',pEdit:'Editar encuesta',pNeed:'Añade la pregunta y al menos 2 opciones.',
+    ordPick:'Elegir un pedido',noOrd:'Aún no tienes pedidos.',viewOrd:'Ver pedido',odNo:'Pedido',odProd:'Producto',odPrice:'Precio',odSt:'Estado',odDt:'Fecha',needLogin:'Inicia sesión primero.',noGame:'No hay juegos con verificación automática.',fail:'Error. Inténtalo de nuevo.'}
+};
+function ktcT(k, a){ let L = 'ht'; try{ L = (typeof currentLang === 'string' && KTC_L[currentLang]) ? currentLang : 'ht'; }catch(e){} const v = (KTC_L[L][k] != null ? KTC_L[L][k] : KTC_L.ht[k]); return typeof v === 'function' ? v(a) : v; }
+function ktcEnc(o){ return '[[kc:' + JSON.stringify(o) + ']]'; }
+function ktcParse(t){ if(typeof t !== 'string' || t.indexOf('[[kc:') !== 0) return null; const m = /^\[\[kc:(\{[\s\S]*\})\]\]$/.exec(t.trim()); if(!m) return null; try{ const o = JSON.parse(m[1]); return (o && o.t) ? o : null; }catch(e){ return null; } }
+function ktcPreview(t){ const o = ktcParse(t); if(!o) return null; return o.t === 'id' ? (ktcT('idT') + ' ' + (o.g||'') + ' ' + (o.i||'')) : o.t === 'ev' ? (ktcT('ev') + ': ' + (o.ti||'')) : o.t === 'po' ? (ktcT('poll') + ': ' + (o.q||'')) : (ktcT('odNo') + ' #' + (o.no||'')); }
+const KTC_IC = {
+  id:'<rect x="3" y="7" width="18" height="12" rx="3"/><path d="M8 13h3M9.5 11.5v3M15 12h.01M17 14h.01"/>',
+  ev:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+  po:'<path d="M18 20V10M12 20V4M6 20v-6"/>',
+  od:'<path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/>',
+  eye:'<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
+  tr:'<path d="M4 5h9M8.5 3v2M6 5c.5 4 3 7 6 8M12 5c-.5 4-3 7-6 9"/><path d="M12 21l4.5-10L21 21M13.6 17.5h5.8"/>',
+  gal:'<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>',
+  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+  chk:'<path d="M5 13l4 4L19 7"/>', x:'<path d="M6 6l12 12M18 6 6 18"/>', plus:'<path d="M12 5v14M5 12h14"/>', chev:'<path d="M9 18l6-6-6-6"/>'
+};
+function ktcIc(k, s){ s = s || 17; return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">'+KTC_IC[k]+'</svg>'; }
+function ktcEsc(s){ return (typeof escapeHtml === 'function') ? escapeHtml(String(s == null ? '' : s)) : String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+const KTC_VB = '<svg width="16" height="16" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="11" fill="#25D366"/><path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function ktcLabel(k, txt){ return '<div style="display:flex;align-items:center;gap:6px;font-weight:800;font-size:12px;letter-spacing:.04em;text-transform:uppercase;margin:0 0 8px;opacity:.9;">' + ktcIc(k, 17) + '<span>' + ktcEsc(txt) + '</span></div>'; }
+function ktcDateStr(d, h){
+  try{ const L = ({ht:'fr-FR',fr:'fr-FR',en:'en-US',es:'es-ES'})[(typeof currentLang === 'string' && KTC_L[currentLang]) ? currentLang : 'ht'];
+    const dt = new Date(d + 'T' + (h || '00:00') + ':00'); if(isNaN(dt)) return ktcEsc((d||'') + ' ' + (h||''));
+    if((typeof currentLang !== 'string') || currentLang === 'ht' || !KTC_L[currentLang]){ const D = ['dimanch','lendi','madi','mèkredi','jedi','vandredi','samdi'], M = ['janvye','fevriye','mas','avril','me','jen','jiyè','out','septanm','oktòb','novanm','desanm']; return ktcEsc(D[dt.getDay()] + ' ' + dt.getDate() + ' ' + M[dt.getMonth()] + (h ? ' · ' + String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0') : '')); }
+    return ktcEsc(dt.toLocaleDateString(L, {weekday:'long', day:'numeric', month:'long'}) + (h ? ' · ' + dt.toLocaleTimeString(L, {hour:'2-digit', minute:'2-digit'}) : '')); }catch(e){ return ktcEsc((d||'') + ' ' + (h||'')); }
+}
+function ktcHtml(text){
+  const o = ktcParse(text); if(!o) return null;
+  const hr = '<div class="ktcHr"></div>';
+  if(o.t === 'id'){
+    return ktcLabel('id', (o.g || ktcT('idT'))) + '<div class="ktcK">' + ktcEsc(ktcT('idT')) + '</div><div style="font-size:19px;font-weight:800;margin-bottom:8px;word-break:break-all;">' + ktcEsc(o.i) + (o.s ? ' <span style="font-size:13px;font-weight:700;opacity:.7;">(' + ktcEsc(o.s) + ')</span>' : '') + '</div>' +
+      '<div class="ktcK">' + ktcEsc(ktcT('name')) + '</div><div style="display:flex;align-items:flex-start;gap:6px;font-weight:700;font-size:15px;margin-bottom:8px;line-height:1.3;word-break:break-word;"><span>' + ktcEsc(o.n) + '</span>' + KTC_VB + '</div>' +
+      hr + '<button type="button" class="ktcBtn" onclick="event.stopPropagation();ktcCopy(this,' + ktcEsc(JSON.stringify(String(o.i||''))).replace(/"/g,'&quot;') + ')">' + ktcIc('copy', 16) + '<span>' + ktcEsc(ktcT('copy')) + '</span></button>';
+  }
+  if(o.t === 'ev'){
+    return ktcLabel('ev', ktcT('ev')) + '<div style="font-size:17px;font-weight:800;margin-bottom:5px;line-height:1.3;word-break:break-word;">' + ktcEsc(o.ti) + '</div><div style="font-size:13.5px;font-weight:700;margin-bottom:' + (o.ds ? '4' : '8') + 'px;">' + ktcDateStr(o.d, o.h) + '</div>' +
+      (o.ds ? '<div style="font-size:13px;opacity:.8;margin-bottom:8px;white-space:pre-wrap;word-break:break-word;">' + ktcEsc(o.ds) + '</div>' : '') +
+      '<div class="ktcEvN" style="font-size:12.5px;opacity:.8;margin-bottom:6px;cursor:pointer;" onclick="event.stopPropagation();ktcShowVoters(this)">' + ktcEsc(ktcT('goingN', 0)) + '</div>' +
+      hr + '<button type="button" class="ktcBtn ktcGo" onclick="event.stopPropagation();ktcVoteClick(this,0)">' + ktcIc('chk', 16) + '<span>' + ktcEsc(ktcT('going')) + '</span></button>';
+  }
+  if(o.t === 'po'){
+    return ktcLabel('po', ktcT('poll')) + '<div style="font-size:15.5px;font-weight:800;margin-bottom:9px;line-height:1.3;word-break:break-word;">' + ktcEsc(o.q) + '</div>' +
+      (o.o || []).map((x, i) => '<div class="ktcOpt" data-i="' + i + '" onclick="event.stopPropagation();ktcVoteClick(this,' + i + ')" style="margin-bottom:8px;cursor:pointer;"><div style="display:flex;justify-content:space-between;gap:10px;font-size:13.5px;margin-bottom:3px;"><span class="ktcOn" style="display:flex;align-items:center;gap:6px;min-width:0;word-break:break-word;"><span class="ktcDot2"></span><span>' + ktcEsc(x) + '</span></span><b class="ktcCnt">0</b></div><div class="ktcBar"><div class="ktcFill" style="width:0%"></div></div></div>').join('') +
+      ''; // (pa gen "vòt" ni zye anba sondaj la)
+  }
+  if(o.t === 'od'){
+    let st = o.st; try{ if(typeof statusLabel === 'function') st = statusLabel(o.st) || o.st; }catch(e){}
+    const row = (k, v) => '<div style="display:flex;justify-content:space-between;gap:12px;"><span style="opacity:.75;">' + ktcEsc(ktcT(k)) + '</span><b style="text-align:right;word-break:break-word;">' + ktcEsc(v) + '</b></div>';
+    let mineOrder = false; try{ mineOrder = !!((state.orders[state.currentUserId] || []).find(x => String(x.id) === String(o.id))); }catch(e){}
+    return ktcLabel('od', ktcT('odNo') + ' #' + (o.no || '')) + '<div style="font-size:13.5px;line-height:1.9;">' + row('odProd', (o.p || '') + (o.v ? ' — ' + o.v : '')) + row('odPrice', (o.pr != null ? o.pr + ' HTG' : '')) + row('odSt', st || '') + (o.dt ? row('odDt', new Date(o.dt).toLocaleDateString()) : '') + '</div>' +
+      (mineOrder ? hr + '<button type="button" class="ktcBtn" onclick="event.stopPropagation();try{closeSupportChat&&closeSupportChat()}catch(e){};openOrderDetail(' + ktcEsc(JSON.stringify(String(o.id))).replace(/"/g,'&quot;') + ')"><span>' + ktcEsc(ktcT('viewOrd')) + '</span>' + ktcIc('chev', 16) + '</button>' : '');
+  }
+  return null;
+}
+function ktcCopy(btn, v){ try{ navigator.clipboard.writeText(String(v)); }catch(e){ const t = document.createElement('textarea'); t.value = v; document.body.appendChild(t); t.select(); try{ document.execCommand('copy'); }catch(_){} t.remove(); } try{ showToast(ktcT('copied')); }catch(e){} }
+(function(){
+  if(document.getElementById('ktcCss')) return;
+  const s = document.createElement('style'); s.id = 'ktcCss';
+  s.textContent = `
+  .ktcCardB{min-width:240px;white-space:normal !important;}
+  .ktHdM{border-radius:16px 4px 16px 16px !important;}
+  .ktHdO{border-radius:4px 16px 16px 16px !important;}
+  .ktTr{clear:both;border-top:1px solid rgba(10,158,61,.25);margin-top:8px;padding-top:6px;font-size:14px;white-space:pre-wrap;word-break:break-word;}
+  .ktTr b{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:#0a9e3d;margin-bottom:2px;}
+  .kcMine .ktTr,[data-role="user"] .ktTr{border-top-color:rgba(255,255,255,.35);}
+  .kcMine .ktTr b,[data-role="user"] .ktTr b{color:#fff;}
+  .ktcK{font-size:11px;opacity:.6;letter-spacing:.05em;text-transform:uppercase;margin-bottom:2px;}
+  .ktcHr{border-top:1px solid rgba(10,158,61,.22);margin:6px 0 2px;}
+  .kcMine .ktcHr,[data-role="user"] .ktcHr{border-top-color:rgba(255,255,255,.35);}
+  .ktcBtn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;background:none;border:none;padding:9px 4px 3px;font:inherit;font-size:14px;font-weight:800;color:#0a9e3d;cursor:pointer;}
+  html.dark .ktcBtn{color:#3fce7c;}
+  .kcMine .ktcBtn,[data-role="user"] .ktcBtn,html.dark .kcMine .ktcBtn{color:#fff;}
+  .ktcBar{height:6px;border-radius:4px;background:rgba(10,158,61,.16);overflow:hidden;}
+  .ktcFill{height:6px;border-radius:4px;background:#0a9e3d;transition:width .35s ease;}
+  .kcMine .ktcBar,[data-role="user"] .ktcBar{background:rgba(255,255,255,.3);}
+  .kcMine .ktcFill,[data-role="user"] .ktcFill{background:#fff;}
+  .ktcDot2{width:15px;height:15px;border-radius:50%;border:2px solid currentColor;opacity:.55;flex-shrink:0;box-sizing:border-box;}
+  .ktcOpt.on .ktcDot2{opacity:1;background:currentColor;box-shadow:inset 0 0 0 3px transparent;position:relative;}
+  .ktcOpt.on .ktcDot2:after{content:"";position:absolute;left:3px;top:0px;width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+  .kcMine .ktcOpt.on .ktcDot2:after,[data-role="user"] .ktcOpt.on .ktcDot2:after{border-color:#0a9e3d;}
+  .ktcGo.on{opacity:.75;}
+  .ktcBg{position:fixed;inset:0;z-index:100008;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;font-family:inherit;}
+  .ktcSh{width:100%;max-width:520px;max-height:88vh;overflow-y:auto;background:#fff;color:#10241a;border-radius:22px 22px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px));box-sizing:border-box;animation:ktcUp .22s ease;}
+  html.dark .ktcSh{background:#10241a;color:#e8f5ec;}
+  @keyframes ktcUp{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+  .ktcH{font-weight:800;font-size:17px;margin:0 0 12px;display:flex;align-items:center;gap:8px;}
+  .ktcF{display:block;font-size:11.5px;font-weight:800;opacity:.6;margin:10px 0 4px;letter-spacing:.03em;}
+  .ktcIn{width:100%;box-sizing:border-box;border:1.5px solid rgba(10,158,61,.3);background:rgba(10,158,61,.05);color:inherit;border-radius:12px;padding:11px 12px;font-size:15px;font-family:inherit;outline:none;}
+  .ktcIn:focus{border-color:#0a9e3d;}
+  .ktcIn[disabled]{filter:blur(2.5px);opacity:.55;}
+  .ktcRow2{display:flex;gap:8px;margin-top:16px;}
+  .ktcB{flex:1;border:none;border-radius:14px;padding:13px;font-weight:800;font-size:15px;font-family:inherit;cursor:pointer;background:#0a9e3d;color:#fff;}
+  .ktcB.g{background:rgba(10,158,61,.12);color:#0a9e3d;} html.dark .ktcB.g{color:#3fce7c;}
+  .ktcB[disabled]{opacity:.45;}
+  .ktcMenu{position:fixed;z-index:100007;min-width:210px;background:#fff;color:#10241a;border-radius:18px;padding:6px 0;box-shadow:0 12px 34px rgba(0,0,0,.28);animation:ktcUp .16s ease;}
+  html.dark .ktcMenu{background:#10241a;color:#e8f5ec;border:1px solid rgba(63,206,124,.3);}
+  .ktcMenu button{display:flex;align-items:center;gap:14px;width:100%;background:none;border:none;color:inherit;padding:12px 18px;font:inherit;font-size:15px;cursor:pointer;text-align:left;}
+  .ktcMenu button svg{color:#0a9e3d;} html.dark .ktcMenu button svg{color:#3fce7c;}
+  .ktcPick{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:rgba(10,158,61,.06);border:1px solid rgba(10,158,61,.2);border-radius:14px;padding:11px 12px;margin-bottom:8px;color:inherit;font:inherit;cursor:pointer;}
+  .ktcPick.on{border-color:#0a9e3d;background:rgba(10,158,61,.16);}
+  `;
+  document.head.appendChild(s);
+})();
+function ktcClose(){ document.querySelectorAll('.ktcBg,.ktcMenu,.ktcMenuBg').forEach(e => e.remove()); }
+function ktcSheet(html){ ktcClose(); const bg = document.createElement('div'); bg.className = 'ktcBg'; bg.innerHTML = '<div class="ktcSh">' + html + '</div>'; bg.addEventListener('click', e => { if(e.target === bg) ktcClose(); }); document.body.appendChild(bg); return bg; }
+/* ---- Meni "+" ---- */
+function ktcPlusMenu(btn, items){
+  ktcClose();
+  const bgc = document.createElement('div'); bgc.className = 'ktcMenuBg'; bgc.style.cssText = 'position:fixed;inset:0;z-index:100006;'; bgc.onclick = ktcClose; document.body.appendChild(bgc);
+  const m = document.createElement('div'); m.className = 'ktcMenu';
+  m.innerHTML = items.map((it, i) => '<button type="button" data-i="' + i + '">' + ktcIc(it.ic, 20) + '<span>' + ktcEsc(it.label) + '</span></button>').join('');
+  document.body.appendChild(m);
+  const r = btn.getBoundingClientRect(); m.style.left = Math.max(10, Math.min(r.left, innerWidth - m.offsetWidth - 10)) + 'px'; m.style.bottom = (innerHeight - r.top + 8) + 'px';
+  m.querySelectorAll('button').forEach(b => b.onclick = () => { const it = items[+b.dataset.i]; ktcClose(); setTimeout(() => it.run(), 30); });
+}
+/* ---- Fòm ID jwè ---- */
+function ktcGames(){ try{ return (state.products || []).filter(p => p.active !== false && (p.variants || []).some(v => v.partnerProductId != null)); }catch(e){ return []; } }
+function ktcOpenId(send){
+  const games = ktcGames(); if(!games.length){ try{ showToast(ktcT('noGame')); }catch(e){} return; }
+  let sel = null, vname = null;
+  const bg = ktcSheet('<div class="ktcH">' + ktcIc('id', 20) + '<span>' + ktcEsc(ktcT('pid')) + '</span></div><span class="ktcF">' + ktcEsc(ktcT('game').toUpperCase()) + '</span><div id="ktcGames">' + games.map((g, i) => '<button type="button" class="ktcPick" data-i="' + i + '"><b>' + ktcEsc(g.name) + '</b></button>').join('') + '</div><div id="ktcIdBox" style="display:none;"><span class="ktcF">' + ktcEsc(ktcT('playerId').toUpperCase()) + '</span><input class="ktcIn" id="ktcPid" inputmode="numeric" autocomplete="off"><div id="ktcSrvW" style="display:none;"><span class="ktcF">' + ktcEsc(ktcT('serverId').toUpperCase()) + '</span><input class="ktcIn" id="ktcSrv" inputmode="numeric" autocomplete="off"></div><div id="ktcVr" style="margin-top:10px;font-size:13.5px;"></div></div><div class="ktcRow2"><button type="button" class="ktcB g" id="ktcX">' + ktcEsc(ktcT('cancel')) + '</button><button type="button" class="ktcB" id="ktcGo" disabled>' + ktcEsc(ktcT('verify')) + '</button></div>');
+  const $ = id => bg.querySelector('#' + id); let variant = null, verified = false;
+  bg.querySelectorAll('.ktcPick').forEach(b => b.onclick = () => {
+    bg.querySelectorAll('.ktcPick').forEach(x => x.classList.remove('on')); b.classList.add('on'); sel = games[+b.dataset.i];
+    variant = (sel.variants || []).find(v => v.partnerProductId != null);
+    $('ktcIdBox').style.display = 'block'; $('ktcSrvW').style.display = (sel.variants || []).some(v => v.requiresServerId && !v.fixedServerId) ? 'block' : 'none';
+    verified = false; vname = null; $('ktcVr').innerHTML = ''; $('ktcGo').textContent = ktcT('verify'); $('ktcGo').disabled = !$('ktcPid').value.trim();
+  });
+  $('ktcPid').oninput = () => { verified = false; vname = null; $('ktcVr').innerHTML = ''; $('ktcGo').textContent = ktcT('verify'); $('ktcGo').disabled = !$('ktcPid').value.trim(); };
+  if($('ktcSrv')) $('ktcSrv').oninput = $('ktcPid').oninput;
+  $('ktcX').onclick = ktcClose;
+  $('ktcGo').onclick = async () => {
+    if(verified){ const srv = ($('ktcSrv') && $('ktcSrvW').style.display !== 'none') ? $('ktcSrv').value.trim() : ((variant && variant.fixedServerId) ? '' : ''); ktcClose(); send(ktcEnc({t:'id', g:sel.name, i:$('ktcPid').value.trim(), s:srv || undefined, n:vname})); return; }
+    const pid = $('ktcPid').value.trim(); if(!pid || !sel || !variant) return;
+    const needSrv = (sel.variants || []).some(v => v.requiresServerId && !v.fixedServerId);
+    const srv = variant.fixedServerId || (needSrv ? $('ktcSrv').value.trim() : '');
+    $('ktcGo').disabled = true; $('ktcVr').innerHTML = '<span style="opacity:.7;">' + ktcEsc(ktcT('verifying')) + '</span>';
+    try{
+      const sb = await getSupabase(); const body = { partner_product_id: String(variant.partnerProductId), player_id: pid, server_id: srv || undefined };
+      let { data, error } = await sb.functions.invoke('partner-verify', { body });
+      if(error && !data){ await new Promise(r => setTimeout(r, 900)); const rt = await sb.functions.invoke('partner-verify', { body }); data = rt.data; error = rt.error; }
+      if(data && data.valid && data.name){ vname = String(data.name); verified = true; $('ktcVr').innerHTML = '<div style="color:#0a9e3d;font-weight:800;">' + ktcEsc(ktcT('found')) + '</div><div style="font-weight:700;margin-top:2px;word-break:break-word;">' + ktcEsc(vname) + '</div>'; $('ktcGo').textContent = ktcT('send'); }
+      else if(data && !data.error && !data.valid){ $('ktcVr').innerHTML = '<div style="color:#e5484d;font-weight:700;">' + ktcEsc(ktcT('notFound')) + '</div>'; }
+      else { $('ktcVr').innerHTML = '<div style="color:#e5484d;font-weight:700;">' + ktcEsc(data && data.error ? data.error : ktcT('failV')) + '</div>'; }
+    }catch(e){ $('ktcVr').innerHTML = '<div style="color:#e5484d;font-weight:700;">' + ktcEsc(ktcT('failV')) + '</div>'; }
+    $('ktcGo').disabled = false;
+  };
+}
+/* ---- Fòm Evènman ---- */
+function ktcOpenEvent(send){
+  const bg = ktcSheet('<div class="ktcH">' + ktcIc('ev', 20) + '<span>' + ktcEsc(ktcT('evNew')) + '</span></div><span class="ktcF">' + ktcEsc(ktcT('evTitle').toUpperCase()) + '</span><input class="ktcIn" id="ktcT" maxlength="80"><div style="display:flex;gap:8px;"><div style="flex:1;"><span class="ktcF">' + ktcEsc(ktcT('evDate').toUpperCase()) + '</span><input class="ktcIn" id="ktcD" type="date"></div><div style="flex:1;"><span class="ktcF">' + ktcEsc(ktcT('evTime').toUpperCase()) + '</span><input class="ktcIn" id="ktcH" type="time"></div></div><span class="ktcF">' + ktcEsc(ktcT('evDesc').toUpperCase()) + '</span><textarea class="ktcIn" id="ktcDs" rows="3" maxlength="300"></textarea><div class="ktcRow2"><button type="button" class="ktcB g" id="ktcX">' + ktcEsc(ktcT('cancel')) + '</button><button type="button" class="ktcB" id="ktcGo">' + ktcEsc(ktcT('send')) + '</button></div>');
+  const $ = id => bg.querySelector('#' + id); $('ktcX').onclick = ktcClose;
+  $('ktcGo').onclick = () => { const ti = $('ktcT').value.trim(), d = $('ktcD').value, h = $('ktcH').value; if(!ti || !d){ (!ti ? $('ktcT') : $('ktcD')).focus(); return; }
+    if(typeof ktBlockBadText === 'function' && (ktBlockBadText(ti) || ktBlockBadText($('ktcDs').value))) return;
+    ktcClose(); send(ktcEnc({t:'ev', ti, d, h: h || undefined, ds: $('ktcDs').value.trim() || undefined})); };
+}
+/* ---- Fòm Sondaj (kreye / ajoute opsyon) ---- */
+function ktcOpenPoll(send, existing){
+  const edit = !!existing; const opts = edit ? (existing.o || []).slice() : ['', '']; const origN = opts.length;
+  const bg = ktcSheet('<div class="ktcH">' + ktcIc('po', 20) + '<span>' + ktcEsc(ktcT(edit ? 'pEdit' : 'pNew')) + '</span></div><span class="ktcF">' + ktcEsc(ktcT('pQ').toUpperCase()) + '</span><input class="ktcIn" id="ktcQ" maxlength="140"' + (edit ? ' disabled' : '') + '><div id="ktcOps"></div><button type="button" class="ktcB g" id="ktcAdd" style="width:100%;margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;">' + ktcIc('plus', 17) + '<span>' + ktcEsc(ktcT('pAdd')) + '</span></button>' + (edit ? '' : '<label style="display:flex;align-items:center;gap:10px;margin-top:14px;font-size:14px;"><input type="checkbox" id="ktcMulti" style="width:18px;height:18px;accent-color:#0a9e3d;"><span>' + ktcEsc(ktcT('pMulti')) + '</span></label>') + '<div class="ktcRow2"><button type="button" class="ktcB g" id="ktcX">' + ktcEsc(ktcT('cancel')) + '</button><button type="button" class="ktcB" id="ktcGo">' + ktcEsc(ktcT(edit ? 'save' : 'send')) + '</button></div>');
+  const $ = id => bg.querySelector('#' + id); $('ktcQ').value = edit ? existing.q : ''; $('ktcX').onclick = ktcClose;
+  const draw = () => { $('ktcOps').innerHTML = opts.map((v, i) => '<span class="ktcF">' + ktcEsc(ktcT('pOpt').toUpperCase()) + ' ' + (i + 1) + '</span><input class="ktcIn ktcOp" data-i="' + i + '" maxlength="60"' + (edit && i < origN ? ' disabled' : '') + '>').join(''); bg.querySelectorAll('.ktcOp').forEach(inp => { inp.value = opts[+inp.dataset.i]; inp.oninput = () => { opts[+inp.dataset.i] = inp.value; }; }); $('ktcAdd').style.display = opts.length >= 12 ? 'none' : 'flex'; };
+  draw(); $('ktcAdd').onclick = () => { opts.push(''); draw(); const l = bg.querySelectorAll('.ktcOp'); l[l.length - 1].focus(); };
+  $('ktcGo').onclick = () => { const q = $('ktcQ').value.trim(); const o = opts.map(x => x.trim()).filter(Boolean);
+    if(!q || o.length < 2){ try{ showToast(ktcT('pNeed')); }catch(e){} return; }
+    if(typeof ktBlockBadText === 'function' && (ktBlockBadText(q) || o.some(x => ktBlockBadText(x)))) return;
+    const multi = edit ? !!existing.m : !!($('ktcMulti') && $('ktcMulti').checked);
+    ktcClose(); send(ktcEnc({t:'po', q, o, m: multi ? 1 : undefined})); };
+}
+/* ---- Chwazi yon kòmand (Sipò) ---- */
+function ktcOpenOrders(send){
+  let list = []; try{ list = (state.orders[state.currentUserId] || []).slice(0, 15); }catch(e){}
+  const bg = ktcSheet('<div class="ktcH">' + ktcIc('od', 20) + '<span>' + ktcEsc(ktcT('ordPick')) + '</span></div><div id="ktcOl">' + (list.length ? list.map((o, i) => { let st = o.status; try{ st = statusLabel(o.status) || o.status; }catch(e){} return '<button type="button" class="ktcPick" data-i="' + i + '"><div style="flex:1;min-width:0;"><div style="font-weight:800;">#' + ktcEsc(o.orderNo || '') + ' · ' + ktcEsc(o.product || '') + '</div><div style="font-size:12.5px;opacity:.7;">' + ktcEsc(o.variant || '') + ' · ' + ktcEsc(o.price) + ' HTG · ' + ktcEsc(st) + '</div></div></button>'; }).join('') : '<div style="opacity:.7;padding:10px 2px;">' + ktcEsc(ktcT('noOrd')) + '</div>') + '</div><div class="ktcRow2"><button type="button" class="ktcB g" id="ktcX">' + ktcEsc(ktcT('cancel')) + '</button></div>');
+  bg.querySelector('#ktcX').onclick = ktcClose;
+  bg.querySelectorAll('.ktcPick').forEach(b => b.onclick = () => { const o = list[+b.dataset.i]; ktcClose(); send(ktcEnc({t:'od', id:o.id, no:o.orderNo, p:o.product, v:o.variant, pr:o.price, st:o.status, dt:o.date})); });
+}
+
+/* ---- Tradiksyon mesaj ---- */
+const KT_TR_LANGS = [['Kreyòl ayisyen','ht'],['Français','fr'],['English','en'],['Español','es']];
+const KT_TR_L = {
+  ht:{t:'Tradui nan…',s:'Chwazi lang ou vle a',w:'Ap tradui…',f:'Pa kapab tradui kounye a. Eseye ankò.'},
+  fr:{t:'Traduire en…',s:'Choisissez la langue',w:'Traduction…',f:'Traduction impossible pour le moment. Réessayez.'},
+  en:{t:'Translate to…',s:'Choose a language',w:'Translating…',f:'Cannot translate right now. Try again.'},
+  es:{t:'Traducir a…',s:'Elige el idioma',w:'Traduciendo…',f:'No se puede traducir ahora. Inténtalo de nuevo.'}
+};
+function ktTrL(){ return KT_TR_L[(typeof currentLang === 'string' && KT_TR_L[currentLang]) ? currentLang : 'ht']; }
+async function ktTranslateText(text, tl){
+  try{
+    const r = await fetch('https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=' + tl + '&dt=t&q=' + encodeURIComponent(text));
+    if(r.ok){ const j = await r.json(); const out = (j[0] || []).map(x => x[0]).join(''); if(out) return out; }
+  }catch(e){}
+  try{
+    const r = await fetch('https://api.mymemory.translated.net/get?q=' + encodeURIComponent(text.slice(0, 480)) + '&langpair=Autodetect|' + tl);
+    if(r.ok){ const j = await r.json(); const out = j && j.responseData && j.responseData.translatedText; if(out && !/INVALID|MYMEMORY WARNING/i.test(out)) return out; }
+  }catch(e){}
+  return null;
+}
+function ktTranslateFlow(bubble, text){
+  if(!bubble || !text) return;
+  const L = ktTrL();
+  const bg = ktcSheet('<div class="ktcH"><span>' + ktcEsc(L.t) + '</span></div><div style="font-size:13px;opacity:.6;margin:-6px 0 6px;">' + ktcEsc(L.s) + '</div>' + KT_TR_LANGS.map((l, i) => '<button type="button" class="ktcPick" data-i="' + i + '" style="margin-bottom:0;border-radius:0;border-width:1px 0 0 0;background:none;"><b style="font-weight:600;font-size:16px;">' + ktcEsc(l[0]) + '</b></button>').join(''));
+  bg.querySelectorAll('.ktcPick').forEach(b => b.onclick = async () => {
+    const lg = KT_TR_LANGS[+b.dataset.i]; ktcClose();
+    const old = bubble.querySelector('.ktTr'); if(old) old.remove();
+    const box = document.createElement('div'); box.className = 'ktTr';
+    box.innerHTML = '<b>' + ktcIc('tr', 13) + ' ' + ktcEsc(lg[0]) + '</b><div class="ktTrB">' + ktcEsc(L.w) + '</div>';
+    bubble.appendChild(box);
+    const out = await ktTranslateText(String(text).replace(/\*\*|\*|~|`/g, ''), lg[1]);
+    const bd = box.querySelector('.ktTrB'); if(bd) bd.textContent = out || L.f;
+  });
+}
 function formatChatText(text, plain){
+  { const _kc = (typeof ktcHtml==='function') ? ktcHtml(text) : null; if(_kc) return _kc; }
   let escaped = escapeHtml(text);
   // Mesaj kliyan: lyen yo klikab (senp, san bouton). Sèlman medya (foto/videyo/vokal) ki soti nan stòkaj nou an ki afiche.
   const _ownBase = (typeof SUPABASE_URL !== 'undefined') ? SUPABASE_URL + '/storage/' : '';
@@ -3479,12 +3726,31 @@ function sendSupportTyping(){
   supportTypingLastSent = now;
   try{ supportTypingChannel.send({ type:'broadcast', event:'typing', payload:{ who:'customer' } }); }catch(e){}
 }
+function ktSupHd(row){
+  try{
+    const b = row.querySelector('.kc-bubble'); if(!b || b.querySelector('.ktHd')) return;
+    const av = row.querySelector('.kc-av'); if(!av) return;
+    const role = row.dataset.role, mine = role === 'user';
+    const _cu = (typeof currentUser === 'function') ? currentUser() : null;
+    const nm = mine ? ((_cu && _cu.name) || '') : 'Kerry Topup';
+    const hd = document.createElement('div'); hd.className = 'ktHd';
+    const media = b.classList.contains('ktv-mine') || (typeof ktIsMediaUrl === 'function' && ktIsMediaUrl(row._text || ''));
+    hd.style.cssText = 'display:flex;align-items:center;gap:7px;margin:' + (media ? '2px 0 6px' : '-2px 0 5px') + ';' + (media ? 'padding:0 6px;' : '') + (mine ? 'flex-direction:row-reverse;' : '');
+    const a2 = av.cloneNode(true); a2.classList.remove('kc-av'); a2.style.cssText += ';width:22px;height:22px;font-size:10px;visibility:visible;display:flex;'; if(a2.querySelector('img') && !a2.style.padding) a2.style.padding = '1px';
+    const n = document.createElement('div'); n.style.cssText = 'font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:4px;min-width:0;word-break:break-word;color:' + (mine ? '#fff' : '#0a9e3d') + ';'; n.textContent = nm;
+    if(!mine){ n.insertAdjacentHTML('beforeend', '<svg width="15" height="15" viewBox="0 0 24 24" style="flex-shrink:0;"><circle cx="12" cy="12" r="11" fill="#25D366"/><path d="M7 12.5l3.2 3.2L17 9" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'); }
+    hd.appendChild(a2); hd.appendChild(n); b.insertBefore(hd, b.firstChild);
+    av.style.display = 'none';
+    b.classList.add(mine ? 'ktHdM' : 'ktHdO');
+  }catch(e){}
+}
 function setSupportBubbleText(row, text, edited){
   const b = row.querySelector('.kc-bubble'); if(!b) return;
   const _ts = (!ktIsMediaUrl(text)) ? '<span class="kt-sts" style="float:right;margin:6px 0 -4px 12px;font-size:10px;opacity:.6;">' + (edited ? ktEditedLabel() : '') + ktSupHHMM(row._when) + '</span>' : '';
-  b.innerHTML = formatChatText(text, !!(row.dataset && row.dataset.role === 'user')) + _ts;
+  b.innerHTML = (row._quote || '') + formatChatText(text, !!(row.dataset && row.dataset.role === 'user')) + _ts;
   row._text = text; row._edited = !!edited;
   if(row._hist) row._hist.content = text;
+  ktSupHd(row);
 }
 function editSupportMessage(row){
   const b = row.querySelector('.kc-bubble'); if(!b) return;
@@ -3514,7 +3780,7 @@ function addSupportMessage(role, text, skipHistory, meta){
   meta = meta || {};
   const _typingRow = document.getElementById('supportTypingRow');
   let entry = null;
-  if(!skipHistory){ entry = { role, content: text }; supportChatHistory.push(entry); }
+  if(!skipHistory){ entry = { role, content: text }; if(meta.reply_text){ entry.reply_to = meta.reply_to || null; entry.reply_name = meta.reply_name; entry.reply_text = meta.reply_text; } supportChatHistory.push(entry); }
   const box = document.getElementById('supportChatMessages');
   const row = document.createElement('div');
   const isBot = role === 'assistant';
@@ -3524,6 +3790,7 @@ function addSupportMessage(role, text, skipHistory, meta){
   row._text = text;
   if(meta.id) row.dataset.dbid = meta.id;
   row._when = meta.created_at || new Date().toISOString();
+  row._quote = (meta.reply_text || meta.reply_name) ? ktSupQuoteHtml(meta.reply_name, meta.reply_text, role === 'user') : '';
   row._reactions = (meta.reactions && typeof meta.reactions === 'object') ? meta.reactions : {};
   const _logoAv = `<div class="kc-av" style="width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid rgba(63,206,124,0.3);overflow:hidden;flex-shrink:0;padding:2px;box-sizing:border-box;"><img src="${window.KT_LOGO_SRC}" alt="Kerry Topup" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>`;
   let avatarHtml = _logoAv;
@@ -3547,6 +3814,7 @@ function addSupportMessage(role, text, skipHistory, meta){
   if(meta.deleted) applySupportDeleted(row);
   else { renderSupportReactions(row); if(!ktIsMediaUrl(text)) setSupportBubbleText(row, text, !!meta.edited); }
   if(meta.id && ktSupIsHidden(meta.id)) row.style.display = 'none';
+  ktSupHd(row);
   attachSupportMsgMenu(row);
   box.scrollTop = box.scrollHeight;
   return row;
@@ -3570,6 +3838,7 @@ function applySupportDeleted(row){
     b.style.background = 'rgba(255,255,255,0.06)'; b.style.boxShadow = 'none'; b.style.color = '#93b1a1'; b.style.border = '1px dashed rgba(255,255,255,0.18)';
   }
   renderSupportReactions(row);
+  ktSupHd(row);
 }
 function attachSupportMsgMenu(row){
   const bubble = row.querySelector('.kc-bubble'); if(!bubble) return;
@@ -3583,38 +3852,150 @@ function attachSupportMsgMenu(row){
   bubble.addEventListener('touchstart', (e) => { moved = false; if(e.target.closest('audio,video,a,button,input,iframe')) return; timer = setTimeout(() => { if(!moved) open(e); }, 450); }, { passive:true });
   bubble.addEventListener('touchmove', () => { moved = true; clearTimeout(timer); }, { passive:true });
   bubble.addEventListener('touchend', () => clearTimeout(timer));
-  bubble.addEventListener('click', (e) => { if(e.target.closest('audio,video,a,button,input,iframe')) return; open(e); });
+  bubble.addEventListener('click', (e) => { if(row._noClick) return; if(e.target.closest('audio,video,a,button,input,iframe')) return; open(e); });
+  let sx = 0, sy = 0, dx = 0, swiping = false;
+  row.addEventListener('touchstart', (e) => { if(row._deleted) return; const tt = e.touches[0]; sx = tt.clientX; sy = tt.clientY; dx = 0; swiping = false; }, { passive:true });
+  row.addEventListener('touchmove', (e) => { if(row._deleted) return; const tt = e.touches[0]; const mx = tt.clientX - sx, my = tt.clientY - sy; if(!swiping && mx > 14 && Math.abs(my) < Math.abs(mx) * 0.5) swiping = true; if(swiping){ dx = Math.max(0, Math.min(mx, 72)); row.style.transition = 'none'; row.style.transform = 'translateX(' + dx + 'px)'; } }, { passive:true });
+  const endSwipe = () => { if(swiping){ row.style.transition = 'transform .18s'; row.style.transform = ''; if(dx >= 56) ktSupSetReply(row); row._noClick = true; setTimeout(() => { row._noClick = false; }, 400); } swiping = false; dx = 0; };
+  row.addEventListener('touchend', endSwipe); row.addEventListener('touchcancel', endSwipe);
 }
-function closeSupportMsgMenu(){ const m = document.getElementById('supportMsgMenu'); if(m) m.remove(); }
-function openSupportMsgMenu(row, rect){
-  closeSupportMsgMenu();
-  const bg = document.getElementById('supportChatBg'); if(!bg) return;
-  const mine = row.dataset.role === 'user';
-  const myReact = (row._reactions || {}).customer;
-  const T = { ht:'Efase pou tout moun', fr:'Supprimer pour tout le monde', en:'Delete for everyone', es:'Borrar para todos' }[currentLang] || 'Delete for everyone';
-  const TME = { ht:'Efase pou mwen', fr:'Supprimer pour moi', en:'Delete for me', es:'Borrar para mí' }[currentLang] || 'Delete for me';
-  const m = document.createElement('div');
-  m.id = 'supportMsgMenu';
-  m.style.cssText = 'position:fixed;z-index:80;background:#10241a;border:1px solid rgba(63,206,124,0.3);border-radius:18px;padding:8px;box-shadow:0 18px 44px rgba(0,0,0,0.55);min-width:200px;';
-  m.innerHTML = '<div style="display:flex;gap:4px;justify-content:center;">' + SUPPORT_REACT_EMOJIS.map(e => `<button data-e="${e}" style="width:38px;height:38px;border:none;border-radius:50%;background:${myReact===e?'rgba(63,206,124,0.25)':'transparent'};font-size:21px;cursor:pointer;">${e}</button>`).join('') + '</div>' +
-    (mine && !ktIsMediaUrl(row._text) ? `<button data-edit="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#f4fbf6;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">✏️ ${({ht:'Modifye',fr:'Modifier',en:'Edit',es:'Editar'})[currentLang] || 'Edit'}</button>` : '') +
-    (!row._deleted ? `<button data-delme="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#ff8a8a;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">🙈 ${TME}</button>` : '') +
-    (mine ? `<button data-del="1" style="width:100%;margin-top:6px;padding:11px 12px;border:none;border-top:1px solid rgba(255,255,255,0.08);background:transparent;color:#ff8a8a;font-weight:700;font-size:13.5px;text-align:left;cursor:pointer;font-family:inherit;">🗑️ ${T}</button>` : '');
-  bg.appendChild(m);
-  const mh = m.offsetHeight, mw = m.offsetWidth;
-  let top = rect.top - mh - 8; if(top < 70) top = Math.min(rect.bottom + 8, window.innerHeight - mh - 10);
-  let left = rect.left + (rect.width - mw)/2; left = Math.max(10, Math.min(left, window.innerWidth - mw - 10));
-  m.style.top = top + 'px'; m.style.left = left + 'px';
-  m.addEventListener('click', (e) => {
-    const b = e.target.closest('button'); if(!b) return;
-    e.stopPropagation();
-    if(b.dataset.e){ reactToSupportMessage(row, b.dataset.e); }
-    else if(b.dataset.edit){ editSupportMessage(row); }
-    else if(b.dataset.delme){ const q = { ht:'Efase mesaj sa a sèlman pou ou ?', fr:'Supprimer ce message seulement pour vous ?', en:'Delete this message only for you?', es:'¿Borrar este mensaje solo para ti?' }[currentLang] || 'Delete for me?'; if(confirm(q)) ktSupHideForMe(row); }
-    else if(b.dataset.del){ deleteSupportMessage(row); }
-    closeSupportMsgMenu();
+/* ===== KT WA MENU — meni ak popup Efase style WhatsApp (Sipò + Kominote) ===== */
+const KT_WA_L = {
+  ht:{more:'Plis',translate:'Tradui',reply:'Reponn',copy:'Kopye',edit:'Modifye',del:'Efase',report:'Rapòte',ban:'Bani',delTitle:'Efase mesaj la ?',cancel:'Anile',forMe:'Pou mwen',forAll:'Pou tout moun',you:'Ou',media:'Medya',replyTo:'Reponn',copied:'Kopye ✓'},
+  fr:{more:'Plus',translate:'Traduire',reply:'Répondre',copy:'Copier',edit:'Modifier',del:'Supprimer',report:'Signaler',ban:'Bannir',delTitle:'Supprimer le message ?',cancel:'Annuler',forMe:'Pour moi',forAll:'Pour tous',you:'Vous',media:'Média',replyTo:'Répondre à',copied:'Copié ✓'},
+  en:{more:'More',translate:'Translate',reply:'Reply',copy:'Copy',edit:'Edit',del:'Delete',report:'Report',ban:'Ban',delTitle:'Delete message?',cancel:'Cancel',forMe:'For me',forAll:'For everyone',you:'You',media:'Media',replyTo:'Reply to',copied:'Copied ✓'},
+  es:{more:'Más',translate:'Traducir',reply:'Responder',copy:'Copiar',edit:'Editar',del:'Eliminar',report:'Denunciar',ban:'Bloquear',delTitle:'¿Eliminar mensaje?',cancel:'Cancelar',forMe:'Para mí',forAll:'Para todos',you:'Tú',media:'Archivo',replyTo:'Responder a',copied:'Copiado ✓'}
+};
+function ktWaL(){ return KT_WA_L[(typeof currentLang !== 'undefined' && KT_WA_L[currentLang]) ? currentLang : 'ht']; }
+const KT_WA_IC = {
+  more:'<circle cx="12" cy="12" r="10"/><path d="M7.5 12h.01M12 12h.01M16.5 12h.01" stroke-width="3"/>',
+  tr:'<path d="M4 5h9M8.5 3v2M6 5c.5 4 3 7 6 8M12 5c-.5 4-3 7-6 9"/><path d="M12 21l4.5-10L21 21M13.6 17.5h5.8"/>',
+  eye:'<path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/>',
+  reply:'<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v3"/>',
+  copy:'<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>',
+  edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/>',
+  del:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  report:'<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>',
+  ban:'<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>'
+};
+function ktWaClose(){ const o = document.getElementById('ktWaMenu'); if(o) o.remove(); }
+function ktWaMenu(o){
+  ktWaClose();
+  const dark = document.documentElement.classList.contains('dark');
+  const r = o.bubble.getBoundingClientRect();
+  const W = window.innerWidth, H = window.innerHeight;
+  const cardBg = dark ? '#1c2b24' : 'rgba(247,248,247,.98)', fg = dark ? '#e8f5ec' : '#111';
+  const ov = document.createElement('div'); ov.id = 'ktWaMenu';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:100005;background:' + (dark ? 'rgba(0,0,0,.6)' : 'rgba(225,232,228,.6)') + ';-webkit-backdrop-filter:blur(7px);backdrop-filter:blur(7px);';
+  const pill = document.createElement('div');
+  pill.style.cssText = 'position:absolute;display:flex;gap:2px;align-items:center;padding:5px 8px;border-radius:999px;background:' + cardBg + ';box-shadow:0 6px 24px rgba(0,0,0,.2);';
+  pill.innerHTML = o.emojis.map(e => '<button data-e="' + e + '" style="width:42px;height:42px;border:none;border-radius:50%;background:' + (o.myEmoji === e ? 'rgba(10,158,61,.25)' : 'transparent') + ';font-size:27px;cursor:pointer;padding:0;line-height:1;">' + e + '</button>').join('');
+  const cl = o.bubble.cloneNode(true);
+  cl.removeAttribute('id');
+  cl.style.position = 'absolute'; cl.style.margin = '0'; cl.style.pointerEvents = 'none'; cl.style.width = r.width + 'px'; cl.style.maxWidth = 'none'; cl.style.maxHeight = Math.round(H * 0.38) + 'px'; cl.style.overflow = 'hidden'; cl.style.transform = 'none';
+  const menu = document.createElement('div');
+  menu.style.cssText = 'position:absolute;width:232px;border-radius:20px;background:' + cardBg + ';box-shadow:0 8px 30px rgba(0,0,0,.25);padding:6px 0;color:' + fg + ';';
+  let sepDone = false;
+  menu.innerHTML = o.items.map((it, i) => {
+    let sep = '';
+    if(it.red && i > 0 && !sepDone){ sep = '<div style="height:1px;background:rgba(128,128,128,.25);margin:4px 18px;"></div>'; sepDone = true; }
+    return sep + '<button data-id="' + it.id + '" style="width:100%;display:flex;align-items:center;gap:15px;padding:12px 20px;border:none;background:transparent;font-family:inherit;font-size:16.5px;text-align:left;cursor:pointer;color:' + (it.red ? '#d1173b' : fg) + ';"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">' + KT_WA_IC[it.icon] + '</svg><span>' + it.label + '</span></button>';
+  }).join('');
+  if(o.more && o.more.length){
+    const Lm = ktWaL(); const btn = (it, sub) => '<button ' + (sub ? 'data-sub="1" ' : '') + 'data-id="' + it.id + '" style="width:100%;display:' + (sub ? 'none' : 'flex') + ';align-items:center;gap:15px;padding:12px 20px' + (sub ? ' 12px 48px' : '') + ';border:none;background:transparent;font-family:inherit;font-size:16.5px;text-align:left;cursor:pointer;color:' + fg + ';"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">' + KT_WA_IC[it.icon] + '</svg><span>' + it.label + '</span></button>';
+    menu.insertAdjacentHTML('beforeend', '<div style="height:1px;background:rgba(128,128,128,.25);margin:4px 18px;"></div><button data-more="1" style="width:100%;display:flex;align-items:center;gap:15px;padding:12px 20px;border:none;background:transparent;font-family:inherit;font-size:16.5px;text-align:left;cursor:pointer;color:' + fg + ';"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">' + KT_WA_IC.more + '</svg><span>' + Lm.more + '</span></button>' + o.more.map(it => btn(it, true)).join(''));
+    menu.querySelectorAll('[data-sub]').forEach(b => { b.style.paddingLeft = '50px'; b.style.padding = '12px 20px 12px 50px'; });
+  }
+  ov.appendChild(pill); ov.appendChild(cl); ov.appendChild(menu);
+  document.body.appendChild(ov);
+  const ph = pill.offsetHeight || 52, mh = menu.offsetHeight, ch = Math.min(r.height, Math.round(H * 0.38));
+  const group = ph + 8 + ch + 10 + mh;
+  let top = r.top - ph - 8;
+  if(top + group > H - 12) top = H - 12 - group;
+  if(top < 12) top = 12;
+  const px = (w) => { const l = o.mine ? Math.min(r.right, W - 12) - w : Math.max(r.left, 12); return Math.max(12, Math.min(l, W - w - 12)); };
+  pill.style.top = top + 'px'; pill.style.left = px(pill.offsetWidth) + 'px';
+  cl.style.top = (top + ph + 8) + 'px'; cl.style.left = r.left + 'px';
+  menu.style.top = (top + ph + 8 + ch + 10) + 'px'; menu.style.left = px(232) + 'px';
+  const t0 = Date.now();
+  ov.addEventListener('click', (e) => {
+    const mb = e.target.closest('[data-more]');
+    if(mb){ menu.querySelectorAll('[data-sub]').forEach(b => { b.style.display = 'flex'; }); const over = menu.getBoundingClientRect().bottom - (H - 12); if(over > 0){ const room = Math.max(0, pill.getBoundingClientRect().top - 12); const d = Math.min(over, room); [pill, cl, menu].forEach(x => { x.style.top = (parseFloat(x.style.top) - d) + 'px'; }); } return; }
+    const eb = e.target.closest('[data-e]'), ib = e.target.closest('[data-id]');
+    if(eb){ ktWaClose(); o.onReact && o.onReact(eb.dataset.e); return; }
+    if(ib){ ktWaClose(); o.onItem && o.onItem(ib.dataset.id); return; }
+    if(Date.now() - t0 > 350) ktWaClose();
   });
-  setTimeout(() => { document.addEventListener('click', closeSupportMsgMenu, { once:true }); }, 0);
+}
+function ktWaDelete(o){
+  const L = ktWaL(); const dark = document.documentElement.classList.contains('dark');
+  const old = document.getElementById('ktWaDel'); if(old) old.remove();
+  const ov = document.createElement('div'); ov.id = 'ktWaDel';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:100006;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:18px;';
+  const col = dark ? '#3fce7c' : '#0a9e3d';
+  const bt = (id, txt) => '<button data-id="' + id + '" style="border:none;background:transparent;color:' + col + ';font-weight:700;font-size:13.5px;padding:8px 4px;cursor:pointer;font-family:inherit;white-space:nowrap;">' + txt + '</button>';
+  ov.innerHTML = '<div style="width:100%;max-width:350px;background:' + (dark ? '#10241a' : '#fff') + ';color:' + (dark ? '#e8f5ec' : '#10241a') + ';border-radius:20px;padding:20px 18px 12px;box-shadow:0 18px 44px rgba(0,0,0,.45);font-family:inherit;"><div style="font-size:15.5px;font-weight:600;margin-bottom:20px;">' + L.delTitle + '</div><div style="display:flex;justify-content:' + (o.canAll ? 'space-between' : 'flex-end') + ';gap:' + (o.canAll ? '6px' : '22px') + ';">' + bt('no', L.cancel) + bt('me', L.forMe) + (o.canAll ? bt('all', L.forAll) : '') + '</div></div>';
+  document.body.appendChild(ov);
+  ov.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-id]');
+    if(b){ ov.remove(); if(b.dataset.id === 'me') o.onMe && o.onMe(); else if(b.dataset.id === 'all') o.onAll && o.onAll(); return; }
+    if(e.target === ov) ov.remove();
+  });
+}
+/* ===== Reponn nan Sipò ===== */
+function ktSupPlus(btn){
+  const send = (c) => { const inp = document.getElementById('supportChatInput'); if(!inp) return; const d = inp.value; inp.value = c; const pr = sendSupportMessage(); inp.value = d; try{ updateSupportSendBtn(); }catch(e){} return pr; };
+  const items = [{ ic:'gal', label:ktcT('gal'), run:()=>document.getElementById('supportGalleryIn').click() }];
+  items.push({ ic:'id', label:ktcT('pid'), run:()=>ktcOpenId(send) });
+  items.push({ ic:'od', label:ktcT('ord'), run:()=>{ if(!state.currentUserId){ try{ showToast(ktcT('needLogin')); }catch(e){} return; } ktcOpenOrders(send); } });
+  ktcPlusMenu(btn, items);
+}
+function ktSupPreview(row){ const x = row._text || ''; { const _kp = (typeof ktcPreview==='function') ? ktcPreview(x) : null; if(_kp) return _kp; } return ktIsMediaUrl(x) ? ktWaL().media : String(x).replace(/\s+/g, ' ').slice(0, 90); }
+function ktSupSetReply(row){
+  const bar = document.getElementById('supportReplyBar'); if(!bar) return;
+  if(!row){ window._ktSupReply = null; bar.style.display = 'none'; return; }
+  const L = ktWaL(); const mine = row.dataset.role === 'user';
+  const cu = (typeof currentUser === 'function') ? currentUser() : null;
+  const sname = mine ? ((cu && cu.name) || L.you) : 'Kerry Topup';
+  window._ktSupReply = { id: row.dataset.dbid || null, sname, text: ktSupPreview(row) };
+  document.getElementById('supportReplyN').textContent = L.replyTo + ' ' + (mine ? L.you : 'Kerry Topup');
+  document.getElementById('supportReplyT').textContent = window._ktSupReply.text;
+  bar.style.display = 'flex';
+  const ta = document.getElementById('supportChatInput'); if(ta){ try{ ta.focus(); }catch(e){} }
+}
+function ktSupQuoteHtml(name, text, mine){
+  return '<div class="kt-q" style="background:rgba(0,0,0,.2);border-left:4px solid ' + (mine ? '#bff5d2' : '#3fce7c') + ';border-radius:8px;padding:5px 9px;margin:0 0 7px;font-size:12.5px;line-height:1.35;"><b style="display:block;font-size:12px;">' + escapeHtml(name || '') + '</b><span style="display:block;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px;">' + escapeHtml(text || '') + '</span></div>';
+}
+function closeSupportMsgMenu(){ ktWaClose(); }
+function openSupportMsgMenu(row, rect){
+  if(row._deleted) return;
+  const L = ktWaL();
+  const mine = row.dataset.role === 'user';
+  const isText = !ktIsMediaUrl(row._text);
+  const items = [{ id:'reply', icon:'reply', label:L.reply }];
+  if(isText) items.push({ id:'copy', icon:'copy', label:L.copy });
+  if(mine && isText) items.push({ id:'edit', icon:'edit', label:L.edit });
+  items.push({ id:'del', icon:'del', label:L.del, red:true });
+  ktWaMenu({
+    bubble: row.querySelector('.kc-bubble'), mine, emojis: SUPPORT_REACT_EMOJIS, myEmoji: (row._reactions || {}).customer, items, more: (isText && !ktcParse(row._text)) ? [{ id:'translate', icon:'tr', label:L.translate }] : null,
+    onReact: (e) => reactToSupportMessage(row, e),
+    onItem: (id) => {
+      if(id === 'reply') ktSupSetReply(row);
+      else if(id === 'copy'){ try{ navigator.clipboard.writeText(row._text || ''); showToast(L.copied); }catch(e){} }
+      else if(id === 'edit') editSupportMessage(row);
+      else if(id === 'translate') ktTranslateFlow(row.querySelector('.kc-bubble'), row._text || '');
+      else if(id === 'del') ktWaDelete({ canAll: mine, onMe: () => ktSupHideForMe(row), onAll: () => doDeleteSupportMessage(row) });
+    }
+  });
+}
+async function doDeleteSupportMessage(row){
+  applySupportDeleted(row);
+  const id = row.dataset.dbid; if(!id) return;
+  try{
+    const sb = await getSupabase();
+    const { error } = await sb.from('support_messages').update({ deleted:true, content:'', reactions:{} }).eq('id', id);
+    if(error){ console.warn('delete msg:', error.message); showToast('⚠️ ' + error.message); }
+  }catch(e){}
 }
 async function reactToSupportMessage(row, emoji){
   const r = Object.assign({}, row._reactions || {});
@@ -3891,7 +4272,8 @@ async function sendSupportMessage(){
   if(window._ktPend){ const ok = await ktFlushPendingImage(); if(!ok) return; if(!text) return; }
   input.value = '';
   updateSupportSendBtn();
-  const _txtRow = addSupportMessage('user', text);
+  const _rp = window._ktSupReply || null; if(_rp) ktSupSetReply(null);
+  const _txtRow = addSupportMessage('user', text, false, _rp ? { reply_to:_rp.id, reply_name:_rp.sname, reply_text:_rp.text } : undefined);
 
   // Si sit la fèmen, kòmanse tracking imedyatman (pa tann 5 mesaj) e pa eseye reponn ak AI
   // Kreye konvèsasyon an IMEDYATMAN ak premye mesaj la (pa tann Mes toutous reponn) — konsa admin toujou wè l
@@ -3911,7 +4293,8 @@ async function sendSupportMessage(){
   if(supportConversationId && !(_txtRow && _txtRow.dataset.dbid)){
     try{
       const sb = await getSupabase();
-      const { data: _tins, error: _tinsErr } = await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text }).select('id').single();
+      let { data: _tins, error: _tinsErr } = await sb.from('support_messages').insert(Object.assign({ conversation_id: supportConversationId, sender:'customer', content:text }, _rp ? { reply_to:_rp.id, reply_name:_rp.sname, reply_text:_rp.text } : {})).select('id').single();
+      if(_tinsErr && _rp && /reply_/i.test(_tinsErr.message || '')){ ({ data: _tins, error: _tinsErr } = await sb.from('support_messages').insert({ conversation_id: supportConversationId, sender:'customer', content:text }).select('id').single()); }
       if(_tinsErr){ showToast('⚠️ Mesaj pa sove: ' + (_tinsErr.message||''), 6000); try{ sendNtfyNotification('🐞 Mesaj chat pa sove', '❌ ' + (_tinsErr.message||'') + ' [' + (_tinsErr.code||'') + ']\n(support_messages insert)', 'high', 'warning'); }catch(e){} }
       if(_tins && _txtRow) _txtRow.dataset.dbid = _tins.id;
       await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', supportConversationId);
@@ -9025,7 +9408,9 @@ async function ktTrDoLookup(v, seq, attempt){
       return;
     }
     window.ktTrRecipient = { id: data.id, name: data.name, publicId: data.public_id, query: v };
-    ktTrSet('<div style="display:flex;align-items:center;gap:12px;margin-top:10px;padding:12px 14px;border:1.5px solid #bfe8cf;background:#e8f8ee;border-radius:12px;"><div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#3fce7c,#17a854);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;">'+escapeHtml((data.name||'?').charAt(0).toUpperCase())+'</div><div style="flex:1;min-width:0;"><div style="font-weight:800;font-size:15px;">'+escapeHtml(data.name||'')+'</div><div style="font-size:12px;color:#0a7c3d;">ID '+escapeHtml(data.public_id||'')+' ✓</div></div></div>', true);
+    let _trAv = ''; try{ const { data: _cd } = await sb.rpc('kt_user_card', { p_id: data.id }); const _r = Array.isArray(_cd) ? _cd[0] : _cd; _trAv = (_r && _r.avatar_url) || ''; }catch(e){}
+    if(seq !== ktTrSeq) return;
+    ktTrSet('<div style="display:flex;align-items:center;gap:12px;margin-top:10px;padding:12px 14px;border:1.5px solid #bfe8cf;background:#e8f8ee;border-radius:12px;"><div style="position:relative;overflow:hidden;width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#3fce7c,#17a854);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;">'+escapeHtml((data.name||'?').charAt(0).toUpperCase())+(/^https:\/\//i.test(_trAv)?'<img src="'+escapeHtml(_trAv)+'" alt="" referrerpolicy="no-referrer" onerror="this.remove()" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">':'')+'</div><div style="flex:1;min-width:0;"><div style="font-weight:800;font-size:15px;">'+escapeHtml(data.name||'')+'</div><div style="font-size:12px;color:#0a7c3d;">ID '+escapeHtml(data.public_id||'')+' ✓</div></div></div>', true);
   }catch(e){
     if(seq !== ktTrSeq) return;
     if(attempt < 1){ setTimeout(() => { if(seq === ktTrSeq) ktTrDoLookup(v, seq, attempt + 1); }, 1200); return; }
@@ -12804,10 +13189,21 @@ function renderAdminTab(){
           </div>
         </div>
         <div id="adminChatMessages" style="background:var(--panel);border-radius:14px;padding:14px;height:400px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">Chajman...</div>
-        <div style="display:flex;gap:6px;align-items:flex-end;">
-          <label style="width:38px;height:38px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;cursor:pointer;">📷<input type="file" accept="image/*,video/*" style="display:none;" onchange="sendAdminChatImage(this)"></label>
-          <textarea id="adminChatInput" rows="1" placeholder="Ekri repons ou..." style="flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:18px;padding:10px 14px;font-size:14px;line-height:1.4;resize:none;overflow-y:auto;max-height:140px;font-family:inherit;color:var(--text);outline:none;" oninput="ktAdminChatGrow(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey && !(window.matchMedia && matchMedia('(pointer:coarse)').matches)){event.preventDefault();sendAdminChatMessage();}"></textarea>
-          <button class="btn btn-green" style="width:auto;padding:10px 18px;" onclick="sendAdminChatMessage()">Voye</button>
+        <div id="adminRecBar" style="display:none;align-items:center;gap:10px;background:#fdecef;border:1.5px solid #f6c3cc;border-radius:26px;padding:10px 12px 10px 16px;">
+          <span style="width:10px;height:10px;border-radius:50%;background:#e23b57;"></span><b style="color:#a3122b;font-size:14px;">Ap anrejistre…</b><span id="adminRecTimer" style="color:#a3122b;font-size:14px;">0:00</span><span style="flex:1;"></span>
+          <button type="button" onclick="adminChatCancelRec()" style="border:none;background:none;font-size:13px;font-weight:700;color:#5f7d6c;padding:8px 10px;font-family:inherit;">Anile</button>
+          <button type="button" onclick="adminChatToggleRec()" aria-label="stop" style="width:40px;height:40px;border-radius:50%;background:#E23B57;border:none;display:flex;align-items:center;justify-content:center;color:#fff;"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="2"/></svg></button>
+        </div>
+        <div id="adminComposer" class="ktAdmBx">
+          <textarea id="adminChatInput" rows="1" placeholder="Ekri repons ou..." class="ktAdmTa" oninput="ktAdminChatGrow(this)" onkeydown="if(event.key==='Enter' && !event.shiftKey && !(window.matchMedia && matchMedia('(pointer:coarse)').matches)){event.preventDefault();sendAdminChatMessage();}"></textarea>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button type="button" class="ktAdmPl" aria-label="+" onclick="document.getElementById('adminChatFile').click()">+</button><input type="file" id="adminChatFile" accept="image/*,video/*" style="display:none;" onchange="sendAdminChatImage(this)">
+            <span style="flex:1;"></span>
+            <button type="button" id="adminMicBtn" class="ktAdmMic" onclick="adminChatMicSend()" aria-label="Voye">
+              <svg id="adminMicIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke-linecap="round"/></svg>
+              <svg id="adminSendIcon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><path d="M2.5 21.5 22 12 2.5 2.5 2.5 10 16 12 2.5 14z"/></svg>
+            </button>
+          </div>
         </div>
       `;
       loadAdminChatConversation(adminChatConversationId);
@@ -14125,7 +14521,7 @@ function renderAdminBubbleContent(b){
     b.innerHTML = '<span style="opacity:0.75;font-style:italic;">🚫 Mesaj siprime</span>';
     b.style.background = 'var(--panel-2)'; b.style.color = 'var(--muted)';
   } else {
-    b.innerHTML = formatChatText(m.content, m.sender === 'customer') + (m.edited ? '<span style="opacity:0.7;font-size:10.5px;"> · modifye</span>' : '') + (rx.length ? '<div style="margin-top:6px;font-size:15px;">' + rx.join(' ') + '</div>' : '');
+    b.innerHTML = (m.reply_text ? ktSupQuoteHtml(m.reply_name, m.reply_text, m.sender === 'customer') : '') + formatChatText(m.content, m.sender === 'customer') + (m.edited ? '<span style="opacity:0.7;font-size:10.5px;"> · modifye</span>' : '') + (rx.length ? '<div style="margin-top:6px;font-size:15px;">' + rx.join(' ') + '</div>' : '');
     ktStyleVoiceBubble(b, m.sender === 'admin', m.content, m.created_at);
   }
 }
@@ -14226,7 +14622,47 @@ async function sendAdminChatImage(input){
     appendAdminChatBubble(inserted);
   }catch(e){ showToast('⚠️ Erè koneksyon'); }
 }
-function ktAdminChatGrow(el){ el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 140) + 'px'; }
+function ktAdminChatGrow(el){ el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 140) + 'px'; ktAdminSendIcon(); }
+function ktAdminSendIcon(){ const i=document.getElementById('adminChatInput'), m=document.getElementById('adminMicIcon'), s=document.getElementById('adminSendIcon'); if(!i||!m||!s) return; const has=i.value.trim().length>0; m.style.display=has?'none':'block'; s.style.display=has?'block':'none'; }
+let adminMR=null, adminChunks=[], adminRecCancel=false, adminRecT0=0, adminRecIv=null;
+function adminChatMicSend(){
+  const i=document.getElementById('adminChatInput');
+  if(i && i.value.trim().length>0){ sendAdminChatMessage().then(ktAdminSendIcon); return; }
+  adminChatToggleRec();
+}
+async function adminChatToggleRec(){
+  if(adminMR && adminMR.state==='recording'){ adminMR.stop(); return; }
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ audio:true });
+    adminChunks=[]; adminRecCancel=false;
+    const mt = (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/webm')) ? 'audio/webm' : '';
+    adminMR = mt ? new MediaRecorder(stream,{mimeType:mt}) : new MediaRecorder(stream);
+    adminMR.ondataavailable = e => { if(e.data && e.data.size>0) adminChunks.push(e.data); };
+    adminMR.onstop = async () => {
+      stream.getTracks().forEach(tr=>tr.stop()); clearInterval(adminRecIv);
+      const bar=document.getElementById('adminRecBar'), box=document.getElementById('adminComposer'); if(bar) bar.style.display='none'; if(box) box.style.display='';
+      if(adminRecCancel || !adminChunks.length) return;
+      await sendAdminChatVoice(new Blob(adminChunks,{type:adminMR.mimeType||'audio/webm'}));
+    };
+    adminMR.start(); adminRecT0=Date.now();
+    const bar=document.getElementById('adminRecBar'), box=document.getElementById('adminComposer'); if(bar) bar.style.display='flex'; if(box) box.style.display='none';
+    adminRecIv=setInterval(()=>{ const s=Math.floor((Date.now()-adminRecT0)/1000); const el=document.getElementById('adminRecTimer'); if(el) el.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); },500);
+  }catch(e){ showToast(t('toast_mic_denied')); }
+}
+function adminChatCancelRec(){ adminRecCancel=true; if(adminMR && adminMR.state==='recording') adminMR.stop(); }
+async function sendAdminChatVoice(blob){
+  if(!adminChatConversationId) return;
+  showToast(t('toast_sending_voice'));
+  const file = new File([blob], uid()+'.weba', { type: blob.type||'audio/webm' });
+  const url = await uploadImageToStorage(file); if(!url) return;
+  try{
+    const sb = await getSupabase();
+    const { data: inserted, error } = await sb.from('support_messages').insert({ conversation_id: adminChatConversationId, sender:'admin', content:url }).select().single();
+    if(error){ showToast('⚠️ ' + error.message); return; }
+    await sb.from('support_conversations').update({ last_message_at: new Date().toISOString() }).eq('id', adminChatConversationId);
+    appendAdminChatBubble(inserted);
+  }catch(e){ showToast('⚠️ Erè koneksyon'); }
+}
 async function sendAdminChatMessage(){
   const input = document.getElementById('adminChatInput');
   const text = input.value.trim();
@@ -16591,12 +17027,37 @@ function injectCss(){
   .kcRow{touch-action:pan-y;position:relative;transition:transform .18s ease;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
   .kcRow.kcDrag{transition:none;}
   .kcRowIc{position:absolute;left:-46px;top:50%;margin-top:-17px;width:34px;height:34px;border-radius:50%;background:rgba(10,158,61,.16);color:#0a9e3d;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(.6);}
+  .kc-bubble{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
   .kcFlash .kc-bubble{animation:kcFlash 1.4s ease;}
   @keyframes kcFlash{0%,60%{box-shadow:0 0 0 4px rgba(255,200,40,.75)}100%{box-shadow:none}}
   .kcHit .kc-bubble{box-shadow:0 0 0 3px rgba(255,200,40,.7) !important;}
   .kcTab{flex:1;text-align:center;padding:10px 0 11px;font-weight:700;font-size:13.5px;color:#fff;opacity:.8;border:none;background:transparent;font-family:inherit;cursor:pointer;border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;}
   .kcTab.on{background:#fff;color:#0a9e3d;opacity:1;font-weight:800;}
   html.dark .kcTab.on{background:#071a10;color:#3fce7c;}
+.kcMP{position:absolute;left:14px;right:14px;bottom:100%;margin-bottom:6px;background:#fff;color:#14281c;border-radius:22px;box-shadow:0 10px 34px rgba(0,0,0,.22);padding:8px 6px;max-height:42vh;overflow-y:auto;z-index:30;display:none;}
+  .kcMH{display:flex;justify-content:space-between;align-items:center;padding:4px 14px 6px;}
+  .kcMH b{font-size:13px;color:#5f7d6c;font-weight:800;}
+  .kcMSBtn{width:34px;height:34px;border-radius:50%;background:#eaf2ed;border:none;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer;}
+  .kcMSB{align-items:center;gap:8px;background:#f1f4f2;border-radius:20px;padding:6px 14px;margin:2px 10px 6px;}
+  .kcMSB input{flex:1;min-width:0;border:none;outline:none;background:transparent;font-size:15px;color:#14281c;font-family:inherit;}
+  .kcMX{color:#8aa397;font-size:18px;cursor:pointer;padding:0 2px;}
+  .kcNm{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px;}
+  .kcIdPop{position:fixed;z-index:100050;background:#1b1f1d;color:#fff;border-radius:16px;padding:10px 12px 10px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:86vw;}
+  .kcIdPop small{display:block;font-size:11px;opacity:.7;}
+  .kcIdPop b{font-size:15px;letter-spacing:.5px;}
+  .kcIdPop button{background:#0FC25F;color:#fff;border:none;border-radius:12px;padding:8px 13px;font-weight:800;font-size:13px;font-family:inherit;cursor:pointer;}
+  .kcMI{display:flex;align-items:center;gap:14px;padding:8px 14px;cursor:pointer;border-radius:14px;}
+  .kcMI:active{background:#eef7f0;}
+  .kcMAv{position:relative;width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;overflow:hidden;}
+  .kcMAv img{position:absolute;inset:0;}
+  .kcMT{display:flex;flex-direction:column;min-width:0;}
+  .kcMT b{font-size:16px;font-weight:800;color:#14281c;}
+  .kcMT small{font-size:13px;color:#667;font-weight:500;}
+  .kcMen{background:rgba(10,158,61,.16);color:#0a9e3d;font-weight:800;border-radius:6px;padding:0 3px;}
+  .kc-bubble .kcMen{color:#0a9e3d;}
+  .kcMine .kc-bubble .kcMen{background:rgba(255,255,255,.28);color:#fff;}
+  .kcAt{background:#e23b57;color:#fff;border-radius:50%;font-size:11px;font-weight:800;min-width:17px;height:17px;align-items:center;justify-content:center;margin-left:4px;line-height:1;}
+  .kcAtFab{position:absolute;top:-3px;right:-3px;min-width:20px;height:20px;font-size:12px;margin:0;border:2px solid #fff;z-index:3;}
   .kcBadge{background:#e23b57;color:#fff;border-radius:9px;font-size:10px;font-weight:800;padding:1px 6px;min-width:16px;text-align:center;}
   .kcHdrBtn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.16);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
   .kcSheetBg{position:fixed;inset:0;z-index:100001;background:rgba(10,20,15,.45);display:flex;align-items:flex-end;justify-content:center;}
@@ -16677,7 +17138,7 @@ function build(){
      <div id="kcReplyBar" style="display:none;align-items:center;gap:10px;background:rgba(10,158,61,.12);border-left:4px solid #0a9e3d;border-radius:10px;padding:6px 10px;margin:0 0 8px;"><div style="flex:1;min-width:0;"><div id="kcReplyN" style="font-weight:800;font-size:12px;color:#0a9e3d;"></div><div id="kcReplyT" style="font-size:12.5px;color:#93b1a1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div></div><button id="kcReplyX" style="width:24px;height:24px;border-radius:50%;border:none;background:rgba(0,0,0,.1);color:#93b1a1;cursor:pointer;font-size:12px;">✕</button></div>
      <div id="kcImgPrev" style="display:none;padding:2px 6px 8px;"></div>
      <div style="display:flex;align-items:center;gap:8px;">
-       <label aria-label="Image" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#e8f5ec;flex-shrink:0;cursor:pointer;font-size:22px;line-height:1;font-weight:300;">+<input id="kcFile" type="file" accept="image/*,video/*" multiple style="display:none;"></label>
+       <button type="button" id="kcPlus" aria-label="+" style="width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;color:#e8f5ec;flex-shrink:0;cursor:pointer;font-size:22px;line-height:1;font-weight:300;border:none;font-family:inherit;padding:0;">+</button><input id="kcFile" type="file" accept="image/*,video/*" multiple style="display:none;">
        <textarea id="kcInput" rows="1" enterkeyhint="enter" style="flex:1;min-width:0;box-sizing:border-box;border:none;outline:none;background:transparent;padding:9px 2px;font-size:15px;color:#e8f5ec;resize:none;overflow-y:auto;max-height:120px;line-height:1.4;font-family:inherit;display:block;align-self:center;"></textarea>
        <button id="kcMic" aria-label="Send" style="width:40px;height:40px;border-radius:50%;background:#0FA654;border:none;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;cursor:pointer;">
          <svg id="kcMicI" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v4M8 23h8" stroke-linecap="round"/></svg>
@@ -16701,6 +17162,14 @@ function build(){
   $('kcMic').onclick = () => { if(inp.value.trim() || (kc.pends&&kc.pends.length)) sendText(); else toggleRec(); };
   $('kcRecX').onclick = () => stopRec(true);
   $('kcFile').onchange = (e) => sendFile(e.target);
+  $('kcPlus').onclick = (e) => { e.stopPropagation(); if(typeof ktcPlusMenu!=='function'){ $('kcFile').click(); return; }
+    const send = (c) => insertMsg(c);
+    ktcPlusMenu($('kcPlus'), [
+      { ic:'gal', label:ktcT('gal'), run:()=>$('kcFile').click() },
+      { ic:'po', label:ktcT('poll'), run:()=>ktcOpenPoll(send) },
+      { ic:'id', label:ktcT('pid'), run:()=>ktcOpenId(send) },
+      { ic:'ev', label:ktcT('ev'), run:()=>ktcOpenEvent(send) }
+    ]); };
   feed.addEventListener('click', () => closePop());
   kc.built = true;
   applyLang();
@@ -16714,7 +17183,7 @@ function applyLang(){
   $('kcInput').placeholder = T('ph');
   $('kcSearchIn').placeholder = T('search');
   $('kcRecL').textContent = T('rec'); $('kcRecX').textContent = T('cancel');
-  updateOnline(); updateUnread();
+  updateOnline(); updateUnread(); try{ initMent(); }catch(e){}
 }
 function setTab(tab){
   if(!build()) return;
@@ -16729,7 +17198,7 @@ function setTab(tab){
   $('kcTitle').style.display = com ? 'block' : 'none';
   $('kcHdrBtns').style.display = com ? 'flex' : 'none';
   if(!com){ toggleSearch(false); closePop(); }
-  if(com){ kc.unread = 0; updateUnread(); markSeen(); applyLang(); enter(); }
+  if(com){ kc.unread = 0; kc.mentUnread = false; updateUnread(); markSeen(); applyLang(); enter(); }
   updateInputState();
 }
 function updateInputState(){
@@ -16811,6 +17280,7 @@ async function subscribe(){
     kc.msgCh = c.channel('kc_community_msgs')
       .on('postgres_changes',{event:'INSERT',schema:'public',table:'community_messages'}, p => onRemoteInsert(p.new))
       .on('postgres_changes',{event:'UPDATE',schema:'public',table:'community_messages'}, p => onRemoteUpdate(p.new))
+      .on('postgres_changes',{event:'*',schema:'public',table:'community_votes'}, () => loadVotes())
       .subscribe();
   }catch(e){}
 }
@@ -16825,7 +17295,7 @@ function onRemoteInsert(m){
     appendRow(m); if(near || mine) feed.scrollTop = feed.scrollHeight;
   }
   if(viewing) markSeen();
-  else if(!mine && !kc.me.muted){ kc.unread++; updateUnread(); }
+  else if(!mine && !kc.me.muted){ kc.unread++; if(mentionsMe(m)) kc.mentUnread = true; updateUnread(); }
 }
 function onRemoteUpdate(m){
   if(!m || !kc.byId.has(m.id)) return;
@@ -16841,6 +17311,7 @@ async function bootUnread(){
     const c = await sb();
     const { count } = await c.from('community_messages').select('id',{count:'exact',head:true}).gt('created_at', seen).neq('user_id', uidNow());
     kc.unread = count||0; updateUnread();
+    bootMentions();
   }catch(e){}
 }
 function updateUnread(){
@@ -16848,6 +17319,7 @@ function updateUnread(){
   el.style.display = kc.unread>0 && kc.tab!=='community' ? 'inline-block' : 'none';
   el.textContent = kc.unread>99 ? '99+' : String(kc.unread);
   try{ if(typeof window.refreshFabBadge==='function') window.refreshFabBadge(); }catch(e){}
+  try{ paintMentMarks(); }catch(e){}
 }
 
 
@@ -16870,7 +17342,7 @@ function renderTyping(){
     el.dataset.k = key;
     el.innerHTML = '<div style="display:flex;">' + shown.map((x,i)=>`<div class="kcTypAv" style="background:${colorFor(x.id)};margin-left:${i?-9:0}px;">${esc(String(x.n).trim().charAt(0).toUpperCase()||'?')}</div>`).join('') + (more>0?`<div class="kcTypAv" style="background:#e3ece6;margin-left:-9px;font-size:10px;">+${more}</div>`:'') + '</div><div class="kcTypB"><i class="kcDot"></i><i class="kcDot"></i><i class="kcDot"></i></div>';
   }
-  feed.appendChild(el);
+  if(el.parentNode !== feed || feed.lastElementChild !== el) feed.appendChild(el);
   if(near) feed.scrollTop = feed.scrollHeight;
 }
 let _typOn=false, _typT=null, _typLast=0;
@@ -16963,6 +17435,80 @@ function flags(m, prev){
   m._showName = !cont; if(cont) prev._hideAv = true;
   return cont;
 }
+/* ---------- Vòt (sondaj ak evènman) ---------- */
+kc.votes = kc.votes || {};
+function cardOf(m){ return (m && typeof ktcParse==='function') ? ktcParse(m.content) : null; }
+let _vT = null;
+function loadVotes(){ clearTimeout(_vT); _vT = setTimeout(async () => {
+  try{
+    const ids = kc.list.filter(m => { const c = cardOf(m); return c && (c.t==='po' || c.t==='ev') && !m.deleted; }).map(m => m.id);
+    if(!ids.length){ kc.votes = {}; return; }
+    const c = await sb(); const { data, error } = await c.from('community_votes').select('msg_id,user_id,opt,name').in('msg_id', ids.slice(-200));
+    if(error) return;
+    const v = {}; (data||[]).forEach(r => { (v[r.msg_id] = v[r.msg_id] || []).push(r); }); kc.votes = v; applyVotes();
+  }catch(e){}
+}, 150); }
+function applyVotes(){ const feed = $('kcFeed'); if(!feed) return; feed.querySelectorAll('.kcRow').forEach(row => { const m = kc.byId.get(row.dataset.id); if(m) applyVotesRow(row, m); }); }
+function applyVotesRow(row, m){
+  const c = cardOf(m); if(!c || (c.t!=='po' && c.t!=='ev')) return;
+  const me = uidNow(); const list = kc.votes[m.id] || [];
+  if(c.t==='po'){
+    const voters = new Set(list.map(x => x.user_id)).size;
+    row.querySelectorAll('.ktcOpt').forEach(o => { const i = +o.dataset.i; const n = list.filter(x => x.opt===i).length;
+      o.querySelector('.ktcCnt').textContent = n; o.querySelector('.ktcFill').style.width = (voters ? Math.round(n*100/voters) : 0) + '%'; o.classList.toggle('on', list.some(x => x.opt===i && x.user_id===me)); });
+    const tot = row.querySelector('.ktcTot'); if(tot) tot.textContent = ktcT('votes', voters);
+  } else {
+    const n = list.filter(x => x.opt===0).length; const mineOn = list.some(x => x.opt===0 && x.user_id===me);
+    const el = row.querySelector('.ktcEvN'); if(el) el.textContent = ktcT('goingN', n);
+    const b = row.querySelector('.ktcGo'); if(b){ b.classList.toggle('on', mineOn); b.querySelector('span').textContent = ktcT(mineOn ? 'goingOn' : 'going'); }
+  }
+}
+window.ktcVoteClick = async function(el, i){
+  const row = el.closest('.kcRow'); if(!row) return; const m = kc.byId.get(row.dataset.id); const c = cardOf(m); if(!m || !c) return;
+  if(!logged() || (kc.me && (kc.me.banned || kc.me.left))) return;
+  const me = uidNow(); const arr = kc.votes[m.id] = kc.votes[m.id] || [];
+  const idx = arr.findIndex(x => x.user_id===me && x.opt===i);
+  if(idx>-1) arr.splice(idx,1); else { if(!(c.t==='po' && c.m)){ for(let k=arr.length-1;k>=0;k--) if(arr[k].user_id===me) arr.splice(k,1); } arr.push({ msg_id:m.id, user_id:me, opt:i, name:myName() }); }
+  applyVotesRow(row, m);
+  try{ const cc = await sb(); const { error } = await cc.rpc('community_vote', { p_id:m.id, p_opt:i, p_name:myName(), p_multi:!!(c.t==='po' && c.m) }); if(error) throw error; }catch(e){ toast(T('fail')); loadVotes(); }
+};
+window.ktcShowVoters = function(el){
+  const row = el.closest('.kcRow'); if(!row) return; const m = kc.byId.get(row.dataset.id); const c = cardOf(m); if(!m || !c) return;
+  const list = kc.votes[m.id] || []; let html = '<div class="ktcH"><span>' + ktcEsc(ktcT('voters')) + '</span></div>';
+  if(!list.length) html += '<div style="opacity:.7;">' + ktcEsc(ktcT('noVoters')) + '</div>';
+  else if(c.t==='ev') html += list.filter(x => x.opt===0).map(x => '<div style="padding:7px 0;font-weight:700;">' + ktcEsc(x.name||'?') + '</div>').join('');
+  else (c.o||[]).forEach((o, i) => { const l = list.filter(x => x.opt===i); if(!l.length) return; html += '<div style="margin:10px 0 2px;font-weight:800;color:#0a9e3d;">' + ktcEsc(o) + ' · ' + l.length + '</div>' + l.map(x => '<div style="padding:5px 0;">' + ktcEsc(x.name||'?') + '</div>').join(''); });
+  html += '<div class="ktcRow2"><button type="button" class="ktcB g" id="ktcX">' + ktcEsc(ktcT('cancel')) + '</button></div>';
+  const bg = ktcSheet(html); bg.querySelector('#ktcX').onclick = ktcClose;
+};
+setInterval(() => { if(kc.built && kc.tab==='community' && typeof supportChatOpen!=='undefined' && supportChatOpen) loadVotes(); }, 15000);
+/* ---------- Kantite moun ki wè chak mesaj ---------- */
+function fmtCount(n){ n = +n || 0; if(n < 1000) return String(n); const f = (v, s) => { const x = Math.floor(v*10)/10; return (x % 1 === 0 ? String(x) : x.toFixed(1)) + s; }; return n < 1e6 ? f(n/1000, 'k') : f(n/1e6, 'M'); }
+const EYE_SVG = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:3px;"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+kc.views = kc.views || {}; kc.seenSent = kc.seenSent || new Set(); kc.seenQ = kc.seenQ || new Set();
+function viewsHtml(m){ return '<span class="kcViews" style="margin-right:8px;white-space:nowrap;">' + EYE_SVG + fmtCount(kc.views[m.id] || 0) + '</span>'; }
+function applyViews(){ const feed = $('kcFeed'); if(!feed) return; feed.querySelectorAll('.kcRow').forEach(r => { const e = r.querySelector('.kcViews'); if(e){ const n = kc.views[r.dataset.id] || 0; e.lastChild.textContent = fmtCount(n); } }); }
+let _viT = null;
+function loadViews(){ clearTimeout(_viT); _viT = setTimeout(async () => {
+  try{
+    const ids = kc.list.filter(m => !m.deleted).map(m => m.id).slice(-200); if(!ids.length) return;
+    const c = await sb(); const { data, error } = await c.rpc('community_view_counts', { p_ids: ids }); if(error || !Array.isArray(data)) return;
+    data.forEach(r => { kc.views[r.msg_id] = Number(r.n) || 0; }); applyViews();
+  }catch(e){}
+}, 200); }
+function flushSeen(){
+  if(!kc.seenQ.size || !logged() || document.hidden) return;
+  const ids = Array.from(kc.seenQ).slice(0, 100); ids.forEach(i => { kc.seenQ.delete(i); kc.seenSent.add(i); });
+  sb().then(c => c.rpc('community_seen', { p_ids: ids })).then(r => { if(r && r.error) ids.forEach(i => kc.seenSent.delete(i)); }).catch(() => ids.forEach(i => kc.seenSent.delete(i)));
+}
+function watchSeen(row, m){
+  try{
+    if(m.user_id === uidNow() || m.deleted || kc.seenSent.has(m.id)) return;
+    if(!kc.io){ kc.io = new IntersectionObserver(es => { es.forEach(e => { if(e.isIntersecting){ const id = e.target.dataset.id; kc.io.unobserve(e.target); if(!kc.seenSent.has(id)) kc.seenQ.add(id); } }); }, { root: $('kcFeed'), threshold: 0.6 }); }
+    kc.io.observe(row);
+  }catch(e){}
+}
+setInterval(() => { if(kc.built && kc.tab==='community' && typeof supportChatOpen!=='undefined' && supportChatOpen){ flushSeen(); loadViews(); } }, 4000);
 function renderAll(){
   { const cut = Date.now() - kc.ret*3600e3; kc.list = kc.list.filter(m => new Date(m.created_at).getTime() > cut); }
   const feed = $('kcFeed'); feed.innerHTML = ''; feed.dataset.gate='';
@@ -16979,6 +17525,7 @@ function renderAll(){
   kc.list.forEach(m => feed.appendChild(buildRow(m)));
   kc.lastDay = lastDay;
   renderTyping();
+  loadVotes(); loadViews();
 }
 function appendRow(m){
   const feed = $('kcFeed');
@@ -16990,14 +17537,21 @@ function appendRow(m){
   m._hideAv=false; flags(m, prev);
   if(prev && prev._hideAv){ const pr = feed.querySelector('.kcRow[data-id="'+prev.id+'"] .kcAv'); if(pr) pr.style.visibility='hidden'; }
   feed.appendChild(buildRow(m));
-  renderTyping();
+  renderTyping(); loadViews();
+  { const _c = cardOf(m); if(_c && (_c.t==='po'||_c.t==='ev')) loadVotes(); }
 }
 function rerenderRow(m){
   const old = $('kcFeed') && $('kcFeed').querySelector('.kcRow[data-id="'+m.id+'"]'); if(!old) return;
   old.replaceWith(buildRow(m));
 }
+function photoOf(m, mine){
+  let u = null; if(mine){ try{ const cu = currentUser(); u = cu && cu.googlePhoto; }catch(e){} }
+  u = u || m.avatar_url || ''; return /^https:\/\//i.test(u) ? u : '';
+}
 function avatarHtml(m, mine){
   const vis = m._hideAv ? 'visibility:hidden;' : '';
+  { const ph = (!m.is_admin) ? photoOf(m, mine) : ''; if(ph){ const ini0 = esc((m.name||'?').trim().charAt(0).toUpperCase()||'?');
+    return `<div class="kcAv" style="width:32px;height:32px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1.5px solid rgba(63,206,124,0.6);box-sizing:border-box;background:#1c4a33;${vis}"><img src="${esc(ph)}" alt="" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.parentNode.innerHTML='<span style=&quot;display:flex;width:100%;height:100%;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;&quot;>${ini0}</span>'"></div>`; } }
   if(m.is_admin) return `<div class="kcAv" style="width:32px;height:32px;border-radius:50%;background:#fff;border:1px solid rgba(63,206,124,0.3);overflow:hidden;flex-shrink:0;padding:2px;box-sizing:border-box;${vis}"><img src="${window.KT_LOGO_SRC||''}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:50%;"></div>`;
   const ini = esc((m.name||'?').trim().charAt(0).toUpperCase()||'?');
   if(mine) return `<div class="kcAv" style="width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3fce7c,#0a9e3d);color:#fff;font-weight:800;font-size:13px;border:1.5px solid rgba(255,255,255,0.35);${vis}">${ini}</div>`;
@@ -17009,28 +17563,37 @@ function buildRow(m){
   row.className = 'kcRow' + (mine?' kcMine':''); row.dataset.id = m.id;
   row.style.cssText = 'display:flex;gap:8px;margin-bottom:6px;align-items:flex-end;' + (mine?'flex-direction:row-reverse;':'');
   let bubbleStyle;
-  if(mine) bubbleStyle = 'background:linear-gradient(135deg,#3fce7c,#0a9e3d);color:#fff;border-radius:16px 16px 4px 16px;box-shadow:0 4px 14px rgba(10,158,61,0.35);';
-  else bubbleStyle = 'background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);color:#e8f5ec;border-radius:16px 16px 16px 4px;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
+  if(mine) bubbleStyle = 'background:linear-gradient(135deg,#3fce7c,#0a9e3d);color:#fff;border-radius:16px 4px 16px 16px;box-shadow:0 4px 14px rgba(10,158,61,0.35);';
+  else bubbleStyle = 'background:rgba(255,255,255,0.07);border:1px solid rgba(63,206,124,0.22);color:#e8f5ec;border-radius:4px 16px 16px 16px;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
   bubbleStyle += 'padding:10px 14px;max-width:100%;font-size:14.5px;white-space:pre-wrap;line-height:1.5;box-sizing:border-box;';
-  const nameLine = (!mine && m._showName) ? `<div style="font-size:11.5px;font-weight:800;color:#0a9e3d;margin:0 0 3px 4px;">${esc(m.name||'')}${m.is_admin?VERIFIED:''}</div>` : '';
+  const nameLine = '';
+  const _media = isMedia(m.content);
+  let hdHtml = '';
+  { let av2 = avatarHtml(Object.assign({}, m, {_hideAv:false}), mine).replace(/width:32px;height:32px/,'width:22px;height:22px').replace(/font-size:13px/g,'font-size:10px').replace('class="kcAv"','class="kcAv2"');
+    hdHtml = `<div class="kcHd" style="display:flex;align-items:center;gap:7px;margin:${_media?'2px 0 6px':'-2px 0 5px'};${_media?'padding:0 6px;':''}${mine?'flex-direction:row-reverse;':''}">${av2}<div class="kcNm" data-u="${esc(m.user_id||'')}" data-n="${esc(m.name||'')}" style="font-size:12.5px;font-weight:800;display:flex;align-items:center;gap:4px;min-width:0;word-break:break-word;color:${mine?'#fff':'#0a9e3d'};">${esc(m.name||'')}${m.is_admin?VERIFIED.replace('margin-left:5px;','margin-left:0;'):''}</div></div>`; }
   let inner;
   if(m.deleted){ inner = `<span style="opacity:.7;font-style:italic;">${esc(T('deleted'))}</span>`; }
   else {
     const q = m.reply_to ? `<div class="kcQuote" data-q="${esc(m.reply_to)}"><b>${esc(m.reply_name||'')}</b><span>${esc(m.reply_text||'')}</span></div>` : '';
     const rep = (state && state.isAdmin && m.reports>0) ? `<div style="font-size:11px;font-weight:800;color:#e5484d;margin-bottom:4px;">${esc(T('reports', m.reports))}</div>` : '';
-    { const body = (typeof formatChatText==='function' ? formatChatText(m.content, true) : esc(m.content)); inner = rep + q + (isMedia(m.content) ? body : fmtHtml(body)); }
+    { const body = (typeof formatChatText==='function' ? formatChatText(m.content, true) : esc(m.content)); const isCard = (typeof ktcParse==='function') && ktcParse(m.content); inner = rep + q + ((isMedia(m.content) || isCard) ? body : hlMentions(fmtHtml(body), m)); }
   }
-  row.innerHTML = `<div class="kcRowIc"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v3"/></svg></div>` + avatarHtml(m, mine) +
+  inner = hdHtml + inner;
+  row.innerHTML = `<div class="kcRowIc"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 6 6v3"/></svg></div>` + avatarHtml(m, mine).replace('class="kcAv" style="','class="kcAv" style="display:none !important;') +
     `<div style="display:flex;flex-direction:column;max-width:82%;min-width:0;align-items:${mine?'flex-end':'flex-start'};">${nameLine}<div class="kc-bubble" style="${bubbleStyle}">${inner}</div><div class="kcReacts" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:-6px;position:relative;z-index:1;padding:0 6px;"></div></div>`;
   const b = row.querySelector('.kc-bubble');
+  if(!m.deleted && typeof ktcParse==='function' && ktcParse(m.content)){ b.classList.add('ktcCardB'); }
   if(!m.deleted){
     try{ if(typeof ktStyleVoiceBubble==='function') ktStyleVoiceBubble(b, mine, m.content, m.created_at); }catch(e){}
-    if(!b.querySelector('.ktv-ts')){ const t = document.createElement('span'); t.style.cssText='float:right;margin:6px 0 -4px 12px;font-size:10px;opacity:.6;'; t.textContent = (m.edited ? T('editedL') : '') + hhmm(m.created_at); b.appendChild(t); }
+    if(!b.querySelector('.ktv-ts')){ const t = document.createElement('span'); t.style.cssText='float:right;margin:6px 0 -4px 12px;font-size:10px;opacity:.6;'; t.innerHTML = viewsHtml(m) + esc((m.edited ? T('editedL') : '') + hhmm(m.created_at)); b.appendChild(t); }
+    else { const ts = b.querySelector('.ktv-ts'); ts.insertAdjacentHTML('afterbegin', viewsHtml(m)); }
     renderReacts(row, m);
   }
   const qEl = row.querySelector('.kcQuote'); if(qEl) qEl.onclick = (e) => { e.stopPropagation(); jumpTo(qEl.dataset.q); };
   attachGestures(row, m);
   if(isHidden(m.id)) row.style.display='none';
+  try{ applyVotesRow(row, m); }catch(e){}
+  watchSeen(row, m);
   return row;
 }
 function renderReacts(row, m){
@@ -17072,6 +17635,7 @@ function setReply(m){
 }
 function previewText(m){
   const c = m.content||'';
+  if(typeof ktcPreview==='function'){ const _p = ktcPreview(c); if(_p) return _p.slice(0,90); }
   if(typeof ktIsVoiceText==='function' && ktIsVoiceText(c)) return '🎤';
   if(typeof ktIsImageText==='function' && ktIsImageText(c)) return '📷';
   if(typeof ktIsVideoText==='function' && ktIsVideoText(c)) return '🎬';
@@ -17087,6 +17651,36 @@ function jumpTo(id){
 /* ---------- Meni (réaction, repons, kopye, rapòte, efase) ---------- */
 function closeSheet(){ const o=$('kcSheetBg'); if(o) o.remove(); }
 function openMenu(m, row){
+  closeSheet(); closePop();
+  if(typeof ktWaMenu !== 'function'){ return openMenuOld(m, row); }
+  const me = uidNow(); const mine = m.user_id===me; const admin = !!(state && state.isAdmin);
+  const L = ktWaL();
+  const _card = (typeof ktcParse==='function') ? ktcParse(m.content) : null;
+  const isText = !_card && !(typeof ktIsVoiceText==='function' && (ktIsVoiceText(m.content)||ktIsImageText(m.content)||ktIsVideoText(m.content)));
+  const items = [{ id:'reply', icon:'reply', label:L.reply }];
+  if(isText) items.push({ id:'copy', icon:'copy', label:L.copy });
+  if(!mine) items.push({ id:'report', icon:'report', label:T('report') });
+  if(mine && (isText || (_card && _card.t==='po'))) items.push({ id:'edit', icon:'edit', label:L.edit });
+  if(_card && _card.t==='po') items.splice(1, 0, { id:'voters', icon:'eye', label:ktcT('voters') });
+  items.push({ id:'del', icon:'del', label:L.del, red:true });
+  if(admin && !mine) items.push({ id:'ban', icon:'ban', label:T('ban'), red:true });
+  const rx = m.reactions || {}; const myEmoji = Object.keys(rx).find(k => Array.isArray(rx[k]) && rx[k].includes(me));
+  ktWaMenu({
+    bubble: row.querySelector('.kc-bubble') || row, mine, emojis: EMOJIS, myEmoji, items, more: (isText && typeof ktTranslateFlow==='function') ? [{ id:'translate', icon:'tr', label:L.translate }] : null,
+    onReact: (e) => react(m, e),
+    onItem: async (a) => {
+      if(a==='reply') setReply(m);
+      else if(a==='voters') ktcShowVoters(row);
+      else if(a==='translate') ktTranslateFlow(row.querySelector('.kc-bubble'), m.content);
+      else if(a==='copy'){ try{ await navigator.clipboard.writeText(m.content); toast(T('copied')); }catch(e){} }
+      else if(a==='report') reportMsg(m);
+      else if(a==='edit'){ if(_card && _card.t==='po') ktcOpenPoll(async (c)=>{ try{ const cc = await sb(); const { error } = await cc.rpc('community_edit', { p_id:m.id, p_content:c }); if(error) throw error; m.content = c; m.edited = true; rerenderRow(m); }catch(e){ toast(T('fail')); } }, _card); else openEdit(m); }
+      else if(a==='del') ktWaDelete({ canAll: (mine||admin), onMe: () => hideForMe(m), onAll: () => delMsg(m) });
+      else if(a==='ban'){ if(confirm(T('banAsk'))) banUser(m); }
+    }
+  });
+}
+function openMenuOld(m, row){
   closeSheet(); closePop();
   const me = uidNow(); const mine = m.user_id===me; const admin = !!(state && state.isAdmin);
   const o = document.createElement('div'); o.id='kcSheetBg'; o.className='kcSheetBg';
@@ -17196,6 +17790,131 @@ function applySearch(){
 }
 document.addEventListener('click', (e) => { const r = e.target.closest && e.target.closest('#kcFeed .kcRow'); if(r && kc.searchOpen && $('kcSearchIn').value.trim()){ const id=r.dataset.id; toggleSearch(false); setTimeout(()=>jumpTo(id),50); } }, true);
 
+/* ---------- @Mansyon ---------- */
+kc.ments = []; kc.mentUnread = false;
+const MT = {
+  ht:{all:'tous', allSub:'Mansyone tout moun nan kominote a', head:'Mansyone yon moun', srch:'Chèche yon moun…', idl:'ID', copy:'Kopye', copied:'ID kopye ✓', load:'Ap chaje…', noid:'ID pa disponib'},
+  fr:{all:'tous', allSub:'Mentionner tout le monde dans la communauté', head:'Mentionner quelqu\'un', srch:'Chercher quelqu\'un…', idl:'ID', copy:'Copier', copied:'ID copié ✓', load:'Chargement…', noid:'ID indisponible'},
+  en:{all:'tous', allSub:'Mention everyone in the community', head:'Mention someone', srch:'Search for someone…', idl:'ID', copy:'Copy', copied:'ID copied ✓', load:'Loading…', noid:'ID unavailable'},
+  es:{all:'tous', allSub:'Mencionar a todos en la comunidad', head:'Mencionar a alguien', srch:'Buscar a alguien…', idl:'ID', copy:'Copiar', copied:'ID copiado ✓', load:'Cargando…', noid:'ID no disponible'}
+};
+function MTT(k){ const l=(typeof currentLang!=='undefined'&&MT[currentLang])?currentLang:'fr'; return MT[l][k]; }
+function mentMembers(){
+  const seen = new Map(); const me = uidNow();
+  (kc.list||[]).forEach(m => { if(!m || !m.user_id || m.user_id===me || m.is_admin===undefined && false) return; const n=(m.name||'').trim(); if(!n) return; const o = seen.get(m.user_id); if(!o) seen.set(m.user_id,{uid:m.user_id,name:n,av:m.avatar_url||''}); else if(m.avatar_url && !o.av) o.av=m.avatar_url; });
+  return Array.from(seen.values());
+}
+function mentAv(p){
+  const ini = esc((p.name||'?').charAt(0).toUpperCase()||'?');
+  if(/^https:\/\//i.test(p.av||'')) return `<span class="kcMAv" style="background:#e6f4ea;"><img src="${esc(p.av)}" alt="" referrerpolicy="no-referrer" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.remove()">${ini}</span>`;
+  return `<span class="kcMAv" style="background:${colorFor(p.uid)};color:#0a7c3d;">${ini}</span>`;
+}
+function mentQuery(){
+  const i = $('kcInput'); const pos = i.selectionStart==null ? i.value.length : i.selectionStart;
+  const before = i.value.slice(0,pos); const mt = /(^|\s)@([^\s@]{0,20})$/.exec(before);
+  if(!mt) return null; return { q:mt[2], start: pos - mt[2].length - 1, pos };
+}
+function closeMent(){ const p=$('kcMentPop'); if(p){ p.style.display='none'; } kc.mentSearch=false; }
+function mentList(){
+  const pop=$('kcMentPop'); const lst=pop && pop.querySelector('#kcMentList'); if(!lst) return;
+  const q = mentQuery(); const sIn=$('kcMentQ');
+  const ql = ((kc.mentSearch && sIn) ? sIn.value : (q?q.q:'')).trim().toLowerCase();
+  const list = mentMembers().filter(p => !ql || p.name.toLowerCase().includes(ql)).sort((a,b)=>a.name.localeCompare(b.name));
+  const showAll = !ql || 'tous'.startsWith(ql);
+  let h = '';
+  if(showAll) h += `<div class="kcMI" data-all="1"><span class="kcMAv" style="background:#d9f0e0;color:#0a9e3d;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span><span class="kcMT"><b>${esc(MTT('all'))}</b><small>${esc(MTT('allSub'))}</small></span></div>`;
+  h += list.slice(0,60).map(p => `<div class="kcMI" data-u="${esc(p.uid)}">${mentAv(p)}<span class="kcMT"><b>${esc(p.name)}</b></span></div>`).join('');
+  lst.innerHTML = h;
+  lst.querySelectorAll('.kcMI').forEach(el => {
+    el.onmousedown = (e) => e.preventDefault();
+    el.onclick = () => pickMent(el.dataset.all ? {all:true} : mentMembers().find(p=>p.uid===el.dataset.u));
+  });
+  return !!h;
+}
+function updateMent(){
+  const w = $('kcInputWrap'); if(!w) return;
+  let pop = $('kcMentPop');
+  if(!pop){ pop = document.createElement('div'); pop.id='kcMentPop'; pop.className='kcMP'; w.appendChild(pop); }
+  const q = mentQuery(); if(!q || kc.me.muted){ closeMent(); return; }
+  if(kc.mentSearch && pop.style.display==='block'){ mentList(); return; }
+  pop.innerHTML = `<div class="kcMH"><b>${esc(MTT('head'))}</b><button type="button" class="kcMSBtn" id="kcMentSBtn" aria-label="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a7c3d" stroke-width="2.4" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button></div><div class="kcMSB" id="kcMentSB" style="display:none;"><input id="kcMentQ" type="text" autocomplete="off" placeholder="${esc(MTT('srch'))}"><span class="kcMX" id="kcMentX">✕</span></div><div id="kcMentList"></div>`;
+  const sBtn=pop.querySelector('#kcMentSBtn'), sBox=pop.querySelector('#kcMentSB'), sIn=pop.querySelector('#kcMentQ');
+  sBtn.onmousedown = e => e.preventDefault();
+  sBtn.onclick = () => { kc.mentSearch = !kc.mentSearch; sBox.style.display = kc.mentSearch ? 'flex' : 'none'; if(kc.mentSearch){ sIn.value=''; setTimeout(()=>sIn.focus(),30); } mentList(); };
+  sIn.oninput = () => mentList();
+  pop.querySelector('#kcMentX').onclick = () => { sIn.value=''; kc.mentSearch=false; sBox.style.display='none'; $('kcInput').focus(); mentList(); };
+  const has = mentList();
+  if(!has){ closeMent(); return; }
+  pop.style.display='block';
+}
+function pickMent(p){
+  if(!p) return; const q = mentQuery(); if(!q) return; const i = $('kcInput');
+  const name = p.all ? 'tous' : p.name;
+  const ins = '@' + name + ' ';
+  i.value = i.value.slice(0,q.start) + ins + i.value.slice(q.pos);
+  const np = q.start + ins.length; i.setSelectionRange(np,np);
+  if(p.all) kc.mAll = true; else if(!kc.ments.some(x=>x.uid===p.uid)) kc.ments.push({uid:p.uid,name:p.name});
+  closeMent(); try{ syncSend(); }catch(e){} i.focus();
+}
+function collectMents(text){
+  const t = String(text||''); const res = { ids:[], all:false };
+  if(/(^|\s)@tous(?=\s|$|[.,!?;:])/.test(t)) res.all = true;
+  kc.ments.forEach(x => { if(t.includes('@'+x.name) && !res.ids.includes(x.uid)) res.ids.push(x.uid); });
+  return res;
+}
+function resetMents(){ kc.ments = []; kc.mAll = false; }
+function hlMentions(html, m){
+  if(String(html).indexOf('@')<0) return html;
+  const names = new Set(); (kc.list||[]).forEach(x=>{ if(x && x.name) names.add(x.name.trim()); }); (kc.ments||[]).forEach(x=>names.add(x.name));
+  const alts = ['tous'].concat(Array.from(names).filter(Boolean).map(n=>esc(n))).sort((a,b)=>b.length-a.length).map(s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'));
+  const re = new RegExp('(^|[\\s>])(@(?:'+alts.join('|')+'))(?=$|[\\s.,!?;:<])','g');
+  return String(html).split(/(<a\b[^>]*>[\s\S]*?<\/a>|<[^>]+>)/g).map((part,i)=> i%2 ? part : part.replace(re,'$1<span class="kcMen">$2</span>')).join('');
+}
+function mentionsMe(m){
+  const me = uidNow(); if(!m || !me || m.user_id===me || m.deleted) return false;
+  return !!m.mention_all || (Array.isArray(m.mentions) && m.mentions.includes(me));
+}
+function initMent(){
+  const i = $('kcInput'); if(!i || i.dataset.mentInit) return; i.dataset.mentInit='1';
+  ['input','click','keyup'].forEach(ev => i.addEventListener(ev, () => { try{ updateMent(); }catch(e){} }));
+  i.addEventListener('blur', () => setTimeout(() => { const a=document.activeElement; if(a && a.id==='kcMentQ') return; closeMent(); }, 150));
+}
+function paintMentMarks(){
+  const on = !!kc.mentUnread && kc.tab!=='community';
+  const tab = $('kcTabCom');
+  if(tab){ let a = $('kcMentTab'); if(!a){ a=document.createElement('span'); a.id='kcMentTab'; a.className='kcAt'; a.textContent='@'; tab.appendChild(a); } a.style.display = on ? 'inline-flex' : 'none'; }
+  const badge = $('supportFabBadge'), fab = $('supportFab');
+  if(fab){ let f = $('supportFabAt'); if(!f){ f=document.createElement('span'); f.id='supportFabAt'; f.className='kcAt kcAtFab'; f.textContent='@'; fab.appendChild(f); } f.style.display = (kc.mentUnread && !(kc.tab==='community' && typeof supportChatOpen!=='undefined' && supportChatOpen)) ? 'inline-flex' : 'none'; }
+}
+async function bootMentions(){
+  try{
+    if(!logged() || kc.me.muted || kc.me.left) return;
+    const seen = localStorage.getItem('kc_seen_'+uidNow()); if(!seen) return;
+    const c = await sb(); const me = uidNow();
+    const { data, error } = await c.from('community_messages').select('id').gt('created_at', seen).neq('user_id', me).or('mention_all.eq.true,mentions.cs.{'+me+'}').limit(1);
+    if(!error && data && data.length){ kc.mentUnread = true; updateUnread(); }
+  }catch(e){}
+}
+
+/* ---------- ID moun (peze sou non) ---------- */
+kc.idCache = kc.idCache || {};
+function closeIdPop(){ const o=document.getElementById('kcIdPop'); if(o) o.remove(); }
+async function showIdPop(el){
+  closeIdPop(); const uid=el.dataset.u; if(!uid) return; const nm=el.dataset.n||'';
+  const o=document.createElement('div'); o.id='kcIdPop'; o.className='kcIdPop';
+  o.innerHTML=`<div><small>${esc(MTT('idl'))} ${esc(nm)}</small><b>${esc(MTT('load'))}</b></div>`;
+  document.body.appendChild(o);
+  const r=el.getBoundingClientRect(); const place=()=>{ const w=o.offsetWidth; o.style.left=Math.max(8,Math.min(r.left,innerWidth-w-8))+'px'; const top=r.top-o.offsetHeight-8; o.style.top=(top<8? r.bottom+8 : top)+'px'; }; place();
+  setTimeout(()=>{ const off=(ev)=>{ if(!o.contains(ev.target)){ closeIdPop(); document.removeEventListener('pointerdown',off,true); } }; document.addEventListener('pointerdown',off,true); },0);
+  let pid = kc.idCache[uid];
+  if(pid===undefined){ try{ const c=await sb(); const { data } = await c.rpc('kt_user_card',{p_id:uid}); const row=Array.isArray(data)?data[0]:data; pid=(row&&row.public_id)||''; kc.idCache[uid]=pid; }catch(e){ pid=''; } }
+  if(!document.getElementById('kcIdPop')) return;
+  if(!pid){ o.innerHTML=`<div><small>${esc(nm)}</small><b>${esc(MTT('noid'))}</b></div>`; place(); setTimeout(closeIdPop,2500); return; }
+  o.innerHTML=`<div><small>${esc(MTT('idl'))} ${esc(nm)}</small><b>${esc(pid)}</b></div><button type="button">${esc(MTT('copy'))}</button>`; place();
+  o.querySelector('button').onclick=async()=>{ try{ await navigator.clipboard.writeText(pid); }catch(e){ const ta=document.createElement('textarea'); ta.value=pid; document.body.appendChild(ta); ta.select(); try{document.execCommand('copy');}catch(e2){} ta.remove(); } try{ showToast(MTT('copied')); }catch(e){} closeIdPop(); };
+}
+document.addEventListener('click', (e) => { const n = e.target.closest && e.target.closest('.kcNm'); if(n){ e.stopPropagation(); showIdPop(n); } }, true);
+
 /* ---------- Voye mesaj ---------- */
 function syncSend(){
   const i = $('kcInput'); i.style.height='auto'; i.style.height = Math.min(i.scrollHeight,120)+'px';
@@ -17206,14 +17925,18 @@ async function insertMsg(content){
   const uid = uidNow(); if(!uid){ return false; }
   const rt = kc.replyTo;
   const row = { user_id:uid, content };
+  try{ const cu = currentUser(); const ph = cu && cu.googlePhoto; if(ph && /^https:\/\//i.test(ph) && !kc.noAvCol) row.avatar_url = ph; }catch(e){}
+  const mn = collectMents(content); if(mn.ids.length) row.mentions = mn.ids; if(mn.all) row.mention_all = true; const hadMn = !!(mn.ids.length||mn.all);
   if(rt){ row.reply_to = rt.id; row.reply_name = rt.name; row.reply_text = previewText(rt); }
   try{
     const c = await sb();
-    const { data, error } = await c.from('community_messages').insert(row).select().single();
+    let { data, error } = await c.from('community_messages').insert(row).select().single();
+    if(error && row.avatar_url && /avatar_url/i.test(String(error.message||''))){ kc.noAvCol = true; delete row.avatar_url; ({ data, error } = await c.from('community_messages').insert(row).select().single()); }
+    if(error && hadMn && /mention/i.test(String(error.message||''))){ delete row.mentions; delete row.mention_all; ({ data, error } = await c.from('community_messages').insert(row).select().single()); }
     if(error) throw error;
     kc.lastSent = Date.now();
     if(data && !kc.byId.has(data.id)){ kc.list.push(data); kc.byId.set(data.id, data); appendRow(data); const f=$('kcFeed'); f.scrollTop=f.scrollHeight; }
-    setReply(null);
+    setReply(null); resetMents();
     markSeen();
     return true;
   }catch(e){
@@ -17318,7 +18041,7 @@ async function adminRender(box){
      <div style="flex:1;min-width:0;"><div style="font-weight:800;font-size:15px;">KERRY TOPUP CHAT</div><div id="kcAdOnline" style="font-size:12px;opacity:.92;margin-top:2px;">…</div></div>
    </div>
    <button class="btn btn-green" id="kcAdOpen" style="width:100%;">👥 Louvri Kominote a</button>
-   <div style="font-size:11.5px;color:var(--muted);margin:6px 2px 0;">Ou wè l menm jan ak kliyan yo. Ou ekri kòm <b>Kerry Topup</b> ak badj verifye ✓.</div>
+   <div style="font-size:11.5px;color:var(--muted);margin:6px 2px 0;">Ou wè l menm jan ak kliyan yo. Ou ekri ak non reyèl ou ak badj verifye ✓.</div>
    <div style="font-weight:800;font-size:14px;margin:20px 0 8px;">⚠️ Mesaj ki rapòte</div>
    <div id="kcAdReports" style="display:flex;flex-direction:column;gap:8px;"><div style="color:var(--muted);font-size:13px;">Chajman...</div></div>`;
   $('kcAdOpen').onclick = openAsAdmin;
@@ -17411,7 +18134,7 @@ setTimeout(boot, 4000); setInterval(boot, 25000);
   setInterval(update, 400);
 })();
 
-window.kcCommunity = { kc, setTab, build, adminRender, openAsAdmin, switcher };
+window.kcCommunity = { kc, setTab, build, adminRender, openAsAdmin, switcher, onRemoteInsert };
 })();
 </script>
 <script>
